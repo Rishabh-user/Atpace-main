@@ -1,0 +1,167 @@
+<div class="box">
+  <div class="box-header with-border">
+    <h3 class="box-title">Program Announcement</h3>
+  </div>
+  <div class="box-body">
+    <form @submit.prevent="onProgramAnnouncement">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="form-group">
+            <label>Company</label>
+            <input type="text" class="form-control" value="" v-model="user_company_name" name="sidebarCompany" readOnly/>
+            {% comment %} <select
+              class="form-control select2"
+              name="company"
+              required
+              style="width: 100%"
+              ref="company"
+              @change="showJourneyList"
+            >
+              <option selected="selected">Select</option>
+              <option
+                v-bind:value="company.id"
+                v-for="company in company_list"
+                :key="company.id"
+              >
+                [[company.name]]
+              </option>
+            </select> {% endcomment %}
+          </div>
+
+          <div id="announcement_form" class="form-group">
+            <label>Journey</label>
+            <select
+              class="form-control select2"
+              name="journey"
+              required
+              style="width: 100%"
+              ref="journey"
+            >
+              <option selected="selected" value="">Select</option>
+              <option
+                v-bind:value="journey.id"
+                v-for="journey in journey_list"
+                :key="journey.id"
+              >
+                [[journey.name]]
+              </option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Topic(Max Char Limit 128)</label>
+            <input
+              name="topic"
+              type="text"
+              required
+              class="form-control"
+              v-model="title"
+              maxlength="128"
+            />
+          </div>
+          <div class="form-group">
+            <label>Summary(Max Char Limit 400)</label>
+            <textarea
+              name="summary"
+              class="form-control"
+              required
+              v-model="description"
+              maxlength="400"
+            ></textarea>
+          </div>
+          <div class="form-group">
+            <label>Attachment</label>
+            <input
+              name="attachment"
+              type="file"
+              class="form-control"
+              ref="attachment"
+              @change="attachmentUpload"
+            />
+          </div>
+
+          <div class="form-group">
+            <label>Please select checkbox: </label> <br />
+            <input
+              type="checkbox"
+              name="mentors"
+              v-model="mentor"
+              id="tomentor"
+            />
+            <label for="tomentor"> All Mentors </label><br />
+            <input
+              type="checkbox"
+              name="mentees"
+              v-model="mentees"
+              id="tomentees"
+            />
+            <label for="tomentees">All Mentees </label><br />
+            <input
+              type="checkbox"
+              name="program_team"
+              v-model="programTeam"
+              id="toprogram"
+            />
+            <label for="toprogram">Program Team Only </label><br />
+            <input
+              type="checkbox"
+              name="everyone"
+              v-model="everyone"
+              id="toeveryone"
+            />
+            <label for="toeveryone">Everyone </label>
+          </div>
+          <hr />
+          <p>
+            <strong>Note: </strong>If there is no
+            <i class="fa fa-check-square-o" aria-hidden="true"></i> selected,
+            then, The announcement will not be shared with anyone.
+          </p>
+          <!-- /.form-group -->
+          <button type="submit" class="btn btn-primary">Save changes</button>
+        </div>
+      </div>
+      <!-- /.row -->
+    </form>
+  </div>
+  <!-- /.box-body -->
+
+  <!-- /.box-footer-->
+</div>
+<!-- /.box -->
+<div class="box">
+  <div class="box-header">
+    <h3 class="box-title">Program Announcement List</h3>
+  </div>
+  <!-- /.box-header -->
+  <div class="box-body">
+    <table
+      id="program-announcement-table"
+      class="table table-bordered table-hover"
+    >
+      <thead>
+        <tr>
+          <th>SNo.</th>
+          <th>Company</th>
+          <th>Journey</th>
+          <th>Topic</th>
+          <th>Attachment</th>
+          <th>Announcement Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          v-for="(program, index) in program_announcement_list"
+          :key="program.id"
+        >
+          <td>[[index+1]]</td>
+          <td>[[program.company_name]]</td>
+          <td>[[program.journey_name]]</td>
+          <td>[[program.topic]]</td>
+          <td><img  v-if="program.attachment" :src="program.attachment" width="100px" height="100px" alt="" /></td>
+          <td class="capitalize">[[program.announce_date]]</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <!-- /.box-body -->
+</div>

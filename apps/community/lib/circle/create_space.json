@@ -1,0 +1,22 @@
+{
+    "success": true,
+    "message": "Space created.",
+    "space": {
+        "id": 179132,
+        "name": "APi Test",
+        "slug": "api-test",
+        "emoji": null,
+        "space_group_id": 53537,
+        "space_group_name": "AtPace Journeys",
+        "url": "https://community.growatpace.com/c/api-test",
+        "community_id": 22900,
+        "is_private": false,
+        "hide_post_settings": null,
+        "display_view": "posts",
+        "post_ids": [],
+        "is_post_disabled": null,
+        "hide_topic_settings": null,
+        "is_topic_disabled": null,
+        "topic_ids": []
+    }
+}

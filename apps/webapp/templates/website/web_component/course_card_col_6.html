@@ -1,0 +1,58 @@
+{% load static %}
+<div class="col-xxl-6 col-xl-6 col-lg-6 col-md-6">
+    <div class="course__item white-bg mb-30 fix">
+        <div class="course__thumb w-img p-relative fix">
+            <a href="{% url 'user:course_detail' course_id=journey.journey.pk %}">
+                <img src="{{MEDIA_URL}}{{journey.journey.image}}" alt="journey image" style="height:250px">
+            </a>
+            <div class="course__tag">
+                <a href="#">{{journey.journey.category}}</a>
+            </div>
+        </div>
+        <div class="course__content">
+            <div class="course__meta d-flex align-items-center justify-content-between">
+                {% if journey.content > 0 %}
+                <div class="course__lesson">
+                    <span><i class="far fa-book-alt"></i>  {{journey.content}} Lesson </span>
+                </div>
+                {% endif %}
+                <div class="course__rating">
+                    
+                </div>
+            </div>
+            <h3 class="course__title"><a
+                    href="{% url 'user:course_detail' course_id=journey.journey.pk %}">{{journey.journey.title}}</a></h3>
+            <div class="course__teacher d-flex align-items-center">
+                {% if journey.journey.company %}
+                <div class="course__teacher-thumb mr-15">
+                    <i class="fal fa-users"></i>
+                </div>
+                <h6><a href="#">{{journey.journey.company.name}}</a></h6>
+                {% else %}
+                <div class="course__teacher-thumb mr-15">
+                    <img src="{{journey.journey.created_by.avatar}}" alt="">
+                </div>
+                <h6><a href="#">{{journey.journey.created_by.first_name}}
+                    {{journey.journey.created_by.last_name}}</a></h6>
+                {% endif %}
+            </div>
+        </div>
+        <div class="course__more d-flex justify-content-between align-items-center">
+            <div class="course__status">
+                {% if journey.journey.is_paid %}
+                    <span>&#36;{{journey.journey.amount}}</span> 
+                {% else %}
+                    <span>Free</span> 
+                {% endif %}
+                
+            </div>
+            <div class="course__btn">
+                <a href="{% url 'user:course_detail' course_id=journey.journey.pk %}" class="link-btn">
+                    Know Details
+                    <i class="far fa-arrow-right"></i>
+                    <i class="far fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,43 @@
+{% extends 'base.html' %} {% load static %} {% block title %} Space {% endblock %}
+ {% load crispy_forms_tags %} {% block content %}
+ {% block css %}
+<link rel="stylesheet" href="{% static 'bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css' %}">
+{% endblock css %} 
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <h1>
+        Spaces
+      </h1>
+      <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Community</a></li>
+        {% if request.path == '/atpace-community/create-space/' %}
+        <li><a href="#">Create Space</a></li>
+        {% else %}
+        <li><a href="#">Edit Space</a></li>
+        {% endif %}
+
+      </ol>
+    </section>
+  
+    <!-- Main content -->
+    <section class="content">
+  
+      <!-- Default box -->
+      <div class="box">
+        <div class="box-header with-border">
+          {% if request.path == '/atpace-community/create-space/' %}
+          <h3 class="box-title">Create Space</h3>
+          {% else %}
+          <h3 class="box-title">Edit Space</h3>
+          {% endif %}
+        </div>
+        <div class="box-body">
+          {% crispy form %}
+  
+        </div>
+      </div>
+    </section>
+    <!-- /.content -->
+  </div>
+  {% endblock content %}

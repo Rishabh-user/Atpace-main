@@ -1,0 +1,84 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>rooms</title>
+    </head>
+    <body>
+        <div>
+            <h1 style="text-align: center;">{{request.user.username}}</h1>
+            <hr>
+        </div>
+        <div style="text-align: right;">
+            <a href="{% url 'roomss' %}" class="btn">All Rooms</a>
+            
+            <a href="{% url 'create-room' %}" class="btn">Create New Room</a>
+            
+            <a style="text-align: right;" href="{% url 'user:logout' %}" class="btn">Logout</a>
+        </div>
+
+        {% comment %} <table> {% endcomment %}
+            {% comment %} <tr> {% endcomment %}
+                {% comment %} <th>Room ID</th> {% endcomment %}
+                {% comment %} <th>Room Name</th> {% endcomment %}
+                {% comment %} <th>Room Privacy</th> {% endcomment %}
+                {% comment %} <th>Room Created</th> {% endcomment %}
+                {% comment %} <th>Room URL</th> {% endcomment %}
+            {% comment %} </tr> {% endcomment %}
+            {% comment %} {% for data in data.data %} {% endcomment %}
+            {% comment %} <tr> {% endcomment %}
+                {% comment %} <td>{{ data.id }}</td> {% endcomment %}
+                {% comment %} <td>{{ data.name }}</td> {% endcomment %}
+                {% comment %} <td>{{ data.privacy }}</td> {% endcomment %}
+                {% comment %} <td>{{ data.api_created }}</td> {% endcomment %}
+                {% comment %} <td><a href="{% url 'index' metting_id=data.id %}"> {{ data.url }}</a></td> {% endcomment %}
+            {% comment %} </tr> {% endcomment %}
+            {% comment %} {% endfor %} {% endcomment %}
+        {% comment %} </table> {% endcomment %}
+        <table style="justify-content: center;">    
+            <h3>User Created Rooms</h3>
+            <hr>
+            <tr>
+                <th>Room ID</th>
+                <th>Room Name</th>
+                <th>Room Privacy</th>
+                <th>Room Created</th>
+                <th>Room URL</th>
+            </tr>
+            {% for data  in Uroom %}
+            <tr>
+                <td>{{ data.id }}</td>
+                <td>{{ data.name }}</td>
+                <td>{{ data.privacy }}</td>
+                <td>{{ data.api_created }}</td>
+                <td><a href="{% url 'index' metting_id=data.id %}"> {{ data.url }}</a></td>
+            </tr>
+            {% endfor %}
+        </table>
+        <br>
+        <table style="justify-content: center;">    
+            <h3>User Alloted Rooms</h3>
+            <hr>
+            <tr>
+                <th>Room ID</th>
+                <th>Room Name</th>
+                <th>Room Privacy</th>
+                <th>Room Created</th>
+                <th>Room URL</th>
+                <th>Alloted User</th>
+            </tr>
+            {% for data  in Proom %}
+            <tr>
+                <td>{{ data.id }}</td>
+                <td>{{ data.name }}</td>
+                <td>{{ data.privacy }}</td>
+                <td>{{ data.api_created }}</td>
+                <td><a href="{% url 'index' metting_id=data.id %}"> {{ data.url }}</a></td>
+                <td>{{ data.user }}</td>
+            </tr>
+            {% endfor %}
+
+          </table>
+
+    </body>
+</html>

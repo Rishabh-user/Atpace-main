@@ -1,0 +1,62 @@
+{% comment %} <div class="box">
+  <div class="box-header">
+  <h3 class="box-title">Filter by</h3>
+  </div>
+  <div class="box-body">
+    <form @submit.prevent="showMatchingReport">
+      <div class="form-group">
+        <label class="col-md-12 control-label">Company</label>
+        <select class="form-control" ref="company" required name="company" style="width: 100%;">
+            <option selected="selected" value="">Select</option>
+            <option
+            v-bind:value="company.id"
+            v-for="company in company_list"
+            :key="company.id"
+            >
+            [[company.name]] 
+            </option>
+        </select>
+      </div>
+      <div class="form-group">
+        <button type="submit" class="btn btn-primary pull-right">Filter</button>
+      </div>
+    </form>
+  </div>
+</div> {% endcomment %}
+{% comment %} <div class="box" v-if="mentor_matching_report"> {% endcomment %}
+  <div class="box">
+    <div class="box-header">
+        <h3 class="box-title">Mentor Matching Report</h3>
+    </div>
+    <!-- /.box-header -->
+    <div class="box-body">
+        <table id="matching-report-table" class="table table-bordered table-hover">
+        <thead>
+            <tr>
+            <th>SNO.</th>
+            <th>Mentor</th>
+            <th>Email</th>
+            <th>Assigned Learners Count</th>
+            <th>Max Learner Count</th>
+            <th>Assigned Learner</th>
+            <th>Remaining Learner</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr v-for="(mentor, index) in mentor_matching_report" :key="index">
+            <th>[[index+1]]</th>
+            <td>[[mentor.mentor_name]]</td>
+            <td>[[mentor.mentor_email]]</td>
+            <td>[[mentor.assigned_learner]]</td>
+            <td>[[mentor.max_learner]]</td>
+            <td>
+              <div v-for="(learner, index) in mentor.learner_list" :key="index">
+              <kbd>[[learner.learner_name]]</kbd>
+              </div>
+            </td>
+            <td>[[mentor.remaining_learner]]</td>
+        </tr>
+        </table>
+    </div>
+<!-- /.box-body -->
+</div>

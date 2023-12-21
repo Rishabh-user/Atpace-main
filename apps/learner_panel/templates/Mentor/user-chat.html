@@ -1,0 +1,97 @@
+<div class="row">
+    <div class="col-md-3">
+        <div class="box box-warning direct-chat direct-chat-warning" style="min-height: 70vh; margin-top:10px;">
+        <div class="box-header with-border">
+            <h3 class="box-title"> Chat List</h3>
+            </div>
+            <div class="box-body" style="height:60vh; margin:10px; overflow: scroll">
+            <ul class="products-list product-list-in-box" >
+                    <li class="item" v-for="(chat, index) in chat_list" :key="index">
+                    <div class="product-img">
+                        <img v-if="chat.avatar" :src="chat.avatar" alt="chat avatar" class="img-circle" @click="showChatMsg(chat.room_name)" style="cursor: pointer;">
+                        <img v-else src='/static/dist/img/avatar.png' alt="avatar" class="img-circle" @click="showChatMsg(chat.room_name)" style="cursor: pointer;">
+                    </div>
+                    <div class="product-info">
+                        <a id="room-name-submit" class="product-title" @click="showChatMsg(chat.room_name)" style="cursor: pointer;">[[chat.name]]</a>
+                        <br>
+                        <a v-if="chat.unread_msg > 0">[[chat.unread_msg]] unread message</a>
+                    </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-9" v-if="chat_msg">
+        <!-- DIRECT CHAT -->
+        <div class="box box-warning direct-chat direct-chat-warning" style="min-height: 70vh; margin-top:10px;">
+            <div class="box-header with-border">
+                <h3 class="box-title" v-if="chat_msg.room_details.room_type == 'OneToOne'">[[chat_msg.receiver_details.full_name]]</h3>
+                <h3 class="box-title" v-else>[[chat_msg.receiver_details.group_name]]</h3>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body" style="height: 50vh;">
+            <!-- Conversations are loaded here -->
+            <div class="direct-chat-messages" style="height: 70vh; overflow: scroll" id="chat-msg-box" >
+                        <!-- Message to the right -->
+                        <div class="direct-chat-msg right" v-for="(chat, index) in chat_msg.data" :key="index" v-if="chat_msg.sender_details.id == chat.sender_id">
+                        <div class="direct-chat-info clearfix">
+                            <span class="direct-chat-name pull-right">[[chat.from_user]]</span>
+                            <span class="direct-chat-timestamp pull-left">[[chat.created_at]]</span>
+                        </div>
+                        <!-- /.direct-chat-info -->
+                        <img class="direct-chat-img" v-if="chat.sender_avatar" :src="chat.sender_avatar" alt="sender avatar">
+                        <img class="direct-chat-img" v-else this.src='/static/dist/img/avatar.png' alt="avatar">
+                        <!-- /.direct-chat-img -->
+                        <div class="direct-chat-text">
+                            [[chat.message]]
+                        </div>
+                        <!-- /.direct-chat-text -->
+                        </div>
+                        <!-- /.direct-chat-msg -->
+
+                        <!-- Message. Default to the left -->
+                        <div class="direct-chat-msg" v-else>
+                        <div class="direct-chat-info clearfix">
+                            <span class="direct-chat-name pull-left" v-if="chat_msg.room_details.room_type == 'OneToOne'">[[chat.from_user]]</span>
+                            <span class="direct-chat-name pull-left" v-else>[[chat.from_user]]</span>
+                            <span class="direct-chat-timestamp pull-right">[[chat.created_at]]</span>
+                        </div>
+                        <!-- /.direct-chat-info -->
+                        <span v-if="chat_msg.room_details.room_type == 'OneToOne'">
+                            <img class="direct-chat-img" v-if="chat.receiver_avatar" :src="chat.receiver_avatar" alt="receiver avatar">
+                            <img class="direct-chat-img" v-else this.src='/static/dist/img/avatar.png' alt="avatar">
+                        </span>
+                        <span v-else>
+                            <img class="direct-chat-img" v-if="chat.sender_avatar" :src="chat.sender_avatar" alt="sender avatar">
+                            <img class="direct-chat-img" v-else this.src='/static/dist/img/avatar.png' alt="avatar">
+                        </span>
+                        <!-- /.direct-chat-img -->
+                        <div class="direct-chat-text">
+                            [[chat.message]]
+                        </div>
+                        <!-- /.direct-chat-text -->
+                        </div>
+                        <!-- /.direct-chat-msg -->
+
+                <div id="chat-box">
+
+                </div>
+            </div>
+            <!--/.direct-chat-messages-->
+            </div>
+            <!-- /.box-body -->
+            <div class="box-footer">
+            <!-- <form action="#" method="post"> -->
+                <div class="input-group">
+                <input id="chat-message-input" type="text" name="message" placeholder="Type Message ..." class="form-control" v-model="msg" @keyup.enter="sendMessage()">
+                <span class="input-group-btn">
+                        <button id="chat-message-submit" type="button" class="btn btn-warning btn-flat" style="margin-top:0px;" @click="sendMessage()">Send</button>
+                    </span>
+                </div>
+            <!-- </form> -->
+            </div>
+            <!-- /.box-footer-->
+        </div>
+        <!--/.direct-chat -->
+        </div>
+</div>

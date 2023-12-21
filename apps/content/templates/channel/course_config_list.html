@@ -1,0 +1,146 @@
+{% extends 'base.html' %} {% load static %}
+{% block title %} Journey Pathway List {% endblock %} 
+<!-- DataTables -->
+{% block css %}
+<link rel="stylesheet" href="{% static 'bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css' %}">
+{% endblock css %} 
+{% block content %}
+
+
+<div class="content-wrapper">
+  <section class="content-header">
+    <h1>
+      Journey Pathway List
+    </h1>
+    <ol class="breadcrumb">
+      <li><a href="#"><i class="fa fa-dashboard"></i>SKill Hierarchy</a></li>
+      <li><a href="#">Journey Pathway</a></li>
+      <li class="active">List</li>
+    </ol>
+  </section>
+
+  <section class="content">
+    <div class="row">
+       <div class="col-xs-12">
+           <div class="box">
+             <div class="box-header">
+               <h3 class="box-title">Journey Pathway List</h3>
+               <a href="{%url 'content:config_course' %}"><button class="btn btn-primary pull-right">Create Journey Pathway</button></a>
+
+             </div>
+             <!-- /.box-header -->
+             <div class="box-body">
+               <table id="example2" class="table table-bordered table-hover">
+                 <thead>
+                 <tr>
+                  <tr>
+                    <th>Role</th>
+                    <th>Journey</th>
+                    <th>Journey Pre Assessment</th>
+                    <th>Skill</th>
+                    <th>Skill Pre Assessment</th>
+                    <th>Action</th>
+                  </tr>
+                   
+                 </tr>
+                 </thead>
+                 <tbody>
+                   {% for config_list in config_lists %}
+                   <tr id="{{config_list.id}}">
+                    <td>{{config_list.role}}</td>
+                    <td>{{config_list.channel}}</td>
+                    <td>{% if config_list.journey_pre_assessment == None %} - {% else %} {{config_list.journey_pre_assessment}} {% endif %}</td>
+                    <td>{{config_list.sub_channel}}</td>
+                    
+                    <td>{{config_list.pre_assessment}}</td>
+                   
+                    <td>
+                      <div class="dropdown">
+                        <button class="btn bg-purple dropdown-toggle btn-select-option" type="button" data-toggle="dropdown" aria-expanded="true">Select an option                                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu options-dropdown">
+                         
+                            <li>
+                                <a href="{% url 'content:config_course_edit' pk=config_list.pk %}"><i class="fa fa-edit option-icon"></i>Edit</a>
+                            </li>
+                            {% if request.session.user_type == "Admin" %}
+                            <li>
+                                <a href="javascript:void(0)"  class="delete_skill_config"><i class="fa fa-trash option-icon"></i>Delete</a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                    </td>
+                   </tr>
+                   {% endfor %}
+                 </tfoot>
+               </table>
+             </div>
+             <!-- /.box-body -->
+           </div>
+           <!-- /.box -->
+ 
+          
+         </div>
+       <!-- /.col -->
+    </div>
+    <!-- /.row -->
+ </section>
+ 
+</div>
+{% endblock content %} 
+{% block js %}
+<script src="{% static 'bower_components/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
+<script>
+
+$(function () {
+  $(".delete_skill_config").click(function(){
+    var id = $(this).parents("tr").attr("id");
+    bootbox.confirm({
+    message: "Are you sure to remove this record ?",
+    buttons: {
+        confirm: {
+            label: 'Yes',
+            className: 'btn-success'
+        },
+        cancel: {
+            label: 'No',
+            className: 'btn-danger'
+        }
+    },
+    callback: function (result) {
+        if(result == true){
+          $.ajax({
+               url:  "{% url 'content:delete_skill_config' %}",
+               type: 'post',
+               data: {pk: id, csrfmiddlewaretoken : "{{csrf_token}}" },
+               error: function() {
+                bootbox.alert('Something is wrong');
+               },
+               success: function(data) {
+                    $("#"+id).remove();
+                    bootbox.alert("Record removed successfully");  
+               }
+            });
+        }
+    }
+});
+});
+});
+
+$(function () {
+ 
+  $('#example2').DataTable({
+    "dom": '<"table-pull-left"f><"table-pull-right"l>tip',
+    'paging'      : true,
+    'lengthChange': true,
+    'searching'   : true,
+    'ordering'    : true,
+    'info'        : true,
+    'autoWidth'   : true,
+    'scrollX'     : true
+  })
+})
+</script>
+{% endblock js %}

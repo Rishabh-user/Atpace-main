@@ -1,0 +1,47 @@
+{% extends 'base.html' %} {% block title %}Create User {% endblock %}
+ {% load crispy_forms_tags %} {% block content %}
+ <style>
+   .modal-footer{
+    display: grid ;
+    justify-content: center;
+  }
+  .modal-dialog{
+    margin-top: 25vh;
+  }
+ </style>
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      
+    </section>
+  
+    <!-- Main content -->
+    <div class="bootbox modal fade in" tabindex="-1" role="dialog" aria-hidden="true" style="display: block;">
+      <div class="modal-dialog">
+         <div class="modal-content">
+            <div class="modal-body">
+               <div class="bootbox-body">
+                  <div class="text-center pt-30 pb-20">
+                     <img src="/static/images/logo/logo.png" width="100">
+
+                     <h3 style="margin-top: 29px; margin-bottom: 0px;">All done</h3>
+                     <p style="padding:20px 0px;">Your Registration is successful. </p>
+                     
+                      <p>
+                           Please ensure you check your email for details and updates from {{program_team_email}} </br>
+                           
+                           At any time you may reach out to {{program_team}}. </br>
+                           
+                           To log out, please go to your profile on the top right, or just close your browser.
+                           </p>
+                     
+                  </div>                  
+               </div>
+            </div>
+            <div class="modal-footer"><a href="{% url 'user:user-dashboard' %}"><button type="button" class="btn btn-primary pull-center bootbox-accept">Ok</button></a></div>
+         </div>
+      </div>
+   </div>    <!-- /.content -->
+  </div>
+  {% endblock content %}
+  

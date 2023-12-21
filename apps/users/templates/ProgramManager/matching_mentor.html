@@ -1,0 +1,174 @@
+{% extends 'base.html' %} {% load static %} 
+ {% load tags %} 
+ {% block title %} {% endblock %}
+ {% block content %}
+ {% block css %}
+<link rel="stylesheet" href="{% static 'bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css' %}">
+{% endblock css %} 
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <h1>
+        Matching 
+      </h1>
+      <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Journey</a></li>
+        <li><a href="#"></a></li>
+
+      </ol>
+    </section>
+  
+    <!-- Main content -->
+    <section class="content">
+  
+      <!-- Default box -->
+      <div class="box">
+        <div class="box-header with-border">
+          <h3 class="box-title">Matching Mentor</h3>
+
+        </div>
+        <div class="box-body">
+          <form method="post" >
+            {% csrf_token %}
+            <div class="form-group col-md-12">
+                <label for="mentor_id">Select Mentor</label>
+                <select id="mentor_id" class="form-control">
+                    <option selected>Select Mentor</option>
+                    {% for user in user_list %}
+                    <option value="{{user.pk}}">{{user}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            {% for question in request.user|mentor_questions %}
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="question_1">Question {{forloop.counter}}</label>
+                    <select id="question_1" class="form-control">
+                        <option selected>Choose...</option>
+                        <option value="{{question.question_id}}">{{question.question}}</option>
+                    </select>
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="ans_1">Answer</label>
+                    <input name="ans_1" class="form-control" type="text" value="{{question.response}}">
+                </div>
+            </div>
+            {% endfor %}
+            {% comment %} <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="question_2">Question 2</label>
+                    <select id="question_2" class="form-control">
+                    <option selected>Choose...</option>
+                    <option>...</option>
+                    </select>
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="ans_1">Answer</label>
+                    <input name="ans_1" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="question_3">Question 3</label>
+                    <select id="question_3" class="form-control">
+                    <option selected>Choose...</option>
+                    <option>...</option>
+                    </select>
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="ans_1">Answer</label>
+                    <input name="ans_1" class="form-control" type="text">
+                </div>
+            </div> {% endcomment %}
+
+            <button type="submit" id="sumbitContent" class="btn btn-primary">Match</button>
+        </form>
+        </div>
+      </div>
+      <!-- /.box -->
+      <div class="box">
+        <div class="box-header">
+          <h3 class="box-title">Learner List</h3>
+           
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body">
+         
+   
+         <table id="example2" class="table table-bordered table-hover">
+          <thead>
+           <tr>
+             <th>SNO.</th>
+             <th>Full Name</th>
+             <th>Email</th>
+         </tr>
+          </thead>
+          <tbody>
+           {% for user in Learners %}
+           
+             <tr>
+               <td>{{forloop.counter}}</td>
+               <td>{{user.first_name}} {{user.last_name}}</td>
+               <td>{{user.email}}</td>
+             </tr>
+             {% endfor %}
+          </tfoot>
+        </table>
+        </div>
+        <!-- /.box-body -->
+      </div>
+  
+    </section>
+    <!-- /.content -->
+  </div>
+  {% endblock content %}
+  {% block js %}
+<script src="{% static 'bower_components/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
+<script>
+
+    
+$(document).on('change', '#mentor_id', function () {
+      var value = $(this).val();
+      console.log(value);
+      $(this).find('option[value="' + value + '"]').attr("selected", "selected");
+      console.log(value,"value");
+  });
+$(function () {
+ 
+ 
+  $('#example2').DataTable({
+    "dom": '<"table-pull-left"f><"table-pull-right"l>tip',
+    'paging'      : true,
+    'lengthChange': true,
+    'searching'   : true,
+    'ordering'    : true,
+    'info'        : true,
+    'autoWidth'   : true,
+    'scrollX'     : true
+  })
+})
+function MentorAssessmentQuestion(){
+  var mentor_id = document.getElementById("mentor_id");
+  console.log(mentor_id);
+    $.ajax({ 
+            type: 'POST',
+            url: '{% url "user:assessment_question" %}', 
+            contentType: false,
+            cache: false,
+            processData: false,
+            data: form_data ,
+                success: function(data){
+                  bootbox.alert(data, function(){
+                  location.reload();
+                  });
+
+                },
+                error: function(){
+                    console.log('fail')
+                }
+        });  
+
+}
+</script>
+{% endblock js %}

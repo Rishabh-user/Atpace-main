@@ -1,0 +1,126 @@
+<!-- Default box -->
+<div class="box">
+  <div class="box-header with-border">
+    <h3 class="box-title">Matching Mentor</h3>
+
+  </div>
+  <div class="box-body">
+    <form @submit.prevent="onAutoMatch">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="form-group">
+            <label>Company</label>
+            <input type="text" class="form-control" value="" v-model="user_company_name" name="sidebarCompany"
+              readOnly />
+            {% comment %} <select class="form-control" ref="company" required name="company" style="width: 100%;"
+              @change="showJourneyList">
+              <option selected="selected" value="">Select</option>
+              <option v-bind:value="company.id" v-for="company in company_list" :key="company.id">
+                [[company.name]]
+              </option>
+            </select> {% endcomment %}
+          </div>
+          <div class="form-group">
+            <label>All Journey</label>
+            <select class="form-control" ref="journey" required name="journey" style="width: 100%;"
+              @change="showPoolList">
+              <option selected="selected" value="">Select</option>
+              <option v-bind:value="journey.id" v-for="journey in journey_list" :key="journey.id" v-if="journey.type!='SelfPaced'">
+                [[journey.name]]
+              </option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Pools</label>
+            <select class="form-control" ref="pool" required name="pool" style="width: 100%;">
+              <option selected="selected" value="">Select</option>
+              <option v-bind:value="pool.id" v-for="pool in pool_list" :key="pool.id">
+                [[pool.name]]
+              </option>
+            </select>
+          </div>
+
+          <!-- /.form-group -->
+          <button type="submit" id="sumbitContent" class="btn btn-primary">Run</button>
+          <button type="button" id="mentorReport" class="btn btn-primary" @click="downloadUserReport('Mentor')">Mentor
+            Report</button>
+          <button type="button" id="menteeReport" class="btn btn-primary" @click="downloadUserReport('Learner')">Mentee
+            Report</button>
+        </div>
+
+
+      </div>
+      <!-- /.row -->
+    </form>
+  </div>
+</div>
+<!-- /.box -->
+<center>
+  <div class="loader" v-if="loading"></div>
+</center>
+<div class="box" v-if="matching_list">
+  <div class="box-header">
+    <h3 class="box-title">Level List</h3>
+
+  </div>
+  <!-- /.box-header -->
+  <div class="box-body">
+    <table id="auto-match-table" class="table table-bordered table-hover">
+      <thead>
+        <tr>
+          <th>SNO.</th>
+          <th>Full Name</th>
+          <th>Email</th>
+          <th>Matching Result</th>
+          {% comment %} <th>Criteria 2</th>
+          <th>Criteria 3</th> {% endcomment %}
+          <th>Admin Assign</th>
+          <th>Assign Date</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="(user, index) in matching_list" :key="index">
+          <td>[[index+1]]</td>
+          <td>[[user.name]]</td>
+          <td>[[user.email]]</td>
+
+          <td v-if="user.poll_mentor_list.length != 0">
+            <select class="form-control" :ref="'mentor1'+index">
+              <option value="">Select </option>
+              <option v-bind:value="mentor.id" v-for="(mentor, index) in user.poll_mentor_list" :key="index"
+                :selected="mentor.id == mentor.already_checked">
+                [[mentor.name]]
+              </option>
+            </select>
+          </td>
+          <td v-else>No Match Found</td>
+
+          <td>
+            <select class="form-control" :ref="'mentor4'+index">
+              <option value="">Select </option>
+              <option v-bind:value="mentor.id" v-for="(mentor, index) in user.manual_assign_list" :key="index">
+                [[mentor.name]]
+              </option>
+            </select>
+          </td>
+          <td>
+            <div v-for="(mentor, index) in user.poll_mentor_list" :key="index">
+              [[mentor.assign_date]]
+            </div>
+          </td>
+          <td>
+            <button type="submit" class="btn btn-primary" @click="onAssignMentor(user.user, index)">Assign</button>
+            <form method="post" action="{% url 'user:mentor_match_preview' %}" target="_blank">
+              {% csrf_token %}
+              <input type="hidden" id="user" name="user" :value="JSON.stringify(user)">
+              <button class="btn btn-default">Preview</button>
+            </form>
+          </td>
+        </tr>
+    </table>
+  </div>
+
+
+  <!-- /.box-body -->
+</div>

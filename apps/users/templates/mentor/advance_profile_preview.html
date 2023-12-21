@@ -1,0 +1,233 @@
+{% extends 'base.html' %} {% load static %}
+{% block content %}
+<div class="content-wrapper">
+  <!-- Content Header (Page header) -->
+  <section class="content-header">
+    <h1>
+      Advance Profile
+    </h1>
+    <ol class="breadcrumb">
+      <li>
+        <a href="#"><i class="fa fa-dashboard"></i> Profile</a>
+      </li>
+      <li class="active">Advance profile</li>
+    </ol>
+  </section>
+
+  <!-- Main content -->
+  <section class="content" id="vue-app">
+    {% include 'component/error_message.html' %}
+    <!-- Default box -->
+    <div class="box">
+      <div class="box-header with-border">
+        <h3 class="box-title">Advance Profile</h3> 
+      </div>
+      <div class="box-body">
+        <div class="row">
+            <div class="col-md-6 col-12">
+                <h4>Mentoring Types</h4>
+                <p v-for="(type, index) in advance_profile.mentoring_types" 
+                    :key="index">
+                    [[type.name]] 
+                </p>
+            </div>
+            <div class="col-md-6 col-12">
+                <h4>Target Audience</h4>
+                <p v-for="(audience, index) in advance_profile.target_audience" 
+                    :key="index">
+                    [[audience.name]] 
+                </p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12 col-12">
+                <h4>Mentoring Style</h4>
+                <p>[[advance_profile.mentoring_style]]</p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6 col-12">
+                <h4>Contact Preferences</h4>
+                <p v-for="(preference, index) in advance_profile.contact_preferences" 
+                    :key="index">
+                    [[preference]]
+                </p>
+            </div>
+            <div class="col-md-6 col-12">
+                <h4>Spoken Language</h4>
+                <p v-for="(languages, index) in advance_profile.languages" 
+                    :key="index">
+                    [[languages]]
+                </p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6 col-12">
+                <h4>Total Experience</h4>
+                <p>[[advance_profile.total_experience]]</p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6 col-12">
+                <h4>Linkedln Profile</h4>
+                <p>[[advance_profile.linkedin_profile]]</p>
+            </div>
+            <div class="col-md-6 col-12">
+                <h4>Twitter Profile</h4>
+                <p>[[advance_profile.twitter_profile]]</p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6 col-12">
+                <h4>Instagram Profile</h4>
+                <p>[[advance_profile.instagram_profile]]</p>
+            </div>
+            <div class="col-md-6 col-12">
+                <h4>Facebook Profile</h4>
+                <p>[[advance_profile.facebook_profile]]</p>
+            </div>
+        </div>
+     </div>
+      <!-- /.box-footer-->
+    </div>
+    <!-- /.box -->
+    <div class="box">
+      <div class="box-header with-border">
+        <h3 class="box-title">Work Experience</h3> 
+      </div>
+      <div class="box-body">
+        <div class="row" v-for="(experience, index) in advance_profile.work_experience" :key="index" style="border-bottom:1px solid #bab8b6; margin:5px">
+            <div class="col-md-1">
+                <img src="{% static 'images/company1.jpg' %}" width="70px" height="70px">
+            </div>
+            <div class="col-md-11">
+                <h4>[[experience.designation]]</h4>
+                <h5>[[experience.company]] - [[experience.employment_type]]</h5>
+                <p>[[experience.location]]</p>
+                <p v-if="experience.currently_working == false">[[experience.start_date]] - [[experience.end_date]]</p>
+                <p v-else>[[experience.start_date]] - present</p>
+                <p>[[experience.description]]</p>
+            </div>
+        </div>
+      </div>
+      <!-- /.box-footer-->
+    </div>
+    <!-- /.box -->
+    <div class="box">
+      <div class="box-header with-border">
+        <h3 class="box-title">Certification</h3> 
+      </div>
+      <div class="box-body">
+        <div class="row" v-for="(certi, index) in advance_profile.certificates" :key="index" style="border-bottom:1px solid #bab8b6; margin:5px">
+            <div class="col-md-1">
+                <a :href="certi.certificate" target="_blank"><img :src="certi.certificate" width="70px" height="70px" style="margin-top:10px;"/></a>
+            </div>
+            <div class="col-md-11">
+                <h4>[[certi.title]]</h4>
+                <p>[[certi.certification_level]] level</p>
+                <p v-if="certi.is_expiration_date == true">[[certi.generated_date]] - [[certi.valid_upto]]</p>
+                <p v-else>[[certi.generated_date]]</p>
+                <p>[[certi.description]]</p>
+            </div>
+        </div>
+      </div>
+      <!-- /.box-footer-->
+    </div>
+    <!-- /.box -->
+    
+    
+  </section>
+  <!-- /.content -->
+  {{ request.user.id|json_script:"user_id" }}
+  {{request.session.token|json_script:"token"}}
+  {{request.session.company_id|json_script:"company_id"}}
+  {{request.session.company_name|json_script:"company_name"}}
+</div>
+{% endblock content %}
+{% block js %} 
+    <script type="text/javascript">
+    let app = new Vue({
+        el: "#vue-app",
+        delimiters: ['[[', ']]'],
+        data() {
+        return {
+            token:JSON.parse(document.getElementById('token').textContent),
+            auth:"",
+            base_url:window.location.origin,
+            user_id: JSON.parse(document.getElementById('user_id').textContent),
+            user_company_name: JSON.parse(document.getElementById('company_name').textContent),
+            user_company_id: JSON.parse(document.getElementById('company_id').textContent),
+            advance_profile: "",
+            mentoring_style:"",
+            lagnuages:"",
+            total_experience:"",
+            linkedln:"",
+            twitter:"",
+            instagram:"",
+            facebook:"",
+            mentoring_types_list:[],
+            target_audience_list:[],
+            contact_preferences_list:[],
+            mentoring_types_data:[],
+            target_audience_data:[],
+            contact_preferences_data:[],
+            contact_private:"",
+            profile_private:"",
+            publish_to_marketplace:"",
+            languages_list:[],
+            role:"",
+            company:"",
+            location:"",
+            start_date:"",
+            end_date:"",
+            work_description:"",
+            generated_date:"",
+            expiration_date:"",
+            title:"",
+            image:"",
+            com_name:""
+        };
+        },
+        mounted(){
+            this.showAdvanceProfile();
+        },
+        methods: {
+            axiosGetRequest: function(url){
+            this.auth = "Token "+this.token;
+            var config = {
+            method: "get",
+            url: url,
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': this.auth,
+            },
+            };
+            return axios(config)
+            },
+            axiosPostRequest: function(url, data){
+                this.auth = "Token "+this.token;
+                var config = {
+                method: "post",
+                url: url,
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                    "Accept": "application/json",
+                    'Authorization': this.auth,
+                },
+                data:data
+                };
+                return axios(config)
+            },
+            
+            async showAdvanceProfile(){
+                var url = window.location.href
+                var user_id = url.split("/")[5]
+                var url =  this.base_url+"/mentor/mentor-advance-profile/"+user_id;
+                response = await this.axiosGetRequest(url);
+                console.log("Advance profile preview", response.data)
+                this.advance_profile = response.data.data
+            },
+        }
+    });
+    </script>
+{% endblock js %} 

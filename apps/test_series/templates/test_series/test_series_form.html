@@ -1,0 +1,360 @@
+{% extends 'base_with_empty_sidebar.html' %}
+{% load static %} {% load tags %}
+{% block css %} 
+<link
+      rel="stylesheet"
+      href="{% static 'css/test_questions/test_form.css' %}"
+    />
+<style>
+.green-text {
+  white-space: pre;
+  font-weight: bolder;
+  font-size: 15px;
+  color: rgb(7, 231, 41);
+}
+.normal-text {
+  white-space: pre;
+  /* Define your default text color here */
+  font-weight: bolder;
+  font-size: 15px;
+  color: black;
+}
+.your-response{
+  font-weight: bold;
+  font-size: 15px !important;
+}
+.correct-answer{
+  font-style: 15px;
+  font-weight: bolder;
+}
+.question{
+  font-weight: bold;
+  font-style: 18px !important; 
+}
+</style>
+{% endblock %}
+  {% block content %}
+      <!-- Content Wrapper. Contains page content -->
+      <div class="content-wrapper" id="vue-app">
+        <div v-show="assessment_form">
+          <section class="content-header">
+            <h1 class="feedback-header">Assessment </h1>
+            {% if questions_list.length > 0 %}
+            <div class="ques-progress-bar">
+              <span>[[ques_no-1]]</span>/
+              <span>[[questions_list.length]]</span>
+            </div>
+            {% endif %}
+          </section>
+
+          <section class="content" style="margin:0px; max-width:1500px;">
+          <div class="row">
+            <div class="col-md-6 col-12 col-sm-12">
+
+              <div class="ques-img">
+                <img v-if="question.image" :src="question.image"/>
+                <img v-else src="{{image}}"/>
+              </div>
+            </div>
+            <div class="col-md-6 col-12 col-sm-12 question-box">
+              <div style="margin-top:100px" v-if="questions_list.length == 0">
+                <h4>We are adding questions in this assessment. Meanwhile you can take other assessment and go through next content.</h4>
+                <button class="btn test-btn pull-right" type="button" @click="redirectJourney">Go Back</button>
+              </div>
+              <div class="" style="margin:auto">
+                <form method="post">
+                  {% csrf_token %}
+                  <input type="hidden" name="question_id" :value="question.id" id="ques_id">
+                  <input type="hidden" name="question_type" :value="question.type" id="ques_type">  
+                  <input type="hidden" name="is_required" :value="question.is_required" id="is_required">  
+                  <div class="row content_data" :data-id="question.id" v-if="question.type == 'DropDown'">
+                    {% include 'test_ques/dropdown.html' %} 
+                  </div>
+                  <div class="row content_data" :data-id="question.id" v-if="question.type == 'ShortAnswer'">
+                    {% include 'test_ques/short_ans.html' %} 
+                  </div>
+                  <div class="row content_data" :data-id="question.id" v-if="question.type == 'MultiChoice'">
+                    {% include 'test_ques/multiChoice.html' %} 
+                  </div>
+                  <div class="row content_data" :data-id="question.id" v-if="question.type == 'Checkbox'">
+                    {% include 'test_ques/checkbox.html' %} 
+                  </div>
+                  <button class="btn test-btn" @click="getQues(ques_no)" type="button" v-if="has_next">Next</button>
+                  <button class="btn test-btn" type="button" v-if="has_next == false && questions_list.length > 0" @click="submitAssessment()">Submit</button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+        <div v-show="assessment_preview">
+          <section class="content-header">
+            <h1 class="feedback-header">Assessment</h1>
+          </section>
+
+          <section class="content">
+            <div class="box" style="padding:10px; border:none">
+              <div class="box-header with-border">
+                <h3 class="box-title">Assessment Response</h3>
+              </div>
+              <div class="box-body">
+                <div class="row">
+                  <div class="col-md-12">
+                    <div class="form-group" v-for="(ques, index) in assessment_preview_list" :key="index">
+                      <label class="question" ><span>Q. </span>[[ques.question]]</label>
+                        <p v-for="(opt, opt_index) in ques.options" :key="opt_index" 
+                            :class="{ 'green-text': opt[1], 'normal-text': !opt[1] }" v-text="`    ${opt[0]}`">
+                        </p>
+                      <p class="correct-answer"><span class="your-response">  Your response:  </span> [[ques.answer]]</p>
+                    </div>
+                    <div class="form-group">
+                      <button class="btn btn-info pull-right" @click="redirectJourney()">OK</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+        {{ request.user.id|json_script:"user_id" }}
+        {{request.session.token|json_script:"token"}}
+      </div>
+    {% endblock content %} 
+  {% block js %} 
+
+<script type="text/javascript">
+  let app = new Vue({
+    el: "#vue-app",
+    delimiters: ['[[', ']]'],
+    data() {
+      return {
+        token:JSON.parse(document.getElementById('token').textContent),
+        auth:"",
+        user_id: JSON.parse(document.getElementById('user_id').textContent),
+        base_url:window.location.origin,
+        questions_list:"",
+        question:"",
+        ques_no:1,
+        has_next:false,
+        ques_response:[],
+        journey_id : window.location.href.split("/")[5],
+        assessment_id : window.location.href.split("/")[6],
+        assessment_form: true,
+        assessment_preview: false,
+        attempt_id: "",
+        assessment_preview_list: ""
+      };
+    },
+    mounted(){
+      this.getAssessment();
+    },
+    methods: {
+      axiosGetRequest: function(url){
+        this.auth = "Token "+this.token;
+        var config = {
+          method: "get",
+          url: url,
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': this.auth,
+          },
+        };
+        return axios(config)
+      },
+      axiosPostRequest: function(url, data){
+        this.auth = "Token "+this.token;
+        var config = {
+          method: "post",
+          url: url,
+          headers: {
+            "Content-Type": "multipart/form-data",
+            "Accept": "application/json",
+            'Authorization': this.auth,
+          },
+          data:data
+        };
+        return axios(config)
+      },
+      addResponse(){
+          var ques_type = document.getElementById("ques_type").value
+          var ques_id = document.getElementById("ques_id").value
+          var is_required = document.getElementById("is_required").value
+          var ques_ans = ""
+          if(ques_type == 'DropDown'){
+            ques_ans = this.$refs.ans_val.value
+          }
+          if(ques_type == 'MultiChoice'){ 
+            var ele = document.getElementsByName("answer"+ques_id)
+            console.log("ele", ele)
+            for(i = 0; i < ele.length; i++) {
+              if(ele[i].checked){
+                console.log(ele[i])
+                ques_ans = ele[i].value
+              }
+            }
+          }
+          if(ques_type == 'Checkbox'){ 
+            var ele = document.getElementsByName("answer"+ques_id)
+            console.log("ele", ele)
+            for(i = 0; i < ele.length; i++) {
+              if(ele[i].checked){
+                console.log(ele[i])
+                if (ques_ans != ""){
+                  ques_ans = ques_ans + ","
+                }
+                ques_ans = ques_ans + ele[i].value
+              }
+            }
+          }
+          if(ques_type == 'ShortAnswer'){
+            ques_ans = document.getElementById("ans").value
+            document.getElementById("ans").value = ""
+          }
+          if(is_required == 'true' && ques_ans == ''){
+            bootbox.alert("This question is required!!")
+            console.log("203")
+            return false
+          }
+          else{
+            console.log("211")
+            this.ques_response.push({
+              "q_id":Number(ques_id),
+              "response":ques_ans
+            })
+            console.log("ques_no", this.ques_response)
+            return true
+          }
+      },
+      getQues(ques_no){
+        console.log("get question no function")
+        var validate = true
+        if(ques_no >= 2 ){
+          validate = this.addResponse()
+        }
+        console.log("validate", validate)
+        //console.log("ques_no", ques_no, this.questions_list.length)
+        if(validate == 'true' || validate == true){
+          for(let i=0; i<this.questions_list.length; i++){
+            if(ques_no == this.questions_list[i].display_order){
+              //console.log("this.",this.questions_list[i].type)
+              this.question = this.questions_list[i]
+            }
+          }
+          this.ques_no = this.ques_no+1
+          if(this.ques_no <= this.questions_list.length){
+            this.has_next = true
+          }
+          else{
+            this.has_next = false
+          }
+          return true
+        }
+        return false
+      },
+      getAssessment() {
+        this.auth = "Token "+this.token;
+        var data = new FormData();
+        data.append("assessment_id", this.assessment_id);
+        data.append("user_id", this.user_id);
+        data.append("journey_type", "SkillDevelopment");
+
+        var config = {
+          method: "post",
+          url: this.base_url+"/api/assessment/",
+          headers: {
+            "Content-Type": "multipart/form-data",
+            "Accept": "application/json",
+            'Authorization': this.auth,
+          },
+          data:data
+        };
+        axios(config)
+          .then((response) => {
+            console.log("Assessment Response", response.data);
+            this.questions_list = response.data.data.question
+            //console.log(response.data.data.question[0])
+            this.getQues('1');
+          })
+          .catch((error) => {
+            console.log("error", error, error.response.data.message);
+        });
+      },
+      submitAssessment() {
+        validate = this.addResponse()
+        if(validate == 'true' || validate == true){
+          this.auth = "Token "+this.token;
+          var data = new FormData();
+          data.append("assessment_id", this.assessment_id);
+          data.append("type", "pre_assessemnt");
+          data.append("journey_id", this.journey_id);
+          data.append("user_id", this.user_id);
+          data.append("journey_type", "SkillDevelopment");
+          data.append("questions",JSON.stringify(this.ques_response))
+
+          var config = {
+            method: "post",
+            url: this.base_url+"/api/submit-assessment/",
+            headers: {
+              "Content-Type": "multipart/form-data",
+              "Accept": "application/json",
+              'Authorization': this.auth,
+            },
+            data:data
+          };
+          axios(config)
+            .then((response) => {
+              console.log("Assessment Response", response.data);
+              bootbox.alert("Assessment Submitted Successfully!")
+              this.assessment_form = false
+              this.assessment_preview = true
+              this.attempt_id = response.data.data.attempt_id
+              this.showPreview()
+            })
+            .catch((error) => {
+              console.log("error", error, error.response.data.message);
+              bootbox.alert("Something Went Wrong!")
+          });
+          return true
+        }
+        return false
+      },
+      showPreview() {
+        this.auth = "Token "+this.token;
+        var data = new FormData();
+        data.append("attempt_id", this.attempt_id);
+        data.append("user_id", this.user_id);
+
+        var config = {
+          method: "post",
+          url: this.base_url+"/api/assessment-answer/",
+          headers: {
+            "Content-Type": "multipart/form-data",
+            "Accept": "application/json",
+            'Authorization': this.auth,
+          },
+          data:data
+        };
+        axios(config)
+          .then((response) => {
+            console.log("Assessment Answer Response", response.data);
+            this.assessment_preview_list = response.data.data
+          })
+          .catch((error) => {
+            console.log("error", error, error.response.data.message);
+        });
+      },
+      redirectJourney(){
+          window.location.assign("/content/journey/v2/"+this.journey_id)
+      },
+      colorTheText(option){
+        if (option[1]==true){
+          {
+            document.getElementById('questions-options').style.color == "green";
+          }
+        }
+      }
+    }
+  });
+</script>
+
+{% endblock js %}

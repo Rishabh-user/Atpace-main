@@ -1,0 +1,6 @@
+<select class="form-control" hx-get="{% url 'user:journey_pool' %}" hx-target="#pool_list"  hx-trigger="change" id ="journey" required name="journey" style="width: 100%;">
+    <option selected="selected" value="">Select</option>
+    {% for channel in all_journey %}
+    <option value="{{channel.id}}" {% if channel.id == selected_journey.pk %} selected {% endif %}>{{channel.title}}</option>
+    {% endfor %}
+</select>

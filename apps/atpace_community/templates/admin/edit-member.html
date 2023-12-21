@@ -1,0 +1,64 @@
+{% extends 'base.html' %} {% load static %} {% block title %} Category {% endblock %}
+ {% load crispy_forms_tags %} {% block content %}
+ {% block css %}
+<link rel="stylesheet" href="{% static 'bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css' %}">
+{% endblock css %} 
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <h1>
+        Space Members
+      </h1>
+      <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Settings</a></li>
+        <li><a href="#">Space Members</a></li>
+
+      </ol>
+    </section>
+  
+    <!-- Main content -->
+    <section class="content">
+  
+      <!-- Default box -->
+      <div class="box">
+        <div class="box-header with-border">
+          <h3 class="box-title">Create Space Member</h3>
+
+        </div>
+        <div class="box-body">
+          {% crispy form %}
+  
+        </div>
+      </div>
+    </section>
+    <!-- /.content -->
+  </div>
+  {% endblock content %}
+
+  {% block js %}
+  <script src="{% static 'bower_components/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+  <script src="{% static 'bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
+  <script>
+    document.getElementById('id_space_group').onchange = function(){
+      $("#id_space").empty();
+      $.ajax({
+          url:  "{% url 'atpace_community:get_spacegroup_space' %}",
+          type: 'GET',
+          data: {space_group: document.getElementById('id_space_group').value},
+          error: function(error) {
+            console.log("error", error)
+          },
+          success: function(data) {
+            console.log("data", data)
+            for(let i=0; i<data.space_list.length; i++){
+              var option = document.createElement("option");
+              option.text = data.space_list[i].title;
+              option.value = data.space_list[i].id;
+              var select = document.getElementById("id_space");
+              select.appendChild(option);
+            }
+          }
+      });
+    }
+  </script>
+  {% endblock js %}  

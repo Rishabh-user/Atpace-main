@@ -1,0 +1,126 @@
+{% extends 'base.html' %} {% load static %} 
+{% block css %}
+<link rel="stylesheet" href="{% static 'bower_components/morris.js/morris.css' %}">
+{% endblock css %}
+{% block content %}
+<div class="content-wrapper">
+  <section class="content-header">
+    <h1>{{journey.title}}</h1>
+    <ol class="breadcrumb">
+      <li>
+        <a href="#"><i class="fa fa-dashboard"></i> Journey</a>
+      </li>
+      <li class="active">Report</li>
+    </ol>
+  </section>
+  <section class="content">
+    <!-- Default box -->
+    <div class="row">
+      <div class="col-lg-3 col-xs-6">
+        <!-- small box -->
+        <div class="small-box bg-aqua">
+          <div class="inner">
+            <h3>{{total_enroll}}</h3>
+
+            <p>Total Enrolled</p>
+          </div>
+          <div class="icon">
+            <i class="fa fa-file-text-o"></i>
+          </div>
+          
+        </div>
+      </div>
+      <div class="col-lg-3 col-xs-6">
+        <!-- small box -->
+        <div class="small-box bg-green">
+          <div class="inner">
+            <h3>{{today_enroll}}</h3>
+
+            <p>Today Enrolled</p>
+          </div>
+          <div class="icon">
+            <i class="fa fa-file-text-o"></i>
+          </div>
+          
+        </div>
+      </div>
+      <div class="col-lg-3 col-xs-6">
+        <!-- small box -->
+        <div class="small-box bg-yellow">
+          <div class="inner">
+            <h3>{{total_enroll}}</h3>
+
+            <p>InProgress</p>
+          </div>
+          <div class="icon">
+            <i class="fa fa-file-text-o"></i>
+          </div>
+          
+        </div>
+      </div>
+      <div class="col-lg-3 col-xs-6">
+        <!-- small box -->
+        <div class="small-box bg-red">
+          <div class="inner">
+            <h3>0</h3>
+
+            <p>Complete</p>
+          </div>
+          <div class="icon">
+            <i class="fa fa-file-text-o"></i>
+          </div>
+          
+        </div>
+      </div>
+    </div>
+    <div class="box box-success">
+        <div class="box-header with-border">
+          <h3 class="box-title">Journey Read Status</h3>
+            <kbd>Dummy Data</kbd>
+          <div class="box-tools pull-right">
+            <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+            </button>
+            <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+          </div>
+        </div>
+        <div class="box-body chart-responsive">
+          <div class="chart" id="bar-chart" style="height: 300px;"></div>
+        </div>
+        <!-- /.box-body -->
+      </div>
+    <!-- /.box -->
+  </section>
+</div>
+{% endblock content %}
+
+{% block js %}
+<!-- Morris.js charts -->
+<script src="{% static 'bower_components/raphael/raphael.min.js' %}"></script>
+<script src="{% static 'bower_components/morris.js/morris.min.js' %}"></script>
+<script>
+    $(function () {
+      
+      var bar = new Morris.Bar({
+        element: 'bar-chart',
+        resize: true,
+        data: [
+          {y: 'Quest1', a: 10, b: 1,c:2},
+          {y: 'Quest 2', a: 2, b: 2,c:2},
+          {y: 'Assessment 1', a: 5, b: 4,c:2},
+          {y: 'Survey 1', a: 7, b: 6,c:2},
+          {y: 'Quest 3', a: 5, b: 4,c:2},
+          {y: 'Journals', a: 7, b: 6,c:2},
+          {y: 'Quest 4', a: 1, b: 9,c:2},
+          {y: 'Quest 5', a: 1, b: 3,c:2},
+          {y: 'Quest 6', a: 5, b: 2,c:2},
+          {y: 'Quest 7', a: 1, b: 1,c:2}
+        ],
+        barColors: ['#00a65a', '#f56954','#f52954'],
+        xkey: 'y',
+        ykeys: ['a', 'b', 'c'],
+        labels: ['InProgress', 'Complete', "Not Start"],
+        hideHover: 'auto'
+      });
+    });
+</script>
+{% endblock js %}

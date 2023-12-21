@@ -1,0 +1,9 @@
+{% autoescape off %}
+Welcome  {{ user.username }},
+
+Thanks for enrolling in this journey!  AtPace is our chance to touch lives, enabling you to fuel your ambitions and help you be the best version of yourself with mindfulness, skills and mentoring. We’ve set off on a mission to create an impact and glad you are joining us on this adventure.
+
+Love and Respect,
+Team AtPace
+
+{% endautoescape %}

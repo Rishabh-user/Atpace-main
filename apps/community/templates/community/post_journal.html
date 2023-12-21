@@ -1,0 +1,269 @@
+{% extends 'base.html' %} {% load tags %} {% load static %}
+{% load tags %}
+{% block css %}
+{% endblock css %} 
+{% block content %}
+
+<div class="content-wrapper">
+  <section class="content-header">
+    <h1>
+      Write Journal
+    </h1>
+    <ol class="breadcrumb">
+      <li><a href="#"><i class="fa fa-dashboard"></i>Write</a></li>
+      <li class="active">Journal</li>
+    </ol>
+  </section>
+
+  <section class="content">
+    <div class="row">
+       <div class="col-xs-12">
+           <div class="box">
+             <div class="box-header">
+               <h3 class="box-title">Write Journal
+               </h3>
+                {% if request.session.user_type == "Mentor" %}
+                  <p>(All the journals you create will remain completely private and not visible to anyone else)</p>
+                {% endif %}
+              </div>
+             <!-- /.box-header -->
+             <div class="box-body">
+             {% if messages %} 
+             {% for message in messages %}
+                <div class="alert-success alert-dismissible" role="alert" >
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true"></span>
+                    </button>
+                    {{ message }}
+                </div>
+            {% endfor %}
+            {% endif %}
+            <form method="post" action="{% url 'community:post_journal' %}">
+            {% csrf_token %}
+            <div class="modal-body">  
+              <div class="row">
+                <div class="col-md-12">
+                <div class="form-group">
+                  <label for=title class="col-md-12 control-label">Title</label>
+                  <input class="form-control" type="hidden" id="id" name="id" value="">
+                  <input class="form-control" type="text" id="title" name="title" placeholder="Title" required>
+                </div> 
+                <div class="form-group" id="journal-textarea">
+                  <textarea id="" name="learning_journal" style="width: 100%; height: 130px; font-size: 14px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;" rows="10" class="form-control textarea" placeholder="Enter Learning Journal"></textarea>
+                </div> 
+                <div class="form-group" style="display:none" id="journal-template-textarea">
+                  <textarea class="form-control" id="journal-content" name="learning_journal" rows="6"></textarea>
+                </div>
+                <div class="form-group" id="is_private_div">
+                  {% if request.session.user_type == "Mentor" %}
+                  <input type="checkbox" id="is_private" name="is_private" value="True" checked readonly style="display:none;"><label style="display:none;">is private</label>
+                  {% else %}
+                    {% if learning_journal.is_private %}
+                    <input type="checkbox" id="is_private" name="is_private" value="True" onchange="show_journey()"> <label for="is_private">is private</label>
+                    {% else %}
+                    <input type="checkbox" id="is_private" name="is_private" value="True" checked onchange="show_journey()"> <label for="is_private">is private</label>
+                    {% endif %}
+                  {% endif %}
+                </div> 
+                <div class="form-group" id="journey-div">
+                  <label for=journey class="col-md-12 control-label">Journey</label>
+                  <select class="form-control select2" style="width:100%;" name="journey" id="journey">
+                    <option value="" selected>Select</option>
+                    {% for journey in request.user|get_mentee_journeys:request.session.company_id %}
+                      {% if learning_journal.journey_id == journey.id %}
+                      <option value="{{journey.id}}" selected>{{journey.title}}</option>
+                      {% else %}
+                      <option value="{{journey.id}}">{{journey.title}}</option>
+                      {% endif %}
+                    {% endfor %}
+                  </select>
+                </div> 
+              <div class="form-group" id="is-draft-div" style="display:none">
+                  <input type="checkbox" id="is_draft" name="is_draft" value="True"> 
+                  <label for="is_draft">is draft</label>
+              </div> 
+              <div class="col-md-2" id="load-clear-template-btn">
+                <button type="button" id="load-template-btn" class="btn btn-info" style="margin: 0px;" onclick="loadTemplate()">Load Template</button>
+                <button type="button" id="clear-template-btn" style="display:none" class="btn btn-info" style="margin: 0px;" onclick="clearTemplate()">Clear Template</button>
+              </div>
+              <div class="col-md-2 pull-right">
+                  {% if request.session.user_type == "Admin" or request.session.user_type == "ProgramManager" %}
+                      <button disabled type="submit" id="sumbitContent" class="btn btn-info" style="margin: 0px;">Submit</button>
+                  {% elif request.session.user_type == "Learner" or request.session.user_type == "Mentor" %}
+                      <button type="submit" id="sumbitContent" class="btn btn-info" style="margin: 0px;">Submit</button>
+                  {% endif %}
+              </div>
+            </div>
+          </div>
+          </div>
+          
+          </form>
+             </div>
+             <!-- /.box-body -->
+           </div>
+           <!-- /.box -->  
+         </div>
+       <!-- /.col -->
+    </div>
+    <!-- /.row -->
+ </section>
+ <div class="modal fade" id="journal-selection-modal" role="dialog">
+    <div class="modal-dialog">
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+            <h4 class="modal-title">Choose one journal template</h4>
+        </div>
+        <div class="modal-body">
+            <div id="journal-data">
+            
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default pull-left" data-dismiss="modal" style="">Close</button>
+            <button type="button" class="btn btn-info" onclick="appendData()">Submit</button>
+        </div>
+      </div>
+    </div>
+  </div>
+ 
+</div>
+{% endblock content %} 
+{% block js %}
+<script>
+$(function () {
+    // Replace the <textarea id="editor1"> with a CKEditor
+    //bootstrap WYSIHTML5 - text editor
+    $('.textarea').wysihtml5({
+    toolbar: {
+    "font-styles": true, // Font styling, e.g. h1, h2, etc.
+    "emphasis": true, // Italics, bold, etc.
+    "lists": true, // (Un)ordered lists, e.g. Bullets, Numbers.
+    "html": false, // Button which allows you to edit the generated HTML.
+    "link": false, // Button to insert a link.
+    "image": false, // Button to insert an image.
+    "color": false, // Button to change color of font
+    "blockquote": true, // Blockquote
+    }
+    })
+  })
+
+  show_journey()
+
+function show_journey(){
+  is_checked = document.getElementById("is_private").checked
+//  document.getElementById("is_private").disabled = true;
+
+  // console.log("is_private", is_checked)
+  if(is_checked){
+    document.getElementById("journey-div").style.display = "none"
+    document.getElementById("load-clear-template-btn").style.display = "none"
+  }
+  else{
+    document.getElementById("journey-div").style.display = "block"
+    document.getElementById("load-clear-template-btn").style.display = "block"
+
+  }
+}
+function loadTemplate(){
+  if(document.getElementById('journey').value){
+    var url = window.location.origin+"/api/journey-journal/"+document.getElementById('journey').value
+    $.ajax({
+        url:  url,
+        type: 'GET',
+        error: function() {
+          bootbox.alert('Something is wrong');
+        },
+        success: function(data) {
+          console.log("data", data)
+          var has_journal = false
+          if(data.data.length < 1){
+            bootbox.alert("This journey does not contain any draft journal template.")
+          }
+          else{
+            $("#journal-data").empty();
+            for(let i=0; i<data.data.length; i++){
+              if(data.data[i].is_draft == true){
+                var has_journal = true
+                var radiobox = document.createElement('input');
+                radiobox.type = 'radio';
+                radiobox.id = 'journal_'+i;
+                radiobox.name = 'journal';
+                radiobox.value = data.data[i].content + "and" + data.data[i].id + "and" + data.data[i].name;
+                var label = document.createElement('label')
+                label.htmlFor = 'journal_'+i;
+                var description = document.createTextNode(data.data[i].name);
+                label.appendChild(description);
+            
+                var newline = document.createElement('br');
+            
+                var container = document.getElementById('journal-data');
+                container.appendChild(radiobox);
+                container.appendChild(label);
+                container.appendChild(newline);
+              }
+            }
+            if(has_journal == true){
+              $('#journal-selection-modal').modal('show');
+            }
+            else{
+              bootbox.alert("This journey does not contain any draft journal template.")
+            }
+          }
+        }
+    });
+  }
+  else{
+    bootbox.alert("Please select a journey!")
+  }
+}
+function appendData(){        
+        if(! document.querySelector('input[name="journal"]:checked')){
+            bootbox.alert("Please select a journal to load template!")
+        }
+        else{
+            var selected_value = document.querySelector('input[name="journal"]:checked').value   
+            $('#journal-selection-modal').modal('hide');
+            document.getElementById('journal-textarea').style.display = 'none'
+            document.getElementById("journal-content").value = selected_value.split("and")[0]
+            document.getElementById("title").value = selected_value.split("and")[2]
+            document.getElementById("id").value = selected_value.split("and")[1]
+            //document.getElementById('title').readOnly = true
+            document.getElementById('journal-template-textarea').style.display = 'block'
+            document.getElementById('load-template-btn').style.display = 'none'
+            document.getElementById('clear-template-btn').style.display = 'block'
+            document.getElementById("is-draft-div").style.display = "block"
+            document.getElementById("is_private_div").style.display = "none"
+            if ($(".wysihtml5-toolbar")[1]){
+                console.log("exists")
+            } 
+            else{
+              $('#journal-content').wysihtml5({
+              toolbar: {
+              "font-styles": true, // Font styling, e.g. h1, h2, etc.
+              "emphasis": true, // Italics, bold, etc.
+              "lists": true, // (Un)ordered lists, e.g. Bullets, Numbers.
+              "html": false, // Button which allows you to edit the generated HTML.
+              "link": false, // Button to insert a link.
+              "image": false, // Button to insert an image.
+              "color": false, // Button to change color of font
+              "blockquote": true, // Blockquote
+              }
+            })
+            }
+        }
+    }
+    function clearTemplate(){
+      console.log("clear template content")
+      document.getElementById('journal-textarea').style.display = 'block'
+      document.getElementById('journal-template-textarea').style.display = 'none'
+      document.getElementById('load-template-btn').style.display = 'block'
+      document.getElementById('clear-template-btn').style.display = 'none'
+      document.getElementById("is-draft-div").style.display = "none"
+      document.getElementById('title').readOnly = false
+      document.getElementById('title').value = ""
+      document.getElementById("is_private_div").style.display = "block"
+
+    }
+</script>
+{% endblock js %}

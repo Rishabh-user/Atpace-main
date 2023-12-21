@@ -1,0 +1,19 @@
+<div class="form-group">
+<label class="question_label">[[question.title]] <span v-if="question.is_required">*</span> </label>
+<table class="table test-table">
+<thead>
+    <tr>
+        <th></th>
+        <th v-for="(col, index) in question.options[1].grid_coloum" :key="index">[[col]]</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr v-for="(row, parent_index) in question.options[0].grid_row" :key="row">
+        <td> [[row]] </td>
+        <td v-for="(checkbox, index) in question.options[1].grid_coloum" :key="checkbox">
+        <input type="checkbox" class="flat-red" :name="'answer'+parent_index+question.id" :value="checkbox" />
+        </td>        
+    </tr>
+    </tbody>
+</table>
+</div> 

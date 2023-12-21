@@ -1,0 +1,20 @@
+<section class="section" id="{{forloop.counter}}">
+  <!-- <div> -->
+  <div class="row text-center">
+    <div class="col-md-12">
+      <div class="content_card" style="min-height: 510px; max-height: 600px">
+        <div class="img-cover">
+          <img
+            class="lazy card_image"
+            src="{{MEDIA_URL}}{{data.file}}"
+            loading="lazy"
+            width="60%"
+            style="min-width: 60%; min-height: 60%"
+          />
+        </div>
+        {{data.title}}
+      </div>
+    </div>
+  </div>
+  <!-- </div> -->
+</section>

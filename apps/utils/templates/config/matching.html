@@ -1,0 +1,296 @@
+{% extends 'base.html' %} {% load static %} {% block title %} Category {% endblock %}
+ {% load crispy_forms_tags %} 
+ {% block content %}
+ {% block css %} 
+
+<link rel="stylesheet" href="{% static 'bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css' %}">
+{% endblock css %} 
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <h1>
+        Pool Allocation
+      </h1>
+      <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Settings</a></li>
+        <li><a href="#">Pool Allocation</a></li>
+      </ol>
+    </section>
+  
+    <!-- Main content -->
+    <section class="content">
+  
+      <!-- Default box -->
+      <!-- <div class="box">
+        <div class="box-header with-border">
+          <h3 class="box-title">Create Poll</h3>
+
+        </div>
+        <div class="box-body">
+  
+        </div>
+      </div> -->
+      <!-- /.box -->
+      <div class="box">
+        <div class="box-header">
+          <div class="col-sm-12">
+            <h3 class="box-title">Change Pool Allocation</h3> <!-- chaning mantors -->
+          </div>
+          <br>
+          <span class="col-sm-3"><h4>Select Action for multiple user : </h4></span> 
+          <span class="col-sm-3" style="padding-top: 8px;" id="">
+            <select class="form-control select2" id="action_select" name="action_select" style="width: 100%; " onchange="check_poll()">
+              <option >Select Action</option>  
+              <option value="add">Add</option>
+              <option value="delete" {% if users.2 %} selected="selected" {% endif %}>Delete</option>
+            </select>
+          </span>
+          <span class="col-sm-4" style="padding-top: 8px; display: none;" id ="pool_select_span"> 
+
+            <form method="post" id="pool_form" action="{% url 'utils:matching' %}">
+              {% csrf_token %} 
+              <select class="form-control select2" id ="pool_select" name="pool_select" style="width: 100%;" onchange="check_poll()">
+                <option value="Select">Select Pool</option> 
+                {% for pool in users.1 %}
+                  <option value="{{pool.id}}" {{ users.2 }} {% if users.2.id == pool.id %} selected="selected" {% endif %} >{{pool.name}}</option>
+                {% endfor %}
+              </select>
+            </form>
+
+          </span>
+          <span class="col-sm-2">
+            <input type="submit" class="btn btn-primary" value="Add Multiple" id="multi_add_btn" onclick="btn_multiple_mentor_add()" style="display: none;">
+            <input type="submit" class="btn btn-primary" value="Delete Multiple" id="multi_dlt_btn" onclick="btn_multiple_mentor_dlt()" style="display: none;">
+          </span> 
+        </div>
+      </div>
+      <div class="box">
+        
+        <!-- /.box-header -->
+      
+        <form action="{% url 'utils:add_mentor_pool' %}" method="post" id="from">  
+          
+          {% csrf_token %}
+          <div class="box-body">
+            <input type="hidden" name="pool_name" id="pool_name" value="">
+            <input type="hidden" name="action_type" id="action_type" value="{% if users.2 %}delete{% endif %}">
+            <table id="example2" class="table table-bordered table-hover">
+              <thead>
+              <tr>
+                <th></th>
+                <th>Full Name</th>
+                <th>username</th> 
+                <th>Status</th>
+                <th>Pool</th>
+                <th>Action</th>
+            </tr>
+              </thead>
+              <tbody>
+              {% for user in users.0 %}
+                <tr> 
+                  <td><input class="checkbox" type="checkbox" name="id" value="{{user.0.username}}"></td>   
+                  <td>{{user.0.first_name}} {{user.0.last_name}}</td>
+                  <td>{{user.0.username}}</td>  
+                  <td>
+                    {% if user.0.is_active %}
+                      <kbd>Active</kbd>
+                    {% else %}
+                      <kbd>InActive</kbd>
+                    {% endif %}
+                  </td>
+                  <td>
+                    {% for pl in user.1 %} 
+                      <kbd>{{pl.pool.name}}</kbd>
+                    {% endfor %}
+                  </td>
+                  <td>
+                    <div class="dropdown">   
+                        <button type="button" class="btn bg-purple update_btn" data-toggle="modal" data-target="#exampleModalCenter" onclick="openModel('{{user.0.username}}','{{user.0.first_name}} {{user.0.last_name}}', '{% for pl in user.1 %}{{pl.pool.id}},{% endfor %}' )">
+                          Update
+                        </button> 
+                    </div>
+                  </td>
+                </tr>
+              {% endfor %}
+              </tfoot>
+            </table>
+          </div>
+          
+        </form>
+        <!-- /.box-body -->
+      </div>
+  
+    </section>
+    <!-- /.content -->
+  </div>
+  <!-- Button trigger modal -->
+
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="md-col-11 modal-title" id="exampleModalLongTitle">Update Pool</h3>
+        <!-- <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button> -->
+      </div>
+      <div class="modal-body">
+        <form action="{% url 'utils:update_mentor_pool' %}" method="post" id="model_from">  
+          {% csrf_token %}
+          <input type="hidden" name="username" id="mentor_id">
+          <div class="col-sm-12">
+            <span class="col-sm-9"><h5>Mentor : <span id="model_mentor"></span> </h5></span>
+          </div>
+          <div class="col-sm-12">
+            <span class="col-sm-12"><h5>Pools</h5></span><br>
+            {% for pool in users.1 %}
+              <span class="col-sm-12"><input value="{{pool.id}}" id="chkbox_{{pool.id}}" class="pool_chkbox" name="pool_records" id="model_pool_inp" type="checkbox">{{pool.name}} </span> 
+            {% endfor %}  
+          </div>  
+            
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" onclick="update_record()" class="btn btn-primary">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+  {% endblock content %}
+  {% block js %}
+<script src="{% static 'bower_components/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
+<script>
+
+
+$(function () {
+ 
+  $('#example2').DataTable({
+    "dom": '<"table-pull-left"f><"table-pull-right"l>tip',
+    'paging'      : true,
+    'lengthChange': true,
+    'searching'   : true,
+    'ordering'    : true,
+    'info'        : true,
+    'autoWidth'   : true,
+    'scrollX'     : true,
+    language: {
+        searchPlaceholder: "Search Individual records"
+    }
+
+  })
+});
+
+function btn_multiple_mentor_add() { 
+  // alert("btn_multiple_mentor_add");
+  pool_select = $("#pool_select").val();
+  checkbox = $('.checkbox').is(":checked")
+  if(pool_select == "Select"){
+    alert("Select Pool");
+    return false;
+  } 
+   
+  if(!checkbox){ 
+    alert("please select any checkbox");
+    return false;
+  } 
+
+  $("#pool_name").val(pool_select);
+  var action_select = $("#action_select").val(); 
+  $("#action_type").val(action_select);
+  $("#from").submit(); 
+}
+
+function btn_multiple_mentor_dlt() { 
+  // alert("btn_multiple_mentor_dlt");
+  pool_select = $("#pool_select").val();
+  // pool_name = $("#pool_name").val();
+  checkbox = $('.checkbox').is(":checked")
+  if(pool_select == "Select"){
+    alert("Select Pool");
+    return false;
+  } 
+   
+  if(!checkbox){ 
+    alert("please select any checkbox");
+    return false;
+  } 
+
+  $("#pool_name").val(pool_select);
+  $("#from").submit(); 
+}
+
+function openModel(username,name,ids) {
+  $("#mentor_id").val(username);
+  $("#model_mentor").text(name);
+  var ary = ids.split(',');
+  
+  console.log(username, ids, ary);
+  $(".pool_chkbox").prop( "checked", false );
+  for (i = 0; i < (ary.length-1); ++i) {
+    $("#chkbox_"+ary[i]).prop( "checked", true );
+  }
+
+}
+
+function update_record() {
+  $("#model_from").submit();
+}
+// upper multi add/delete functions
+function check_poll(){
+  var action_select = $("#action_select").val(); 
+  var pool_select = $("#pool_select").val(); 
+  // alert("check_poll");
+  {% if users.2 %} 
+  if(action_select == "add"){
+    window.location.href = "{% url 'utils:matching' %}"
+  } 
+  {% endif %}
+
+  if(action_select == "delete" & pool_select != "Select"){
+    // alert("pool_form");
+    $("#pool_form").submit();
+  } 
+}
+
+$("#action_select").on('change', function() { 
+  if(this.value == "add"){
+    $(".checkbox").show();
+    $(".update_btn").hide();
+    $("#multi_add_btn").show();
+    $("#multi_dlt_btn").hide();  
+    $("#pool_select_span").show();  
+  }else if(this.value == "delete"){
+    $(".update_btn").show();
+    $(".update_btn").hide();
+    $("#multi_add_btn").hide();
+    $("#multi_dlt_btn").show(); 
+    $("#pool_select_span").show();  
+    // $("#pool_form").submit(); 
+  }else{
+    $(".checkbox").hide();
+    $(".update_btn").show();
+    $("#multi_add_btn").hide();
+    $("#multi_dlt_btn").hide();
+    $("#pool_select_span").hide(); 
+  }
+});
+
+$( document ).ready(function() {
+    
+    {% if users.2 %} 
+      $("#pool_select_span").show();
+      $(".update_btn").hide();
+      $(".checkbox").show()
+      $("#multi_dlt_btn").show(); 
+    {% else %}
+      $(".checkbox").hide()
+    {% endif %}
+
+});
+</script> 
+{% endblock js %}

@@ -1,0 +1,53 @@
+<div class="box">
+  <div class="box-header">
+    <h3 class="box-title">Current and upcoming plan</h3>
+  </div>
+  <!-- /.box-header -->
+  <div class="box-body">
+    <table id="current-plan-table" class="table table-bordered table-hover">
+      <thead>
+        <tr>
+          <th>SNo.</th>
+          <th>Subscription</th>
+          <th>Company</th>
+          <th>Amount</th>
+          <th>Duration</th>
+          <th>Start Date</th>
+          <th>End Date</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="(plan, index) in current_plan_list">
+          <td>[[index+1]]</td>
+          <td>[[plan.title]]</td>
+          <td>[[plan.company_name]]</td>
+          <td v-if="plan.sub_type == 'Free'">0 USD</td>
+          <td v-else>[[plan.price]] USD</td>
+          <td>[[plan.duration]] [[plan.duration_type]]</td>
+          <td>[[plan.valid_from]]</td>
+          <td>[[plan.valid_till]]</td>
+          <td>
+            <button v-if="plan.is_cancel"
+              class="btn btn-danger"
+            >
+              Cancelled
+            </button>
+            <button v-else-if="plan.left_days < 0"
+              class="btn btn-danger"
+            >
+              Expired
+            </button>
+            <button v-else
+              class="btn btn-warning"
+              @click="oncanclePlan(plan.id, plan.subscription_id, plan.company_id)"
+            >
+              Cancel
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <!-- /.box-body -->
+</div>

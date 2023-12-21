@@ -1,0 +1,35 @@
+<div class="box">
+  <div class="box-header">
+    <h3 class="box-title">Transaction List</h3>
+  </div>
+  <!-- /.box-header -->
+  <div class="box-body">
+    <table id="paywall-table" class="table table-bordered table-hover">
+      <thead>
+        <tr>
+          <th>SNo.</th>
+          <th>Company</th>
+          <th>Subscription</th>
+          <th>Amount</th>
+          <th>Duration</th>
+          <th>Start Date</th>
+          <th>End Date</th>
+          <th>Transaction Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="(transaction, index) in transaction_list">
+          <td>[[index+1]]</td>
+          <td>[[transaction.company_name]]</td>
+          <td>[[transaction.subscription_name]]</td>
+          <td>[[transaction.amount]] [[transaction.currency_code]]</td>
+          <td>[[transaction.subscription_duration]]</td>
+          <td>[[transaction.subscription_start_date]]</td>
+          <td>[[transaction.subscription_end_date]]</td>
+          <td>[[transaction.transaction_date]]</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <!-- /.box-body -->
+</div>

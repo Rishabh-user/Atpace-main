@@ -1,0 +1,151 @@
+{% extends 'website/web_base.html' %} {% load static %}
+{% block content %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.15/css/intlTelInput.css">
+<!-- sign up area start -->
+<section class="signup__area po-rel-z1 pt-100 pb-145">
+    <div class="sign__shape">
+        <img class="man-1" src="assets/img/icon/sign/man-3.png" alt="">
+        <img class="man-2 man-22" src="assets/img/icon/sign/man-2.png" alt="">
+        <img class="circle" src="assets/img/icon/sign/circle.png" alt="">
+        <img class="zigzag" src="assets/img/icon/sign/zigzag.png" alt="">
+        <img class="dot" src="assets/img/icon/sign/dot.png" alt="">
+        <img class="bg" src="assets/img/icon/sign/sign-up.png" alt="">
+        <img class="flower" src="assets/img/icon/sign/flower.png" alt="">
+    </div>
+    <div class="container">
+        <div class="row">
+            <div class="col-xxl-8 offset-xxl-2 col-xl-8 offset-xl-2">
+                <div class="section__title-wrapper text-center mb-55">
+                    <h2 class="section__title">Create a Guest <br> Account</h2>
+
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xxl-6 offset-xxl-3 col-xl-6 offset-xl-3 col-lg-8 offset-lg-2 ">
+                <div class="sign__wrapper white-bg">
+                    {% include 'component/messages.html' %}
+                    <div class="sign__form">
+                        <form id="singup" method="POST" action="{% url 'utils:get_guest_user' %}">
+                            {% csrf_token %}
+                            <div class="row">
+                                <div class="form-group col-12">
+                                    <label>Enter Email*</label>
+                                    <input type="email" placeholder="Email" required class="form-control" name="email"
+                                        id="">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-12">
+                                    <label>Enter First Name*</label>
+                                    <input type="text" placeholder="First Name" required class="form-control" name="fname"
+                                        id="">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-12">
+                                    <label>Enter Last Name*</label>
+                                    <input type="text" placeholder="Last Name" required class="form-control" name="lname"
+                                        id="">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-12">
+                                    <label>Enter Phone Number*</label>
+                                    <br>
+                                    <input type="text" placeholder="Mobile" style="width: 150%;" required
+                                        class="form-control" name="mobile" id="phone">
+                                </div>
+                            </div>
+                            <input type="hidden" name="meet_id" value="{{meet_id}}">
+                            <div class="row">
+                                <div class="sign__action d-flex justify-content-between">
+                                    <div class="sign__agree d-flex align-items-center">
+                                        <input class="m-check-input" type="checkbox" required class="form-control"
+                                            id="m-agree" name="term_and_conditions">
+                                        <label class="m-check-label" for="m-agree">I agree to the <a target="_blank"
+                                                href="{% static 'website/files/Terms_of_Use(EULA)_GROWATPACE.pdf' %}">
+                                                Terms &amp; Conditions</a>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <br>
+                            <button type="submit" class="e-btn w-100" id="btnSubmit"> <span></span>Join meet with Guest Account</button>
+                            <div class="sign__new text-center mt-20">
+                                <p>Already have Account ? <a href="{% url 'user:login' %}"> Sign In</a></p>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+</main>
+{% endblock content %}
+
+{% block js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.15/js/intlTelInput.min.js"></script>
+
+<script>
+    // Vanilla Javascript
+    var input = document.querySelector("#phone");
+    window.intlTelInput(input, ({
+        // options here
+    }));
+
+    $(document).ready(function () {
+        $('.iti__flag-container').click(function () {
+            var countryCode = $('.iti__selected-flag').attr('title');
+            var countryCode = countryCode.replace(/[^0-9]/g, '')
+            $('#phone').val("");
+            $('#phone').val("+" + countryCode + " " + $('#phone').val());
+        });
+    });
+
+</script>
+
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+
+<script type="text/javascript">
+    // $(window).on('beforeunload', function () {
+    //     $("button[type=submit]").prop("disabled", "disabled");
+    // });
+</script>
+
+<!-- <script>
+    $(document).ready(function () {
+        var text = "Learner"
+        $("#id_type option").filter(function () {
+            return this.text == text;
+        }).text('Learner/Mentee');
+    });
+</script> -->
+
+<script>
+    $(document).ready(function () {
+        $('#m-agree, #m-enable').on('change', function () {
+            if ($(this).is('checked')) {
+                $(this).prop('value', 'False');
+            }
+            else {
+                $(this).prop('value', 'True');
+            }
+        })
+    })
+</script>
+
+<!-- submit when enter button is hit -->
+<script>
+    const form = document.getElementById('singup');
+    form.addEventListener('keypress', function (e) {
+        if (e.keyCode == 13) {
+            e.preventDefault();
+            console.log("EVENT listner added")
+        }
+    })
+    console.log("MEETID", "{{meet_id}}")
+</script>
+
+{% endblock %}

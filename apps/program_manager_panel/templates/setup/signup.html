@@ -1,0 +1,43 @@
+<div class="box">
+             <div class="box-header">
+               <h3 class="box-title">Journey Setup List</h3>
+                <a href="/content/create-journey-page-setup/"><button class="btn btn-primary pull-right">Create Journey Setup</button></a> 
+             </div>
+             <!-- /.box-header -->
+             <div class="box-body">
+               <table id="signup-table" class="table table-bordered table-hover">
+                 <thead>
+                 <tr>
+                  <tr>
+                    <th>Journey Title</th>
+                    <th>Pdpa Label</th>
+                    <th>Learn Label</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                  </tr>
+                   
+                 </tr>
+                 </thead>
+                 <tbody>
+                   <tr v-for="channel in journey_setup_list" :key="channel.id">                   
+                    <td>[[channel.journey]] </td>
+                    <td>[[channel.pdpa_label]]</td>
+                    <td>[[channel.learn_label]]</td>
+                    <td><kbd class="capitalize">[[channel.is_active]]</kbd></td>
+                    <td>
+                      <div class="dropdown">
+                        <button class="btn bg-purple dropdown-toggle btn-select-option" type="button" data-toggle="dropdown" aria-expanded="true">Select an option                                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu options-dropdown">                         
+                            <li>
+                                <a :href="'/content/edit-setup/'+channel.id"><i class="fa fa-edit option-icon"></i>Edit</a>
+                            </li>                            
+                        </ul>
+                    </div>
+                    </td>
+                   </tr>
+               </table>
+             </div>
+             <!-- /.box-body -->
+           </div>
+           <!-- /.box -->

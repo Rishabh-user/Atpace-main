@@ -1,0 +1,45 @@
+ <div class="box">
+      <div class="box-header">
+        <h3 class="box-title">Mentees List</h3>
+      </div>
+      <!-- /.box-header -->
+      <div class="box-body">
+        <table id="mentees-coachees-table" class="table table-bordered table-hover">
+          <thead>
+          <tr>
+            <th>Full Name</th>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Journey</th>
+            <th>Action</th>
+        </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(mentee, index) in mentees_list" :key="index">
+              <td class="capitalize"><a :href="'/mentee-details/'+mentee.mentee_id+'/'+mentee.journey_id">[[mentee.mentee_name]]</a></td>
+              <td>[[mentee.mentee_username]]</td>
+              <td>[[mentee.mentee_email]]</td>
+              <td>[[mentee.mentee_phone]]</td>
+              <td><a :href="'/content/journey/v2/'+mentee.journey_id">[[mentee.journey_name]]</a></td>
+              <td>
+                <div class="dropdown">
+                  <button class="btn bg-purple dropdown-toggle btn-select-option" type="button" data-toggle="dropdown" aria-expanded="true">Select an option                                            <span class="caret"></span>
+                  </button>
+                  <ul class="dropdown-menu options-dropdown">
+                    <li>
+                      <a :href="'/user/profile/'+mentee.mentee_id" target="_blank"><i class="fa fa-eye option-icon"></i>View Profile</a>
+                    </li>
+                    {% comment %} <li>
+                      <a :href="'/feedback/feedback-form/Mentee/'+mentee.mentee_id+'/'">Feedback</a>
+                    </li> {% endcomment %}
+                  </ul>
+                </div>
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+      <!-- /.box-body -->
+    </div>
+    <!-- /.box -->

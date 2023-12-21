@@ -1,0 +1,156 @@
+{% extends 'base.html' %} {% load static %}
+{% load tags %}
+<!-- DataTables -->
+{% block css %}
+<link rel="stylesheet" href="{% static 'bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css' %}">
+{% endblock css %}
+{% block content %}
+
+
+<div class="content-wrapper">
+  <section class="content-header">
+    <h1>
+      User
+      <small>List</small>
+    </h1>
+    <ol class="breadcrumb">
+      <li><a href="#"><i class="fa fa-dashboard"></i> User Settings</a></li>
+      <li><a href="#">User</a></li>
+      <li class="active">List</li>
+    </ol>
+  </section>
+
+  <section class="content">
+    <div class="box">
+      <div class="box-header">
+        <span class="col-sm-3"><h4>Remove multiple user from journey: </h4></span>
+        <span class="col-sm-3" style="padding-top: 8px;" id="">
+          <select class="form-control select2" id="action_select" name="action_select" style="width: 100%;">
+            <option selected="selected">Select Action</option>
+            <option value="removed">Remove</option>
+          </select>
+        </span>
+        <span class="col-sm-2">
+          <input type="submit" class="btn btn-primary" value="Add Multiple" id="multi_add_btn" onclick="btn_multiple_journey_remove()" style="display: none;">
+        </span> 
+    </div>
+    </div>
+    <div class="row">
+       <div class="col-xs-12">
+           <div class="box">
+             <div class="box-header">
+               <h3 class="box-title">Users Journey List</h3>
+
+
+              </div>
+              <form action="{% url 'user:bulk_journey_remove' %}" method="post" id="from">
+                {% csrf_token %}
+               <!-- /.box-header -->
+             <div class="box-body">
+              {% include 'component/error_message.html' %}
+              <input type="hidden" name="action" id="action_type" value="">
+              <table id="example2" class="table table-bordered table-hover">
+                 <thead>
+                  <tr>
+                    <th></th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Journey</th>
+                    <th>Status</th>
+                      <th>Created at</th>
+                    <th>Action</th>
+                </tr>
+                 </thead>
+                 <tbody>
+                  {% for journey in journey %}
+                    <tr>
+                      <td><input class="checkbox" style="display: none;" type="checkbox" name="journey_id" value="{{journey.pk}}"></td>
+
+                        <td><a href="{% url 'user:user-profile' pk=journey.user.id %}" >{{journey.user.first_name | capfirst}} {{journey.user.last_name | capfirst}} </a></td>
+
+                      <td>{{journey.user.email}}</td>
+                      <td>{{journey.Channel}}</td>
+                      <td>
+                          <kbd>{{journey.status}}</kbd>
+
+                        </td>
+                        <td>{{journey.created_at}}</td>
+                      <td>
+                        <div class="dropdown">
+                          <button class="btn bg-purple dropdown-toggle btn-select-option" type="button" data-toggle="dropdown" aria-expanded="true">Select an option<span class="caret"></span>
+                          </button>
+                          <ul class="dropdown-menu options-dropdown">
+                            <li hx-get="{% url 'user:remove_journey' user_channel_id=journey.pk %}" hx-confirm="Are you sure you wish to remove user from journey?">
+                                <a href=""><i class="fa fa-edit option-icon"></i>Remove Journey</a>
+                          </li>
+
+                          </ul>
+                      </div>
+                      </td>
+                    </tr>
+                    {% endfor %}
+                 </tfoot>
+               </table>
+             </div>
+            </form>
+            <!-- /.box-body -->
+           </div>
+           <!-- /.box -->
+
+
+         </div>
+       <!-- /.col -->
+    </div>
+    <!-- /.row -->
+ </section>
+
+</div>
+{% endblock content %}
+{% block js %}
+<script src="{% static 'bower_components/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
+<script>
+
+$(function () {
+
+  $('#example2').DataTable({
+    "dom": '<"table-pull-left"f><"table-pull-right"l>tip',
+    'paging'      : true,
+    'lengthChange': true,
+    'searching'   : true,
+    'ordering'    : true,
+    'info'        : true,
+    'autoWidth'   : true,
+    'scrollX'     : true
+  })
+})
+
+$( document ).ready(function() {
+  $("#action_select").on('change', function() { 
+  if(this.value == "removed"){
+    $(".checkbox").show();
+    $("#multi_add_btn").show();
+  }else{
+    $(".checkbox").hide();
+    $("#multi_add_btn").hide();
+  }
+})
+});
+
+function btn_multiple_journey_remove() {
+  // alert("btn_multiple_mentor_add");
+  checkbox = $('.checkbox').is(":checked")
+  console.log("checkbox ", checkbox)
+  if(!checkbox){
+    alert("please select any checkbox");
+    return false;
+  }
+  
+  var action_select = $("#action_select").val(); 
+  console.log("action_select ", action_select)
+  $("#action_type").val(action_select);
+  $("#from").submit(); 
+}
+
+</script>
+{% endblock js %}

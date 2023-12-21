@@ -1,0 +1,78 @@
+
+    <div class="row">
+       <div class="col-xs-12">
+           <div class="box">
+             <div class="box-header">
+               <h3 class="box-title">Users List</h3>
+              </div>
+            <form action="{% url 'user:bulk_inactive_archive' %}" method="post" id="from">
+              {% csrf_token %}
+             <!-- /.box-header -->
+             <div class="box-body">
+              {% include 'component/error_message.html' %}
+              <input type="hidden" name="action" id="action_type" value="">
+              <table id="archive-table" class="table table-bordered table-hover">
+                 <thead>
+                  <tr>
+                    <th>Full Name</th>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Date Modified</th>
+                    <th>Lite Signup</th>
+                    <th>Status</th>
+                    
+                    {% comment %} <th>Action</th> {% endcomment %}
+                </tr>
+                 </thead>
+                 <tbody>
+                    <tr v-for="user in archive_users_list" :key="user.id">
+                      <td>[[user.name]]</td>
+                      <td>[[user.username]]</td>
+                      <td>[[user.email]]</td>
+                      <td>[[user.phone]]</td>
+                      <td>[[user.updated_at]]</td>
+                      <td><kbd>[[user.is_lite_signup]]<kbd></td>
+                      <td class="active_list"><kbd>[[user.status]]</kbd> </td>
+                      {% comment %} <td>
+                        <div class="dropdown">
+                          <button class="btn bg-purple dropdown-toggle btn-select-option" type="button" data-toggle="dropdown" aria-expanded="true">Select an option<span class="caret"></span>
+                          </button>
+                          <ul class="dropdown-menu options-dropdown">
+                            <li>
+                              <a href="{% url 'user:user-profile' pk=user.id %}"><i class="fa fa-edit option-icon"></i>View</a>
+                          </li>
+                          <li>
+                            <a href="{% url 'content:user_journey' pk=user.id %}"><i class="fa fa-edit option-icon"></i>Report</a>
+                          </li>
+                          <li>
+                            <a href="{% url 'content:journey_report' pk=user.id %}"><i class="fa fa-edit option-icon"></i>Course Status</a>
+                          </li>
+                          
+                          <li>
+                            <a href="{% url 'user:update-user' pk=user.id %}"><i class="fa fa-edit option-icon"></i>Edit</a>
+                          </li>
+                          <li>
+                            <a href="{% url 'user:delete-user' pk=user.id %}"><i class="fa fa-trash option-icon"></i>Delete</a>
+                          </li>
+                          
+                          <li>
+                            <a href="{% url 'user:set-password' pk=user.id %}"><i class="fa fa-edit option-icon"></i>Set Password</a>
+                          </li>
+                          </ul>
+                      </div>
+                      </td> {% endcomment %}
+                    </tr>
+                 </tfoot>
+               </table>
+             </div>
+            </form>
+             <!-- /.box-body -->
+           </div>
+           <!-- /.box -->
+ 
+          
+         </div>
+       <!-- /.col -->
+    </div>
+    <!-- /.row -->

@@ -1,0 +1,73 @@
+{% extends 'base.html' %} {% block title %} Survey Response {% endblock %} {%
+load crispy_forms_tags %} {% block content %}
+<style>
+   .question_label {
+          border: 2px solid #9f9f9f;
+          padding: 9px 10px;
+          width: 100%;
+          background-color: #f39c12 ;
+          margin: 20px 0;
+          color: white;
+        }
+</style>
+<div class="content-wrapper">
+  <!-- Content Header (Page header) -->
+  <section class="content-header">
+    <h1>
+        Survey Response
+    </h1>
+    <ol class="breadcrumb">
+      <li>
+        <a href="#"><i class="fa fa-dashboard"></i> Survey</a>
+      </li>
+      <li class="active">Response</li>
+    </ol>
+  </section>
+
+  <!-- Main content -->
+  <section class="content">
+    <!-- Default box -->
+    <div class="box">
+      <div class="box-header with-border">
+        <h3 class="box-title">Survey Response</h3>
+        <a href="{%url 'api:survey_csv' attempt_id=survey_attempt_id %}"><span class="btn btn-primary pull-right">Export As CSV</span></a>
+      </div>
+      <div class="box-body">
+        {% for user_answers in user_answers %}
+        <label class="question_label">Q: {{user_answers.question}}</label>
+        {% if user_answers.question.type == "FileUpload" %}
+          <img src="{{MEDIA_URL}}{{user_answers.upload_file}}">
+        {% else %}
+        A:{{user_answers.response}} 
+        {% endif %}
+        
+        {% endfor %}
+      </div>
+    </div>
+    <!-- /.box -->
+    <div class="box">
+      <div class="box-body">
+        <form method="post">
+          {% csrf_token %}
+          <input
+            type="hidden"
+            name="survey_attempt"
+            value="{{survey_attempt_id}}"
+          />
+          <div class="form-group">
+            <select class="form-control select2" name="user_skill">
+              {% for label in labels %}
+              <option value="{{label.pk}}">{{label}}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <button type="submit" class="btn btn-primary" name="Submit">Submit</button>
+          <button type="submit" class="btn btn-primary" value="joined" name="survey_and_joined">Survey & Joined Journey</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- /.content -->
+</div>
+{% endblock content %}

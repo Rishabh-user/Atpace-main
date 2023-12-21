@@ -1,0 +1,121 @@
+{% load static %} {% load tags %}
+{% load notifications %}
+<header class="main-header" style="border-bottom: 2px solid gray;">
+  <!-- Logo -->
+  <a href="{% url 'user:index' %}" class="logo">
+    <!-- mini logo for sidebar mini 50x50 pixels -->
+    {% if request.session.user_type == "Admin" or not request.session.company_id|company_logo %}
+      <span class="logo-mini"><img src="{% static 'images/logo/logo.png' %}"></span>
+    {% else %}
+      <span class="logo-mini"><img src="{{MEDIA_URL}}{{ request.session.company_id|company_logo}}"></span>
+    {% endif %}
+    
+    {% if DEBUG %}
+    <!-- logo for regular state and mobile devices -->
+      {% if request.session.user_type == "Admin" or not request.session.company_id|company_logo %}
+      <span class="logo-lg"><img width="150%" id="company-logo" src="{% static 'images/logo/logo.png' %}"></span>
+      {% else %}
+      <span class="logo-lg"><img width="150%" id="company-logo" src="{{MEDIA_URL}}{{ request.session.company_id|company_logo}}"></span>
+      {% endif %}
+    {% else %}
+    {% if request.session.user_type == "Admin" or not request.session.company_id|company_logo %}
+      <span class="logo-lg"><img id="company-logo" src="{% static 'images/logo/logo.png' %}"></span>
+      {% else %}
+      <span class="logo-lg"><img id="company-logo" src="{{MEDIA_URL}}{{ request.session.company_id|company_logo}}"></span>
+       {% endif %}
+    {% endif %}
+  </a>
+  
+  <!-- Header Navbar: style can be found in header.less -->
+  <nav class="navbar navbar-static-top">
+    <!-- Sidebar toggle button-->
+    <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">
+      <span class="sr-only">Toggle navigation</span>
+    </a>
+    <div id="google_translate_element" class="google-translate-div"></div>
+
+{#   <div><strong>Select your language</strong></div>#}
+
+      {% if request.session.user_type != "Admin" and  request.session.company_id|company_banner %}
+      <span class="company-banner"><img style="height:50px; padding: 4px; display: block;
+  margin-left: auto;
+  margin-right: auto;
+  min-width:auto;
+  max-width: 50%;" src="{{MEDIA_URL}}{{ request.session.company_id|company_banner}}"></span>
+      {% else %}
+      <span class="company-banner"><img class="default-banner" src="{% static 'images/logo/default_banner.png' %}">
+      </span>
+      {% endif %}
+
+    <div class="navbar-custom-menu" {% if request.session.user_type != "Admin" and request.session.company_id|company_banner %} style="margin-top: -50px;" {% endif %}>
+      <ul class="nav navbar-nav">
+        <li class="dropdown notifications-menu">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="true">
+        <i class="fa fa-bell" style="font-size: 1.5em;"></i>
+        <span class="label  our-background_color">{{ request.user|notification_count }}</span>
+        </a>
+          <ul class="dropdown-menu">              
+              {% for notification in request.user|notification_list  %}
+                <li class="header">{{notification.description}} {{notification.timestamp}}</li>
+              {% endfor %}
+              <li class="footer"><a href="/push-notification/all/">View all</a></li>
+          </ul>
+        </li>
+        <li class="dropdown user user-menu">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+            <img
+              src="{{MEDIA_URL}}{{request.user.avatar}}"
+              onerror="this.onerror=null; this.src='{{request.user.avatar}}'"
+              class="user-image"
+              alt="User Image"
+            />
+            <span class="hidden-xs"> {{request.user.first_name}}  </span>
+          </a>
+          <ul class="dropdown-menu">
+            <!-- User image -->
+            <li class="user-header">
+              <img
+                src="{{MEDIA_URL}}{{request.user.avatar}}"
+                onerror="this.onerror=null; this.src='{{request.user.avatar}}'"
+                class="img-circle"
+                alt="User Image"
+              />
+
+              <p>{{ request.user.first_name }}</p>
+              
+            </li>
+          <li >
+            {% if request.user.pk %}
+                <a href="{% url 'user:user-profile' pk=request.user.pk %}" class="btn btn-default" style="margin: 10px 0px !important;">Profile</a>
+            {% endif %}
+          </li>
+          <li >
+              <a href="{% url 'leaderboard:leaderboard' %}" class="btn btn-default " style="margin: 10px 0px !important;">Leaderboard</a>
+          </li>
+          <li >
+              <a href="{% url 'user:user_certificates' %}" class="btn btn-default " style="margin: 10px 0px !important;">View Certificates</a>
+          </li>
+            <!-- Menu Body -->
+            <!-- Menu Footer-->
+            <li class="user-footer">
+      
+              <div class="pull-left">
+                {% if request.user.password == '' %}
+                <a href="{% url 'user:set-password' pk=request.user.pk %}" class="btn btn-default">Set Password</a>
+                {% else %}
+                <a href="{% url 'user:password_change' %}" class="btn btn-default">Change Password</a>
+                {% endif %}
+              </div>
+             
+              <div class="pull-right">
+                <a href="{% url 'user:logout' %}" class="btn btn-default">Sign out</a>
+              </div>
+            </li>
+          </ul>
+        </li>
+        <!-- Control Sidebar Toggle Button -->
+      </ul>
+    </div>
+  </nav>
+
+</header>

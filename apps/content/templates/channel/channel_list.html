@@ -1,0 +1,349 @@
+{% extends 'base.html' %} {% load static %}
+{% block title %} Journey List {% endblock %} 
+{% load tags %}
+<!-- DataTables -->
+{% block css %}
+<link rel="stylesheet" href="{% static 'bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css' %}">
+{% endblock css %} 
+{% block content %}
+
+
+<div class="content-wrapper">
+  <section class="content-header">
+    <h1>
+      Journey
+    </h1>
+    <ol class="breadcrumb">
+      <li><a href="#"><i class="fa fa-dashboard"></i>Journey Setup</a></li>
+      <li><a href="#">Journey</a></li>
+      <li class="active">List</li>
+    </ol>
+  </section>
+
+  <section class="content">
+    <div class="row">
+       <div class="col-xs-12">
+           <div class="box">
+             <div class="box-header">
+               <h3 class="box-title">Journey List</h3>
+               {% if 'mentoring_journey' in request.path %}
+                <a href="{%url 'api:journey_data' journey_type='MentoringJourney' %}"><button class="btn btn-primary pull-right">Export Journeys</button></a>
+               
+               {% else %}
+                <a href="{%url 'api:journey_data' journey_type='All' %}"><button class="btn btn-primary pull-right">Export Journeys</button></a>
+               {% endif %}
+               <a href="{%url 'content:create-channel' %}"><button class="btn btn-primary pull-right">Create Journey</button></a>
+
+             </div>
+             <!-- /.box-header -->
+             <div class="box-body">
+               <table id="example2" class="table table-bordered table-hover">
+                 <thead>
+                 <tr>
+                  <tr>
+                    <th>Journey Title</th>
+                    <th>Category</th>
+                    <th>Type</th>
+                    <th>Description</th>
+                    
+                    <th>Action</th>
+                  </tr>
+                   
+                 </tr>
+                 </thead>
+                 <tbody>
+                   {% for channel in channels %}
+                   
+                   <tr {% if channel.is_global %} style="background: lightblue;" {% endif %} id="{{channel.id}}">
+                    <td>{{channel.title}} </td>
+                    <td>{{ channel.category|check_value_is_none }} </td>
+                    <td>{{channel.channel_type}}</td>
+                    <td>{{channel.description|safe}}</td>
+                    
+                    <td>
+                      <div class="dropdown">
+                        <button class="btn bg-purple dropdown-toggle btn-select-option" type="button" data-toggle="dropdown" aria-expanded="true">Select an option                                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu options-dropdown">
+                          <li>
+                              <a href="{% url 'content:channel_groups_list' channel_id=channel.pk %}"><i class="fa fa-eye option-icon"></i>Journey Proficiency Level</a>
+                          </li>
+                           
+                          <li>
+                            <a href="{% url 'content:journey_all_report' channel=channel.pk %}"><i class="fa fa-eye option-icon"></i>Journey Users Data</a>
+                        </li>
+                         
+                          <li>
+                            <a href="{% url 'content:user_list' channel_id=channel.pk %}"><i class="fa fa-user option-icon"></i>View Users</a>
+                          </li>
+                         
+                          <li>
+                            <a href="{% url 'content:journey_content_list' channel_id=channel.pk %}"><i class="fa fa-eye option-icon"></i>View Contents</a>
+                          </li>
+                            <li>
+                                <a href="{% url 'content:edit-channel' pk=channel.pk %}"><i class="fa fa-edit option-icon"></i>Edit</a>
+                            </li>
+                            {% if channel.channel_type == "MentoringJourney" or channel.channel_type == "SelfPaced" %}
+                            <li>
+                              <a href="{% url 'content:setup-journey-content' journey_id=channel.pk%}"  ><i class="fa fa-cog option-icon"></i>Setup Journey</a>
+                            </li>
+                            <li>
+                              <a href="{% url 'user:journey_report' journey=channel.pk%}"  ><i class="fa fa-bar-chart option-icon"></i>Reporting</a>
+                            </li>
+                            <li>
+                              <a data-target="#modal-default" data-toggle="modal" onclick="getId('{{channel.id}}', '{{channel.channel_type}}')"><i class="fa fa-save option-icon"></i>Save as</a>
+                            </li>
+                            {% endif %}
+                            {% if channel.channel_type == "SkillDevelopment" %}
+                            <li>
+                              <a data-target="#modal-skill-journey" data-toggle="modal" onclick="getId('{{channel.id}}', '{{channel.channel_type}}')"><i class="fa fa-save option-icon"></i>Save as</a>
+                            </li>
+                            {% endif %}
+                            <li>
+                                <a href="javascript:void(0)"  class="delete_channel"><i class="fa fa-trash option-icon"></i>Delete</a>
+                            </li>
+
+                        </ul>
+                    </div>
+                    </td>
+                   </tr>
+                   {% endfor %}
+                 </tfoot>
+               </table>
+             </div>
+             <!-- /.box-body -->
+           </div>
+           <!-- /.box -->
+ 
+          
+         </div>
+       <!-- /.col -->
+    </div>
+    <!-- /.row -->
+ </section>
+  <div class="modal fade" id="modal-default" style="display: none;">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form id="journey_form">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span></button>
+          <h4 class="modal-title">Save As</h4>
+        </div>
+        <div class="modal-body">
+            <input name="id" id="journey_id" type="hidden" value=""/>
+            <div class="form-group">
+              <label>Journey Name</label>
+              <input type="text" class="form-control"  name="journey" id="journey" required>
+            </div>
+            <div class="form-group">
+              <input type="checkbox" class="form-check-input"  name="is_lite_signup_enable" id="is_lite_signup_enable" value="">
+              <label for="is_lite_signup_enable">Is lite signup enable</label>
+            </div>
+            <div class="form-group">
+              <input type="checkbox" class="form-check-input"  name="add_to_community" id="add_to_community" value="">
+              <label for="add_to_community">Add to community</label>
+            </div>
+            <div class="form-group">
+              <input type="checkbox" class="form-check-input"  name="show_on_website" id="show_on_website" value="">
+              <label for="show_on_website">Show on website</label>
+            </div>
+            <div class="form-group">
+              <input type="checkbox" class="form-check-input"  name="is_wp_required" id="is_wp_required" value="">
+              <label for="is_wp_required">Whatsapp notification required</label>
+            </div>
+            <div class="form-group">
+              <input type="checkbox" class="form-check-input"  name="profile_assessment" id="profile_assessment" value="">
+              <label for="profile_assessment">Replicate profile assessment</label>
+            </div>
+            <div class="form-group">
+              <input type="checkbox" class="form-check-input"  name="replicate_content" id="replicate_content" value="">
+              <label for="replicate_content">Replicate Content</label>
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+          <button type="submit" id="sumbitChannel" class="btn btn-primary">Save changes</button>
+        </div>
+      </form>
+      </div>
+      <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+  </div> 
+  <div class="modal fade" id="modal-skill-journey" style="display: none;">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form id="skill_journey_form">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span></button>
+          <h4 class="modal-title">Save As</h4>
+        </div>
+        <div class="modal-body">
+            <input name="id" id="skill_journey_id" type="hidden" value=""/>
+            <div class="form-group">
+              <label>Journey Name</label>
+              <input type="text" class="form-control"  name="journey" id="skill_journey" required>
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+          <button type="submit" id="replicateSkillChannel" class="btn btn-primary">Save changes</button>
+        </div>
+        </form>
+      </div>
+      <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+  </div> 
+</div>
+{% endblock content %} 
+{% block js %}
+<script src="{% static 'bower_components/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
+<script>
+
+$(function () {
+  $(".delete_channel").click(function(){
+    var id = $(this).parents("tr").attr("id");
+    bootbox.confirm({
+    message: "Are you sure to remove this record ?",
+    buttons: {
+        confirm: {
+            label: 'Yes',
+            className: 'btn-success'
+        },
+        cancel: {
+            label: 'No',
+            className: 'btn-danger'
+        }
+    },
+    callback: function (result) {
+        if(result == true){
+          $.ajax({
+               url:  "{% url 'content:delete_channel' %}",
+               type: 'post',
+               data: {pk: id, csrfmiddlewaretoken : "{{csrf_token}}" },
+               error: function() {
+                bootbox.alert('Something is wrong');
+               },
+               success: function(data) {
+                    $("#"+id).remove();
+                    bootbox.alert("Record removed successfully");  
+               }
+            });
+        }
+    }
+});
+});
+});
+
+function getId(id, type){
+  console.log(id)
+  document.getElementById("skill_journey_id").value = id
+  if(type == 'MentoringJourney' || type == 'SelfPaced'){
+    document.getElementById("journey_id").value = id
+  }
+}
+
+$(function () {
+  $("#sumbitChannel").on('click', function (event) {
+    var id = document.getElementById('journey_id').value;
+    console.log("id ", id);
+    journey = $('#journey').val();
+    console.log("journey ", journey);
+    var data = {
+      pk: document.getElementById('journey_id').value,
+      journey: $('#journey').val(),
+      is_lite_signup_enable: document.getElementById('is_lite_signup_enable').checked,
+      add_to_community: document.getElementById('add_to_community').checked,
+      show_on_website: document.getElementById('show_on_website').checked,
+      is_wp_required: document.getElementById('is_wp_required').checked,
+      profile_assessment: document.getElementById('profile_assessment').checked,
+      replicate_content: document.getElementById('replicate_content').checked,
+      csrfmiddlewaretoken : "{{csrf_token}}"
+    }
+    console.log("Data", data)
+    if (journey){
+      $.ajax({
+        url:  "{% url 'content:copy_journey_data' %}",
+        type: 'post',
+        data: data,
+        error: function() {
+          bootbox.alert('Something is wrong');
+        },
+        success: function(data) {
+          if (data.success){
+          bootbox.alert(data.message);
+          window.location.reload();
+          }
+          else {
+            bootbox.alert(data.message);
+            window.location.reload();
+          }  
+        }
+      });
+    }
+    else {
+      bootbox.alert("Please specify new journey name");
+    }
+    event.preventDefault();
+  });
+});
+
+$(function () {
+  $("#replicateSkillChannel").on('click', function (event) {
+    var id = document.getElementById('skill_journey_id').value;
+    console.log("id ", id);
+    journey = $('#skill_journey').val();
+    console.log("journey ", journey);
+    var data = {
+      pk: id,
+      journey: journey,
+      csrfmiddlewaretoken : "{{csrf_token}}"
+    }
+    console.log("Data", data)
+    if (journey){
+      $.ajax({
+        url:  "{% url 'content:copy_skill_journey_data' %}",
+        type: 'post',
+        data: data,
+        error: function() {
+          bootbox.alert('Something is wrong');
+        },
+        success: function(data) {
+          if (data.success){
+          bootbox.alert(data.message);
+          window.location.reload();
+          }
+          else {
+            bootbox.alert(data.message);
+            window.location.reload();
+          }  
+        }
+      });
+    }
+    else {
+      bootbox.alert("Please specify new journey name");
+    }
+    event.preventDefault();
+  });
+});
+
+
+$(function () {
+ 
+  $('#example2').DataTable({
+    "dom": '<"table-pull-left"f><"table-pull-right"l>tip',
+    'paging'      : true,
+    'lengthChange': true,
+    'searching'   : true,
+    'ordering'    : true,
+    'info'        : true,
+    'autoWidth'   : true,
+    'scrollX'     : true
+  })
+})
+</script>
+{% endblock js %}

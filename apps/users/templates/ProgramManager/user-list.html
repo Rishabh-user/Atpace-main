@@ -1,0 +1,297 @@
+{% extends 'base.html' %} {% load static %}
+{% if request.path == '/user/list/' %} User List {% else %} Admin {% endif %}
+{% load tags %}
+<!-- DataTables -->
+{% block css %}
+<link rel="stylesheet" href="{% static 'bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css' %}">
+{% endblock css %} 
+{% block content %}
+
+
+<div class="content-wrapper">
+  <section class="content-header">
+    <h1>
+      User
+      <small>List</small>
+    </h1>
+    <ol class="breadcrumb">
+      <li><a href="#"><i class="fa fa-dashboard"></i> User Settings</a></li>
+      <li><a href="#">User</a></li>
+      <li class="active">List</li>
+    </ol>
+  </section>
+
+  <section class="content">
+    <div class="row">
+       <div class="col-xs-12">
+        <div class="box">
+          <div class="box-header">
+          <h3 class="box-title">Filter by</h3>
+          </div>
+          <div class="box-body">
+            <form method="post" action="{% url 'user:program_user_list' %}">
+              {% csrf_token %}
+              <div class="form-group">
+                <label class="col-md-12 control-label">User</label>
+                <input class="form-control" type="text" name="user" id="user" placeholder="user" />
+              </div>
+              <div class="form-group">
+                <label class="col-md-12 control-label">Assessment</label>
+                <select class="form-control select2" name="assessment" id="assessment" style="width:100%;">
+                  <option value="">Select</option>
+                  <option value="complete">Complete</option>
+                  <option value="pending">Pending</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="col-md-12 control-label">Journey</label>
+                <select class="form-control select2" name="journey" id="journey" style="width:100%;">
+                  <option value="">Select</option>
+                  {% for journey in request.user|program_manager_journeys %}
+                    <option value="{{journey.title}}">{{journey.title}}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="form-group">
+                <button type="submit" class="btn btn-primary pull-right">Filter</button>
+              </div>
+            </form>
+          </div>
+        </div>
+           <div class="box">
+             <div class="box-header">
+               <h3 class="box-title">Users List</h3>
+
+              </div>
+             <!-- /.box-header -->
+             <div class="box-body">
+
+               <table id="example2" class="table table-bordered table-hover">
+                 <thead>
+                  <tr>
+                    <th>Full Name</th>
+                    <th>username</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Profile Assessment</th>
+                    <th>Type</th>
+                    <th>Journy</th>
+                    <th>Status</th>
+                    <th>Join Date</th>
+                    <th>Date Modified</th>
+                    <th>Lite Signup</th>
+                    {% comment %} <th>User Profile</th> {% endcomment %}
+                    <th>User Status</th>
+                </tr>
+                 </thead>
+                 <tbody>
+                  {% for list in registration_list %}
+                    <tr>
+                      
+                      <td>{{list.user.first_name}} {{list.user.last_name}}</td>
+                      <td><a href="{% url 'user:user-profile' pk=list.user.id %}?user_type={{list.user.userType.all|join:', ' }}" target="_blank">{{list.user.username}}</a></td>
+                      <td><a href="{% url 'user:user-profile' pk=list.user.id %}?user_type={{list.user.userType.all|join:', ' }}" target="_blank">{{list.user.email}}</a></td>
+                      <td>{{list.user.phone}}</td>
+                      <td>{% if list.user.user_profile_assest.all.count == 0 %} <kbd>Pending</kbd> {% else %} <kbd>Complete</kbd> {% endif %}</td>
+                      <td>{{list.user.userType.all|join:', ' }}  </td>
+                      <td>
+                      <kbd>{{list.journey.Channel.title}}</kbd>
+                         {% comment %} {% for i in user.user_content.all %}
+                          {% if i.Channel.company in request.user.company.all  %}
+                            <kbd>{{i.Channel.title}}<kbd><br>
+                              <br>
+                          
+                          {% endif %}
+                        {% endfor %%} {% endcomment %}
+
+{% comment %}                        
+                        {% for j in user.user_coupan.all %}
+                              {{j.code.journey}}
+                        {% endfor %} {% endcomment %}
+                        
+                      </td>
+                      
+                      <td>
+                        {% if list.user.is_active %}
+                          <kbd>Active</kbd>
+                        {% else %}
+                          <kbd>InActive</kbd>
+                        {% endif %}
+                        </td>
+                        <td>{{list.user.date_joined}}</td>
+                        <td>{{list.user.date_modified}}</td>
+                        <td><kbd>{{list.user.is_lite_signup}}<kbd></td>
+                      {% comment %} <td><a href="{% url 'user:user-profile' pk=user.id %}?user_type={{user.userType.all|join:', ' }}" target="_blank"><kbd>User Profile</kbd></a> </td> {% endcomment %}
+                      <td >
+                        
+                        {% if not list.user.is_archive %}
+
+                        {% if list.user.pk in check_mentor %}
+                          <kbd>Active</kbd>
+                          {% else %}
+                            <div class="dropdown" >
+                              <button class="btn bg-purple dropdown-toggle btn-select-option" type="button" data-toggle="dropdown" aria-expanded="true">Select an option<span class="caret"></span></button>
+                              <ul class="dropdown-menu options-dropdown">
+                                <li  class="archive_user" data-id="{{list.user.id}}">
+                                  <a href="#" ><i class="fa fa-edit option-icon"></i>Archive</a>
+                              </li>
+                              {% if "Mentor" in list.user.userType.all|join:', ' %}
+                              <li class="add_mentor_pool" data-id="{{list.user.id}}">
+                                  <a href="#" data-toggle="modal" data-target="#modal-default"><i class="fa fa-edit option-icon"></i>Add to Mentor Pool</a>
+                              </li>
+                              {% endif %}
+                              {% if "Learner" in list.user.userType.all|join:', ' %}
+                              <li>
+                                <a href="#"><i class="fa fa-edit option-icon"></i>Add to Mentee Pool</a>
+                            </li>
+                            {% endif %}
+                          </div>
+                          {% endif %}
+                      
+                      {% else %}
+                      <kbd>Archive</kbd>
+                      {% endif %}
+                      </td>
+                    </tr>
+                    {% endfor %}
+
+                 </tfoot>
+               </table>
+             </div>
+             <!-- /.box-body -->
+           </div>
+           <!-- /.box -->
+
+           <div class="modal fade" id="modal-default" style="display: none;">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <form id="Content_form">
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span></button>
+                  <h4 class="modal-title">Add to Pool</h4>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="pool_mentor_id" name="pool_mentor_id">
+                    <div class="form-group">
+                        <label>Select Pool</label>
+                        <select class="form-control select2" id="pool" required style="width: 100%;">
+    
+                          <option selected="selected" value="">Select Pool</option>
+                          {% for pool in pool %}
+                            <option value="{{pool.id}}">{{pool.name}}</option>
+                          {% endfor %}
+                        </select>
+                      
+                      </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+                  <button type="submit" id="sumbitpool" class="btn btn-primary">Save changes</button>
+                </div>
+              </form>
+              </div>
+          
+         </div>
+       <!-- /.col -->
+    </div>
+    <!-- /.row -->
+ </section>
+ 
+</div>
+{% endblock content %} 
+{% block js %}
+
+<script src="{% static 'bower_components/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
+<script src="https://cdn.datatables.net/buttons/2.0.0/js/dataTables.buttons.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.0.0/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.0.0/js/buttons.print.min.js"></script>
+<script>
+
+$(function () {
+ $("body").on("click",".add_mentor_pool",function(){
+   var id = $(this).data('id');
+   document.getElementById("pool_mentor_id").value = id;
+});
+$("body").on("click",".archive_user",function(){
+  var contextthis = this;
+   var id = $(this).data('id');
+   bootbox.confirm("Are you Sure you want toArchive this user!", function(result){ 
+     if(result){
+      var formdata = {
+      user_id: id,
+      csrfmiddlewaretoken: "{{csrf_token}}",
+    };
+   $.ajax({
+      type: "post",
+      url: "{% url 'user:archive_user' %}",
+      data: formdata,
+      encode: true,
+//      contentType: "application/json", 
+    }).done(function(data){
+      if(data == "Success"){
+       
+        $(contextthis).parent().parent().parent().html('<kbd>Archive</kbd>');
+      }
+    })
+     }
+    
+});
+   
+});
+$('#example2').DataTable({
+    // "dom": '<"table-pull-left"f><"table-pull-right"l>tip',
+    dom: 'Bfrtip',
+    "ordering": false,
+    buttons: [
+        'copy', 'csv', 'excel', 'pdf', 'print'
+    ]
+  });
+});
+
+$(document).ready(function () {
+  $('#pool').change(function(){
+    var formdata = {
+      pool: $('#pool').val(),
+      user_id: $("#pool_mentor_id").val(),
+      csrfmiddlewaretoken: "{{csrf_token}}",
+    };
+    $.ajax({
+      type: "post",
+      url: "{% url 'user:add_mentor' %}",
+      data: formdata,
+      encode: true,
+//      contentType: "application/json", 
+    }).done(function(data){
+      console.log(data);
+    })
+  });
+});
+
+function filter_user(){
+  user = document.getElementById("user").value
+  console.log("Hello", user)
+  $.ajax({
+    url:"{% url 'user:program_user_list' %}",
+    type:"POST",
+    data:{user:user, csrfmiddlewaretoken : "{{csrf_token}}" },
+    error: function(data){
+      console.log(data)
+    },
+    success: function(data) {
+      console.log(data)
+    },
+  });
+}
+function filter_assessment(){
+  console.log("Hello")
+}
+function filter_journey(){
+  console.log("Hello")
+}
+
+</script>
+{% endblock js %}

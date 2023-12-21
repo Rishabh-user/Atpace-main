@@ -1,0 +1,65 @@
+/* Sarthak */
+
+h3, h5 {
+    line-height: 1.5;
+}
+
+/* Large devices (laptops/desktops, 1024 and up) */
+@media only screen and (min-width: 1024px) {
+    .course_card {
+        height: 90px;
+        border-top-left-radius: 12px;
+        border-top-right-radius: 12px;
+    }
+
+    .course_box {
+        height: 315px;
+        border-left: none;
+    }
+}
+
+@media only screen and (max-width: 1024px) {
+    .box.box-widget.widget-user.course_box.glassmorphism {
+        height: 315px;
+    }
+}
+
+/* Extra large devices (large laptops and desktops, 1200px and up) */
+@media only screen and (min-width: 1200px) {
+    .course_card {
+        height: 163px;
+        border-top-left-radius: 12px;
+        border-top-right-radius: 12px;
+    }
+
+    .course_box {
+        height: 315px;
+        border-left: none;
+    }
+}
+
+.card-logo-img {
+    height: auto;
+    width: 100%;
+    max-width: 80px;
+}
+
+.fixedButton {
+    position: fixed;
+    bottom: 0px;
+    right: 0px;
+    padding: 40px;
+}
+
+.roundedFixedBtn {
+    height: 60px;
+    line-height: 65px;
+    width: 60px;
+    font-size: 2em;
+    font-weight: bold;
+    border-radius: 50%;
+    background-color: #4CAF50;
+    color: white;
+    text-align: center;
+    cursor: pointer;
+}

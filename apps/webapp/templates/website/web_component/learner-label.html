@@ -1,0 +1,16 @@
+{% load static %} {% load tags %}
+<div class="course__description-list mb-45">
+<h4>{% if order.type == "learn_label" %} {{ order.data }} {% else %}What Will you learn {% endif %} </h4>
+<ul>
+   
+{% with order.journey.what_we_learn|split:"," as what_we_learn_list %}
+
+  {% for learn in what_we_learn_list %}
+
+  <li>{{learn|safe}}</li>
+  {% endfor %}
+{% endwith %}
+</ul>
+</div>                               
+</div>
+</div>

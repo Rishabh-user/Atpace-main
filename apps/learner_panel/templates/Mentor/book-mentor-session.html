@@ -1,0 +1,36 @@
+ <div class="box">
+      <div class="box-header">
+        <h3 class="box-title">Book Mentor Session</h3>
+      </div>
+      <!-- /.box-header -->
+      <div class="box-body">
+        <table id="book-session-table" class="table table-bordered table-hover">
+          <thead>
+          <tr>
+            <th>Name</th>
+            <th>Mentor</th>
+            <th>Time</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+          </thead>
+          <tbody>
+            <tr v-for="session in book_mentor_session" :key="session.id">
+              <td class="capitalize">[[session.title]]</td>
+              <td>[[session.mentor_name]]</td>
+              <td>[[session.start_time]]</td>
+              <td>[[session.status]]</td>
+              <td>
+                  <button class="btn btn-danger" v-if="session.status == 'Cancelled'">Cancelled</button>
+                  <button class="btn btn-danger" v-if="session.status == 'Expired'">Expired</button>
+                  <button class="btn btn-info" @click="BookSlot(session.id, session.mentor_id, session.start_time, session.end_time, session.title, user_id, base_url, token)" v-if="session.status == 'Available'">Book Slot</button>
+                  <button class="btn btn-success" v-if="session.status == 'Booked'">Booked</button>
+                  <button class="btn btn-danger" @click="CancelSlot(session.id, session.mentor_id, session.title, user_id, base_url, token)" v-if="session.status == 'Booked'">Cancel</button>
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+      <!-- /.box-body -->
+    </div>
+    <!-- /.box -->

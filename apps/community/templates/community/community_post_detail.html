@@ -1,0 +1,41 @@
+{% load tags %}
+<div class="box box-widget">
+    <a href="{% url 'community:journey_post_details' channel=channel.pk post_id=data.id %}"> <h4 style="padding: 10px;">{{data.title}}</h4></a>
+    <div class="box-header with-border">
+      <div class="user-block">
+        <img class="img-circle" src="{{data.user_profile_image}}" alt="User Image">
+        <span class="username"><a href="#" style="color: black;">{{data.created_by}}</a></span>
+        <span class="description">
+          {{ data.created_at }}
+          </span>
+      </div>
+      <!-- /.user-block -->
+      {% if data.created_by_id == request.user.id %}
+      <div class="box-tools">
+        <button type="button" class="btn btn-box-tool" data-toggle="tooltip" title="" data-original-title="Mark as read">
+          <i class="fa fa-circle-o"></i></button>
+        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+        </button>
+        <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+      </div>
+      {% endif %}
+      <!-- /.box-tools -->
+    </div>
+    <!-- /.box-header -->
+    <div class="box-body">
+      <!-- post text -->
+      {% autoescape off %}
+      {% if data.body %}
+      {{data.body}}
+      {% else %}
+      {{data.description}}
+      {% endif %}
+    {% endautoescape %}
+      <!-- Social sharing buttons -->
+      <hr>
+      <!-- <button type="button" class="btn btn-default btn-xs"><i class="fa fa-share"></i> Share</button> -->
+      <button type="button" class="btn btn-default btn-xs"><i class="fa fa-thumbs-o-up"></i> Like</button>
+      <span class="pull-right text-muted">{% if data.likes_count != 0 %} {{data.likes_count}} {% endif %} likes -  comments({{data.total_comments}})</span>
+    </div>
+    <!-- /.box-body -->
+               </div>

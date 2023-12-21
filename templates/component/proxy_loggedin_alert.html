@@ -1,0 +1,31 @@
+{% load tags %}
+<style>
+    .enclosed-div {
+        margin-left: 256px;
+        margin-top: 66px;
+        width: 80%;
+    }
+</style>
+{% if request.session.user_type == "Admin" or request.session.user_type == "ProgramManager" %}
+    {% if request.session.UserDashboardView %}
+        <div class="callout callout-danger lead enclosed-div">
+            <h4>Proxy Logged in Alert!</h4>
+            <p>You are logged in as a {{ request.user.username }}. You are not authorised to do any changes in this
+                dashboard.</p>
+        <a href="{% url 'user:user-dashboard' %}">
+           <button class="btn btn-info" style="margin:1px;">Back to Admin Dashboard</button>
+        </a>
+        </div>
+    {% endif %}
+
+    {% if request.session.MentorDashboardView %}
+        <div class="callout callout-danger lead enclosed-div">
+            <h4>Proxy Logged in Alert!</h4>
+            <p>You are logged in as a {{ request.user.username }}. You are not authorised to do any changes in this
+                dashboard.</p>
+        <a href="{% url 'user:user-dashboard' %}">
+           <button class="btn btn-info" style="margin:1px;">Back to Admin Dashboard</button>
+        </a>
+        </div>
+    {% endif %}
+{% endif %}

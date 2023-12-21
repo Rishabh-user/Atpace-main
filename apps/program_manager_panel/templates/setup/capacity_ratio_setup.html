@@ -1,0 +1,133 @@
+<div class="row" style="margin-top: 30px;">
+    <div class="col-md-2">
+    <div class="card side-tab" style="">
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item" @click="showCreateCapacity" id="createCapacity">Create</li>
+            <li class="list-group-item" @click="showListCapacity" id="listCapacity">List</li>
+        </ul>
+    </div>
+    </div>
+    <div class="col-md-10">
+      <div v-if="displayCreateCapacity">
+        <div class="box">
+        <div class="box-header with-border">
+          <h3 class="box-title">Capacity Ratio Setup</h3>
+        </div>
+        <div class="box-body">
+          <form @submit.prevent="onCapacityRatioSetup">
+            <div class="row">
+                    <div class="col-md-12">
+                      <div class="form-group">
+                        <label>Company</label>
+                        <input type="text" class="form-control" value="" v-model="user_company_name" name="sidebarCompany" readOnly/>
+                        {% comment %} <select class="form-control select2" name="company" required style="width: 100%;" @change="onSelectCompany" ref="company">
+                          <option selected="selected">Select</option>
+                          <option
+                            v-bind:value="company.id"
+                            v-for="company in company_list"
+                            :key="company.id"
+                          >
+                              [[company.name]]
+                          </option>
+                        </select> {% endcomment %}
+                      </div>
+                      <!-- /.form-group -->
+                      <div class="form-group">
+                        <label>Subscription</label>
+                        <select class="form-control select2" name="subscription" required style="width: 100%;" @change="onSelectSubscription" ref="subscription">
+                          <option selected="selected">Select</option>
+                          <option
+                            v-bind:value="subscription.id"
+                            v-for="subscription in subscription_list"
+                            :key="subscription.id"
+                          >
+                            [[subscription.subscription_title]] 
+                          </option>
+                        </select>
+                      </div>
+                      <!-- /.form-group -->
+                      <div class="form-group">
+                        <label>Max Mentors</label>
+                        <input
+                          name="max_mentor"
+                          type="number"
+                          id="max_mentor"
+                          v-model="max_mentor"
+                          class="form-control"
+                          readonly
+                          required
+                        />
+                      </div>
+                      <!-- /.form-group -->
+                      <div class="form-group">
+                        <label>Max Mentees</label>
+                        <input
+                          name="max_mentees"
+                          type="number"
+                          id="max_mentees"
+                          v-model="max_mentees"
+                          class="form-control"
+                          readonly
+                          required
+                        />
+                      </div>
+                      <!-- /.form-group -->
+                      <div class="form-group">
+                        <label>Mentees per mentor</label>
+                        <input
+                          name="mentees_per_mentor"
+                          type="number"
+                          id="mentees_per_mentor"
+                          v-model="mentees_per_mentor"
+                          class="form-control"
+                          required
+                        />
+                      </div>
+                      <!-- /.form-group -->
+                      
+                    </div>
+                    <!-- /.col -->
+                    <button type="submit" class="btn btn-primary">Create</button>
+                  </div>
+                  <!-- /.row -->
+        </form>
+        </div>
+      </div>
+      <!-- /.box -->
+      </div>
+      <div v-if="displayListCapacity">
+        <div class="box">
+        <div class="box-header">
+          <h3 class="box-title">Capacity Ratio Setup List</h3>
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body">
+          <table id="capacity-ratio-table" class="table table-bordered table-hover">
+            <thead>
+             <tr>
+               <th>SNo.</th>
+               <th>Subscription</th>
+               <th>Max Mentors</th>
+               <th>Max Mentees</th>
+               <th>Mentees per mentors</th>
+             </tr>
+            </thead>
+            <tbody>
+             <tr v-for="(subscription, index) in capicity_ratio_list">
+               <td>[[index+1]]</td>
+               <td>[[subscription.subscription_name]]</td>
+               <td>[[subscription.max_mentor]]</td>
+               <td>[[subscription.max_learner]]</td>
+               <td>[[subscription.learners_per_mentor]]</td>
+             </tr>
+            </tfoot>
+          </table>
+        </div>
+        <!-- /.box-body -->
+      </div>
+      </div>
+    </div>
+</div>
+
+
+  

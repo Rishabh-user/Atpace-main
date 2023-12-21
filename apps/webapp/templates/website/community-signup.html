@@ -1,0 +1,494 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+
+    <title>Welcome Atpace</title>
+    <link rel="stylesheet" href="{% static 'website/community/mystyle.css' %}">
+       <style>
+		  @media only screen and (max-width: 600px){
+iframe {
+    margin-top: -20px;
+    height: 600px;
+}}
+	  </style>
+	<style>
+	         .btn-grad {background-image: linear-gradient(to right, #DA22FF 0%, #9733EE  51%, #DA22FF  100%)}
+         .btn-grad {
+            margin: 10px;
+            padding: 15px 35px;
+            text-align: center;
+            text-transform: uppercase;
+            transition: 0.5s;
+            background-size: 200% auto;
+            color: white;            
+            box-shadow: 0 0 20px #eee;
+            border-radius: 10px;
+            display: block;
+			width: 350px;
+          }
+
+          .btn-grad:hover {
+            background-position: right center; /* change the direction of the change here */
+            color: #fff;
+            text-decoration: none;
+          }
+         
+.strikethrough-diagonal {
+	 position: relative;
+	 color: white;
+	 font-weight: bold;
+	 font-size: 22px;
+}
+ .strikethrough-diagonal:before {
+	 position: absolute;
+	 content: '';
+	 left: 0;
+	 top: 45%;
+	 right: 0;
+	 border-top: 1px solid;
+	 border-color: inherit;
+	 -webkit-transform: skewY(-10deg);
+	 -moz-transform: skewY(-10deg);
+	 transform: skewY(-10deg);
+}
+
+.alert{
+  display: none !important;
+}
+	</style>
+	<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-M5C926N');</script>
+<!-- End Google Tag Manager -->
+      <meta name="facebook-domain-verification" content="apk1erketgj35nsfgbs657gvicwqu4" />
+  </head>
+<body>
+	<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-M5C926N"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+	<section id="topbanner" class="py-5">
+		<div class="container">
+		<p style="
+    TEXT-ALIGN: CENTER;
+"><img src="{% static 'website/images/Long Shadow white.png' %}" style="height: 90px;" alt=""></p><div class="row text-center justify-content-center align-items-center">
+			<h2>Join the Atpace Community</h2>
+			<h1 id="main-heading"><span style="color: #fff500; line-height: 1.45;">UPSKILL</span> WITH INDUSTRY EXPERTS</h1>
+			<div class="col-lg-6 header-col">
+				
+				
+				
+				<div id="video-title"><p style="color: #fff500; margin: auto; margin-top: 16px;">A JOURNEY OF THE COMMUNITY OFFERINGS</p></div>
+				<iframe title="vimeo-player" src="https://player.vimeo.com/video/687651624?h=701d9bd114" width="100%" height="360" frameborder="0"  allowfullscreen=""></iframe></div>
+				{% comment %}
+							
+
+				<p><a href="#" class="btnstyle1 mob_res" ><img data-bs-toggle="modal" data-bs-target="#SignUpModal" src="{% static 'website/images/buttun1.png' %}" alt=""></a></p>
+				{% endcomment %}
+			
+			
+				<p style="  display: flex;
+  align-items: center;
+  justify-content: center;"><button data-bs-toggle="modal" data-bs-target="#SignUpModal" class="btn-grad" id="signup_button1" style="justify-content: center;"><div class="pull-left" style="float:left"><span class="strikethrough-diagonal" id="signup_button1_amount">INR 799</span></div><div class="pull-right" style="float:right"> <span style="line-height: 0;"><strong id="signup_button1_join">Join Community</strong></span><br><small style="font-size: 10px; line-height: 0;" id="signup_button1_free">(Now For Free)</small></div></button></p>
+
+				<p style="margin-top: -14px;
+				font-size: 13px;">Limited Period Access</p>
+				{% if messages %}
+			{% for message in messages %}
+			
+			<p style="color: white;">	{{message}}</p>
+		
+		{% endfor %}
+		{% endif %}
+			</div>
+			
+		</div>
+		
+	</section>
+	
+	
+	
+	<section id="excomm" class="py-5">
+		<div class="container">
+			<h2 class="text-center"style="font-size: 30px;
+			font-weight: 700;" >CONTENT OF THE EXCLUSIVE COMMUNITY</h2>
+				
+			<h3 class="lead text-center">What will you get</h3>
+		<div class="row">
+			<div class="col-md-4">
+				<div class="cards">
+					<img src="{% static 'website/images/knowledge.png' %}" alt="" /> 
+					<h4>Knowledge Sharing</h4>
+					<ul>
+						<li>Get unlimited access to <br>knowledge sharing in the community </li>
+						
+					</ul>
+				</div>
+			</div>
+			<div class="col-md-4">
+				<div class="cards">
+					<img src="{% static 'website/images/Livesession.png' %} " alt="" /> 
+					<h4>Live Sessions</h4>
+					<ul>
+						<li>Live sessions by industry <br>experts and working professionals </li>
+					
+					</ul>
+				</div>
+			</div>
+			<div class="col-md-4">
+				<div class="cards">
+					<img src="{% static 'website/images/Scorecard.png' %}" alt="" /> 
+					<h4>Course Bundle</h4>
+					<ul>
+						<li>Get a bundle of three <br>courses spread over 3 months</li>
+				
+					
+					</ul>
+				</div>
+			</div>
+		</div>
+		
+		<div class="row">
+			<div class="col-md-4">
+				<div class="cards">
+					<img src="{% static 'website/images/Project.png' %}" alt="" /> 
+					<h4>Project opportuity</h4>
+					<ul>
+						<li>Opportunity to engage<br> with students across Asia.</li>
+						<li>Project opportunity/internship<br> opportunity</li>
+					
+					</ul>
+				</div>
+			</div>
+			<div class="col-md-4">
+				<div class="cards">
+					<img src="{% static 'website/images/Videos.png' %}" alt="" /> 
+					<h4>Readiness Scorecard</h4>
+					<ul>
+						<li>Get corporate readiness scorecard<br> at the end of the 3-month program!</li>
+					
+					
+					</ul>
+				</div>
+			</div>
+			<div class="col-md-4">
+				<div class="cards">
+					<img src="{% static 'website/images/learninghours.png' %}" alt="" /> 
+					<h4>600+ hours Learning</h4>
+					<ul>
+						<li>Get access to 600+ hours of learning, <br>upskilling and knowledge sharing sessions</li>
+						
+					
+					</ul>
+				</div>
+			</div>
+		</div>
+		<p style="  display: flex;
+  align-items: center;
+  justify-content: center;"><button data-bs-toggle="modal" data-bs-target="#SignUpModal" class="btn-grad" id="signup_button2" style="justify-content: center;"><div class="pull-left" style="float:left"><span class="strikethrough-diagonal" id="signup_button2_amount">INR 799</span></div><div class="pull-right" style="float:right"> <span style="line-height: 0;"><strong id="signup_button2_join">Join Community</strong></span><br><small style="font-size: 10px; line-height: 0;" id="signup_button2_free">(Now For Free)</small></div></button></p>
+
+		</div>
+	</section>
+
+
+	<section id="logosection" class="">
+		
+		
+		<div class="container">
+		
+		<div class="row text-center justify-content-center align-items-center">
+			<div class="col-12">
+				<h2 class="text-center" style="font-size: 30px;
+				font-weight: 700;">GET EXPOSURE TO INDUSTRY EXPERTS FROM</h2>
+				<p>
+					
+					<img src="{% static 'website/images/barclays-logo-1.png' %}" alt="" />
+					
+					<img src="{% static 'website/images/flipcart.png' %}" alt="">
+
+					<img src="{% static 'website/images/csc.png' %}" alt="">
+
+					<img src="{% static 'website/images/ccc.png' %}" alt="">
+				
+				</p>
+			</div>
+			
+		</div>
+		</div>
+	</section>
+	
+	
+
+	
+	<section id="learnhow" class="py-5">
+		<div class="container">
+			<h2 class="text-center" style="margin-bottom: 50px; font-size: 30px;
+			font-weight: 700;">YOU WILL LEARN HOW TO</h2>
+
+		<div class="row">
+			<div class="col-md-4">
+				<div class="cards">
+					<img src="{% static 'website/images/BS.png' %}" alt="" /> 
+					<h4>Become an early Entrepreneur</h4>
+					<ol>
+						<li>How to make a business  presentation.</li>
+						<li>Innovation as a culture</li>
+						<li>The journey: Side Hustle -> Gig -> Entrepreneur.
+						</li>
+					</ol>
+				</div>
+			</div>
+			<div class="col-md-4">
+				<div class="cards">
+					<img src="{% static 'website/images/EE.png' %}" alt="" /> 
+					<h4>Business scenario</h4>
+					<h6 style="text-align: center;color:white;font-weight: 600;"> The rapid pace of change</h6>
+					<ol>
+						<li>What is the new normal & what to expect?</li>
+						<li>Storytelling through <br>data - Learn to Visualize and Present.</li>
+						<li>What would you need to do now to be successful in the new normal?
+						</li>
+					</ol>
+				</div>
+			</div>
+			<div class="col-md-4">
+				<div class="cards">
+					<img src="{% static 'website/images/IQEQ.png' %}" alt="" /> 
+					<h4>IQ - EQ - CQ </h4>
+						<h6 style="text-align: center;color:white;font-weight: 600;">How important are Values</h6>
+					<ol>
+						<li>Basics of human value management.</li>
+						<li>Importance & Impact of Early leadership
+						</li>
+						<li>Manage your boss / Manage your CEO
+						</li>
+					</ol>
+				</div>
+			</div>
+		</div>
+		
+		
+		</div>
+	</section>
+	
+	
+	<section id="joincomm" class="py-5">
+		<div class="container">
+		<div class="border">
+			<h2 class="text-center"  style="font-size: 30px;
+			font-weight: 700;">WHO SHOULD JOIN ATPACE COMMUNITY</h2>
+			<h3 class="lead text-center mb-5">EXCLUSIVE ACCESS</h3>
+		<div class="row">
+			<div class="col-md-4">					
+				<h3 class="clr1"><a href="#">Graduates</a></h3>
+			</div>
+			<div class="col-md-4">					
+				<h3 class="clr2"><a href="#">Early Entrepreneurs</a></h3>
+			</div>
+			<div class="col-md-4">					
+				<h3 class="clr3"><a href="#">Early Professionals</a></h3>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-4">					
+				<h3 class="clr4"><a href="#">Final year students</a></h3>
+			</div>
+			<div class="col-md-4">					
+				<h3 class="clr5"><a href="#">Working Professionals</a></h3>
+			</div>
+			<div class="col-md-4">					
+				<h3 class="clr6"><a href="#">Career Shifters</a></h3>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-4">					
+				<h3 class="clr7"><a href="#">Freelancers</a></h3>
+			</div>
+			<div class="col-md-4">					
+				<h3 class="clr8 hide"><a href="#">Founders</a></h3>
+			</div>
+			<div class="col-md-4">					
+				<h3 class="clr9 hide"><a href="#">Coaches</a></h3>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-4">					
+				<h3 class="clr10 hide"><a href="#">Mentors</a></h3>
+			</div>
+			<div class="col-md-4">					
+				<h3 class="clr11 hide"><a href="#">Consultants</a></h3>
+			</div>
+			<div class="col-md-4">					
+				<h3 class="clr12 hide"><a href="#">Subject Matter Experts</a></h3>
+			</div>
+		</div>
+		<h3 class="lead text-center my-3">IF YOU THINK YOU ARE ONE OF THOSE KINDLY REGISTER</h3>
+		<p style="  display: flex;
+  align-items: center;
+  justify-content: center;"><button data-bs-toggle="modal" data-bs-target="#SignUpModal" class="btn-grad" id="signup_button3" style="justify-content: center;"><div class="pull-left" style="float:left"><span class="strikethrough-diagonal" id="signup_button3_amount">INR 799</span></div><div class="pull-right" style="float:right"> <span style="line-height: 0;"><strong id="signup_button3_join">Join Community</strong></span><br><small style="font-size: 10px; line-height: 0;" id="signup_button3_free">(Now For Free)</small></div></button></p>
+
+		</div>
+		</div>
+	</section>
+	
+	
+	
+	<section id="ourpartner" class="pt-3 pb-5">
+		<div class="container">
+			<h2 class="text-center" style="font-size: 30px;
+			font-weight: 700;">OUR PARTNERS TO BRING OUR VISION TO LIFE</h2>
+			
+			<div class="row mt-4">
+			<div class="col-6 text-center">					
+				<img src="{% static 'website/images/2.jpg' %}" alt="" />
+				<p style="margin-top: 20px;">www.wenpowerhr.sg <br>
+Wenpower group, Singapore & India - Content & Program delivery partner</p>
+			</div>
+			<div class="col-6 text-center">					
+				<img src="{% static 'website/images/asia-hrm.jpg' %}" alt="" />
+				<p style="margin-top: 20px;">www.asiahrm.com <br>
+					Asiahrm, Asia - HR Community partner</p>
+			</div>
+			
+			</div>
+			
+		</div>
+	</section>
+		<section class="home-testimonial">
+		<div class="container-fluid">
+			<div class="row d-flex justify-content-center testimonial-pos">
+				<div class="col-md-12 d-flex justify-content-center">
+					<h2 class="text-center">LET'S HEAR OUR ATPACE COMMUNITY MEMBERS</h2><br>
+				
+				</div>
+			</div>
+			<section class="home-testimonial-bottom">
+				<div class="container testimonial-inner">
+					<div class="row d-flex justify-content-center">
+						<div class="col-md-3 style-3">
+							<div class="tour-item " style="margin-bottom: 20px;">
+								<div class="tour-desc bg-white">
+									<div class="tour-text color-grey-3 text-center">“Was able to communicate with mentors in a live session was very valuable”</div>
+									<div class="d-flex justify-content-center pt-2 pb-2"><img class="tm-people" src="{% static 'website/images/shiv.png' %}" alt=""></div>
+									<div class="link-name d-flex justify-content-center">Shiv Sharma</div>
+					
+								</div>
+							</div>
+						</div>
+						<div class="col-md-3 style-3">
+							<div class="tour-item " style="margin-bottom: 20px;">
+								<div class="tour-desc bg-white">
+									<div class="tour-text color-grey-3 text-center">“I wish there was live help on program but I am sure it will come soon”</div>
+									<div class="d-flex justify-content-center pt-2 pb-2"><img class="tm-people" src="{% static 'website/images/unnati.jpeg' %}" alt=""></div>
+									<div class="link-name d-flex justify-content-center">Unnati Soni</div>
+
+								</div>
+							</div>
+						</div>
+						<div class="col-md-3 style-3">
+							<div class="tour-item "style="margin-bottom: 20px;">
+								<div class="tour-desc bg-white">
+									<div class="tour-text color-grey-3 text-center">“Community helped me with many ideas and sharing to grow.”</div>
+									<div class="d-flex justify-content-center pt-2 pb-2"><img class="tm-people" src="{% static 'website/images/pratiksha.png' %}" alt=""></div>
+									<div class="link-name d-flex justify-content-center">Prateeksha Dubey</div>
+
+								</div>
+							</div>
+						</div>
+						<div class="col-md-3 style-3">
+							<div class="tour-item "style="margin-bottom: 20px;">
+								<div class="tour-desc bg-white">
+									<div class="tour-text color-grey-3 text-center">“Had to work hard to keep up with the interaction sessions but inspiring”</div>
+									<div class="d-flex justify-content-center pt-2 pb-2"><img class="tm-people" src="{% static 'website/images/kapil.png' %}" alt=""></div>
+									<div class="link-name d-flex justify-content-center">Kapil Yadav</div>
+
+								</div>
+							</div>
+						</div>
+					</div>
+			</section>
+	</section>
+    <!-- Button trigger modal -->
+
+    <!-- Modal -->
+ 
+	<section id="ourpartner" class="py-5 py-6">
+		<div class="container" style="margin-top: 30px;">
+		
+			<p style="  display: flex;
+  align-items: center;
+  justify-content: center;"><button data-bs-toggle="modal" data-bs-target="#SignUpModal" class="btn-grad" id="signup_button4" style="justify-content: center;"><div class="pull-left" style="float:left"><span class="strikethrough-diagonal" id="signup_button4_amount">INR 799</span></div><div class="pull-right" style="float:right"> <span style="line-height: 0;"><strong id="signup_button4_join">Join Community</strong></span><br><small style="font-size: 10px; line-height: 0;" id="signup_button4_free">(Now For Free)</small></div></button></p>
+
+			<p class="text-center">A community for upskilling, filled with detailed learnings and<br> mental models that will help you to become a gig-worker 🚀 in 3 FoolProof models.</p>
+		</div>
+	</section>
+
+       <div class="modal fade" id="SignUpModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+    <div class="modal-content">
+        <form method="post">
+            {% csrf_token %}
+        <div class="modal-header" >
+				<div  >		
+				<p><img src="{% static '/website/img/logo.png' %}" style="height: 90px;" alt=""></p>
+					<h5>Community Signup</h5>
+				</div>
+
+			
+        	<h5 class="modal-title" id="exampleModalLabel"  ></h5>
+			
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+        
+            <div class="mb-3">
+            <label for="exampleFormControlInput1" class="form-label">Enter Name</label>
+            <input type="text" name="name" class="form-control" required id="" placeholder="Enter Name">
+        </div>
+        <div class="mb-3">
+            <label for="exampleFormControlInput1" class="form-label">Enter Email address</label>
+            <input type="email" name="email" class="form-control" required id="email" placeholder="name@mail.com">
+        </div>
+        <div class="mb-3">
+            <label for="exampleFormControlInput1" class="form-label">Enter Password</label>
+            <input type="password" name="password" class="form-control" required id="password" placeholder="">
+        </div>
+        
+
+        <div class="modal-footer">
+    
+        <button type="submit" class="btn btn-primary" id = "invite_button">Submit</button>
+        </div>
+        </form>
+    </div>
+    </div>
+    </div>
+	
+
+	
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script><script>
+		// $(function () {
+		// 	$("#signup_button1").click(function() {
+		// 		$("[data-component=CookieStatus']").hide();
+		// 	});
+		// });
+
+		$(document).ready(function() {
+            $('#iframe').load(function() {
+                $("#iframe").contents().find("head").append("<style>div[data-component='CookieStatus']{display:none;}</style>");  
+            });
+        });
+	</script>
+  </body>
+</html>

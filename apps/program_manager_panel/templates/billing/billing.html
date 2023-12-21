@@ -1,0 +1,310 @@
+{% extends 'base.html' %} {% load static %} 
+{% block title %} Billing {% endblock %} 
+{% block css %}
+  <link
+          rel="stylesheet"
+          href="{% static 'css/program_manager/program_manager.css' %}"
+  />
+  <style>
+    .capitalize {
+      text-transform: capitalize;
+    }
+  </style>
+{% endblock css %} {% block content %}
+<div class="content-wrapper" id="vue-app">
+  <div :class="'alert alert-dismissible '+[[alert_class]]" v-if="alert_msg" style="margin:10px;">
+    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+    <h4 style="margin-top:10px;"><i class="icon fa fa-warning"></i> Alert!</h4>
+    <a href="/manager/billing">[[alert_msg]]</a>
+  </div>
+  <section class="content-header">
+    <h1>Billing</h1>
+  </section>
+  <section class="content">
+    <div class="row">
+      <div class="col-md-2">
+        <div class="small-box box-tab" style="border-top: 5px solid #1B74E4;" @click="showPlan()" id="plan">
+          <div class="inner">
+            <h4>All Plan Subscription</h4>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <div class="small-box box-tab" @click="showYourPlan()" id="your-plan">
+          <div class="inner">
+            <h4>Your Plan Subscription</h4>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <div class="small-box box-tab" @click="showPaywall()" id="paywall">
+          <div class="inner">
+            <h4>Paywall</h4>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div v-if="displayPlan">
+    {% include 'billing/subscription.html' %}
+    </div>
+        <div v-if="displayYourPlan">
+    {% include 'billing/your_plan.html' %}
+    </div>
+    <div v-if="displayPaywall">
+    {% include 'billing/paywall.html' %}
+    </div>
+   
+  </section>
+  {{ request.user.id|json_script:"user_id" }}
+  {{request.session.token|json_script:"token"}}
+  {{request.session.company_id|json_script:"company_id"}}
+  {{request.session.company_name|json_script:"company_name"}}
+</div>
+{% endblock content %} {% block js %} 
+<script src="{% static 'bower_components/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
+<script type="text/javascript">
+  let app = new Vue({
+    el: "#vue-app",
+    delimiters: ['[[', ']]'],
+    data() {
+      return {
+        displayPaywall: false,
+        displayPlan: true,
+        token:JSON.parse(document.getElementById('token').textContent),
+        user_id: JSON.parse(document.getElementById('user_id').textContent),
+        auth:"",
+        subscription_list:"",
+        transaction_list:"",
+        base_url:window.location.origin,
+        displayYourPlan:false,
+        current_plan_list:"",
+        company_list:"",
+        subscription_id:"",
+        alert_msg:"",
+        alert_class:"",
+        sub_type:"",
+        user_company_name: JSON.parse(document.getElementById('company_name').textContent),
+        user_company_id: JSON.parse(document.getElementById('company_id').textContent),
+      };
+    },
+    mounted(){
+      this.showPlan();
+      this.showAlert();
+    },
+    methods: {
+      axiosGetRequest: function(url){
+        this.auth = "Token "+this.token;
+        var config = {
+          method: "get",
+          url: url,
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': this.auth,
+          },
+        };
+        return axios(config)
+      },
+      axiosPostRequest: function(url, data){
+        this.auth = "Token "+this.token;
+        var config = {
+          method: "post",
+          url: url,
+          headers: {
+            "Content-Type": "multipart/form-data",
+            "Accept": "application/json",
+            'Authorization': this.auth,
+          },
+          data:data
+        };
+
+        return axios(config)
+      },
+      async showAlert(){
+        var url = this.base_url+"/manager/check-for-subscription/"+this.user_id+"/";
+        response = await this.axiosGetRequest(url);
+        console.log("Alert response", response.data)
+        if(response.data.message != "No alert available"){
+          this.alert_msg = response.data.message
+          this.alert_class = response.data.css_class
+        }
+      },
+      async destroyDataTable(id){
+        if($(id).DataTable()){
+          console.log("destroying", id);
+          $(id).DataTable().clear();
+          $(id).DataTable().destroy();
+        }
+      },
+      async initializeDataTable(id){
+        console.log("initializing");
+        await this.sleep(2000);
+        $(id).DataTable({
+          "dom": '<"table-pull-left"f><"table-pull-right"l>tip',
+          'destroy': true,
+          'paging'      : true,
+          'lengthChange': true,
+          'searching'   : true,
+          'ordering'    : true,
+          'info'        : true,
+         'autoWidth'   : false,
+         'retrieve':true,
+         'scrollX': true,
+        })
+      },
+      sleep: function(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+      },
+      async oncanclePlan(id, subscription_id, company_id){
+        var base_url1 = this.base_url
+        var user_id1  = this.user_id
+        var auth1 = "Token "+this.token
+        bootbox.confirm({
+          message: "Are you sure to cancel the subscription?",
+          buttons: {
+              confirm: {
+                  label: 'Yes',
+                  className: 'btn-success'
+              },
+              cancel: {
+                  label: 'No',
+                  className: 'btn-danger'
+              }
+          },
+          callback: function (result) {
+              if(result == true){
+                var data = new FormData();
+                data.append("company_id", company_id);
+                data.append("user_subscription_id", id );
+                data.append("is_cancel", "true");
+                var url =  base_url1+"/manager/subscription-detail/"+user_id1+"/"+subscription_id+"/";
+                var config = {
+                  method: "post",
+                  url: url,
+                  headers: {
+                    "Content-Type": "multipart/form-data",
+                    "Accept": "application/json",
+                    'Authorization': auth1,
+                  },
+                  data:data
+                };
+                axios(config)
+                  .then((response) => {
+                    console.log("Subscription cancle Response", response.data);
+                    bootbox.alert(response.data.message)
+                  })
+                  .catch((error) => {
+                    console.log("error", error);
+                    bootbox.alert(response.data.message)
+                });
+              }
+          }
+        });
+        await this.sleep(2000);
+        console.log("calling show plan")
+        await this.showYourPlan();
+      },
+      async buySubscription(subs_id, sub_type){
+        console.log("line 150 data", subs_id)
+        if(sub_type == 'Buy'){
+          window.location.href = this.base_url+"/checkout/subscription/"+subs_id+"/"+this.user_company_id;
+        }
+        else{
+          var data = new FormData();
+          data.append("subscription_id", subs_id);
+          data.append("company_id", this.user_company_id);
+          
+          var url =  this.base_url+"/manager/subscribe-free-subscripion/"+this.user_id+"/";
+
+          try{
+            response = await this.axiosPostRequest(url, data);
+            console.log("Free Subscription Subscribe Response", response.data);
+            bootbox.alert(response.data.message)
+          }
+          catch(err){
+            console.log("error", err);
+            bootbox.alert(err.response.data.message);
+          }
+          await this.showPlan();
+        }
+      },
+      /*selectCompany(subscription_id, type){
+        this.subscription_id = subscription_id
+        this.sub_type = type
+      },*/
+      async removePaywall(){
+        ele = document.getElementById("paywall")    
+        ele.style.borderTop = "none";
+        this.displayPaywall = false;
+        await this.destroyDataTable("#paywall-table")
+      },
+      async removePlan(){
+        ele = document.getElementById("plan")    
+        ele.style.borderTop = "none";
+        this.displayPlan = false;
+
+      },
+      async removeYourPlan(){
+        ele = document.getElementById("your-plan")    
+        ele.style.borderTop = "none";
+        this.displayYourPlan = false;
+        await this.destroyDataTable("#current-plan-table");
+
+      },
+      async showPlan() {
+      this.displayPlan = true;
+      plan = document.getElementById("plan")
+      plan.style.borderTop = "5px solid #1B74E4";
+
+      await this.removePaywall();
+      await this.removeYourPlan();
+      
+
+      var url =  this.base_url+"/manager/all-subscription-list/"+this.user_id+"/";
+      var response = await this.axiosGetRequest(url);
+      console.log("Subscription list Response", response.data);
+      this.subscription_list = response.data.data;
+
+      var url = this.base_url+"/manager/program-data-list/"+this.user_id+"/";
+      response = await this.axiosGetRequest(url);
+      console.log("Company list Response", response.data);
+      this.company_list = response.data.company_list
+
+    },
+    async showPaywall() {
+      this.displayPaywall = true;
+      this.transaction_list = ""
+      paywall = document.getElementById("paywall")
+      paywall.style.borderTop = "5px solid #1B74E4";
+      await this.removePlan();
+      await this.removeYourPlan();
+
+      var url =  this.base_url+"/manager/transaction-list/"+this.user_id+"/";
+      var response = await this.axiosGetRequest(url);
+      console.log("Transaction list Response", response.data);
+      this.transaction_list = response.data.data;
+
+      await this.initializeDataTable("#paywall-table");
+
+    },
+    async showYourPlan() {
+      this.current_plan_list = ""
+      this.displayYourPlan = true;
+      ele = document.getElementById("your-plan")
+      ele.style.borderTop = "5px solid #1B74E4";
+      await this.removePlan();
+      await this.removePaywall();
+
+      var url =  this.base_url+"/manager/user-subscriptions/"+this.user_id+"/";
+      var response = await this.axiosGetRequest(url);
+      console.log("Current plan list Response", response.data);
+      this.current_plan_list = response.data.data;
+
+      await this.initializeDataTable("#current-plan-table");
+
+    },
+    }
+  });
+</script>
+
+{% endblock js %}

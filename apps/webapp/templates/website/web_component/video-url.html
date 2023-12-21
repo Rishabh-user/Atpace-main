@@ -1,0 +1,11 @@
+{% load static %} {% load tags %}
+
+{% if order.data %}
+<div style="text-align:center">
+    {{order.data|youtube_embed_url|safe }}
+    {% comment %} <iframe width="520" height="315" allowfullscreen
+        src="">
+    </iframe> {% endcomment %}
+</div>
+{% endif %}
+</div>

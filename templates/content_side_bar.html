@@ -1,0 +1,226 @@
+{% load static %} {% load tags %}
+<aside class="main-sidebar " style="box-shadow: 0px 12px 7px #2329314d; background-color: white; border-radius: none;     background: rgba(187, 176, 176, 0.137);
+backdrop-filter: blur( 1.5px );
+-webkit-backdrop-filter: blur( 1.5px ); border-right: 1px solid #ababab;">
+    <!-- sidebar: style can be found in sidebar.less -->
+    <section class="sidebar">
+        <!-- Sidebar user panel -->
+        <div class="user-panel">
+            <div class="pull-left image">
+                <img
+                        src="{{MEDIA_URL}}{{request.user.avatar}}"
+                        onerror="this.onerror=null; this.src='{{request.user.avatar}}'"
+                        class="img-circle"
+                        alt="User Image"
+                />
+            </div>
+            <div class="pull-left info">
+                <p>{{ request.user.first_name }} {{ request.user.last_name }}</p>
+                <a href="#"><i class="fa fa-circle text-success"></i> Online</a>
+            </div>
+        </div>
+        <!-- sidebar menu: : style can be found in sidebar.less -->
+        <ul class="sidebar-menu" data-widget="tree">
+            {% if request.user|user_profile_assessment == 0 %}
+            <li class="header our_background_color">All Joined Journey</li>
+            {% for channel in request.user|user_channel %}
+            {% if channel.Channel.channel_type == "MentoringJourney" %}
+            <li class="joined_channel">
+                <a
+                        href="{% url 'content:Channel_content_v2' Channel=channel.Channel.pk  %}"
+                        style="font-size: 12px;">
+                    <i class="fa fa-circle-o"></i> <span>{{channel.Channel}} </span>
+                </a>
+            </li>
+            {% endif %}
+            {% endfor %}
+            {% else %}
+            <li class="header our_background_color">MAIN NAVIGATION</li>
+            <li class="{% active 'content:user-content' %}">
+                <a href="{% url 'content:user-content'%}">
+                    <i class="fa fa-file-text-o"></i> <span>My Content</span>
+                </a>
+            </li>
+            <li class="{% active 'content:pending_content' %}">
+                <a href="{% url 'content:pending_content'%}">
+                    <i class="fa fa-check"></i> <span>Course Approval</span>
+                </a>
+            </li>
+            <li class="{% active 'user:program_journeys' %}">
+                <a href="{% url 'user:program_journeys'%}">
+                    <i class="fa fa-check"></i> <span>Program Journeys</span>
+                </a>
+            </li>
+            <li class="{% active 'user:program_announcement' %}">
+                <a href="{% url 'user:program_announcement'%}">
+                    <i class="fa fa-check"></i> <span>Program Announcement</span>
+                </a>
+            </li>
+            {% comment %} <li class="{% active 'user:program_announcement_list' %}">
+                <a href="{% url 'user:program_announcement_list'%}">
+                    <i class="fa fa-check"></i> <span>Program Announcement List</span>
+                </a>
+            </li> {% endcomment %}
+            <li class="treeview {% active 'survey:create-survey' %} {% active 'survey:survey-list' %} {% active 'survey:user_survey_attempt'%}">
+                <a href="#">
+                    <i class="fa fa-question"></i> <span>Survey </span>
+                    <span class="pull-right-container">
+            <i class="fa fa-angle-left pull-right"></i>
+          </span>
+                </a>
+                <ul class="treeview-menu">
+                    <li class="{% active 'survey:create-survey' %}">
+                        <a href="{% url 'survey:create-survey'%}"
+                        ><i class="fa fa-circle-o"></i>Create Survey</a
+                        >
+                    </li>
+                    <li class="{% active 'survey:survey-list' %}">
+                        <a href="{% url 'survey:survey-list'%}"
+                        ><i class="fa fa-circle-o"></i>Show All Survey</a
+                        >
+                    </li>
+                     <li class="{% active 'survey:user_survey_attempt' %}">
+                        <a href="{% url 'survey:user_survey_attempt'%}"
+                        ><i class="fa fa-circle-o"></i>User Survey Response</a
+                        >
+                    </li>
+                    <li class="{% active 'survey:all_survey_report' %}">
+                        <a href="{% url 'survey:all_survey_report'%}"
+                          ><i class="fa fa-circle-o"></i>User Survey Report</a
+                        >
+                      </li>
+                </ul>
+            </li>
+            <li class="treeview {% active 'test_series:create-test' %} {% active 'test_series:test-list' %} {% active 'test_series:user_test_attempt' %}">
+                <a href="#">
+                    <i class="fa fa-check-square-o"></i> <span>Assessment </span>
+                    <span class="pull-right-container">
+            <i class="fa fa-angle-left pull-right"></i>
+          </span>
+                </a>
+                <ul class="treeview-menu">
+                    <li class="{% active 'test_series:create-test' %}">
+                        <a href="{% url 'test_series:create-test'%}"
+                        ><i class="fa fa-circle-o"></i>Create Assessment</a
+                        >
+                    </li>
+                    <li class="{% active 'test_series:test-list' %}">
+                        <a href="{% url 'test_series:test-list'%}"
+                        ><i class="fa fa-circle-o"></i>Show All Assessment</a
+                        >
+                    </li>
+                </ul>
+            </li>
+            <li class="treeview {% active 'user:meet' %}">
+                <a href="#">
+                    <i class="fa fa-check-square-o"></i> <span>Collaboration</span>
+                    <span class="pull-right-container">
+            <i class="fa fa-angle-left pull-right"></i>
+          </span>
+                </a>
+                <ul class="treeview-menu">
+                    <li class="{% active 'user:create_meet' %}">
+                        <a href="{% url 'user:create_meet'%}"
+                        ><i class="fa fa-circle-o"></i>Create LiveStream</a
+                        >
+                    </li>
+                    
+                    <li class="{% active 'user:list_meeting' %}">
+                        <a href="{% url 'user:list_meeting'%}"
+                        ><i class="fa fa-circle-o"></i>LiveStream List</a
+                        >
+                    </li>
+                    <li class="{% active 'user:create_group_meet' %}">
+                        <a href="{% url 'user:create_group_meet'%}"
+                        ><i class="fa fa-circle-o"></i>Create Group Meeting</a
+                        >
+                    </li>
+                    
+                    <li class="{% active 'user:list_group_meeting' %}">
+                        <a href="{% url 'user:list_group_meeting'%}"
+                        ><i class="fa fa-circle-o"></i>Group Meeting List</a
+                        >
+                    </li>
+                </ul>
+            </li>
+            <li class="{% active 'user:chat' %}">
+                <a href="{% url 'user:chat' %}"> <i class="fa fa-dashboard"></i> <span>Chat</span> </a>
+            </li>
+            <li class="{% active 'leaderboard:goal_setting' %}">
+                <a href="{% url 'leaderboard:goal_setting' %}"> <i class="fa fa-dashboard"></i> <span>Goal Approval</span> </a>
+            </li>
+            <li class="treeview {% active 'user:create_match_question' %} {% active 'user:all_match_question' %} {% active 'user:match_question' %}">
+                <a href="#">
+                    <i class="fa fa-check-square-o"></i> <span>Matching Setup</span>
+                    <span class="pull-right-container">
+            <i class="fa fa-angle-left pull-right"></i>
+          </span>
+                </a>
+                <ul class="treeview-menu">
+                    <li class="{% active 'user:create_match_question' %}">
+                        <a href="{% url 'user:create_match_question'%}"
+                        ><i class="fa fa-circle-o"></i>Create Matching Setup</a
+                        >
+                    </li>
+                    <li class="{% active 'user:all_match_question' %}">
+                        <a href="{% url 'user:all_match_question'%}"
+                        ><i class="fa fa-circle-o"></i>Show All Matching Setup</a
+                        >
+                    </li>
+                </ul>
+            </li>
+            <li class="">
+                <a href="{% url 'user:attendance' %}"
+                ><i class="fa fa-circle-o"></i>Attendance Report</a>
+            </li>
+            <li class="">
+                <a href="{% url 'user:program_user_list' %}"
+                ><i class="fa fa-circle-o"></i>Registration List</a>
+            </li>
+            <li class="">
+                <a href="{% url 'utils:category' %}"
+                ><i class="fa fa-circle-o"></i>Category</a
+                >
+            </li>
+            <li class="">
+                <a href="{% url 'utils:industry' %}"
+                ><i class="fa fa-circle-o"></i>Industry</a
+                >
+            </li>
+           {% if request.user.company %}
+            <li class="">
+                    <a href="{% url 'user:program_team_list' %}"
+                ><i class="fa fa-circle-o"></i>Issues Raised</a
+                >
+            </li>
+            {% endif %}
+            <li class="">
+                <a href="{% url 'utils:tags' %}"
+                ><i class="fa fa-circle-o"></i>Tags</a
+                >
+            </li>
+            <li class="">
+                <a href="{% url 'utils:pool' %}"
+                ><i class="fa fa-circle-o"></i>Pool Setup</a
+                >
+            </li>
+            <li class="">
+                <a href="{% url 'utils:matching' %}"
+                ><i class="fa fa-circle-o"></i>Pool Allocation</a
+                >
+            </li>
+            <li class="">
+                <a href="{% url 'user:matching_mentor' %}"
+                ><i class="fa fa-circle-o"></i>Matching Page</a
+                >
+            </li>
+            <li>
+                <a href="{% url 'user:mentor_matching_repost' %}">
+                    <i class="fa fa-circle-o"> Mentor Matching Report</i>
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </section>
+    <!-- /.sidebar -->
+</aside>

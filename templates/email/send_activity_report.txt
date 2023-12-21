@@ -1,0 +1,10 @@
+Hello,
+Manager {{ name }},
+
+The requested report is in the csv file.
+You can download the report file.
+
+Thanks 
+
+Regards
+Team AtPace

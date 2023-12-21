@@ -1,0 +1,399 @@
+{% extends 'base.html' %}
+{% load static %} {% load tags %}
+{% block css %} 
+{% endblock %}
+{% block sidebar %}
+<aside
+class="main-sidebar"
+style="
+  box-shadow: 0px 12px 7px #2329314d;
+  background-color: white;
+  border-radius: none;
+  backdrop-filter: blur(1.5px);
+  -webkit-backdrop-filter: blur(1.5px);
+  border-right: 1px solid #ababab;
+"
+>
+<!-- sidebar: style can be found in sidebar.less -->
+<section class="sidebar" style="background-color: #fff">
+  <ul class="sidebar-menu" data-widget="tree">
+    {% for data in content_data %}
+
+    {% endfor %}
+  </ul>
+</section>
+</aside>
+{% endblock sidebar %}
+{% block content %}
+      <!-- Content Wrapper. Contains page content -->
+      
+      <div class="content-wrapper">
+        
+        <section class="content-header">
+       
+          
+          {% if channel.is_community_required %}
+            <h1>{{channel}}</h1>
+            <small style="font-size: 14px; line-break: auto;"><b>This is your journal. Add on the nuggets of learning here and it will be available to you - <br>for reference both on learn and revise modes
+              You can post questions to the community or look at learning from others by clicking on the community button or menu on the side</b></small>
+          {% else %}
+            <h1>Journals </h1>
+            <small style="font-size: 14px;"><b>This is your journal. Add on the nuggets of learning here and it will be available to you - <br> for reference both on learn and revise modes</b></small>
+          {% endif %}
+          {% if channel %}
+          <ol class="breadcrumb">
+
+            <a  href="{% cookie 'last_course_url' %}">
+              <button class="btn btn-warning"> Back to Course </button>
+            </a>
+          </ol>
+            {% endif %}
+        </section>
+       
+        <section class="content">
+          <div class="nav-tabs-custom">
+            <ul class="nav nav-tabs">
+                <li class="active"><a href="#tab_1" data-toggle="tab">Learning Journal</a></li>
+                <li><a href="#tab_2" data-toggle="tab">Mentoring Journal</a></li>
+                <li><a href="#tab_3" data-toggle="tab">Private Journal</a></li>
+            </ul>
+            <div class="tab-content">
+                <div class="tab-pane active" id="tab_1">
+                {% if journal.learning_journal|length > 0 %}
+                  {% for data in journal.learning_journal %}
+                
+                  <div class="box box-widget">
+                    <h4 style="padding: 10px;"><a href="{% url 'user:learning_journal_post' user_id=request.user.id pk=data.data.pk %}">{{data.data.name}}</a>
+                    {% if data.data.user_id == journal.user_id %}
+                    <a href="{% url 'community:edit_journal' user_id=request.user.id pk=data.data.pk %}"><button class="btn btn-primary pull-right">Edit</button></a>
+                    {% endif %}
+                    </h4>
+                    <div class="box-header with-border">
+                      <div class="user-block">
+                        <img class="img-circle" src="{{MEDIA_URL}}{{request.user.avatar}}" alt="User Image" onerror="this.onerror=null; this.src='{{request.user.avatar}}'">
+                        <span class="username"><a href="#" style="color: black;">{{data.data.user_name}}</a></span>
+                        <span class="description">  
+                          {{ data.data.created_at }}
+                        </span>   
+                      </div>
+                      <!-- /.user-block -->
+                    </div>
+                    <!-- /.box-header -->
+                    <div class="box-body">
+                      <!-- post text -->
+                      {% autoescape off %}
+                        {{data.data.learning_journal}}
+                        {% endautoescape %}
+                      
+                        {% for attachment in data.attachments %}
+                        {% if attachment.image_upload %}
+                        <img src="{{MEDIA_URL}}{{attachment.image_upload}}" width="300"> 
+                        {% elif attachment.file_upload %}
+                        <a href="{{MEDIA_URL}}{{attachment.file_upload}}" download="download">
+                        <div class="box_icon">
+                          <span class="icon_i" style="display: inline" ><span icon_align="left">
+                            <i class="fa-solid fa-file"></i>
+                          </span></span>
+                          <div class="box_text">
+                              <h3>{{ attachment.file_upload.file}}</h3>
+                          </div>
+                        </div>
+                          {% endif %}
+                        {% endfor %}
+    
+                      <!-- Social sharing buttons -->
+                      <hr>
+                    </div>
+                    <!-- /.box-body -->
+                    {% if data.comment %}
+                    <div class="box-footer box-comments">
+
+                      {% for comment in data.comment %}
+                      {% if forloop.counter <= 2 %}
+                      <div class="box-comment">
+                        <!-- User image -->
+                        <img class="img-circle img-sm" src="{{MEDIA_URL}}{{request.user.avatar}}" alt="" onerror="this.onerror=null; this.src='{{request.user.avatar}}'">
+            
+                        <div class="comment-text">
+                            <span class="username">
+                              {{comment.user_name}}
+                              <span class="text-muted pull-right">
+                                {% if channel.is_community_required %}
+                                {{comment.body.created_at|get_type}}
+                                {% else %}
+                                {{comment.created_at}}
+                                {% endif %}
+                              </span>
+                            </span><!-- /.username -->
+                            {% autoescape off %}
+                            {% if channel.is_community_required %}
+                            {{comment.body}}
+                            {% else %}
+                            {{comment.body}}
+                            {% endif %}
+                            {% endautoescape %}
+                        </div>
+                        <!-- /.comment-text -->
+                      </div>
+                      {% endif %}
+                      {% endfor %}
+                      <!-- /.box-comment -->
+                    </div>
+                    {% endif %}
+                    <!-- /.box-footer -->
+                    
+                    <div class="box-footer">
+                      <form action="{% url 'user:journal_comment'%}" method="post">
+                        {% csrf_token %}
+                        <img class="img-responsive img-circle img-sm" src="{{MEDIA_URL}}{{request.user.avatar}}" alt="" onerror="this.onerror=null; this.src='{{request.user.avatar}}'">
+                        <!-- .img-push is used to add margin to elements next to floating images -->
+                        <div class="img-push">
+                          <input type="hidden" value="{{data.data.pk}}" name="learningjournal_id"/>
+                          <textarea class="form-control input-sm" name="answer" placeholder="Write your comment here..."></textarea>
+                        </div>
+                          {% if request.session.user_type == "Admin" or request.session.user_type == "ProgramManager" %}
+                              <button disabled class="btn btn-info">POST</button>
+                          {% elif request.session.user_type == "Learner" or request.session.user_type == "Mentor" %}
+                              <button class="btn btn-info">POST</button>
+                          {% endif %}
+
+                      </form>
+                    </div>
+                    <!-- /.box-footer -->
+                  </div>
+                  {% endfor %}
+                  {% else %}
+                  <center><b>No Learning Journal</b></center>
+                  {% endif %}
+                </div>
+                <!-- /.tab-pane -->
+                <div class="tab-pane" id="tab_2">
+                {% if journal.weekly_learning_journal|length > 0 %}
+                  {% for data in journal.weekly_learning_journal %}
+                  <div class="box box-widget">
+                    {% if data.data.user_id == journal.user_id and journal.is_draft %}
+                    <a href="{% url 'community:edit_weekly_journals' id=data.data.pk %}"><button class="btn btn-primary pull-right">Edit</button></a>
+                    {% endif %}
+                    <h4 style="padding: 10px;"><a href="{% url 'user:learning_journal_post' user_id=request.user.id pk=data.data.pk %}">{{data.data.name}}</a></h4>
+                    <div class="box-header with-border">
+                      <div class="user-block">
+                        <img class="img-circle" src="{{MEDIA_URL}}{{request.user.avatar}}" alt="User Image" onerror="this.onerror=null; this.src='{{request.user.avatar}}'">
+                        <span class="username"><a href="#" style="color: black;">{{data.data.user_name}}</a></span>
+                        <span class="description">  
+                          {{ data.data.created_at }}
+                        </span>   
+                      </div>
+                      <!-- /.user-block -->
+                    </div>
+                    <!-- /.box-header -->
+                    <div class="box-body">
+                      <!-- post text -->
+                      {% autoescape off %}
+                        {{data.data.learning_journal}}
+                        {% endautoescape %}
+                      
+                        {% for attachment in data.attachments %}
+                        {% if attachment.image_upload %}
+                        <img src="{{MEDIA_URL}}{{attachment.image_upload}}" width="300"> 
+                        {% elif attachment.file_upload %}
+                        <a href="{{MEDIA_URL}}{{attachment.file_upload}}" download="download">
+                        <div class="box_icon">
+                          <span class="icon_i" style="display: inline" ><span icon_align="left">
+                            <i class="fa-solid fa-file"></i>
+                          </span></span>
+                          <div class="box_text">
+                              <h3>{{ attachment.file_upload.file}}</h3>
+                          </div>
+                        </div>
+                          {% endif %}
+                        {% endfor %}
+    
+                      <!-- Social sharing buttons -->
+                      <hr>
+                    </div>
+                    <!-- /.box-body -->
+                    <div class="box-footer box-comments">
+
+                      {% for comment in data.comment %}
+                      {% if forloop.counter <= 2 %}
+                      <div class="box-comment">
+                        <!-- User image -->
+                        <img class="img-circle img-sm" src="{{MEDIA_URL}}{{request.user.avatar}}" alt="" onerror="this.onerror=null; this.src='{{request.user.avatar}}'">
+            
+                        <div class="comment-text">
+                            <span class="username">
+                              {{comment.user_name}}
+                              <span class="text-muted pull-right">
+                                {% if channel.is_community_required %}
+                                {{comment.body.created_at|get_type}}
+                                {% else %}
+                                {{comment.created_at}}
+                                {% endif %}
+                              </span>
+                            </span><!-- /.username -->
+                            {% autoescape off %}
+                            {% if channel.is_community_required %}
+                            {{comment.body}}
+                            {% else %}
+                            {{comment.body}}
+                            {% endif %}
+                            {% endautoescape %}
+                        </div>
+                        <!-- /.comment-text -->
+                      </div>
+                      {% endif %}
+                      {% endfor %}
+                      <!-- /.box-comment -->
+                    </div>
+                    <!-- /.box-footer -->
+                    
+                    <div class="box-footer">
+                      <form action="{% url 'user:journal_comment'%}" method="post">
+                        {% csrf_token %}
+                        <img class="img-responsive img-circle img-sm" src="{{MEDIA_URL}}{{request.user.avatar}}" alt="" onerror="this.onerror=null; this.src='{{request.user.avatar}}'">
+                        <!-- .img-push is used to add margin to elements next to floating images -->
+                        <div class="img-push">
+                          <input type="hidden" value="{{data.data.pk}}" name="learningjournal_id"/>
+                          <textarea class="form-control input-sm" name="answer" placeholder="Press enter to post answer"></textarea>
+                        </div>
+                          {% if request.session.user_type == "Admin" or request.session.user_type == "ProgramManager" %}
+                              <button disabled class="btn btn-info">POST</button>
+                          {% elif request.session.user_type == "Learner" or request.session.user_type == "Mentor" %}
+                              <button class="btn btn-info">POST</button>
+                          {% endif %}
+
+                      </form>
+                    </div>
+                    <!-- /.box-footer -->
+                  </div>
+                  {% endfor  %}
+                  {% else %}
+                  <center><b>No Mentoring Journal</b></center>
+                  {% endif %}
+                </div>
+                <!-- /.tab-pane -->
+                <div class="tab-pane" id="tab_3">
+                {% if journal.private_journal|length > 0 %}
+                  {% for data in journal.private_journal %}
+                  <div class="box box-widget">
+                    <h4 style="padding: 10px;"><a href="{% url 'user:learning_journal_post' user_id=request.user.id pk=data.data.pk %}">{{data.data.name}}</a>
+                    {% if data.data.user_id == journal.user_id %}
+                    <a href="{% url 'community:edit_journal' user_id=request.user.id pk=data.data.pk %}"><button class="btn btn-primary pull-right">Edit</button></a>
+                    {% endif %}
+                    </h4>
+                    <div class="box-header with-border">
+                      <div class="user-block">
+                        <img class="img-circle" src="{{MEDIA_URL}}{{request.user.avatar}}" alt="User Image" onerror="this.onerror=null; this.src='{{request.user.avatar}}'">
+                        <span class="username"><a href="#" style="color: black;">{{data.data.user_name}}</a></span>
+                        <span class="description">  
+                          {{ data.data.created_at }}
+                        </span>   
+                      </div>
+                      <!-- /.user-block -->
+                    </div>
+                    <!-- /.box-header -->
+                    <div class="box-body">
+                      <!-- post text -->
+                      {% autoescape off %}
+                        {{data.data.learning_journal}}
+                        {% endautoescape %}
+                      
+                        {% for attachment in data.attachments %}
+                        {% if attachment.image_upload %}
+                        <img src="{{MEDIA_URL}}{{attachment.image_upload}}" width="300"> 
+                        {% elif attachment.file_upload %}
+                        <a href="{{MEDIA_URL}}{{attachment.file_upload}}" download="download">
+                        <div class="box_icon">
+                          <span class="icon_i" style="display: inline" ><span icon_align="left">
+                            <i class="fa-solid fa-file"></i>
+                          </span></span>
+                          <div class="box_text">
+                              <h3>{{ attachment.file_upload.file}}</h3>
+                          </div>
+                        </div>
+                          {% endif %}
+                        {% endfor %}
+    
+                      <!-- Social sharing buttons -->
+                      <hr>
+                    </div>
+                    <!-- /.box-body -->
+                    <div class="box-footer box-comments">
+
+                      {% for comment in data.comment %}
+                      {% if forloop.counter <= 2 %}
+                      <div class="box-comment">
+                        <!-- User image -->
+                        <img class="img-circle img-sm" src="{{MEDIA_URL}}{{request.user.avatar}}" alt="" onerror="this.onerror=null; this.src='{{request.user.avatar}}'">
+            
+                        <div class="comment-text">
+                            <span class="username">
+                              {{comment.user_name}}
+                              <span class="text-muted pull-right">
+                                {% if channel.is_community_required %}
+                                {{comment.body.created_at|get_type}}
+                                {% else %}
+                                {{comment.created_at}}
+                                {% endif %}
+                              </span>
+                            </span><!-- /.username -->
+                            {% autoescape off %}
+                            {% if channel.is_community_required %}
+                            {{comment.body}}
+                            {% else %}
+                            {{comment.body}}
+                            {% endif %}
+                            {% endautoescape %}
+                        </div>
+                        <!-- /.comment-text -->
+                      </div>
+                      {% endif %}
+                      {% endfor %}
+                      <!-- /.box-comment -->
+                    </div>
+                    <!-- /.box-footer -->
+                    
+                    <div class="box-footer">
+                      <form action="{% url 'user:journal_comment'%}" method="post">
+                        {% csrf_token %}
+                        <img class="img-responsive img-circle img-sm" src="{{MEDIA_URL}}{{request.user.avatar}}" alt="" onerror="this.onerror=null; this.src='{{request.user.avatar}}'">
+                        <!-- .img-push is used to add margin to elements next to floating images -->
+                        <div class="img-push">
+                          <input type="hidden" value="{{data.data.pk}}" name="learningjournal_id"/>
+                          <textarea class="form-control input-sm" name="answer" placeholder="Press enter to post answer"></textarea>
+                        </div>
+                          {% if request.session.user_type == "Admin" or request.session.user_type == "ProgramManager" %}
+                              <button disabled class="btn btn-info">POST</button>
+                          {% elif request.session.user_type == "Learner" or request.session.user_type == "Mentor" %}
+                              <button class="btn btn-info">POST</button>
+                          {% endif %}
+
+                      </form>
+                    </div>
+                    <!-- /.box-footer -->
+                  </div>
+                  {% endfor  %}
+                  {% else %}
+                  <center><b>No Private Journal</b></center>
+                  {% endif %}
+                </div>
+
+            </div>
+            <!-- /.tab-content -->
+          </div>
+          </section>
+      </div>
+{% endblock content %} 
+{% block js %}
+<script>
+    $(document).ready(function() {
+  $(".show-hide-btn").click(function() {
+    var id = $(this).data("id");
+    $("#half-" + id).toggle();//hide/show..
+    $("#full-" + id).toggle();
+  })
+})
+</script>
+{% endblock %}
+  </body>
+</html>

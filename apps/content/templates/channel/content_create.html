@@ -1,0 +1,1319 @@
+{% extends 'base.html' %} 
+{% load static %}
+{% block title %} Create Microskill {% endblock %} 
+{% load crispy_forms_tags %} 
+
+{% block css %} 
+<script src="{% static 'bower_components/ckeditor/ckeditor.js' %}"></script>
+<style>
+.content_icon {
+    padding: 6px 20px;
+}
+.image-upload{
+  display: inline;
+  padding: 6px 20px;
+}
+
+.image-upload > input
+{
+    display: none;
+}
+
+.image-upload img
+{
+    width: 80px;
+    cursor: pointer;
+}
+
+.cover-image-upload > input
+{
+    display: none;
+}
+
+.cover-image-upload img
+{
+    width: 80px;
+    cursor: pointer;
+}
+
+.cover-pdf-upload img
+{
+    width: 80px;
+    cursor: pointer;
+}
+
+.question_option{
+  border: 2px solid rgba(0, 255, 115, 0.767)  !important;
+  }
+
+/* input {
+
+  outline: 0;
+  border-width: 0 0 0px !important;
+} */
+
+
+
+:-moz-placeholder {
+  text-align: center;
+}
+#content_title br {
+    display: none
+}
+#content_title{
+    outline: 0px solid transparent;
+}
+[contentEditable=true]:empty:not(:focus):before{
+    content:attr(data-text)
+}
+
+.content{
+  min-height:auto;
+}
+.btn{
+  margin: 0 !important;
+}
+</style>
+{% endblock %}
+{% block content %}
+    <div class="content-wrapper">
+      <!-- Content Header (Page header) -->
+      <section class="content-header">
+        <h1>
+          Create Microskill
+         
+        </h1>
+        {% if content.ContentData.all.count %}
+          <button data-toggle="modal" data-target="#modal-default" class="btn btn-primary">Submit Microskill</button>
+       
+        {% endif %}
+          <ol class="breadcrumb">
+          <li><a href="#"><i class="fa fa-dashboard"></i> Microskill</a></li>
+          <li><a href="#">Create</a></li>
+
+        </ol>
+      </section>
+    
+      <!-- Main content -->
+      <section class="content">
+        <div class="row">
+            <div class="col-md-12">
+                <!-- Widget: user widget style 1 -->
+                <div class="box box-widget widget-user">
+                  <!-- Add the bg color to the header using any of the bg-* classes -->
+                  
+                  
+                  <div class="widget-user-header bg-black" style="background: url('{{MEDIA_URL}}{{content.image}}') center; background-size: cover; background-repeat: no-repeat; height: 70vh;">
+                    
+                  </div>
+                
+                  <div class="box-footer">
+                    <h2 id="content_title" class="content_title" contenteditable="true">{{content.title}}</h2>
+                    <div class="user-block">
+                        <img class="img-circle lazy" src="{% static 'dist/default/default-img.gif' %}" alt="User Image" >
+                        <span class="description"><a href="#">{{ request.user.username }}</a></span>
+                      </div>
+                    </div>
+                    
+                </div>
+                <!-- /.widget-user -->
+              </div>
+
+        </div>
+        <!-- Default box -->
+        <div class="row">
+            <div class="col-md-9">
+                <div class="box">
+                    
+                    <div class="box-body reorder-gallery">
+                      
+                  {% for data in data %}
+                  {% if data.type == "Video" %}
+                  <section class="content" id="{{data.pk}}">
+                      <div class="box-header with-border">
+                         <div class="box-tools pull-right"><a href="{% url 'content:delete_content_data' content=content.pk pk=data.pk %}"><button type="button" class="btn btn-box-tool"><i class="fa fa-times fa-2x"></i></button></a></div>
+                      </div>
+                      <div>
+                          <div class="row">
+                              <div class="col-md-12">
+                                  <div class="col-md-2"></div>
+                                  <div class="col-md-8">
+                                      <video src="{{MEDIA_URL}}{{data.video}}" width="100%" controls></video>
+                                      <input type="text" placeholder="Caption" name="caption" dir="auto" value="{{data.title}}"  class="form-control" onchange="UpdateData('{{data.pk}}', '{{data.type}}',  this.value, 'title')">
+                                      <div id="upload_subtitles_">
+                                      <br><br>
+                                      <span>UPLOAD SUBTITLES (.vtt ONLY)</span><br><br>
+                                      <input class="col-md-4" type="file" name="subtitle_file" id="subtitle_file" accept=".vtt">
+                                      <div class="col-md-2" style="color: red;" id="subtitle_message">Example: subtitle.vtt</div>
+                                      <button class="col-md-2 btn btn-primary" onclick="TranslateSubtitles('{{data.pk}}')">Add</button>
+                                      <!-- <button class="col-md-2 btn btn-primary">Add</button> -->
+                                      </div>
+                                  </div>
+                                  <div class="col-md-2"></div>
+                              </div>
+                          </div>
+                      </div>
+                      <!-- <div class="more_subtitles" id="more_subtitles"> -->
+                          <!-- <label class="col-md-3">Choose a language</label>
+                          <select id="lang_type" class="col-md-3">
+                            <option value="zh-CN">Chinese(Simplified)</option>
+                            <option value="zh-TW">Chinese(Traditional)</option>
+                            <option value="nl">Dutch</option>
+                            <option value="tl">English</option>
+                            <option value="es">Filipino</option>
+                            <option value="fr">French</option>
+                            <option value="de">German</option>
+                            <option value="id">Indonesian</option>
+                            <option value="ja">Japanese</option>
+                            <option value="ko">Korean</option>
+                            <option value="ms">Malay</option>
+                            <option value="mn">Mongolian</option>
+                            <option value="pl">Polish</option>
+                            <option value="pt">Portuguese</option>
+                            <option value="es">Spanish</option>
+                            <option value="th">Thai</option>
+                            <option value="vi">Vietnamese</option>
+                          </select> -->
+                          
+                          <!-- <button class="col-md-1" onclick="TranslateSubtitles('{{data.pk}}')">Translate</button> -->
+                  </section>
+                  {% elif data.type == "Image" %}
+                 
+                  <section class="content" id="{{data.pk}}">
+                      <div class="box-header with-border">
+                         <div class="box-tools pull-right"><a href="{% url 'content:delete_content_data' content=content.pk pk=data.pk %}"><button type="button" class="btn btn-box-tool"><i class="fa fa-times fa-2x"></i></button></a></div>
+                      </div>
+                      <div>
+                          <div class="row">
+                              <div class="col-md-12">
+                                  
+                                  <div class="col-md-2"></div>
+                                  <div class="col-md-8">
+                                      <img  src="{{MEDIA_URL}}{{data.file}}" width="100%" loading="lazy" ></video>
+                                      <input type="text" placeholder="Caption" name="caption" dir="auto" value="{{data.title}}" class="form-control" onchange="UpdateData('{{data.pk}}', '{{data.type}}', this.value, 'title')">
+                                  </div>
+                                  <div class="col-md-2"></div>
+                              </div>
+                          </div>
+                      </div>
+                  </section>
+                  
+                  {% elif data.type == "Text" %}
+                    <section class="content" id="{{data.pk}}">
+                      <div class="box-header with-border">
+                        <div class="box-tools pull-right"><a href="{% url 'content:delete_content_data' content=content.pk pk=data.pk %}"><button type="button" class="btn btn-box-tool"><i class="fa fa-times fa-2x"></i></button></a></div>
+                      </div>
+                      <div class="row">
+                    <div class="col-md-1"></div>
+                    <div class="col-md-8">
+                      <div  contenteditable="true"  id="textfield{{data.pk}}" onfocusout="UpdateData('{{data.pk}}', '{{data.type}}',  this.innerHTML, 'data')" style="padding:10px;" data-text="Start Writing">{{data.data|safe}}</div>
+                      <script>
+                        // Turn off automatic editor creation first.
+                        
+                        CKEDITOR.inline('textfield{{data.pk}}');
+                    </script>  
+                    </div>
+                      <div class="col-md-1"></div>
+                      
+                  </div>
+                  <div style="color: red;" id="text_message">Word Limit : 80</div>
+                  </section>
+                  {% elif data.type == "YtVideo" %}
+                  <section class="content" id="{{data.pk}}">
+                    <div class="box-header with-border">
+                       <div class="box-tools pull-right"><a href="{% url 'content:delete_content_data' content=content.pk pk=data.pk %}"><button type="button" class="btn btn-box-tool"><i class="fa fa-times fa-2x"></i></button></a></div>
+                    </div>
+                    <div class="content">
+                       <div class="row">
+                          <div class="col-md-12">
+                             <div class="col-md-1"></div>
+                             <div class="col-md-2">
+                                <svg class="_3I2yXtKreOOjsiuOP5gHxC" viewBox="0 0 153 153">
+                                   <path fill="#009FC6" fill-rule="evenodd" d="M0 0h153v153H0z"></path>
+                                   <path fill="#FFF" d="M80.97 53.15c.22-12.48 10.4-22.42 22.72-22.2 12.3.2 22.12 10.5 21.9 22.98-.2 12.48-10.38 22.42-22.7 22.2-12.34-.2-22.16-10.5-21.95-22.98zm6.22 56.3c.12-9.1 7.54-16.34 16.53-16.18 9 .16 16.15 7.66 16 16.76-.17 9.1-7.58 16.34-16.57 16.18-9-.12-16.16-7.62-16-16.72zM31.44 53.08c.16-9.1 7.57-16.34 16.57-16.18 9 .16 16.15 7.66 16 16.76-.17 9.1-7.58 16.34-16.57 16.18-9-.16-16.15-7.66-16-16.76z"></path>
+                                </svg>
+                             </div>
+                             <div class="col-md-8">
+                                <div class="form-group"><input placeholder="Title" type="text" class="form-control" name="title" value="{{data.title}}" onchange="UpdateData('{{data.pk}}', '{{data.type}}',  this.value, 'title')"/></div>
+                                <div class="form-group"><textarea class="form-control" rows="2" name="description" placeholder="Description (max. 140 characters)" maxlength="140" onchange="UpdateData('{{data.pk}}', '{{data.type}}',  this.value, 'data')">{{data.data}}</textarea></div>
+                                <div class="form-group"><input placeholder="URL" type="url" class="form-control" name="url" value="{% if data.url == None %} URL {% else %} {{data.url}} {% endif %}" onchange="UpdateData('{{data.pk}}', '{{data.type}}',  this.value, 'url')"/></div>
+                             </div>
+                             <div class="col-md-1"></div>
+                          </div>
+                       </div>
+                       <div style="color: red;" id="link_message">example: https://www.youtube.com/watch?v=parameter </div>
+                    </div>
+                 </section>
+                
+                  {% elif data.type == "Pdf" %}
+                  <section class="content" id="{{data.pk}}">
+                    <div class="box-header with-border">
+                       <div class="box-tools pull-right"><a href="{% url 'content:delete_content_data' content=content.pk pk=data.pk %}"><button type="button" class="btn btn-box-tool"><i class="fa fa-times fa-2x"></i></button></a></div>
+                    </div>
+                    <div class="content">
+                       <div class="row">
+                          <div class="col-md-12">
+                          <div class="col-md-1"></div>
+                             <div class="col-md-2">
+                                <svg class="_3uaZv9zYzLJp8hE4_z9uA4" version="1.1" id="Capa_1" x="0px" y="0px" viewBox="0 0 56 56" xml:space="preserve">
+                                   <g>
+                                      <path d="M36.985,0H7.963C7.155,0,6.5,0.655,6.5,1.926V55c0,0.345,0.655,1,1.463,1h40.074 c0.808,0,1.463-0.655,1.463-1V12.978c0-0.696-0.093-0.92-0.257-1.085L37.607,0.257C37.442,0.093,37.218,0,36.985,0z" style="fill: rgb(233, 233, 224);"></path>
+                                      <polygon points="37.5,0.151 37.5,12 49.349,12 " style="fill: rgb(217, 215, 202);"></polygon>
+                                      <path d="M19.514,33.324L19.514,33.324c-0.348,0-0.682-0.113-0.967-0.326 c-1.041-0.781-1.181-1.65-1.115-2.242c0.182-1.628,2.195-3.332,5.985-5.068c1.504-3.296,2.935-7.357,3.788-10.75 c-0.998-2.172-1.968-4.99-1.261-6.643c0.248-0.579,0.557-1.023,1.134-1.215c0.228-0.076,0.804-0.172,1.016-0.172 c0.504,0,0.947,0.649,1.261,1.049c0.295,0.376,0.964,1.173-0.373,6.802c1.348,2.784,3.258,5.62,5.088,7.562 c1.311-0.237,2.439-0.358,3.358-0.358c1.566,0,2.515,0.365,2.902,1.117c0.32,0.622,0.189,1.349-0.39,2.16 c-0.557,0.779-1.325,1.191-2.22,1.191c-1.216,0-2.632-0.768-4.211-2.285c-2.837,0.593-6.15,1.651-8.828,2.822 c-0.836,1.774-1.637,3.203-2.383,4.251C21.273,32.654,20.389,33.324,19.514,33.324z M22.176,28.198 c-2.137,1.201-3.008,2.188-3.071,2.744c-0.01,0.092-0.037,0.334,0.431,0.692C19.685,31.587,20.555,31.19,22.176,28.198z M35.813,23.756c0.815,0.627,1.014,0.944,1.547,0.944c0.234,0,0.901-0.01,1.21-0.441c0.149-0.209,0.207-0.343,0.23-0.415 c-0.123-0.065-0.286-0.197-1.175-0.197C37.12,23.648,36.485,23.67,35.813,23.756z M28.343,17.174 c-0.715,2.474-1.659,5.145-2.674,7.564c2.09-0.811,4.362-1.519,6.496-2.02C30.815,21.15,29.466,19.192,28.343,17.174z M27.736,8.712c-0.098,0.033-1.33,1.757,0.096,3.216C28.781,9.813,27.779,8.698,27.736,8.712z" style="fill: rgb(204, 75, 76);"></path>
+                                      <path d="M48.037,56H7.963C7.155,56,6.5,55.345,6.5,54.537V39h43v15.537C49.5,55.345,48.845,56,48.037,56z" style="fill: rgb(204, 75, 76);"></path>
+                                      <g>
+                                         <path d="M17.385,53h-1.641V42.924h2.898c0.428,0,0.852,0.068,1.271,0.205 c0.419,0.137,0.795,0.342,1.128,0.615c0.333,0.273,0.602,0.604,0.807,0.991s0.308,0.822,0.308,1.306 c0,0.511-0.087,0.973-0.26,1.388c-0.173,0.415-0.415,0.764-0.725,1.046c-0.31,0.282-0.684,0.501-1.121,0.656 s-0.921,0.232-1.449,0.232h-1.217V53z M17.385,44.168v3.992h1.504c0.2,0,0.398-0.034,0.595-0.103 c0.196-0.068,0.376-0.18,0.54-0.335c0.164-0.155,0.296-0.371,0.396-0.649c0.1-0.278,0.15-0.622,0.15-1.032 c0-0.164-0.023-0.354-0.068-0.567c-0.046-0.214-0.139-0.419-0.28-0.615c-0.142-0.196-0.34-0.36-0.595-0.492 c-0.255-0.132-0.593-0.198-1.012-0.198H17.385z" style="fill: rgb(255, 255, 255);"></path>
+                                         <path d="M32.219,47.682c0,0.829-0.089,1.538-0.267,2.126s-0.403,1.08-0.677,1.477s-0.581,0.709-0.923,0.937 s-0.672,0.398-0.991,0.513c-0.319,0.114-0.611,0.187-0.875,0.219C28.222,52.984,28.026,53,27.898,53h-3.814V42.924h3.035 c0.848,0,1.593,0.135,2.235,0.403s1.176,0.627,1.6,1.073s0.74,0.955,0.95,1.524C32.114,46.494,32.219,47.08,32.219,47.682z M27.352,51.797c1.112,0,1.914-0.355,2.406-1.066s0.738-1.741,0.738-3.09c0-0.419-0.05-0.834-0.15-1.244 c-0.101-0.41-0.294-0.781-0.581-1.114s-0.677-0.602-1.169-0.807s-1.13-0.308-1.914-0.308h-0.957v7.629H27.352z" style="fill: rgb(255, 255, 255);"></path>
+                                         <path d="M36.266,44.168v3.172h4.211v1.121h-4.211V53h-1.668V42.924H40.9v1.244H36.266z" style="fill: rgb(255, 255, 255);"></path>
+                                      </g>
+                                   </g>
+                                   <g></g>
+                                   <g></g>
+                                   <g></g>
+                                   <g></g>
+                                   <g></g>
+                                   <g></g>
+                                   <g></g>
+                                   <g></g>
+                                   <g></g>
+                                   <g></g>
+                                   <g></g>
+                                   <g></g>
+                                   <g></g>
+                                   <g></g>
+                                   <g></g>
+                                </svg>
+                             </div>
+                             <div class="col-md-8">
+                                <div class="form-group"> <input placeholder="Title" type="text" class="form-control" value="{{data.title}}" name="title" onchange="UpdateData('{{data.pk}}', '{{data.type}}',  this.value, 'title')"/> </div>
+                                <div class="form-group"> <textarea class="form-control" rows="2" name="description" placeholder="Description (max. 140 characters)" maxlength="140" onchange="UpdateData('{{data.pk}}', '{{data.type}}',  this.value, 'data')">{{data.data}}</textarea> </div>
+                                <div class="form-group"> <input placeholder="file" accept=".pdf,.doc" type="file" class="form-control" name="file" value="" onchange="UpdateData('{{data.pk}}', '{{data.type}}',  this.value, 'file')"/>{{data.file}} </div>
+                             </div>
+                             <div class="col-md-1"></div>
+                          </div>
+                       </div>
+                    </div>
+                 </section>
+                 {% elif data.type == "Link" %}
+                  <section class="content" id="{{data.pk}}">
+                    <div class="box-header with-border">
+                       <div class="box-tools pull-right"><a href="{% url 'content:delete_content_data' content=content.pk pk=data.pk %}"><button type="button" class="btn btn-box-tool"><i class="fa fa-times fa-2x"></i></button></a></div>
+                    </div>
+                    <div class="content">
+                       <div class="row">
+                          <div class="col-md-12">
+                          <div class="col-md-1"></div>
+                             <div class="col-md-2">
+                              <i class="fa fa-link fa-4x"></i>
+                             </div>
+                             <div class="col-md-8">
+                                <div class="form-group"> <input placeholder="Title" type="text" class="form-control" value="{{data.title}}" name="title" onchange="UpdateData('{{data.pk}}', '{{data.type}}',  this.value, 'title')"/> </div>
+                                <div class="form-group"> <textarea class="form-control" rows="2" name="description" placeholder="Description (max. 140 characters)" maxlength="140" onchange="UpdateData('{{data.pk}}', '{{data.type}}',  this.value, 'data')">{{data.data}}</textarea> </div>
+                                {{data.link_data.link_type}}:{{data.link_data.redirection}}
+                             </div>
+                             <div class="col-md-1"></div>
+                          </div>
+                       </div>
+                    </div>
+                 </section>
+                 {% elif data.type == "Quiz" %}
+                 <section class="content" id="{{data.pk}}">
+                  <div class="box-header with-border">
+                    <div class="box-tools pull-right"><a href="{% url 'content:delete_content_data' content=content.pk pk=data.pk %}"><button type="button" class="btn btn-box-tool"><i class="fa fa-times fa-2x"></i></button></a></div>
+                 </div>
+                  <div class="content">
+                     <div class="row">
+                      <div class="col-md-1"></div>
+                      <div class="col-md-10">
+                        <label><i class="fa fa-question"></i> Question <small>Multiple Choice Question</small></label>
+                        <div class="form-group"><input placeholder="Insert your multiple choice question here (max. 100 characters)" type="text"  class="form-control " name="title" value="{{data.title}}"  onchange="UpdateData('{{data.pk}}', '{{data.type}}',  this.value, 'title')"/></div>
+                      <div id="question_options_{{data.id}}">
+                    
+                        {% for option in data.content_data_option.all %}
+                        <div class="input-group margin" data-id ={{option.id}}>
+                          <input class="form-control question_option " onchange="UpdateOption('{{option.id}}', this.value, '{{option.content_data.id}}', this)" placeholder="Quiz Answer 1" value="{{option.option}}">
+                          <span class="input-group-btn">
+                            <button type="button"  class="btn btn-default btn-flat is_correct"><i class="fa fa-check {% if option.correct_answer %} text-red {% endif %}"></i></button>
+                            <button type="button" id="q_close_button_{{option.id}}" class="btn btn-default btn-flat close_button" ><i class="fa fa-times"></i></button>
+                          </span>
+                        </div>   
+                        {% endfor %}                  
+                      </div>
+                        <div class="input-group margin quiz_option_btn_{{data.pk}}"  onClick="AddOption('{{data.id}}')">
+                          <span class="btn btn-primary btn-block " >
+                            <i class="fa fa-plus"></i> Add Choice
+                          </span>
+                        </div>
+                      </div>
+                      <div class="col-md-1"></div>
+                      
+                    </div>
+                  </div>
+                  
+              </section>
+
+              {% elif data.type == "Poll" %}
+                 <section class="content" id="{{data.pk}}">
+                  <div class="box-header with-border">
+                    <div class="box-tools pull-right"><a href="{% url 'content:delete_content_data' content=content.pk pk=data.pk %}"><button type="button" class="btn btn-box-tool"><i class="fa fa-times fa-2x"></i></button></a></div>
+                 </div>
+                  
+                  <div class="content">
+                     <div class="row">
+                      <div class="col-md-1"></div>
+                      <div class="col-md-10">
+                       <label><i class="fa fa-bar-chart"></i> Poll </label>
+                      <div class="form-group"><input placeholder="Insert your Poll Question here (max. 100 characters)" type="text" class="form-control" name="title" value="{{data.title}}"  onchange="UpdateData('{{data.pk}}', '{{data.type}}',  this.value, 'title')"/></div>
+                     <div id="poll_options_{{data.id}}">
+                      {% for option in data.content_data_option.all %}
+                      <div class="input-group margin" data-id={{option.id}}>
+                        <input class="form-control question_option"  data-id="{{data.id}}"  placeholder="Poll Answer 1" onchange="UpdateOption('{{option.id}}', this.value, '{{option.content_data.id}}', this)"  value="{{option.option}}">
+                        <span class="input-group-btn">
+                          <button type="button" id="poll_close_button" class="btn btn-default btn-flat close_button" ><i class="fa fa-times"></i></button>
+                        </span>
+                      </div>
+                      {% endfor %}       
+                    </div>
+                      <div class="input-group margin quiz_option_btn_{{data.pk}}" onClick="AddPollOption('{{data.id}}')">
+                        <span class="btn btn-primary btn-block " >
+                          <i class="fa fa-plus"></i> Add Choice
+                        </span>
+                      </div>
+                    </div>
+                    <div class="col-md-1"></div>
+                      
+                    </div>
+                  </div>
+                  
+              </section>
+              {% elif data.type == "Activity" %}
+                 <section class="content" id="{{data.pk}}">
+                    <div class="box-header with-border">
+                       <div class="box-tools pull-right"><a href="{% url 'content:delete_content_data' content=content.pk pk=data.pk %}"><button type="button" class="btn btn-box-tool"><i class="fa fa-times fa-2x"></i></button></a></div>
+                    </div>
+                    <div class="content">
+                       <div class="row">
+                          <div class="col-md-12">
+                             <div class="col-md-1"></div>
+                             <div class="col-md-2">
+                              <i class="fa fa-tasks fa-4x"></i>
+                             </div>
+                             <div class="col-md-8">
+                                <div class="form-group"><input placeholder="Title" type="text" class="form-control" name="title" value="{{data.title}}" onchange="UpdateData('{{data.pk}}', '{{data.type}}',  this.value, 'title')"/></div>
+                                <div class="form-group"><textarea class="form-control" rows="2" name="description" placeholder="Description (max. 140 characters)" maxlength="140" onchange="UpdateData('{{data.pk}}', '{{data.type}}',  this.value, 'data')">{{data.data}}</textarea></div>
+                                <div class="form-group">
+                                  <label>Select Activity Type</label>
+                                  <select class="form-control select2" id="activity_type" required style="width: 100%;" onchange="UpdateData('{{data.pk}}', '{{data.type}}',  this.value, 'activity_type')">
+                                    <option value="">Select</option>
+                                    <option value="Case Study" {% if data.activity_type == 'Case Study' %} selected {% endif %}>Case Study</option>
+                                    <option value="Research" {% if data.activity_type == 'Research' %} selected {% endif %}>Research</option>
+                                    <option value="Business Presentation/Assignment" {% if data.activity_type == 'Business Presentation/Assignment' %} selected {% endif %}>Business Presentation/Assignment</option>
+                                    <option value="Video documentary" {% if data.activity_type == 'Video documentary' %} selected {% endif %}>Video documentary</option>
+                                  </select>
+                                </div>
+                             </div>
+                             <div class="col-md-1"></div>
+                          </div>
+                       </div>
+                    </div>
+                 </section>
+
+                  {% endif %}
+                  
+                  
+                  {% endfor %}
+                  <style>
+                    .progress {
+            display: -ms-flexbox;
+            display: flex;
+            visibility: hidden;
+            height: 20px;
+            overflow: hidden;
+            font-size: .75rem;
+            background-color: #e9ecef;
+            border-radius: .25rem;
+          margin-top: 10px;
+        }
+        .progress-bar {
+            display: -ms-flexbox;
+            display: flex;
+            -ms-flex-direction: column;
+            flex-direction: column;
+            -ms-flex-pack: center;
+            justify-content: center;
+            overflow: hidden;
+            color: #fff;
+            text-align: center;
+            white-space: nowrap;
+            background-color: #28a745;
+            transition: width .6s ease;
+          font-size: 16px;
+          text-align: center;
+        }
+        
+                          </style>
+                          <div class="progress">
+                            <div class="progress-bar"></div>
+                        </div>
+                        <div id="uploadStatus"></div>
+                  <!-- <div id="content_creator"></div> -->
+                    </div>
+                    <!-- /.box-body -->
+                    <div class="box-footer">
+                      <div class="row">
+                          <div class="col-md-12">
+                              <i class="fa fa-book fa-2x content_icon"  data-toggle="tooltip" title="Text card" id="text_card"></i> 
+                              <div class="image-upload">
+                                  <label for="file-image-input">
+                                      <i class="fa fa-image fa-2x " data-toggle="tooltip" title="Image card" id="image_card" ></i>
+                                  </label>
+                              
+                                  <input id="file-image-input" accept="image/png, image/gif, image/jpeg" type="file"/>
+                              </div>
+                              
+                               
+                              <div class="image-upload">
+                                  <label for="file-input">
+                                      <i class="fa fa-video-camera fa-2x " data-toggle="tooltip" title="Video card" id="Video_card"></i>
+                                  </label>
+                              
+                                  <input id="file-input" accept="video/mp4,video/x-m4v,video/*" type="file"/>
+                              </div>
+                              <div class="image-upload">
+                                <label for="file-pdf-input">
+                                  <i class="fa fa-file fa-2x " data-toggle="tooltip" title="Pdf card" id="pdf_card"></i> 
+                                </label>
+                            
+                                <input id="file-pdf-input" accept=".pdf" type="file"/>
+                            </div>
+                              
+                              <i class="fa fa-youtube fa-2x content_icon" data-toggle="tooltip" title="Video card" id="link_card"></i> 
+                              
+                              <i class="fa fa-bar-chart fa-2x content_icon" data-toggle="tooltip" title="Poll card" id="poll_card"></i>
+                              <i class="fa fa-question fa-2x content_icon" data-toggle="tooltip" title="Quiz card" id="quiz_card"></i>
+                              <!-- <button class="fa fa-link fa-2x content_icon" data-toggle="tooltip" data-toggle="modal" data-target="#modal-link-card" title="Link card" ></button> -->
+                              <i class="fa fa-link fa-2x content_icon" data-toggle="modal" data-target="#modal-link-card" title="Link card"></i>
+                              <i class="fa fa-tasks fa-2x content_icon" title="Activity card" id="activity_card"></i>
+                            </div>
+                      </div>
+                    </div>
+                    <!-- /.box-footer-->
+                  </div>
+
+            </div>
+            <div class="col-md-3">
+                <ul class="timeline timeline-inverse reorder-gallery">
+                    
+                    <!-- timeline item -->
+                    {% for data in data %}
+                    <li id="{{data.pk}}">
+                      <i class="fa fa-circle bg-blue"></i>
+  
+                      <div class="timeline-item">
+                        <div class="timeline-body">
+                        {% if data.title %}
+                          
+                            {{data.title|slice:":25" }}
+                        
+                        
+                        {% else %}
+                            Empty Card
+                            
+                        {% endif %}
+                        </div>
+                      
+                            
+                      </div>
+                    </li>
+                    {% endfor %}
+
+                  </ul>
+                  
+            </div>
+        </div>
+        <!-- /.box -->
+    
+      </section>
+      <div class="modal fade" id="modal-link-card" style="display: none;">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <form id="system_links_pages">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">×</span></button>
+              <h4 class="modal-title">Link Type</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Select Link Type</label>
+                    <select class="form-control select2" id="link_type" required style="width: 100%;">
+                      <option selected hidden disabled value="">Select</option>
+                      <option  value="Internal">Internal</option>
+                      <option value="External">External</option>
+                      
+                    </select>
+                  </div>
+                  
+                  <div class="form-group" style=" display: none;">
+                    <label>Redirection</label>
+                    <select class="form-control select2" id="redirection_page"  style="width: 100%;">
+                      <option selected hidden disabled value="">Select</option>
+                      <option value="profile_assessment">Profile Assessment</option>
+                      
+                    </select>
+                  </div>
+                  <div class="form-group" style="display: none;">
+                    <label>Redirection</label>
+                    <input type="url" style="border: 1px solid ;"   name="external_redirection_page" placeholder="Enter Url" id="external_redirection_page" class="form-control">
+                  </div>
+                  <div class="form-group">
+                  
+                    <input type="checkbox" id="new_tab_open" name="new_tab_open" value="false" > Open in Tab
+                  </div>
+                  
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+              <button type="submit" id="sumbitContent" class="btn btn-primary">Save changes</button>
+            </div>
+          </form>
+          </div>
+          <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+      </div>
+
+      <div class="modal fade" id="modal-default" style="display: none;">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <form id="Content_form">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">×</span></button>
+              <h4 class="modal-title">Submit Content</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Select Journey</label>
+                    <select class="form-control select2" id="channel" required style="width: 100%;">
+
+                      <option selected="selected" value="">Select Journey</option>
+                      {% for channel in channel %}
+                        <option value="{{channel.pk}}">{{channel.title}}</option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                  <div id="sub_channel_div"></div>
+                  <div class="form-group">
+                    <label>Select Proficiency Level (Select Multiple) </label>
+                    <select class="form-control select2" multiple="multiple"  id="group" required style="width: 100%;">
+
+                      
+                     
+                    </select>
+                  </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+              <button type="submit" id="sumbitContent" class="btn btn-primary">Save changes</button>
+            </div>
+          </form>
+          </div>
+          <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+      </div>
+      <!-- /.content -->
+    </div>
+{% endblock content %}
+
+{% block js %} 
+
+
+<script>
+
+CKEDITOR.disableAutoInline = true;
+
+$(document).on('change', '#sub_channel', function(e) {
+  console.log("dd");
+    var formData = {
+      channel: $("#sub_channel").val(),
+      csrfmiddlewaretoken:"{{csrf_token}}"
+    };
+    selectChannelGroup(formData);
+});
+
+
+function selectChannelGroup(formData){
+   $.ajax({
+      type: "POST",
+      url: '{% url "content:select_channel_group" %}',
+      data: formData,
+      encode: true,
+    }).done(function (data) {
+      // var obj = JSON.parse(data);
+    
+      $("#group").empty();
+      data = data['data']
+      $.each(data,function(key, value)
+                { 
+                    $("#group").append('<option value=' + value['id'] + '>' + value['title'] + '</option>');
+                });
+    });
+}
+
+$('#new_tab_open').change(function () {
+         var chk = $("#new_tab_open")
+         var IsChecked = chk[0].checked
+         if (IsChecked) {
+          chk.attr('checked', 'checked')
+         } 
+         else {
+          chk.removeAttr('checked')                            
+         }
+          chk.attr('value', IsChecked)
+     });
+$('#link_type').change(function (){
+  var link_type = $("#link_type").val();
+  console.log(link_type);
+  if(link_type == "Internal"){
+    $("#redirection_page").parent().show();
+    $("#external_redirection_page").parent().hide();
+
+  } else {
+
+    $("#redirection_page").parent().hide()
+    $("#external_redirection_page").parent().show();
+  }
+});
+
+$(document).ready(function () {
+
+$("#channel").change(function(){
+    var formData = {
+      channel: $("#channel").val(),
+      csrfmiddlewaretoken:"{{csrf_token}}"
+    };
+    $.ajax({
+      type: "POST",
+      url: '{% url "content:check_sub_channel" %}',
+      data: formData,
+      encode: true,
+    }).done(function (data) {
+      
+      $("#sub_channel_div").empty();
+      if(data.SkillDevelopment){
+
+          $("#sub_channel_div").html(' <div class="form-group"><label>Select Skill</label><select class="form-control select2" id="sub_channel" required style="width: 100%;"><option selected="selected" value = "">Select Skill</option></select></div>')
+          console.log(data.data);
+          $.each(data.data,function(key, value)
+                { 
+                    $("#sub_channel").append('<option value=' + value['id'] + '>' + value['title'] + '</option>');
+                });
+          } else {
+            selectChannelGroup(formData);
+      }
+    });
+    
+
+    event.preventDefault();
+});
+
+$(function() {
+    $(document).on('click', '.close_subtitle_button', function(e) {
+      e.preventDefault();
+      var id = $(this).parents("div").attr("data-id");
+      var oThis = $(this);
+      if(id == ""){
+        oThis.parent().remove();
+      } else {
+      
+      var form_data = new FormData();
+      var csrfmiddlewaretoken = "{{csrf_token}}"; 
+      form_data.append("id", id);
+      form_data.append("csrfmiddlewaretoken", csrfmiddlewaretoken);
+      $.ajax({
+        type: "POST",
+        url: "{% url 'content:delete_subtitle_option' %}",
+        data: form_data,
+        contentType: false,
+                cache: false,
+                processData: false,
+        success: function(data){	
+        
+             oThis.parent().remove();		
+        }
+    });
+  }
+  });
+});
+
+// close added subtitle
+$(function() {
+    $(document).on('click', '.close_subtitle_button', function(e) {
+      e.preventDefault();
+      var id = $(this).parents("div").attr("data-id");
+      var oThis = $(this);
+      if(id == ""){
+        oThis.parent().parent().remove();
+      } else {
+      
+      var form_data = new FormData();
+      var csrfmiddlewaretoken = "{{csrf_token}}"; 
+      form_data.append("id", id);
+      form_data.append("csrfmiddlewaretoken", csrfmiddlewaretoken);
+      $.ajax({
+        type: "POST",
+        url: "{% url 'content:delete_cd_option' %}",
+        data: form_data,
+        contentType: false,
+                cache: false,
+                processData: false,
+        success: function(data){	
+        
+             oThis.parent().parent().remove();		
+        }
+    });
+  }
+  });
+});
+
+$(function() {
+    $(document).on('click', '.is_correct', function(e) {
+      e.preventDefault();
+      var id = $(this).parents("div").attr("data-id");
+      var oThis = $(this);
+      var form_data = new FormData();
+      var csrfmiddlewaretoken = "{{csrf_token}}"; 
+      form_data.append("id", id);
+      form_data.append("csrfmiddlewaretoken", csrfmiddlewaretoken);
+      $.ajax({
+        type: "POST",
+        url: "{% url 'content:correct_answer' %}",
+        data: form_data,
+        contentType: false,
+                cache: false,
+                processData: false,
+        success: function(data){
+          oThis.addClass('text-red')
+
+        }
+    });
+  });
+});
+
+  
+
+  $("#Content_form").submit(function (event) {
+    sub_channel = $("#sub_channel").val();
+    if(sub_channel === undefined){
+      sub_channel = null
+    }
+    channel = $("#channel").val();
+    var group = $("#group").val();
+  //   group = group.map(x => {
+  //     return({name: x});
+  // });
+
+    var formData = {
+      channel: channel,
+      sub_channel : sub_channel,
+      group: group,
+      content_id: "{{content.pk}}",
+      csrfmiddlewaretoken:"{{csrf_token}}"
+    };
+    console.log(formData);
+    $.ajax({
+      type: "POST",
+      url: '{% url "content:update_channel" %}',
+      data: formData,
+      encode: true,
+    }).done(function (data) {
+      bootbox.alert({
+          message: data,
+          callback: function () {
+              location.reload()
+          }
+      })
+    });
+
+    event.preventDefault();
+  });
+  $("#system_links_pages").submit(function (event) {
+    
+    var link_type = $("#link_type").val();
+    var redirection = $("#redirection_page").val();
+    let new_tab_open = $("#new_tab_open").val();
+    let external_redirection_page = $("#external_redirection_page").val()
+
+    var formData = {
+      link_type: link_type,
+      redirection: redirection,
+      new_tab_open:new_tab_open,
+      external_redirection_page : external_redirection_page,
+      content_id: "{{content.pk}}",
+      csrfmiddlewaretoken:"{{csrf_token}}"
+    };
+    console.log(formData);
+    $.ajax({
+      type: "POST",
+      url: '{% url "content:add_link_type_content" %}',
+      data: formData,
+      encode: true,
+    }).done(function (data) {
+      bootbox.alert({
+          message: data,
+          callback: function () {
+              location.reload()
+          }
+      })
+    });
+
+    event.preventDefault();
+  });
+});
+
+
+
+    var data = '';
+    var image  = '<section><div class="box-header with-border"><div class="box-tools pull-right"><button type="button" class="btn btn-box-tool"><i class="fa fa-times fa-2x"></i></button></div></div></section>'
+    var link  = '';
+    $( document ).ready(function() {
+        $("#text_card").click(function() {
+          
+            addData("Text");
+        });
+        $("#pdf_card").click(function(){
+            // $(".box-body").append(pdf);
+            $(document).on('change', '#file-pdf-input', function(){
+            
+            UploadFile("file-pdf-input", "Pdf")
+            
+        });
+        });
+        $("#poll_card").click(function(){
+            addData("Poll")
+        });
+        $("#quiz_card").click(function(){
+            addData("Quiz")
+        });
+        $("#image_card").click(function() {
+            $(document).on('change', '#file-image-input', function(){
+            
+                UploadFile("file-image-input", "Image")
+                
+            });
+        });
+
+        $("#link_card").click(function() {
+            addData("YtVideo")
+        });
+
+        $("#Video_card").click(function() {
+            $(document).on('change', '#file-input', function(){
+            
+            UploadFile("file-input", "Video")
+            
+         });
+        });
+
+        $("#activity_card").click(function(){
+            addData("Activity")
+        });
+
+    function UploadFile(param1, param2){
+        var file_data  = $("#"+param1).prop("files")[0];
+        var csrfmiddlewaretoken = "{{csrf_token}}"; 
+        var form_data = new FormData();
+        form_data.append("file", file_data);
+        form_data.append("csrfmiddlewaretoken", csrfmiddlewaretoken);
+        form_data.append('type', param2)
+        form_data.append('content', "{{content.pk}}")
+        $(".progress").css({"visibility":"visible"});
+        $.ajax({ 
+              xhr: function() {
+                    
+                    var xhr = new window.XMLHttpRequest();
+                    xhr.upload.addEventListener("progress", function(evt) {
+                        if (evt.lengthComputable) {
+                            var percentComplete = Math.floor((evt.loaded / evt.total) * 100);
+                            $(".progress-bar").width(percentComplete + '%');
+                            $(".progress-bar").html(percentComplete+'%');
+                        }
+                    }, false);
+                    return xhr;
+                },
+                type: 'POST',
+                url: '{% url "content:upload-videos" %}', 
+                contentType: false,
+                cache: false,
+                processData: false,
+                data: form_data ,
+                beforeSend: function(){
+                    $(".progress-bar").width('0%');
+                },
+                    success: function(data){
+                      
+                      location.reload();
+                    },
+                    error: function(){
+                        
+                    }
+            });
+    }
+
+    function addData(type){
+      var form_data = new FormData();
+      var csrfmiddlewaretoken = "{{csrf_token}}"; 
+      form_data.append("type", type);
+      form_data.append("csrfmiddlewaretoken", csrfmiddlewaretoken);
+      form_data.append('content', "{{content.pk}}")
+      // console.log(form_data)
+      $.ajax({ 
+                type: 'POST',
+                url: '{% url "content:add-field" %}', 
+                contentType: false,
+                cache: false,
+                processData: false,
+                data: form_data ,
+                    success: function(data){
+                      // console.log(data)
+                      location.reload()
+                    },
+                    error: function(){
+                        
+                    }
+            }); 
+    }
+});
+
+function UpdateOption(id , value, content_id, elem ){
+      var form_data = new FormData();
+      var csrfmiddlewaretoken = "{{csrf_token}}"; 
+      form_data.append("id", id);
+      form_data.append('content_id', content_id)
+      form_data.append("csrfmiddlewaretoken", csrfmiddlewaretoken);
+      form_data.append('value', value)
+      $.ajax({ 
+                type: 'POST',
+                url: '{% url "content:update_option" %}', 
+                contentType: false,
+                cache: false,
+                processData: false,
+                data: form_data ,
+                    success: function(data){
+                      
+                      elem.parentNode.setAttribute("data-id", data['id'])
+                    },
+                    error: function(data){
+                      
+                    }
+            }); 
+}
+$(document).on('keyup', ".question_option", function (e) {
+  var id = $(this).parents("section").attr("id");
+  console.log(id);
+    if (e.key === 'Enter' || e.keyCode === 13) {
+        // Do something
+        $(".quiz_option_btn_"+id).click()
+    }
+});
+
+function matchYoutubeUrl(url) {
+    var p = /^(?:https?:\/\/)?(?:www\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))((\w|-){11})(?:\S+)?$/;
+    var matches = url.match(p);
+    if(matches){
+        return matches[1];
+    }
+    return false;
+}
+
+function dataValidation(param2, param3){
+  if(param2 == "YtVideo"){
+    id = matchYoutubeUrl(param3)
+    console.log(id);
+    if(id==false){
+      $('#link_message').html("Invalid Url");
+      return false;
+    } else{
+      $('#link_message').html("example: https://www.youtube.com/watch?v=parameter")
+      return true;
+
+    }
+  } else if(param2 == "Text"){
+    var len = param3.split(" ").length;
+    if(len <= 80){ //80 words, hardcoded, probably change this to maxwords, or whatever.
+      $('#text_message').html("Word Limit : 80");
+      return true
+    } else {
+      $('#text_message').html("You have reached your maximum limit of characters allowed");
+      return false;
+    }
+    
+
+  }
+}
+
+function subtitleValidation(file){
+  var subtitle_file = document.getElementById('subtitle_file').files[0]
+  var file_name = subtitle_file.file_name
+  var splitted_array = file_name.split('.')
+  var extension = splitted_array[splitted_array.length-1]
+  console.log("File extension", extension)
+  if (extension != 'vtt'){
+    $('#subtitle_message').html(`Invalid file with extension ${extension}`);
+    return false
+  }
+  else{
+    $('#subtitle_message').html();
+    return true 
+  }
+}
+
+function UpdateData(param1, param2, param3, key){
+
+  if (dataValidation(param2, param3) == true){
+    console.log("Working");
+  }
+  var form_data = new FormData();
+  var csrfmiddlewaretoken = "{{csrf_token}}"; 
+  form_data.append("id", param1);
+  form_data.append("type", param2);
+  form_data.append("data", param3);
+  form_data.append("key", key);
+  form_data.append("csrfmiddlewaretoken", csrfmiddlewaretoken);
+    $.ajax({ 
+            type: 'POST',
+            url: '{% url "content:update-data" %}',
+            contentType: false,
+            cache: false,
+            processData: false,
+            data: form_data ,
+                success: function(data){
+                // location.reload()
+
+                },
+                error: function(){
+                    console.log('update data fail')
+                }
+        });  
+
+}
+
+// function UploadSubtitles(param1){
+
+//   console.log("id ",param1)
+//   const lang = document.getElementById('lang_type').value
+//   // console.log("lang_type ",document.getElementById('lang_type').value)
+
+//   var subtitle_file = document.getElementById('subtitle_file').files[0]
+//   // console.log("subtitle_file ",document.getElementById('subtitle_file'))
+
+//   const language_selected = document.getElementById('lang_type')
+//   // console.log("Labguaga seleted",language_selected.options[language_selected.selectedIndex].text)
+
+//   if (lang==null || subtitle_file==null){
+//     console.log("Can not send null values of languages and subtitles file")
+//     alert("Can not send empty values")
+//   }
+
+//   var form_data = new FormData();
+//   var csrfmiddlewaretoken = "{{csrf_token}}"; 
+//   form_data.append("id", param1);
+//   form_data.append("lang_type", document.getElementById('lang_type').value);
+//   form_data.append("subtitle_file", document.getElementById('subtitle_file').files[0]);
+//   form_data.append("csrfmiddlewaretoken", csrfmiddlewaretoken);
+//     $.ajax({
+//             type: 'POST',
+//             url: '{% url "content:upload-subtitle" %}', 
+//             contentType: false,
+//             cache: false,
+//             processData: false,
+//             data: form_data ,
+//                 success: function(data){
+//                   console.log("Subtitles uploaded")
+//                 // location.reload()
+
+//                 },
+//                 error: function(){
+//                     console.log('subtitiles fail')
+//                 }
+//         });  
+
+// }
+
+function TranslateSubtitles(param1){
+
+  console.log("id ",param1)
+
+  var subtitle_file = document.getElementById('subtitle_file').files[0]
+
+
+  if (subtitle_file==null){
+    console.log("Can not send null values of languages and subtitles file")
+    alert("Can not send empty values")
+  }
+
+  var form_data = new FormData();
+  var csrfmiddlewaretoken = "{{csrf_token}}"; 
+  form_data.append("id", param1);
+  form_data.append("subtitle_file", document.getElementById('subtitle_file').files[0]);
+  form_data.append("csrfmiddlewaretoken", csrfmiddlewaretoken);
+
+  var subtitle_file = document.getElementById('subtitle_file').files[0]
+  var file_name = subtitle_file.name
+  var splitted_array = file_name.split('.')
+  var extension = splitted_array[splitted_array.length-1]
+  if (extension != 'vtt'){
+    document.getElementById('subtitle_message').innerHTML = `Invalid file with extension ${extension}`
+    console.log("HTML changed")
+    return false
+  }
+  else{
+    $('#subtitle_message').html();
+  }
+
+    $.ajax({
+            type: 'POST',
+            url: '{% url "content:translate-subtitle" %}', 
+            contentType: false,
+            cache: false,
+            processData: false,
+            data: form_data ,
+                success: function(data){
+                  console.log("Translate success")
+                // location.reload()
+
+                },
+                error: function(){
+                    console.log('Translate fail')
+                }
+        });  
+}
+
+$(document).ready(function(){	
+	$("ul.reorder-gallery").sortable({		
+		update: function( event, ui ) {
+			updateOrder();
+		}
+	});
+
+  
+});
+function updateOrder() {	
+	var item_order = new Array();
+	$('ul.reorder-gallery li').each(function() {
+		item_order.push($(this).attr("id"));
+	});
+  console.log(item_order);
+  var form_data = new FormData();
+  var csrfmiddlewaretoken = "{{csrf_token}}"; 
+  form_data.append("order", item_order);
+  form_data.append('content', "{{content.pk}}")
+  form_data.append("csrfmiddlewaretoken", csrfmiddlewaretoken);
+ 
+	$.ajax({
+		type: "POST",
+		url: "{% url 'content:update-order' %}",
+		data: form_data,
+	  contentType: false,
+            cache: false,
+            processData: false,
+		success: function(data){	
+      location.reload()		
+		}
+	});
+}
+
+  function AddOption(id) {
+    count = $("#question_options_"+id+" input").length;
+    count = count +1;
+      console.log(count);
+    $("#question_options_"+id).append(
+      '<div class="input-group margin" data-id>\
+        <input class="form-control question_option" id="add_poll_options_'+id+'_'+count+'" onchange="UpdateOption(0, this.value, '+id+', this)" placeholder="Quiz Answer '+count+'" >\
+        <span class="input-group-btn">\
+          <button type="button"  id = "is_correct" class="btn btn-default btn-flat is_correct"><i class="fa fa-check "></i></button>\
+          <button type="button" id="close_button" class="btn btn-default btn-flat close_button" ><i class="fa fa-times"></i></button>\
+        </span>\
+      </div>');
+      document.getElementById('add_poll_options_'+id+'_'+count).focus();
+  }
+
+  // function AddSubtitleOption() {
+  //   count = $("#upload_subtitles_").length;
+  //   console.log("Count", count)
+  //   const lang = document.getElementById('lang_type').value
+  //   console.log("lang_type ",document.getElementById('lang_type').value)
+
+  //   var subtitle_file_name = document.getElementById('subtitle_file').files[0].name
+  //   console.log("subtitle_file ",subtitle_file_name)
+
+  //   const language_selected = document.getElementById('lang_type')
+  //   const language_selected_text = language_selected.options[language_selected.selectedIndex].text
+  //   console.log("Language seleted",language_selected.options[language_selected.selectedIndex].text)
+  //   // count = count +1;
+  //   $("#upload_subtitles_").append(
+  //     '<div class="added_language col-md-12" id="added_language" data-id>\
+  //       <div class="col-md-4">'+language_selected_text+'</div>\
+  //       <div class="col-md-4">'+subtitle_file_name+'</div>\
+  //       <button type="button" id="close_subtitle_button" class="col-md-2 btn btn-default btn-flat close_subtitle_button"><i class="fa fa-times"></i></button>\
+  //       <button class="col-md-2" style="text-align: center;"><input class="col-md-2"type="file" name="update_subtitle_file" id="update_subtitle_file" accept=".vtt" style="visibility:hidden; text-align: center;">Update</button>\
+  //     </div>');
+  //     console.log("Code added")
+  //     // document.getElementById('added_language_'+count).focus();
+  // }
+
+  function AddPollOption(id) {
+    count = $("#poll_options_"+id+" input").length;
+    count = count +1;
+      console.log(count);
+    $("#poll_options_"+id).append(
+      '<div class="input-group margin" data-id>\
+        <input class="form-control question_option"  id="add_options_'+id+'_'+count+'"  placeholder="Poll Answer '+count+' " onchange="UpdateOption(0, this.value, '+id+', this)" >\
+        <span class="input-group-btn">\
+          <button type="button" id="close_button" class="btn btn-default btn-flat close_button"><i class="fa fa-times"></i></button>\
+        </span>\
+      </div>');
+     
+      document.getElementById('add_options_'+id+'_'+count).focus();
+  }
+
+ $('#content_title').on('focusout', function(event) {
+  var form_data = new FormData();
+  var csrfmiddlewaretoken = "{{csrf_token}}"; 
+  form_data.append("id", '{{content.pk}}');
+  form_data.append("title", document.getElementById("content_title").innerHTML);
+  form_data.append("csrfmiddlewaretoken", csrfmiddlewaretoken);
+  console.log(form_data);
+    $.ajax({ 
+            type: 'POST',
+            url: '{% url "content:update_content_title" %}', 
+            contentType: false,
+            cache: false,
+            processData: false,
+            data: form_data ,
+                success: function(data){
+                location.reload()
+
+                },
+                error: function(){
+                    console.log(' content fail line 1125')
+                }
+        });  
+});
+
+$(document).on('keypress',function(e) {
+    
+    if(e.which == 13) {
+      var id = $(this).val;
+      console.log(id);
+      if($("#poll_options_"+id).length) {
+        AddOption(id);
+      } 
+    }  
+});
+
+
+</script>
+{% endblock %}

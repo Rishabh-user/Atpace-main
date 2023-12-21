@@ -1,0 +1,205 @@
+{% extends 'base.html' %} {% load static %}
+{% block title %}
+{% if request.path == '/user/list/' %} User List {% else %} Admin {% endif %}
+{% endblock %}
+{% load tags %}
+<!-- DataTables -->
+{% block css %}
+<link rel="stylesheet" href="{% static 'bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css' %}">
+{% endblock css %} 
+{% block content %}
+
+
+<div class="content-wrapper">
+  <section class="content-header">
+    <h1>
+      User
+      <small>List</small>
+    </h1>
+    <ol class="breadcrumb">
+      <li><a href="#"><i class="fa fa-dashboard"></i> User Settings</a></li>
+      <li><a href="#">User</a></li>
+      <li class="active">List</li>
+    </ol>
+  </section>
+
+  <section class="content">
+    <div class="box">
+      <div class="box-header">
+        <span class="col-sm-3"><h4>Select Action for multiple user: </h4></span>
+        <span class="col-sm-3" style="padding-top: 8px;" id="">
+          <select class="form-control select2" id="action_select" name="action_select" style="width: 100%;">
+            <option selected="selected">Select Action</option>
+            {% if request.path == '/user/inactive-list/' %}
+            <option value="Active">Active</option>
+            {% else %}
+            <option value="InActive">InActive</option>
+            {% endif %}
+            <option value="Archive" >Archive</option>
+            <option value="wp_enable" >Enable Whatsapp</option>
+            <option value="wp_disable" >Disable Whatsapp</option>
+
+          </select>
+        </span>
+        <span class="col-sm-2">
+          <input type="submit" class="btn btn-primary" value="Add Multiple" id="multi_add_btn" onclick="btn_multiple_inactive_archive()" style="display: none;">
+        </span> 
+    </div>
+    </div>
+    <div class="row">
+       <div class="col-xs-12">
+           <div class="box">
+             <div class="box-header">
+               <h3 class="box-title">Users List</h3>
+               {% if request.path == '/user/list/' or request.path == '/user/inactive-list/' %}
+               <a href="{% url 'user:create-user' %}"><button class="btn btn-primary pull-right">Create User</button></a>
+               {% else %}
+                <a href="{% url 'user:create_admin' %}"><button class="btn btn-primary pull-right">Create Admin</button></a>
+              {% endif %}
+              {% if request.path == '/user/list/' %}
+              <a href="{% url 'api:active_user_csv' active_status='True' %}"><button class="btn btn-primary pull-right">Export As CSV</button></a>
+              {% else %}
+              <a href="{% url 'api:active_user_csv' active_status='False' %}"><button class="btn btn-primary pull-right">Export As CSV</button></a>
+              {% endif %}
+               
+              </div>
+            <form action="{% url 'user:bulk_inactive_archive' %}" method="post" id="from">
+              {% csrf_token %}
+             <!-- /.box-header -->
+             <div class="box-body">
+              {% include 'component/error_message.html' %}
+              <input type="hidden" name="action" id="action_type" value="">
+              <table id="example2" class="table table-bordered table-hover">
+                 <thead>
+                  <tr>
+                    <th></th>
+                    <th>Full Name</th>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Date Modified</th>
+                    <th>Lite Signup</th>
+                    <th>Status</th>
+                    
+                    <th>Action</th>
+                </tr>
+                 </thead>
+                 <tbody>
+                  {% for user in users %}
+                    <tr>
+                      <td><input class="checkbox" style="display: none;" type="checkbox" name="user_id" value="{{user.id}}"></td>
+                      <td>{{user.first_name|capfirst}} {{user.last_name|capfirst}}</td>
+                      <td>{{user.username}}</td>
+                      <td>{{user.email}}</td>
+                      <td>{{user.phone}}</td>
+                      <td>{{user.date_modified}}</td>
+                        <td><kbd>{{user.is_lite_signup}}<kbd></td>
+                      <td class="active_list">
+                        {% if user.is_active %}
+                          <kbd>Active</kbd>
+                        {% else %}
+                          <kbd>InActive</kbd>
+                        {% endif %}
+                        </td>
+                      <td>
+                        <div class="dropdown">
+                          <button class="btn bg-purple dropdown-toggle btn-select-option" type="button" data-toggle="dropdown" aria-expanded="true">Select an option<span class="caret"></span>
+                          </button>
+                          <ul class="dropdown-menu options-dropdown">
+                            <li>
+                              <a href="{% url 'user:user-profile' pk=user.id %}"><i class="fa fa-eye option-icon"></i>View</a>
+                          </li>
+                          {% comment %} <li>
+                            <a href="{% url 'content:user_journey' pk=user.id %}"><i class="fa fa-edit option-icon"></i>Report</a>
+                          </li> {% endcomment %}
+                          <li>
+                            <a href="{% url 'content:journey_report' pk=user.id %}"><i class="fa fa-eye option-icon"></i>Course Status</a>
+                          </li>
+                          
+                          <li>
+                            <a href="{% url 'user:update-user' pk=user.id %}"><i class="fa fa-edit option-icon"></i>Edit</a>
+                          </li>
+                          
+
+                          <li>
+                            <a href="{% url 'user:set-password' pk=user.id %}"><i class="fa fa-edit option-icon"></i>Set Password</a>
+                          </li>
+
+                          {% comment %} <li>
+                            <a href="{% url 'user:user-dashboard-admin' pk=user.id %}"><i class="fa fa-edit option-icon"></i>view dashboard</a>
+                          </li> {% endcomment %}
+                          <li>
+                            <a href="{% url 'user:delete-user' pk=user.id %}"><i class="fa fa-trash option-icon"></i>Delete</a>
+                          </li>
+
+                          </ul>
+                      </div>
+                      </td>
+                    </tr>
+                    {% endfor %}
+                 </tfoot>
+               </table>
+             </div>
+            </form>
+             <!-- /.box-body -->
+           </div>
+           <!-- /.box -->
+ 
+          
+         </div>
+       <!-- /.col -->
+    </div>
+    <!-- /.row -->
+ </section>
+ 
+</div>
+{% endblock content %} 
+{% block js %}
+<script src="{% static 'bower_components/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
+<script>
+
+$(function () {
+ 
+  $('#example2').DataTable({
+    "dom": '<"table-pull-left"f><"table-pull-right"l>tip',
+    'paging'      : true,
+    'lengthChange': true,
+    'searching'   : true,
+    'ordering'    : true,
+    'info'        : true,
+    'autoWidth'   : true,
+    'scrollX'     : true
+  })
+})
+$( document ).ready(function() {
+  $("#action_select").on('change', function() { 
+    val = this.value
+  if(val == "InActive" | val == "wp_enable" | val == "wp_disable" | val == "Active" | val == "Archive"){
+    $(".checkbox").show();
+    $("#multi_add_btn").show();
+  }else{
+    $(".checkbox").hide();
+    $("#multi_add_btn").hide();
+  }
+})
+});
+
+function btn_multiple_inactive_archive() {
+  checkbox = $('.checkbox').is(":checked")
+  if(!checkbox){
+    alert("please select a checkbox");
+    return false;
+  }
+  
+  var action_select = $("#action_select").val(); 
+  $("#action_type").val(action_select);
+  $("#from").submit(); 
+}
+
+//function action_select_dropdown() {
+//
+//}
+
+</script>
+{% endblock js %}

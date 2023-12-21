@@ -1,0 +1,40 @@
+<section class="content section" id="{{forloop.counter}}" data-id="{{data.id}}">
+    <div class="box-header with-border">
+    </div>
+    <div class="content">
+       <div class="row">
+        
+        <div class="col-md-12 ">
+          <div class="content_card">
+         <label><i class="fa fa-bar-chart"></i> Poll <small>(In your opinion)</small></label>
+        <h2>{{data.title}}</h2>
+       <div id="question_options">
+       
+        {% for option in data.content_data_option.all %}
+        {% if data.poll_response %}
+        {% for poll in data.poll_response %}
+        {% if option.option == poll.option %}
+          <div class="c_poll_btn success poll_option_q" style="pointer-events:none; position:relative" >
+            <div class="poll_option" style="padding: 9px 16px; position: absolute; height: auto; z-index: 2;"  id="poll_option{{option.id}}" data-value="{{option.option}}">{{option.option}}</div>
+            <div class="poll_option_bar" style="padding: 20px 28px;
+            height: 100%;
+            z-index: 0; {% if poll.count != 0 %} background-color: #6ceb96; width: {{poll.count}}%; {% endif %}" ></div>
+          </div>
+        
+          {% endif %}
+        {% endfor %}
+        {% else %}
+        <div class="c_poll_btn success poll_option_q">
+          <div class="poll_option" style="padding: 9px 28px;" id="poll_option{{option.id}}"  data-value="{{option.option}}"><span>{{option.option}}</span></div>
+        </div>
+        {% endif %}
+        {% endfor %}
+       
+      </div>
+    </div>
+   </div>
+        
+      </div>
+    </div>
+    
+</section>

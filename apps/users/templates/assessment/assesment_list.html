@@ -1,0 +1,149 @@
+{% extends 'base.html' %} {% load static %}
+{% block title %} Community List {% endblock %}
+<!-- DataTables -->
+{% block css %}
+<link rel="stylesheet" href="{% static 'bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css' %}">
+<style>
+  span.select2.select2-container.select2-container--default {
+    float: right;
+}
+</style>
+{% endblock css %} 
+{% block content %}
+
+
+<div class="content-wrapper">
+  <section class="content-header">
+    <h1>
+      Profile Assessment Question
+    </h1>
+    <ol class="breadcrumb">
+      <li><a href="#"><i class="fa fa-dashboard"></i> Profile Assessment Question</a></li>
+      <li><a href="#">List</a></li>\
+    </ol>
+  </section>
+
+  <section class="content">
+    
+    <div class="row">
+      <div class="col-xs-12">    
+        </span>
+           <div class="box">
+               <div class="box-header">
+               <h3 class="box-title">Profile Assessment Question List</h3>
+              
+               <select class="col-md-2 pull-right select2" id="type" onchange="update_data()">
+                <option selected value="">Select Action</option>
+                {% comment %} <option value="All">All</option> {% endcomment %}
+                <option value="Learner">Learner</option>
+                <option value="Mentor">Mentor</option>
+                <option value="ProgramManager">ProgramManager</option>
+              </select>
+    
+             </div>
+
+             <!-- /.box-header -->
+             <div class="box-body">
+               <table id="example2" class="table table-bordered table-hover">
+                 <thead>
+                 <tr>
+                  <tr>
+                    <th>Question </th>
+                    <th>Journey </th>
+                    <th>Type</th>
+                    <th>Question For</th>
+                    <th>Display Order</th>
+                    <th>Action</th>
+                    
+                  </tr>
+                   
+                 </tr>
+                 </thead>
+                 <tbody>
+                   {% for assessment in assessment %}
+                   <tr>
+                    <td>{{assessment.question}}</td>
+                    <td>{{assessment.journey}}</td>
+                    <td>{{assessment.question_type}}</td>
+                    <td>{{assessment.question_for}}</td>
+                    <td id="display_order" onchange="update_order('{{assessment.pk}}')"><input type="text" value="{{assessment.display_order}}" id="value_{{assessment.pk}}" name="value" /></td>
+                    <td>
+                      <div class="dropdown">
+                        <button class="btn bg-purple dropdown-toggle btn-select-option" type="button" data-toggle="dropdown" aria-expanded="true">Select an option                                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu options-dropdown">
+                            <li>
+                                <a href="{% url 'user:edit_question' pk=assessment.pk %}"><i class="fa fa-edit option-icon"></i>Edit</a>
+                            </li>
+                            
+                            <li>
+                                <a href="{% url 'user:delete_assessment' pk=assessment.pk %}"><i class="fa fa-trash option-icon"></i>Delete</a>
+                            </li>
+                        </ul>
+                    </div>
+                    </td>
+                 </tr>
+                   {% endfor %}
+                 </tfoot>
+               </table>
+             </div>
+             <!-- /.box-body -->
+           </div>
+           <!-- /.box -->
+ 
+          
+         </div>
+       <!-- /.col -->
+    </div>
+    <!-- /.row -->
+ </section>
+ 
+</div>
+{% endblock content %} 
+{% block js %}
+<script src="{% static 'bower_components/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
+<script>
+
+$(function () {
+ 
+  $('#example2').DataTable({
+    "dom": '<"table-pull-left"f><"table-pull-right"l>tip',
+    'paging'      : true,
+    'lengthChange': true,
+    'searching'   : true,
+    'ordering'    : true,
+    'info'        : true,
+    'autoWidth'   : true,
+    'scrollX'     : true
+  })
+})
+
+
+</script>
+<script>
+  function update_order(pk){
+    console.log("Test")
+    value = document.getElementById('value_'+pk).value;
+    console.log(pk, value)
+    if(pk!=""){
+      $.ajax({
+        url:  "{% url 'user:question_reorder' %}",
+        type: 'POST',
+        data: {value: value, pk :pk, csrfmiddlewaretoken : "{{csrf_token}}" },
+        error: function() {
+        bootbox.alert('Something is wrong');
+        },
+        success: function(data) {
+          bootbox.alert("order updated successfully");
+      }
+    })
+   }
+  };
+
+  function update_data(){
+    type = document.getElementById('type').value
+    window.location.href = '?type='+type
+  }
+</script>
+{% endblock js %}

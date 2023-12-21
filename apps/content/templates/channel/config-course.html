@@ -1,0 +1,184 @@
+{% extends 'base.html' %}  {% load tags %} {% block title %} Journey Pathway {% endblock %} 
+{% load crispy_forms_tags %} {% block content %}
+    <div class="content-wrapper">
+      <!-- Content Header (Page header) -->
+      <section class="content-header">
+        <h1>
+          Journey Pathway
+    
+        </h1>
+        <ol class="breadcrumb">
+          <li><a href="#"><i class="fa fa-dashboard"></i> Skill</a></li>
+          <li><a href="#">Journey Pathway</a></li>
+        </ol>
+      </section>
+    
+      <!-- Main content -->
+      <section class="content">
+    
+        <!-- Default box -->
+        <div class="box">
+          <div class="box-header with-border">
+            <h3 class="box-title">Journey Pathway</h3>
+            
+            <a href="{%url 'content:config_course_list' %}"><button class="btn btn-primary pull-right">Journey Pathway List</button></a>
+
+          </div>
+          <div class="box-body">
+            {% include 'component/error_message.html' %}
+          
+            <form method="post" action="">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label>Roles</label>
+                            <select class="form-control select2" id ="role" name="role" style="width: 100%;">
+                              <option selected="selected">Select</option>
+                              {% for role in request.user|all_role %}
+                                <option value="{{role.pk}}">{{role.name}}</option>
+                                {% endfor %}
+                            </select>
+                            </div>
+                      <div class="form-group">
+                        <label>Journey</label>
+                        <select class="form-control select2" id ="channel" name="channel" style="width: 100%;">
+                          <option selected="selected">Select</option>
+                          {% for channel in request.session.user_type|all_skill_channel:request.session.company_id %}
+                            <option value="{{channel.pk}}">{{channel.title}}</option>
+                            {% endfor %}
+                        </select>
+                      </div>
+                      <div class="form-group">
+                        <label>Journey Pre Assessment <span id="is_test_required"></span></label>
+                        <select class="form-control select2" id="journey_pre_assessment" name="journey_pre_assessment" required style="width: 100%;">
+          
+                          <option selected="selected" value="">Select Pre Assessment</option>
+                          {% for assessment in request.user|all_assessment %}
+                          <option value="{{assessment.pk}}">{{assessment.name}}</option>
+                          {% endfor %}
+                        </select>
+                      </div>
+                      
+                      <!-- /.form-group -->
+                      <div class="form-group"><label>Select Skill</label><select class="form-control select2" id="sub_channel" name="sub_channel" required style="width: 100%;"><option selected="selected" val>Select Skill </option></select></div>
+                      <div class="form-group">
+                        <label>Select Skill Pre Assessment <span id="skill_is_test_required"></span></label>
+                        <select class="form-control select2" id="skill_pre_assessment" name="pre_assessment" required style="width: 100%;">
+          
+                          <option selected="selected" value="">Select Pre Assessment</option>
+                          {% for assessment in request.user|all_assessment %}
+                          <option value="{{assessment.pk}}">{{assessment.name}}</option>
+                          {% endfor %}
+                        </select>
+                      </div>
+                      
+                      <div id="channel_groups"></div>
+                      <!-- /.form-group -->
+                      <button type="submit" id="sumbitContent" class="btn btn-primary">Save changes</button>
+                    </div>
+                   
+                  </div>
+                  <!-- /.row -->
+            </form>
+    
+          </div>
+         
+        </div>
+        <!-- /.box -->
+    
+      </section>
+      <!-- /.content -->
+    </div>
+    {% endblock content %}
+    {% block js %}
+    <script>
+    $(document).on('change', '#sub_channel', function(e) {
+        console.log("dd");
+          var formData = {
+            channel: $("#sub_channel").val(),
+            csrfmiddlewaretoken:"{{csrf_token}}"
+          };
+          selectChannelGroup(formData);
+      });
+      
+      
+      function selectChannelGroup(formData){
+         $.ajax({
+            type: "POST",
+            url: '{% url "content:select_channel_group" %}',
+            data: formData,
+            encode: true,
+          }).done(function (data) {
+            // var obj = JSON.parse(data);
+            $("#channel_groups").empty();
+            if(!data.is_test_required){
+              $("#skill_is_test_required").html("(We don't need  pre assessment for this skill)");
+              document.getElementById("skill_pre_assessment").removeAttribute("required");
+            } else {
+              $("#skill_is_test_required").empty();
+            }
+            data = data['data']
+            console.log(data);
+            $.each(data,function(key, value)
+                      { 
+                          $("#channel_groups").append('<div class="row">\
+<div class="col-md-6"><div class="form-group"><label>Select Proficiency Level</label><input type="text" readonly  name="title" value="'+value['title']+'" class="form-control"><input type="hidden" readonly  name="group[]" value="'+value['id']+'" class="form-control">\
+  </div>\
+</div>\
+<div class="col-md-6">\
+    <div class="form-group">\
+        <label>Select Post Assessment</label>\
+        <select class="form-control select2"  id="post_assessment" name="post_assessment[]" required style="width: 100%;">\
+          <option selected="selected" value="">Select Post Assessment</option>\
+          {% for assessment in request.user|all_assessment %}\
+          <option value="{{assessment.pk}}">{{assessment.name}}</option>\
+          {% endfor %}\
+        </select>\
+      </div>\
+</div>\
+<div>');
+                      });
+          });
+      }
+      
+      $(document).ready(function () {
+      
+      $("#channel").change(function(){
+          var formData = {
+            channel: $("#channel").val(),
+            csrfmiddlewaretoken:"{{csrf_token}}"
+          };
+          $.ajax({
+            type: "POST",
+            url: '{% url "content:check_sub_channel" %}',
+            data: formData,
+            encode: true,
+          }).done(function (data) {
+           
+            $("#sub_channel").empty();
+            if(!data.is_test_required){
+              $("#is_test_required").html("(We don't need assessment pre assessment for this channel)");
+              document.getElementById("journey_pre_assessment").removeAttribute("required");
+            } else {
+              $("#is_test_required").empty();
+            }
+            
+            if(data.SkillDevelopment){
+      
+              $("#sub_channel").append('<option selected="selected" value="">Select Skill</option>');
+                $.each(data.data,function(key, value)
+                      { 
+                          $("#sub_channel").append('<option value=' + value['id'] + '>' + value['title'] + '</option>');
+                      });
+                } else {
+                  selectChannelGroup(formData);
+                }
+          });
+          
+      
+          event.preventDefault();
+      });
+      });
+    </script>
+    {% endblock js %}

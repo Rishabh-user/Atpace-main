@@ -1,0 +1,101 @@
+{% extends 'base.html' %} {% load static %} {% block title %}Content To Review Record{% endblock %}
+ {% block content %}
+ {% block css %}
+<link rel="stylesheet" href="{% static 'bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css' %}">
+{% endblock css %} 
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <h1>
+        Content Review
+      </h1>
+      <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Settings</a></li>
+        <li><a href="#">Content Review</a></li>
+
+      </ol>
+    </section>
+  
+    <!-- Main content -->
+    <section class="content">
+      <div class="row">
+         <div class="col-xs-12">
+             <div class="box">
+               <div class="box-header">
+                 <h3 class="box-title">Content Review List</h3>
+
+               </div>
+
+                <div class="box-body">
+                    <table id="example2" class="table table-bordered table-hover">
+                      <thead>
+                      <tr>
+                        <th>Title</th>
+                        <th>Post Title</th>
+                        <th>Posted By</th>
+                        <th>Post Type</th>
+                        <th>Space</th>
+                        <th>Is Reviewed</th>
+                        <th>Reviewed By</th>
+                        <th>Action</th>
+                      </tr>
+                      </thead>
+                      <tbody> 
+                      {% for data in review_contents %}
+                      <tr>
+                        <td>{{data.title}}</td>
+                        <td>{{data.post.title}}</td>
+                        <td>{{data.user.first_name}} {{data.user.last_name}}</td>
+                        <td>{{data.posted_on}}</td>
+                        <td>{{data.space.title}}</td>
+                        <td>{{data.is_reviewed}}</td>
+                        <td>{% if data.reviewed_by %} {{data.reviewed_by.first_name}} {{data.reviewed_by.last_name}} {% else %} None {% endif %}</td>
+                        <td>
+                          <div class="dropdown">
+                            <button class="btn bg-purple dropdown-toggle btn-select-option" type="button" data-toggle="dropdown" aria-expanded="true">Select an option<span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu options-dropdown">
+                                <li>
+                                    <a href="{% url 'atpace_community:review_content' review_content_id=data.id %}" ><i class=""></i>Review</a>
+                                </li>
+                                {% comment %} <li id="delete_data" data-id={{data.id}}>
+                                  <a href="#" ><i class="fa fa-trash option-icon"></i>Delete</a>
+                              </li> {% endcomment %}
+                          </ul>
+                        </div>
+                        </td>
+
+                      </tr>
+                      {% endfor %}
+                      </tfoot>
+                    </table>
+                  </div>
+                  <!-- /.box-body -->
+                </div>
+              </div>
+            </div>
+
+  </section>
+  <!-- /.content -->
+</div>
+{% endblock content %}
+{% block js %}
+<script src="{% static 'bower_components/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
+<script>
+
+$(function () {
+
+$('#example2').DataTable({
+  "dom": '<"table-pull-left"f><"table-pull-right"l>tip',
+  'paging'      : true,
+  'lengthChange': true,
+  'searching'   : true,
+  'ordering'    : true,
+  'info'        : true,
+  'autoWidth'   : true,
+  'scrollX'     : true
+})
+})
+</script>
+{% endblock js %}

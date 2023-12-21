@@ -1,0 +1,106 @@
+{% extends 'base.html' %} {% load static %}
+{% if request.path == '/user/list/' %} User List {% else %} Admin {% endif %}
+{% load tags %}
+<!-- DataTables -->
+{% block css %}
+<link rel="stylesheet" href="{% static 'bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css' %}">
+{% endblock css %} 
+{% block content %}
+
+
+<div class="content-wrapper">
+  <section class="content-header">
+    <h1>
+      Mentor Matching
+    
+    </h1>
+    <ol class="breadcrumb">
+      <li><a href="#"><i class="fa fa-dashboard"></i> Mentor Matching</a></li>
+      <li><a href="#">Mentor Matching</a></li>
+      <li class="active">List</li>
+    </ol>
+  </section>
+
+  <section class="content">
+    <div class="row">
+       <div class="col-xs-12">
+           <div class="box">
+             <div class="box-header">
+               <h3 class="box-title">Mentor Matching List</h3>
+
+               
+              </div>
+             <!-- /.box-header -->
+             <div class="box-body">
+
+               <table id="example2" class="table table-bordered table-hover">
+                 <thead>
+                  <tr>
+                    <th>Mentor</th>
+                    <th>Mentee</th>
+                    <th>Journey</th>
+                    <th>Status</th>
+                    <td>Update At</td>
+                    <td>Assign By</td>
+                    
+                </tr>
+                 </thead>
+                 <tbody>
+                  {% for data in data %}
+                    <tr>
+                      
+                      <td><a href="{% url 'user:user-profile' pk=data.mentor.id %}" target="_blank">{{data.mentor.first_name}} {{data.mentor.last_name}}</a> </td>
+                      <td><a href="{% url 'user:user-profile' pk=data.user.id %}" target="_blank">{{data.user.first_name}} {{data.user.last_name}}</a></td>
+                      <td>{{data.journey}}</td>
+                      <td>
+                        {% if data.is_assign %}
+                          <kbd>Assign</kbd>
+                        {% else %}
+                          <kbd>Revoke</kbd>
+                        {% endif %}
+                        </td>
+                        <td>{{data.updated_at}}</td>
+                      
+                      <td>{{data.assign_by.first_name}} {{data.assign_by.last_name}}</td>
+                    </tr>
+                    {% endfor %}
+
+                 </tfoot>
+               </table>
+             </div>
+             <!-- /.box-body -->
+           </div>
+           <!-- /.box -->
+
+         
+           
+       <!-- /.col -->
+    </div>
+    <!-- /.row -->
+ </section>
+ 
+</div>
+{% endblock content %} 
+{% block js %}
+
+<script src="{% static 'bower_components/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
+<script src="https://cdn.datatables.net/buttons/2.0.0/js/dataTables.buttons.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.0.0/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.0.0/js/buttons.print.min.js"></script>
+<script>
+
+
+  $('#example2').DataTable({
+    // "dom": '<"table-pull-left"f><"table-pull-right"l>tip',
+    dom: 'Bfrtip',
+    buttons: [
+        'copy', 'csv', 'excel', 'pdf', 'print'
+    ]
+  });
+
+</script>
+{% endblock js %}

@@ -1,0 +1,39 @@
+{% load static %}
+<section class="banner__area pb-110">
+    <div class="container">
+        <div class="row">
+            <div class="col-xxl-6 col-xl-6 col-lg-6 col-md-6">
+                <div class="banner__item p-relative mb-40"
+                     data-background="{% static 'website/img/banner/banner-bg-1.jpg' %}">
+                    <div class="banner__content">
+                        <span>Free</span>
+                        <h3 class="banner__title">
+                            <a href="{% url 'user:transition_to_success' %}">Transition to Success</a>
+                        </h3>
+                        <a href="{% url 'user:transition_to_success' %}" class="e-btn e-btn-2">Find out More</a>
+                    </div>
+                    <div class="banner__thumb d-none d-sm-block d-md-none d-lg-block">
+                        <img src="{% static 'website/img/banner/banner-img-1.png' %}" alt="banner image 1" width="200"> 
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-xxl-6 col-xl-6 col-lg-6 col-md-6">
+                <div class="banner__item p-relative mb-40"
+                     data-background="{% static 'website/img/banner/banner-bg-2.jpg' %}">
+                    <div class="banner__content">
+                        <span class="orange">new</span>
+                        <h3 class="banner__title">
+                            <a href="https://forum.growatpace.com/">Community</a>
+                        </h3>
+                        <a href="https://forum.growatpace.com/" class="e-btn e-btn-2">Find Out More</a>
+                    </div>
+                    <div class="banner__thumb banner__thumb-2 d-none d-sm-block d-md-none d-lg-block">
+                        <img src="{% static 'website/img/banner/banner-img-2.png' %}" alt="banner image 2" width="200">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,448 @@
+{% extends 'base.html' %} {% load static %} 
+{% block css %}
+    <style>
+      .small-box{
+        box-shadow: 0px 2px 4px 3px rgb(0 0 0 / 47%);
+        border-radius: 12px;
+      }
+    </style>
+{% endblock css %} 
+ {% load dashboard %}  {% block title %}
+Dashboard {% endblock %} {% block content %}
+<div class="content-wrapper">
+  <!-- Content Header (Page header) -->
+  <section class="content-header">
+    <h1>Dashboard</h1>
+    <ol class="breadcrumb">
+      <li>
+        <a href="#"><i class="fa fa-dashboard"></i> User</a>
+      </li>
+      <li><a href="#">Dashboard</a></li>
+    </ol>
+  </section>
+
+  <!-- Main content -->
+  <section class="content">
+    <h4>Journey</h4>
+    <div class="row">
+      <div class="col-lg-3 col-xs-6">
+        <!-- small box -->
+        <div class="small-box bg-aqua">
+          <div class="inner">
+            
+            <h3>{{ request.user|total_journy }}</h3>
+
+            <p>Total Journey</p>
+          </div>
+          <div class="icon">
+            <i class="fa fa-file-text-o"></i>
+          </div>
+          <a href="#" class="small-box-footer"
+            >More info <i class="fa fa-arrow-circle-right"></i
+          ></a>
+        </div>
+      </div>
+      <div class="col-lg-3 col-xs-6">
+        <!-- small box -->
+        <div class="small-box bg-green">
+          <div class="inner">
+            
+            <h3>{{ request.user|new_journy }}</h3>
+
+            <p>New Journey</p>
+          </div>
+          <div class="icon">
+            <i class="fa fa-file-text-o"></i>
+          </div>
+          <a href="#" class="small-box-footer"
+            >More info <i class="fa fa-arrow-circle-right"></i
+          ></a>
+        </div>
+      </div>
+      <div class="col-lg-3 col-xs-6">
+        <!-- small box -->
+        <div class="small-box bg-yellow">
+          <div class="inner">
+            <h3>{{ request.user|joined_journy }}</h3>
+
+            <p>Joined</p>
+          </div>
+          <div class="icon">
+            <i class="fa fa-file-text-o"></i>
+          </div>
+          <a href="#" class="small-box-footer"
+            >More info <i class="fa fa-arrow-circle-right"></i
+          ></a>
+        </div>
+      </div>
+      <div class="col-lg-3 col-xs-6">
+        <!-- small box -->
+        <div class="small-box bg-red">
+          <div class="inner">
+            <h3>{{ request.user|last_7_days_journy }}</h3>
+
+            <p>Last 7 days</p>
+          </div>
+          <div class="icon">
+            <i class="fa fa-file-text-o"></i>
+          </div>
+          <a href="#" class="small-box-footer"
+            >More info <i class="fa fa-arrow-circle-right"></i
+          ></a>
+        </div>
+      </div>
+    </div>
+    <h4>Skill</h4>
+    <div class="row">
+      <div class="col-lg-3 col-xs-6">
+        <!-- small box -->
+        <div class="small-box bg-red">
+          <div class="inner">
+            <h3>{{ request.user|total_skill }}</h3>
+
+            <p>Total Skill</p>
+          </div>
+          <div class="icon">
+            <i class="fa fa-file-text-o"></i>
+          </div>
+          <a href="#" class="small-box-footer"
+            >More info <i class="fa fa-arrow-circle-right"></i
+          ></a>
+        </div>
+      </div>
+      <div class="col-lg-3 col-xs-6">
+        <!-- small box -->
+        <div class="small-box bg-aqua">
+          <div class="inner">
+            <h3>{{ request.user|new_skill }}</h3>
+
+            <p>New Skill</p>
+          </div>
+          <div class="icon">
+            <i class="fa fa-file-text-o"></i>
+          </div>
+          <a href="#" class="small-box-footer"
+            >More info <i class="fa fa-arrow-circle-right"></i
+          ></a>
+        </div>
+      </div>
+      <div class="col-lg-3 col-xs-6">
+        <!-- small box -->
+        <div class="small-box bg-green">
+          <div class="inner">
+            <h3>{{ request.user|last_7_days_skill }}</h3>
+
+            <p>Last 7 Days</p>
+          </div>
+          <div class="icon">
+            <i class="fa fa-file-text-o"></i>
+          </div>
+          <a href="#" class="small-box-footer"
+            >More info <i class="fa fa-arrow-circle-right"></i
+          ></a>
+        </div>
+      </div>
+    
+    </div>
+    <h4>MicroSkill</h4>
+    <div class="row">
+      <div class="col-lg-3 col-xs-6">
+        <!-- small box -->
+        <div class="small-box bg-yellow">
+          <div class="inner">
+            <h3>{{ request.user|total_microskill }}</h3>
+
+            <p>Total Microskill</p>
+          </div>
+          <div class="icon">
+            <i class="fa fa-file-text-o"></i>
+          </div>
+          <a href="#" class="small-box-footer"
+            >More info <i class="fa fa-arrow-circle-right"></i
+          ></a>
+        </div>
+      </div>
+      <div class="col-lg-3 col-xs-6">
+        <!-- small box -->
+        <div class="small-box bg-red">
+          <div class="inner">
+            <h3>{{ request.user|new_microskill }}</h3>
+
+            <p>New Microskill</p>
+          </div>
+          <div class="icon">
+            <i class="fa fa-file-text-o"></i>
+          </div>
+          <a href="#" class="small-box-footer"
+            >More info <i class="fa fa-arrow-circle-right"></i
+          ></a>
+        </div>
+      </div>
+      <div class="col-lg-3 col-xs-6">
+        <!-- small box -->
+        <div class="small-box bg-aqua">
+          <div class="inner">
+            <h3>{{ request.user|pending_microskill }}</h3>
+
+            <p>Pending Microskill</p>
+          </div>
+          <div class="icon">
+            <i class="fa fa-file-text-o"></i>
+          </div>
+          <a href="#" class="small-box-footer"
+            >More info <i class="fa fa-arrow-circle-right"></i
+          ></a>
+        </div>
+      </div>
+      <div class="col-lg-3 col-xs-6">
+        <!-- small box -->
+        <div class="small-box bg-green">
+          <div class="inner">
+            <h3>{{ request.user|draft_microskill }}</h3>
+
+            <p> Draft Microskill</p>
+          </div>
+          <div class="icon">
+            <i class="fa fa-file-text-o"></i>
+          </div>
+          <a href="#" class="small-box-footer"
+            >More info <i class="fa fa-arrow-circle-right"></i
+          ></a>
+        </div>
+      </div>
+      <div class="col-lg-3 col-xs-6">
+        <!-- small box -->
+        <div class="small-box bg-green">
+          <div class="inner">
+            <h3>{{ request.user|live_microskill }}</h3>
+
+            <p> Live Microskill</p>
+          </div>
+          <div class="icon">
+            <i class="fa fa-file-text-o"></i>
+          </div>
+          <a href="#" class="small-box-footer"
+            >More info <i class="fa fa-arrow-circle-right"></i
+          ></a>
+        </div>
+      </div>
+      <div class="col-lg-3 col-xs-6">
+        <!-- small box -->
+        <div class="small-box bg-yellow">
+          <div class="inner">
+            <h3>{{ request.user|last_7_days_micro_skill }}</h3>
+
+            <p> Last 7 days</p>
+          </div>
+          <div class="icon">
+            <i class="fa fa-file-text-o"></i>
+          </div>
+          <a href="#" class="small-box-footer"
+            >More info <i class="fa fa-arrow-circle-right"></i
+          ></a>
+        </div>
+      </div>
+
+    </div>
+    <h4>Survey</h4>
+    <div class="row">
+      <div class="col-lg-3 col-xs-6">
+        <!-- small box -->
+        <div class="small-box bg-aqua">
+          <div class="inner">
+            <h3>{{ request.user|total_survey }}</h3>
+
+            <p>Total Survey</p>
+          </div>
+          <div class="icon">
+            <i class="fa fa-question"></i>
+          </div>
+          <a href="#" class="small-box-footer"
+            >More info <i class="fa fa-arrow-circle-right"></i
+          ></a>
+        </div>
+      </div>
+      <div class="col-lg-3 col-xs-6">
+        <!-- small box -->
+        <div class="small-box bg-green">
+          <div class="inner">
+            <h3>{{ request.user|new_survey }}</h3>
+
+            <p>New Survey</p>
+          </div>
+          <div class="icon">
+            <i class="fa fa-question"></i>
+          </div>
+          <a href="#" class="small-box-footer"
+            >More info <i class="fa fa-arrow-circle-right"></i
+          ></a>
+        </div>
+      </div>
+      <div class="col-lg-3 col-xs-6">
+        <!-- small box -->
+        <div class="small-box bg-yellow">
+          <div class="inner">
+            <h3>{{ request.user|last_7_days_survey }}</h3>
+
+            <p>Last 7 Days</p>
+          </div>
+          <div class="icon">
+            <i class="fa fa-question"></i>
+          </div>
+          <a href="#" class="small-box-footer"
+            >More info <i class="fa fa-arrow-circle-right"></i
+          ></a>
+        </div>
+      </div>
+      <div class="col-lg-3 col-xs-6">
+        <!-- small box -->
+        <div class="small-box bg-red">
+          <div class="inner">
+            <h3>{{ request.user|total_survey_attempt }}</h3>
+
+            <p>Total Survey Attempt </p>
+          </div>
+          <div class="icon">
+            <i class="fa fa-question"></i>
+          </div>
+          <a href="#" class="small-box-footer"
+            >More info <i class="fa fa-arrow-circle-right"></i
+          ></a>
+        </div>
+      </div>
+      <div class="col-lg-3 col-xs-6">
+        <!-- small box -->
+        <div class="small-box bg-red">
+          <div class="inner">
+            <h3>{{ request.user|new_survey_attempt }}</h3>
+
+            <p>New Survey  Attempt </p>
+          </div>
+          <div class="icon">
+            <i class="fa fa-question"></i>
+          </div>
+          <a href="#" class="small-box-footer"
+            >More info <i class="fa fa-arrow-circle-right"></i
+          ></a>
+        </div>
+      </div>
+      <div class="col-lg-3 col-xs-6">
+        <!-- small box -->
+        <div class="small-box bg-aqua">
+          <div class="inner">
+            <h3>{{ request.user|last_7_days_survey_attempt }}</h3>
+
+            <p>Last 7 days Attempt</p>
+          </div>
+          <div class="icon">
+            <i class="fa fa-question"></i>
+          </div>
+          <a href="#" class="small-box-footer"
+            >More info <i class="fa fa-arrow-circle-right"></i
+          ></a>
+        </div>
+      </div>
+    </div>
+    <h4>Assessment</h4>
+    <div class="row">
+      <div class="col-lg-3 col-xs-6">
+        <!-- small box -->
+        <div class="small-box bg-yellow">
+          <div class="inner">
+            <h3>{{ request.user|total_assessment }}</h3>
+
+            <p>Total Assessment</p>
+          </div>
+          <div class="icon">
+            <i class="fa fa-check-square-o"></i>
+          </div>
+          <a href="#" class="small-box-footer"
+            >More info <i class="fa fa-arrow-circle-right"></i
+          ></a>
+        </div>
+      </div>
+      <div class="col-lg-3 col-xs-6">
+        <!-- small box -->
+        <div class="small-box bg-red">
+          <div class="inner">
+            <h3>{{ request.user|new_assessment }}</h3>
+
+            <p>New Assessment</p>
+          </div>
+          <div class="icon">
+            <i class="fa fa-check-square-o"></i>
+          </div>
+          <a href="#" class="small-box-footer"
+            >More info <i class="fa fa-arrow-circle-right"></i
+          ></a>
+        </div>
+      </div>
+      <div class="col-lg-3 col-xs-6">
+        <!-- small box -->
+        <div class="small-box bg-aqua">
+          <div class="inner">
+            <h3>{{ request.user|last_7_days_assessment }}</h3>
+
+            <p>Last 7 Days</p>
+          </div>
+          <div class="icon">
+            <i class="fa fa-check-square-o"></i>
+          </div>
+          <a href="#" class="small-box-footer"
+            >More info <i class="fa fa-arrow-circle-right"></i
+          ></a>
+        </div>
+      </div>
+      <div class="col-lg-3 col-xs-6">
+        <!-- small box -->
+        <div class="small-box bg-green">
+          <div class="inner">
+            <h3>{{ request.user|total_assessment_attempt }}</h3>
+
+            <p>Total Assessment Attempt</p>
+          </div>
+          <div class="icon">
+            <i class="fa fa-check-square-o"></i>
+          </div>
+          <a href="#" class="small-box-footer"
+            >More info <i class="fa fa-arrow-circle-right"></i
+          ></a>
+        </div>
+      </div>
+      <div class="col-lg-3 col-xs-6">
+        <!-- small box -->
+        <div class="small-box bg-green">
+          <div class="inner">
+            <h3>{{ request.user|new_assessment_attempt }}</h3>
+
+            <p>New Assessment Attempt</p>
+          </div>
+          <div class="icon">
+            <i class="fa fa-check-square-o"></i>
+          </div>
+          <a href="#" class="small-box-footer"
+            >More info <i class="fa fa-arrow-circle-right"></i
+          ></a>
+        </div>
+      </div>
+      <div class="col-lg-3 col-xs-6">
+        <!-- small box -->
+        <div class="small-box bg-yellow">
+          <div class="inner">
+            <h3>{{ request.user|last_7_days_assessment_attempt }}</h3>
+
+            <p>Last 7 days Attempt</p>
+          </div>
+          <div class="icon">
+            <i class="fa fa-check-square-o"></i>
+          </div>
+          <a href="#" class="small-box-footer"
+            >More info <i class="fa fa-arrow-circle-right"></i
+          ></a>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- /.content -->
+</div>
+{% endblock content %}

@@ -1,0 +1,141 @@
+{% extends 'base.html' %} {% load static %} {% block title %} Category {% endblock %}
+ {% load crispy_forms_tags %} {% block content %}
+ {% block css %}
+<link rel="stylesheet" href="{% static 'bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css' %}">
+{% endblock css %} 
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <h1>
+        Pool Setup
+      </h1>
+      <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Settings</a></li>
+        <li><a href="#">Pool Setup</a></li>
+
+      </ol>
+    </section>
+  
+    <!-- Main content -->
+    <section class="content">
+  
+      <!-- Default box -->
+      <div class="box">
+        <div class="box-header with-border">
+          <h3 class="box-title">Create Pool Setup</h3>
+
+        </div>
+        <div class="box-body">
+          {% crispy form %}
+        </div>
+      </div>
+      <!-- /.box -->
+      <div class="box">
+        <div class="box-header">
+          <h3 class="box-title">Pool Setup List</h3>
+          
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body">
+          <table id="example2" class="table table-bordered table-hover">
+            <thead>
+             <tr>
+               <th>SNo.</th>
+               <th>Poll</th>
+               <th>Journey</th>
+               <th>Active</th>
+               <th>Action</th>
+               
+             </tr>
+            </thead>
+            <tbody> 
+             {% for pool in pool %}
+             <tr>
+               <td>{{forloop.counter }}</td>
+               <td>{{pool.name}}</td>
+               <td>{{pool.journey}}</td>
+               <td>{{pool.is_active}}</td>
+               
+               <td>
+                <div class="dropdown">
+                  <button class="btn bg-purple dropdown-toggle btn-select-option" type="button" data-toggle="dropdown" aria-expanded="true">Select an option                                            <span class="caret"></span>
+                  </button>
+                  <ul class="dropdown-menu options-dropdown">
+                      <li>
+                          <a href="{% url 'utils:edit_pool' pk=pool.pk %}"><i class="fa fa-edit option-icon"></i>Edit</a>
+                      </li>
+                      
+                      <li id="delete_pool" data-id={{pool.pk}}>
+                          <a href="javascript:void(0)" class="delete_pool"><i class="fa fa-trash option-icon"></i>Delete</a>
+                      </li>
+                  </ul>
+              </div>
+              </td>
+
+             </tr>
+             {% endfor %}
+            </tfoot>
+          </table>
+        </div>
+        <!-- /.box-body -->
+      </div>
+  
+    </section>
+    <!-- /.content -->
+  </div>
+  {% endblock content %}
+  {% block js %}
+<script src="{% static 'bower_components/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
+<script>
+
+  $(function () {
+    $("body").on("click","#delete_pool",function(){
+      var id = $(this).data('id');
+      bootbox.confirm({
+      message: "Are you sure to remove this record ?",
+      buttons: {
+          confirm: {
+              label: 'Yes',
+              className: 'btn-success'
+          },
+          cancel: {
+              label: 'No',
+              className: 'btn-danger'
+          }
+      },
+      callback: function (result) {
+          if(result == true){
+            $.ajax({
+                 url:  "{% url 'utils:delete_pool' %}",
+                 type: 'POST',
+                 data: {pk: id, csrfmiddlewaretoken : "{{csrf_token}}" },
+                 error: function() {
+                  bootbox.alert('Something is wrong');
+                 },
+                 success: function(data) {
+                      $("#"+id).remove();
+                      bootbox.alert("Record removed successfully");
+                 }
+              });
+          }
+      }
+  });
+  });
+  });
+  
+$(function () {
+ 
+  $('#example2').DataTable({
+    "dom": '<"table-pull-left"f><"table-pull-right"l>tip',
+    'paging'      : true,
+    'lengthChange': true,
+    'searching'   : true,
+    'ordering'    : true,
+    'info'        : true,
+    'autoWidth'   : true,
+    'scrollX'     : true
+  })
+})
+</script>
+{% endblock js %}

@@ -1,0 +1,16 @@
+{% autoescape off %}
+
+Hello,
+
+Your Program team has posted the following updates for your attention
+
+By: {{ announce_by }}
+Topic: {{ topic }}
+Summary Text: {{ content }}
+
+{{ url }}
+
+Regards,
+Program Team
+
+{% endautoescape %}

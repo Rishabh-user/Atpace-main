@@ -1,0 +1,15 @@
+{% autoescape off %}
+Hello {{user}},
+
+Reminder for the task: {{task_name}}.
+
+Start Time: {{start_time}} UTC
+Due Time: {{due_time}} UTC
+Description: {{description}}
+
+For more details view your calendar
+
+Regards
+Program team
+
+{% endautoescape %}

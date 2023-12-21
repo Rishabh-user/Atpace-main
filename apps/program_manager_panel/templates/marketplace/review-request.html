@@ -1,0 +1,39 @@
+ <div class="box">
+    <div class="box-header">
+    <h3 class="box-title">Review Request List</h3>
+    </div>
+    <!-- /.box-header -->
+    <div class="box-body">
+    <table id="review-request-table" class="table table-bordered table-hover">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Date</th>
+            <th>Action</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr v-for="list in review_request_list" :key="list.id">
+            <td class="capitalize"><a :href="'/user/profile/'+list.id" target="_blank">[[list.name]]</a></td>
+            <td>[[list.email]]</td>
+            <td>[[list.phone]]</td>
+            <td>[[list.date_of_request]]</td>
+            <td>
+            <div class="dropdown">
+                <button class="btn bg-purple dropdown-toggle btn-select-option" type="button" data-toggle="dropdown" aria-expanded="true">Select an option                                            <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu options-dropdown">
+                    <li @click="approveRejectRequest(list.id, 'Approved')" class="anchor"><a><i class="fa fa-pencil option-icon"></i>Approve</a></li>
+                    <li @click="approveRejectRequest(list.id, 'Rejected')" class="anchor"><a><i class="fa fa-times option-icon"></i>Reject</a></li>
+                    <li class="anchor"><a :href="'/user/advance-profile-preview/'+list.id" target="_blank"><i class="fa fa-eye option-icon"></i>View</a></li>
+                </ul>
+            </div>
+            </td>
+            </tr>
+    </table>
+    </div>
+    <!-- /.box-body -->
+</div>
+<!-- /.box -->

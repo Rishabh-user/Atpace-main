@@ -1,0 +1,41 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>room</title>
+    </head>
+    <body>
+        <div>
+            <h1 style="text-align: center;">{{request.user.username}}</h1>
+            <hr>
+        </div>
+        
+        <div>
+            <p style="text-align: left;">Total Count {{ data.total_count }}</p>
+        </div>
+        <div style="text-align: right;">
+            <a href="{% url 'roomss' %}" class="btn">All Rooms</a>
+            
+            <a href="{% url 'create-room' %}" class="btn">Create New Room</a>
+            
+            <a style="text-align: right;" href="{% url 'logout' %}" class="btn">Logout</a>
+        </div>
+
+        <table>
+            <tr>
+                <th>Room ID</th>
+                <th>Room Name</th>
+                <th>Room Privacy</th>
+                <th>Room Created</th>
+                <th>Room URL</th>
+            </tr>
+            <tr>
+                <td>{{ data.id }}</td>
+                <td>{{ data.name }}</td>
+                <td>{{ data.privacy }}</td>
+                <td>{{ data.api_created }}</td>
+                <td>{{ data.url }}</td>
+            </tr>
+          </table>
+    </body>
+</html>

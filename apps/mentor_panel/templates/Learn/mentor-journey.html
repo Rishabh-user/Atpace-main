@@ -1,0 +1,32 @@
+ <div class="box">
+      <div class="box-header">
+        <h3 class="box-title">Alloted Journey</h3>
+      </div>
+      <!-- /.box-header -->
+      <div class="box-body">
+          <table id="all-journey-table" class="table table-bordered table-hover">
+            <thead>
+            <tr>
+              <th>Pools</th>
+              <th>Title</th>
+              <th>Category</th>
+              <th>Type</th>
+              <th>Description</th>
+              <th>View</th>
+          </tr>
+            </thead>
+            <tbody>
+              <tr v-for="journey in all_journey" :key="journey.id">
+                <td>[[journey.pools]]</td>
+                <td class="capitalize">[[journey.title]]</td>
+                <td>[[journey.category]]</td>
+                <td>[[journey.type]]</td>
+                <td>[[journey.short_description]]</span></td>
+                <td><a :href="'/content/journey/v2/'+journey.journey_id"><button class="btn btn-primary">View</button></a></td>
+              </tr>
+            </tfoot>
+          </table>
+      </div>
+      <!-- /.box-body -->
+    </div>
+    <!-- /.box -->

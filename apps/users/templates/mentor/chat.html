@@ -1,0 +1,491 @@
+{% extends 'base.html' %} {% load static %} 
+{% load tags %}
+{% block css %}
+
+    <link
+            rel="stylesheet"
+            href="{% static 'css/users_app/mentor/chat.css' %}"
+    />
+{% endblock %}
+{% block content %}
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <h1>
+        Chat
+        <small>Chat</small>
+      </h1>
+      <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li class="active">Chat</li>
+      </ol>
+      {% if request.session.user_type == "Admin" or request.session.user_type == "Mentor" or request.session.user_type == "ProgramManager" %}
+      <button class="btn btn-primary" data-toggle="modal" data-target="#modal-default">Create Group</button>
+      {% endif %}
+    </section>
+    <!-- Main content -->
+    <section class="content">
+        <div class="row">
+        <div class="col-md-3">
+            <div class="box box-warning direct-chat direct-chat-warning" style="min-height: 70vh;">
+            <div class="box-header with-border">
+                <h3 class="box-title"> Chat List</h3>
+
+
+              </div>
+              <div class="box-body" >
+                <ul class="products-list product-list-in-box">
+                    {% for room in all_rooms %}
+                    {% if room.type == 'OneToOne' %} 
+                        {% if logged_user.username == room.username %}
+                            <li class="item">
+                              <div class="product-img">
+                                <img src="{{MEDIA_URL}}{{room.user2_avatar}}"  onerror="this.onerror=null; this.src='/static/dist/img/avatar.png'" alt="user avatar" class="img-circle" style="cursor: pointer;">
+                              </div>
+                              <div class="product-info">
+                                <a id="room-name-submit" href="{% url 'user:user_chat' room_name=room.room_name %}" class="product-title" style="cursor: pointer;">{{room.user2_full_name}} 
+                                  </a>
+                                  <br>
+                                  {% if room.unread_msg > 0 %}
+                                  <span>{{room.unread_msg}} unread message</span>
+                                  {% endif %}
+
+                              </div>
+                            </li>
+
+                        {% elif logged_user.username != room.username %}
+                            <li class="item">
+                              <div class="product-img">
+                                <img src="{{MEDIA_URL}}{{room.user1_avatar}}" onerror="this.onerror=null; this.src='/static/dist/img/avatar.png'" alt="user avatar" class="img-circle" style="cursor: pointer;">
+                              </div>
+                              <div class="product-info">
+                                <a id="room-name-submit" href="{% url 'user:user_chat' room_name=room.room_name %}" class="product-title" style="cursor: pointer;">{{room.user1_full_name}}
+
+                                  </a>
+                                  <br>
+                                  {% if room.unread_msg > 0 %}
+                                  <span>{{room.unread_msg}} unread message</span>
+                                  {% endif %}
+
+                              </div>
+                            </li>
+                        {% endif %}
+                    {% else %}
+                            <li class="item">
+                              <div class="product-img">
+                                <img src="{{MEDIA_URL}}{{room.group_avatar}}" onerror="this.onerror=null; this.src='/static/dist/img/group_image.jpg'" alt="user Image" class="img-circle">
+                              </div>
+                              <div class="product-info">
+                                <a id="" href="{% url 'user:user_chat' room_name=room.room_name %}" class="product-title">{{room.group_name}}
+
+                                  </a>
+                                  <br>
+                                  <span>{{room.members_count}} Members</span>
+                                  <br>
+                                  {% if room.unread_msg > 0 %}
+                                  <span>{{room.unread_msg}} unread message</span>
+                                  {% endif %}
+
+
+                              </div>
+                            </li>
+                    {% endif %}
+                    
+                    {% endfor %}
+                  </ul>
+              </div>
+            </div>
+        </div>
+            {% if room_name %}
+        <div class="col-md-9">
+            <!-- DIRECT CHAT -->
+            <div class="box box-warning direct-chat direct-chat-warning" style="min-height: 70vh;">
+              <div class="box-header with-border">
+                <h3 class="box-title">{{name}}</h3>
+
+
+              </div>
+              <!-- /.box-header -->
+              <div class="box-body" style="height: 50vh;">
+                <!-- Conversations are loaded here -->
+                <div class="direct-chat-messages" style="height: 70vh;" id="chat-msg-box">
+                    {% for chat in chats %}
+
+                        {% if logged_user == chat.from_user %}
+                          <!-- Message to the right -->
+                          <div class="direct-chat-msg right">
+                            <div class="direct-chat-info clearfix">
+                              <span class="direct-chat-name pull-right">{{chat.from_user.first_name}} {{chat.from_user.last_name}}</span>
+                              <span class="direct-chat-timestamp pull-left">{{chat.timestamp}}</span>
+                            </div>
+                            <!-- /.direct-chat-info -->
+                            <img class="direct-chat-img" src="{{MEDIA_URL}}{{chat.from_user.avatar}}" onerror="this.onerror=null; this.src='/static/dist/img/avatar.png'" alt="from user avatar">
+                            <!-- /.direct-chat-img -->
+                            <div class="direct-chat-text">
+                              {{chat.message|linebreaks}}
+                            </div>
+                            <!-- /.direct-chat-text -->
+                          </div>
+                          <!-- /.direct-chat-msg -->
+                        {% else %}
+                          <!-- Message. Default to the left -->
+                          <div class="direct-chat-msg">
+                            <div class="direct-chat-info clearfix">
+                              <span class="direct-chat-name pull-left">{{chat.from_user.first_name}} {{chat.from_user.last_name}}</span>
+                              <span class="direct-chat-timestamp pull-right">{{chat.timestamp}}</span>
+                            </div>
+                            <!-- /.direct-chat-info -->
+                            <img class="direct-chat-img" src="{{MEDIA_URL}}{{chat.from_user.avatar}}" onerror="this.onerror=null; this.src='/static/dist/img/avatar.png'" alt="from user avatar">
+                            <!-- /.direct-chat-img -->
+                            <div class="direct-chat-text">
+                                {{chat.message|linebreaks}}
+                            </div>
+                            <!-- /.direct-chat-text -->
+                          </div>
+                          <!-- /.direct-chat-msg -->
+                        {% endif %}
+                  {% endfor %}
+
+                  <div id="chat-box">
+
+                  </div>
+
+                   <!-- Message to the right -->
+                    <!-- <div class="direct-chat-msg right" id="right-div">
+                    </div> -->
+                    <!-- /.direct-chat-msg -->
+                    <!-- Message to the left -->
+                    <!-- <div class="direct-chat-msg" id="left-div">
+                    </div> -->
+                    <!-- /.direct-chat-msg -->
+                </div>
+                <!--/.direct-chat-messages-->
+
+                <!-- Contacts are loaded here -->
+                <div class="direct-chat-contacts">
+                  <ul class="contacts-list">
+                    <li>
+                      <a href="#">
+                        <img class="contacts-list-img" src="{{request.user.avatar}}" alt="User Image">
+
+                        <div class="contacts-list-info">
+                              <span class="contacts-list-name">
+                                Count Dracula
+                                <small class="contacts-list-date pull-right">2/28/2015</small>
+                              </span>
+                          <span class="contacts-list-msg">How have you been? I was...</span>
+                        </div>
+                        <!-- /.contacts-list-info -->
+                      </a>
+                    </li>
+                    <!-- End Contact Item -->
+                    <li>
+                      <a href="#">
+                        <img class="contacts-list-img" src="{{request.user.avatar}}" alt="User Image">
+
+                        <div class="contacts-list-info">
+                              <span class="contacts-list-name">
+                                Sarah Doe
+                                <small class="contacts-list-date pull-right">2/23/2015</small>
+                              </span>
+                          <span class="contacts-list-msg">I will be waiting for...</span>
+                        </div>
+                        <!-- /.contacts-list-info -->
+                      </a>
+                    </li>
+                    <!-- End Contact Item -->
+                    <li>
+                      <a href="#">
+                        <img class="contacts-list-img" src="{{request.user.avatar}}" alt="User Image">
+
+                        <div class="contacts-list-info">
+                              <span class="contacts-list-name">
+                                Nadia Jolie
+                                <small class="contacts-list-date pull-right">2/20/2015</small>
+                              </span>
+                          <span class="contacts-list-msg">I'll call you back at...</span>
+                        </div>
+                        <!-- /.contacts-list-info -->
+                      </a>
+                    </li>
+                    <!-- End Contact Item -->
+                    <li>
+                      <a href="#">
+                        <img class="contacts-list-img" src="{{request.user.avatar}}" alt="User Image">
+
+                        <div class="contacts-list-info">
+                              <span class="contacts-list-name">
+                                Nora S. Vans
+                                <small class="contacts-list-date pull-right">2/10/2015</small>
+                              </span>
+                          <span class="contacts-list-msg">Where is your new...</span>
+                        </div>
+                        <!-- /.contacts-list-info -->
+                      </a>
+                    </li>
+
+                    <!-- End Contact Item -->
+                  </ul>
+                  <!-- /.contatcts-list -->
+                </div>
+                <!-- /.direct-chat-pane -->
+              </div>
+              <!-- /.box-body -->
+              <div class="box-footer">
+                <!-- <form action="#" method="post"> -->
+                  <div class="input-group">
+                    <input id="chat-message-input" type="text" name="message" placeholder="Type Message ..." class="form-control">
+                    <span class="input-group-btn">
+                          <button id="chat-message-submit" type="button" class="btn btn-warning btn-flat" style="margin-top:0px;">Send</button>
+                        </span>
+                    {{ room_name|json_script:"room-name" }}
+                  </div>
+                <!-- </form> -->
+              </div>
+
+              <!-- /.box-footer-->
+            </div>
+            {{ request.user.id|json_script:"user_id" }}
+            <!--/.direct-chat -->
+          </div>
+        </div>
+        {% endif %}
+      <div class="modal fade" id="modal-default" style="display: none;">
+        <div class="modal-dialog">
+          <form id="create_group" action="{% url 'user:create_group' %}" method="POST" enctype="multipart/form-data">
+          {% csrf_token %}
+          {% comment %} <form id="create_group"> {% endcomment %}
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">×</span></button>
+              <h4 class="modal-title">Create Group</h4>
+            </div>
+            <div class="modal-body">
+              <div class="form-group">
+                <label>Name</label>
+                <input class="form-control" id="name" type="text" name="name" required placeholder="Name"/>
+              </div>
+              <div class="form-group">
+                <label>Description</label>
+                <input class="form-control" id="description" type="text" name="description" required placeholder="Description"/>
+              </div>
+              <div class="form-group">
+                <label>Profile Photo</label>
+                <input class="form-control" id="image" type="file" name="image" accept="image/*"/>
+              </div> 
+              <div class="form-group">
+                <label>Add Members</label>
+                <select class="form-control select2" name="members" id="members" required style="width: 100%;" multiple>
+                  {% if request.session.user_type == "Mentor" %}
+                    {% for mentee in request.user|get_mentor_mentees %}
+                      <option value="{{mentee.user.pk}}">{{mentee.user.first_name}} {{mentee.user.last_name}}</option>
+                    {% endfor %}
+                  {% elif request.session.user_type == "Admin" %}
+                    {% for user in request.user|get_users %}
+                      <option value="{{user.pk}}">{{user.first_name}} {{user.last_name}}</option>
+                    {% endfor %}
+                  {% elif request.session.user_type == "ProgramManager" %}
+                    {% for user in request.user|program_manager_members %}
+                      <option value="{{user.pk}}">{{user.first_name}} {{user.last_name}}</option>
+                    {% endfor %}
+                  {% endif %}
+                </select>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+              <button type="submit" class="btn btn-primary">Save changes</button>
+            </div>
+          </div>
+        </form>
+          <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+      </div>
+    </section>
+    <!-- /.content -->
+  </div>
+{% endblock %}
+{% block js %}
+<script>
+let chat_msg_box = document.getElementById("chat-msg-box");
+chat_msg_box.scrollTop = chat_msg_box.scrollHeight
+$("#create_groups").submit(function (event) {
+    name = $("#name").val();
+    description = $("#description").val();
+    members = $("#members").val();
+    image = $("#image").val();
+    //console.log("image",event.target.files[0])
+    console.log("image", $("#image")[0].files[0].name)
+
+
+    var formData = {
+      name : name,
+      description: description,
+      members: members,
+      image:image,
+      csrfmiddlewaretoken:"{{csrf_token}}"
+    };
+    console.log(formData);
+    $.ajax({
+      type: "POST",
+      url: '{% url "user:create_group" %}',
+      data: formData,
+      encode: true,
+    }).done(function (data) {
+        //location.reload()
+    });
+
+    event.preventDefault();
+  });
+        var currentdate = new Date().toLocaleString();
+        // document.querySelector('#room-name-submit').onclick = function(e) {
+        //     // var roomName = document.querySelector('#room-name-submit').value;
+        //     // window.location.pathname = '/chatapp/' + roomName + '/';
+        //     window.location.pathname = '/chatapp/admin/';
+        // };
+
+        const roomName = JSON.parse(document.getElementById('room-name').textContent);
+        const user_id = JSON.parse(document.getElementById('user_id').textContent);
+        var protocol = document.location.protocol;
+        if(protocol == "http:"){
+          var socket_server = "ws" ;
+        } else {
+          var socket_server = "wss" ;
+        }
+        const chatSocket = new WebSocket(
+            socket_server
+            +'://'
+            + window.location.host
+            + '/ws/chat/'
+            + user_id
+            + "/" 
+            + roomName
+            + '/'
+           
+        );
+
+        chatSocket.onopen = function(e) {
+             console.log("Successfully connected to the WebSocket. Change the status to online");
+             console.log(roomName)
+            $.ajax({
+                 url:  "{% url 'user:user_chat_status' %}",
+                 type: 'POST',
+                 data: {WebSocket: "connected" , csrfmiddlewaretoken : "{{csrf_token}}" },
+                 error: function(data) {
+                   console.log(data)
+                   bootbox.alert('Something is wrong');
+                 },
+                 success: function(data) {
+                    console.log("data",data)
+                 }
+              });
+        }
+
+        chatSocket.onmessage = function(e) {
+            console.log("to-user",roomName);
+            console.log("message send")
+            const data = JSON.parse(e.data);
+            console.log(data);
+            const from_user_id = data['user_id']
+            const from_user = data['from_user']
+            // console.log("from_user_id",from_user_id);
+            const loggedInUserId = JSON.parse(document.getElementById('user_id').textContent)
+            // console.log("login_user_id",loggedInUserId)
+            if ( from_user_id != loggedInUserId) {
+                // console.log("same side")
+                // const right_div = document.getElementById("right-div");
+                const chat_box = document.getElementById("chat-box");
+                const right_div = document.createElement('div');
+                right_div.classList.add('direct-chat-msg', 'right');
+                const chat_div = document.createElement('div');
+                chat_div.classList.add('direct-chat-info', 'clearfix');
+                const chat_span = document.createElement('span');
+                chat_span.classList.add('direct-chat-name', 'pull-right');
+                chat_span.textContent = from_user;
+                const time_span = document.createElement('span');
+                time_span.classList.add('direct-chat-timestamp', 'pull-left');
+                time_span.textContent = currentdate;
+                chat_div.append(chat_span);
+                chat_div.append(time_span);
+                const msg_div = document.createElement('div');
+                msg_div.classList.add('direct-chat-text');
+                msg_div.innerHTML = data.message;
+                right_div.append(chat_div)
+                right_div.append(msg_div)
+                chat_box.append(right_div)
+
+            }
+            if ( from_user_id == loggedInUserId) {
+                // console.log("other side")
+                // const right_div = document.getElementById("left-div");
+                const chat_box = document.getElementById("chat-box");
+                // console.log("chat_box", chat_box)
+                const right_div = document.createElement('div');
+                right_div.classList.add('direct-chat-msg');
+                const chat_div = document.createElement('div');
+                chat_div.classList.add('direct-chat-info', 'clearfix');
+                const chat_span = document.createElement('span');
+                chat_span.classList.add('direct-chat-name', 'pull-left');
+                chat_span.textContent = from_user;
+                const time_span = document.createElement('span');
+                time_span.classList.add('direct-chat-timestamp', 'pull-right');
+                time_span.textContent = currentdate;
+                chat_div.append(chat_span);
+                chat_div.append(time_span);
+                const msg_div = document.createElement('div');
+                msg_div.classList.add('direct-chat-text');
+                msg_div.innerHTML = data.message;
+                right_div.append(chat_div)
+                right_div.append(msg_div)
+                chat_box.append(right_div)
+
+            }
+            let chat_msg_box = document.getElementById("chat-msg-box");
+            function scrollBottom(element) {
+              element.scroll({ top: element.scrollHeight, behavior: "smooth" });
+            }
+            scrollBottom(chat_msg_box);
+
+            // document.querySelector('#chat-log').value += (data.message + '\n');
+        };
+
+        chatSocket.onclose = function(e) {
+            console.log(e);
+            console.error('Chat socket has closed unexpectedly');
+            $.ajax({
+                 url:  "{% url 'user:user_chat_status' %}",
+                 type: 'POST',
+                 data: {WebSocket: "disconnected" , csrfmiddlewaretoken : "{{csrf_token}}" },
+                 error: function(data) {
+                   console.log(data)
+                 },
+                 success: function(data) {
+                    console.log("data",data)
+                 }
+              });
+        };
+
+        document.querySelector('#chat-message-input').focus();
+        document.querySelector('#chat-message-input').onkeyup = function(e) {
+            if (e.keyCode === 13) {  // enter, return
+                document.querySelector('#chat-message-submit').click();
+            }
+        };
+
+        document.querySelector('#chat-message-submit').onclick = function(e) {
+            const messageInputDom = document.querySelector('#chat-message-input');
+            const message = messageInputDom.value;
+            console.log("message", message)
+            console.log(JSON.stringify({
+                'message': message
+            }))
+            //chatSocket.send(JSON.stringify({
+              //  'message': message
+            //}));
+            chatSocket.send(message)
+            messageInputDom.value = '';
+        };
+    </script>
+{% endblock %}

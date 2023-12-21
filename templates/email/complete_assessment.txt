@@ -1,0 +1,7 @@
+{% autoescape off %}
+Woohoo!!
+Post Assignment completed! What a champ !
+Congratulations on completion of the journey!
+
+Check out more Journeys to upskill yourself.
+{% endautoescape %}

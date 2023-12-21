@@ -1,0 +1,16 @@
+Dear {{user_name}},
+
+I'm pleased to inform you that you've successfully completed {{journey}} and demonstrated the expected levels of attendance and proficiency. Congratulations on this achievement from {{company}} !
+
+Your attached certificate represents your dedication, hard work, and commitment to your growth and learning. It's a symbol of your achievement and inspiration to pursue further growth.
+
+We hope your experience with us provided valuable skills and knowledge for your goals. We look forward to hearing about your success.
+
+Congratulations, and all the best!
+
+Sincerely,
+
+{{program_team}}
+{{designation}}
+
+{{company}}

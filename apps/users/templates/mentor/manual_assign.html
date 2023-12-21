@@ -1,0 +1,130 @@
+{% extends 'base.html' %} {% load static %} 
+ {% load tags %} 
+ {% block title %} {% endblock %}
+ {% block content %}
+ {% block css %}
+<link rel="stylesheet" href="{% static 'bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css' %}">
+{% endblock css %} 
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <h1>
+        Assign User Manual 
+      </h1>
+      <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Journey</a></li>
+        <li><a href="#"></a></li>
+
+      </ol>
+    </section>
+  
+    <!-- Main content -->
+    <section class="content">
+  
+      <!-- Default box -->
+      <div class="box">
+        <div class="box-header with-border">
+          <h3 class="box-title">Assign User Manual</h3>
+
+        </div>
+        <div class="box-body">
+          {% include 'component/error_message.html' %}
+          <form method="post" >
+            {% csrf_token %}
+            
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label>All Journey</label>
+                        <select class="form-control" hx-get="{% url 'user:journey_mentor' %}" hx-target="#mentor_list"  hx-trigger="change"   id ="journey" required name="journey" style="width: 100%;">
+                          <option selected="selected " value="">Select</option>
+                          {% for channel in request.session.user_type|all_mentoring_channel %}
+                            <option value="{{channel.pk}}" {% if channel.pk == selected_journey.pk %} selected {% endif %}>{{channel.title}}</option>
+                            {% endfor %}
+                        </select>
+                        </div>
+                        <div class="form-group" i>
+                          <label>Mentor</label>
+                          <div id="mentor_list">
+                            {% include 'partials/mentor_list.html' %}
+                          </div>
+                        </div>
+                          <div class="form-group">
+                            <label>User</label>
+                            <select class="form-control select2" id ="user" required name="user" style="width: 100%;">
+                              <option selected="selected" value="">Select</option>
+                            {% for user in request|get_all_learner %}
+                              
+                                <option value="{{user.pk}}"> {% if user.company.all != None %} {{user.company.all|join:', '}}  -  {% endif %} {{user.first_name}} {{user.last_name}}, {{user.email}} </option>
+                             {% endfor %}  
+                            </select>
+                            </div>
+
+                  <!-- /.form-group -->
+                  <button type="submit" id="sumbitContent" class="btn btn-primary">Submit</button>
+                </div>
+                
+               
+              </div>
+              <!-- /.row -->
+        </form>
+        </div>
+      </div>
+      <!-- /.box -->
+
+  
+    </section>
+    <!-- /.content -->
+  </div>
+  {% endblock content %}
+  {% block js %}
+<script src="{% static 'bower_components/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
+<script>
+
+
+$(function () {
+ 
+  $('#example2').DataTable({
+    "dom": '<"table-pull-left"f><"table-pull-right"l>tip',
+    'paging'      : true,
+    'lengthChange': true,
+    'searching'   : true,
+    'ordering'    : true,
+    'info'        : true,
+    'autoWidth'   : true,
+    'scrollX'     : true
+  })
+})
+function AssignMentor(user, row){
+  console.log(user);
+  console.log(row);
+  console.log();
+  var form_data = new FormData();
+  var csrfmiddlewaretoken = "{{csrf_token}}"; 
+  form_data.append("user", user);
+  form_data.append("journey", '{{selected_journey.pk}}');
+  form_data.append("mentor", $('input[name=mentor_id_'+row+']:checked').val());
+  form_data.append("csrfmiddlewaretoken", csrfmiddlewaretoken);
+  console.log(form_data);
+    $.ajax({ 
+            type: 'POST',
+            url: '{% url "user:assign_mentor" %}', 
+            contentType: false,
+            cache: false,
+            processData: false,
+            data: form_data ,
+                success: function(data){
+                  bootbox.alert(data, function(){
+                  location.reload();
+                  });
+
+                },
+                error: function(){
+                    console.log('fail')
+                }
+        });  
+
+}
+</script>
+{% endblock js %}

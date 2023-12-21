@@ -1,0 +1,41 @@
+{% autoescape off %}
+
+Dear {{mentor_name}},
+
+Enhance your mentoring experience on our marketplace by completing your mentor profile. Your expertise has made a significant impact, and a complete profile can attract more mentees seeking your insights.
+
+Benefits of completing your profile:
+
+Stand out: Highlight your skills and experience to attract mentees in relevant areas.
+
+Showcase achievements: Display certifications, awards, and accomplishments to establish credibility.
+
+Connect personally: Add details about hobbies and interests to create a stronger bond.
+
+Expand your network: Detailed profiles enable better mentee matches.
+
+Completing your profile is quick:
+
+Log in at {{login_url}}.
+
+Go to your profile settings.
+
+Fill in required fields, including professional background and expertise.
+
+Upload a professional profile picture.
+
+A well-crafted profile benefits both mentees and your growth. Make a lasting impression and attract eager learners.
+
+Thank you for being part of our mentoring community. We anticipate seeing your profile shine!
+
+For assistance, reach our support team at {{info_contact_email}}.
+
+Regards,
+
+Program Team
+
+MentorCircle
+
+
+
+{% endautoescape %}

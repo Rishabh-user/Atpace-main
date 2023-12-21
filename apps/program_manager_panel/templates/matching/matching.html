@@ -1,0 +1,599 @@
+{% extends 'base.html' %} {% load static %}
+{% block title %} Matching {% endblock %}
+{% load tags %}
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/program_manager/program_manager.css' %}" />
+<style>
+  .capitalize {
+    text-transform: capitalize;
+  }
+
+  .loader {
+    border: 16px solid #f3f3f3;
+    border-radius: 50%;
+    border-top: 12px solid rgb(27, 116, 228);
+    width: 80px;
+    height: 80px;
+    -webkit-animation: spin 2s linear infinite;
+    /* Safari */
+    animation: spin 2s linear infinite;
+  }
+
+  /* Safari */
+  @-webkit-keyframes spin {
+    0% {
+      -webkit-transform: rotate(0deg);
+    }
+
+    100% {
+      -webkit-transform: rotate(360deg);
+    }
+  }
+
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+</style>
+{% endblock css %} {% block content %}
+<div class="content-wrapper" id="vue-app">
+  <div :class="'alert alert-dismissible '+[[alert_class]]" v-if="alert_msg" style="margin:10px;">
+    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+    <h4 style="margin-top:10px;"><i class="icon fa fa-warning"></i> Alert!</h4>
+    <a href="/manager/billing">[[alert_msg]]</a>
+  </div>
+  <div class="small-box box-tab" style="margin:8px;" v-if="capacity_ratio">
+    <div class="box-header">
+      <h4>Current Capacity Ratio</h4>
+    </div>
+    <div class="box-body">
+      <span><b>Subscription: </b> [[capacity_ratio.title]] &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Max Mentor: </b>
+        [[capacity_ratio.max_mentor]] &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Max Mentee: </b>
+        [[capacity_ratio.max_learner]]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Max Mentee per Mentor:
+        </b>[[capacity_ratio.learner_per_mentor
+        ]] &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Remaining Days: </b> [[capacity_ratio.left_days]] </span>
+    </div>
+  </div>
+  <section class="content-header">
+    <h1>Matching</h1>
+  </section>
+  <section class="content">
+    <div class="row">
+      <div class="col-md-2">
+        <div class="small-box box-tab" style="border-top: 5px solid #1B74E4;" @click="showAutoMatch()" id="auto-match">
+          <div class="inner">
+            <h4>Auto Match</h4>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <div class="small-box box-tab" @click="showCheckPairs()" id="check-pairs">
+          <div class="inner">
+            <h4>Check Pairs</h4>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <div class="small-box box-tab" @click="showManualAssign()" id="manual-assign">
+          <div class="inner">
+            <h4>Manual Assign</h4>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <div class="small-box box-tab" @click="showMentorMatching()" id="mentor-matching">
+          <div class="inner">
+            <h4>Mentor Matching Report</h4>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <div class="small-box box-tab" @click="showMatchingSetup()" id="matching-setup">
+          <div class="inner">
+            <h4>Matching Setup</h4>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div v-if="displayAutoMatch">
+      {% include 'matching/auto_match.html' %}
+    </div>
+    <div v-if="displayCheckPairs">
+      {% include 'matching/check_pairs.html' %}
+    </div>
+    <div v-if="displayManualAssign">
+      {% include 'matching/manual_assign.html' %}
+    </div>
+    <div v-if="displayMentorMatching">
+      {% include 'matching/mentor_matching_report.html' %}
+    </div>
+    <div v-if="displayMatchingSetup">
+      {% include 'matching/matching_setup.html' %}
+    </div>
+  </section>
+  {{ request.user.id|json_script:"user_id" }}
+  {{request.session.token|json_script:"token"}}
+  {{request.session.company_id|json_script:"company_id"}}
+  {{request.session.company_name|json_script:"company_name"}}
+</div>
+{% endblock content %} {% block js %}
+<script src="{% static 'bower_components/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
+<script type="text/javascript">
+
+  const app = new Vue({
+    el: "#vue-app",
+    delimiters: ['[[', ']]'],
+    data() {
+      return {
+        displayAutoMatch: true,
+        displayCheckPairs: false,
+        displayManualAssign: false,
+        displayMentorMatching: false,
+        displayMatchingSetup: false,
+        token: JSON.parse(document.getElementById('token').textContent),
+        user_id: JSON.parse(document.getElementById('user_id').textContent),
+        auth: "",
+        matching_setup_list: "",
+        company_list: "",
+        company_id: "",
+        journey_id: "",
+        journey_list: "",
+        pool_list: "",
+        matching_list: "",
+        check_pairs_list: "",
+        tab_name: "",
+        base_url: window.location.origin,
+        mentor_matching_report: "",
+        company: "",
+        displayMentee: false,
+        displayMentor: false,
+        displayMentorMentee: false,
+        mentor_list: "",
+        mentee_list: "",
+        mentor_mentee_list: "",
+        capacity_ratio: "",
+        alert_msg: "",
+        alert_class: "",
+        user_company_name: JSON.parse(document.getElementById('company_name').textContent),
+        user_company_id: JSON.parse(document.getElementById('company_id').textContent),
+        loading: false,
+      };
+    },
+    mounted() {
+      this.showAutoMatch();
+      this.showCapacity();
+      this.showAlert();
+    },
+    methods: {
+      axiosGetRequest: function (url) {
+        this.auth = "Token " + this.token;
+        var config = {
+          method: "get",
+          url: url,
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': this.auth,
+          },
+        };
+        return axios(config)
+      },
+      axiosPostRequest: function (url, data) {
+        this.auth = "Token " + this.token;
+        var config = {
+          method: "post",
+          url: url,
+          headers: {
+            "Content-Type": "multipart/form-data",
+            "Accept": "application/json",
+            'Authorization': this.auth,
+          },
+          data: data
+        };
+
+        return axios(config)
+      },
+      async showAlert() {
+        var url = this.base_url + "/manager/check-for-subscription/" + this.user_id + "/";
+        response = await this.axiosGetRequest(url);
+        console.log("Alert response", response.data)
+        if (response.data.message != "No alert available") {
+          this.alert_msg = response.data.message
+          this.alert_class = response.data.css_class
+        }
+      },
+      async showCapacity() {
+        var url = this.base_url + "/manager/user-subscriptions/" + this.user_id + "/";
+        response = await this.axiosGetRequest(url);
+        console.log("Capacity Ratio response", response.data)
+        ln = response.data.data.length
+        if (response.data.data[ln - 1].left_days > 0) {
+          this.capacity_ratio = response.data.data[ln - 1]
+        }
+        console.log("capacity ratio", this.capacity_ratio)
+      },
+      async destroyDataTable(id) {
+        if ($(id).DataTable()) {
+          console.log("destroying", id);
+          $(id).DataTable().clear();
+          $(id).DataTable().destroy();
+        }
+      },
+      async initializeDataTable(id) {
+        //await this.destroyDataTable(this.tab_name)
+        //this.tab_name = id
+        await this.sleep(2000);
+        console.log("initializing", id);
+        $(id).DataTable({
+          "dom": '<"table-pull-left"f><"table-pull-right"l>tip',
+          'destroy': true,
+          'paging': true,
+          'lengthChange': true,
+          'searching': true,
+          'ordering': true,
+          'info': true,
+          'autoWidth': false,
+          'retrieve': true,
+          'scrollX': true,
+        })
+      },
+      sleep: function (ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+      },
+      removeAutoMatch: function () {
+        ele = document.getElementById('auto-match')
+        this.displayAutoMatch = false;
+        ele.style.borderTop = "none";
+
+        this.destroyDataTable("#auto-match-table");
+      },
+      removeCheckPairs: function () {
+        this.destroyDataTable("#mentor-mentee-table");
+        this.destroyDataTable("#mentor-table");
+        this.destroyDataTable("#mentee-table");
+        this.displayMentee = false;
+        this.displayMentor = false;
+        this.displayMentorMentee = false;
+        ele = document.getElementById('check-pairs')
+        this.displayCheckPairs = false;
+        ele.style.borderTop = "none";
+        ele = document.getElementById('all-mentees-mentors')
+        if (ele) {
+          ele.style.borderLeft = "none";
+        }
+        ele = document.getElementById('all-mentees')
+        if (ele) {
+          ele.style.borderLeft = "none";
+        }
+        ele = document.getElementById('all-mentors')
+        if (ele) {
+          ele.style.borderLeft = "none";
+        }
+        //this.destroyDataTable("#check-pairs-table");
+      },
+      removeManualAssign: function () {
+        ele = document.getElementById('manual-assign')
+        this.displayManualAssign = false;
+        ele.style.borderTop = "none";
+        this.destroyDataTable("#manual-assign-table")
+      },
+      removeMentorMatching: function () {
+        ele = document.getElementById('mentor-matching')
+        this.displayMentorMatching = false;
+        ele.style.borderTop = "none";
+        this.destroyDataTable("#matching-report-table");
+      },
+      removeMatchingSetup: function () {
+        ele = document.getElementById('matching-setup')
+        this.displayMatchingSetup = false;
+        ele.style.borderTop = "none";
+        this.destroyDataTable("#matching-setup-table");
+      },
+      async onAssignMentor(user, index) {
+        //console.log(this.$refs.journey.value, this.$refs.journey.value)
+        /*console.log("hello1", this.$refs['mentor1'+index]);
+        console.log("hello2", this.$refs['mentor2'+index]);
+        console.log("hello3", this.$refs['mentor3'+index]);
+        console.log("hello4", this.$refs['mentor4'+index]);*/
+
+        var mentor_value = ""
+        if (this.$refs['mentor1' + index]) {
+          mentor_value = this.$refs['mentor1' + index][0].value;
+          //console.log("hello1", this.$refs['mentor1'+index][0].value);
+        }
+        if (this.$refs['mentor2' + index] && !mentor_value) {
+          mentor_value = this.$refs['mentor2' + index][0].value;
+          //console.log("hello2", this.$refs['mentor2'+index][0].value);
+        }
+        if (this.$refs['mentor3' + index] && !mentor_value) {
+          mentor_value = this.$refs['mentor3' + index][0].value;
+          //console.log("hello3", this.$refs['mentor3'+index][0].value);
+        }
+        if (this.$refs['mentor4' + index] && !mentor_value) {
+          mentor_value = this.$refs['mentor4' + index][0].value;
+          //console.log("hello4", this.$refs['mentor4'+index][0].value);
+        }
+
+        if (mentor_value) {
+          var data = new FormData();
+          data.append("learner_id", user);
+          data.append("journey_id", this.$refs.journey.value);
+          data.append("company", this.user_company_id);
+          data.append("mentor_id", mentor_value);
+
+          var url = this.base_url + "/manager/assign-mentor/" + this.user_id + "/";
+          response = await this.axiosPostRequest(url, data);
+          console.log("Assign Mentor Response", response.data);
+          bootbox.alert(response.data.message)
+        }
+        else {
+          alert("Please select mentor from dropdown")
+        }
+      },
+      /*async showJourneyList(){
+        //console.log("journey list calling")
+        this.company_id = this.$refs.company.value
+        var url =  this.base_url+"/manager/matching-data/"+this.user_id+"/?company_id="+this.company_id;
+        response = await this.axiosGetRequest(url);
+        console.log("Journey list Response", response.data);
+        this.journey_list = response.data.journey_list
+      },*/
+      async showPoolList() {
+        this.journey_id = this.$refs.journey.value
+        var url = this.base_url + "/manager/matching-data/" + this.user_id + "/?journey_id=" + this.journey_id;
+        response = await this.axiosGetRequest(url);
+        console.log("Pool list Response", response.data);
+        this.pool_list = response.data.pool_list
+      },
+      async showAutoMatch() {
+        ele = document.getElementById('auto-match')
+        this.displayAutoMatch = true;
+        ele.style.borderTop = "5px solid #1B74E4";
+
+        this.removeCheckPairs();
+        this.removeManualAssign();
+        this.removeMentorMatching();
+        this.removeMatchingSetup();
+        this.matching_list = "";
+        this.company_list = "";
+        this.journey_list = "";
+        this.pool_list = "";
+
+        var url = this.base_url + "/manager/journey-list/" + this.user_id + "/?company_id=" + this.user_company_id;
+        response = await this.axiosGetRequest(url);
+        console.log("Journey list Response", response.data);
+        this.journey_list = response.data.data
+        //var url =  this.base_url+"/manager/program-data-list/"+this.user_id+"/";
+        //var response = await this.axiosGetRequest(url);
+        //console.log("Company list Response", response.data);
+        //this.company_list = response.data.company_list;
+
+        //await this.initializeDataTable("#auto-match-table")
+
+      },
+      async showMatchingReport() {
+        //await this.destroyDataTable("#matching-report-table");
+        this.mentor_matching_report = "";
+        //console.log("line 389", this.mentor_matching_report)
+        var data = new FormData();
+
+        //data.append("company_id", this.$refs.company.value);
+        data.append("company_id", this.user_company_id);
+        var url = this.base_url + "/manager/mentor-matching-report/" + this.user_id + "/";
+        try {
+          response = await this.axiosPostRequest(url, data);
+          console.log("Mentor Matching Response", response.data);
+          this.mentor_matching_report = response.data.data;
+        }
+        catch (err) {
+          console.log("error", err);
+          this.mentor_matching_report = "";
+          bootbox.alert(err.response.data.message);
+        }
+
+        await this.initializeDataTable("#matching-report-table")
+
+      },
+      async onAutoMatch() {
+        this.matching_list = ""
+        this.loading = true
+        await this.destroyDataTable("#auto-match-table")
+        var data = new FormData();
+        data.append("pool_id", this.$refs.pool.value);
+        data.append("journey_id", this.$refs.journey.value);
+        //data.append("company_id", this.$refs.company.value);
+        data.append("company_id", this.user_company_id);
+        var url = this.base_url + "/manager/auto-matching/" + this.user_id + "/";
+        response = await this.axiosPostRequest(url, data);
+        console.log("Auto Match Response", response.data);
+        //this.showAutoMatch();
+        this.matching_list = response.data.data.user_list;
+        this.loading = false
+        await this.initializeDataTable("#auto-match-table");
+
+      },
+      async showAllMenteesMentors() {
+        this.displayMentor = false;
+        this.displayMentee = false;
+        this.displayMentorMentee = true;
+        this.mentor_mentee_list = ""
+        await this.destroyDataTable("#mentee-table");
+        await this.destroyDataTable("#mentor-table");
+        ele = document.getElementById('all-mentees-mentors')
+        ele.style.borderLeft = "5px solid #1B74E4";
+        ele = document.getElementById('all-mentees')
+        ele.style.borderLeft = "none";
+        ele = document.getElementById('all-mentors')
+        ele.style.borderLeft = "none";
+
+        var url = this.base_url + "/manager/mentor-mentee-list/" + this.user_id + "/";
+        var response = await this.axiosGetRequest(url);
+        console.log("Mentor mentee list Response", response.data);
+        this.mentor_mentee_list = response.data.data;
+        console.log("line 322");
+        await this.initializeDataTable("#mentor-mentee-table");
+        console.log("line 324");
+      },
+      async showAllMentees() {
+        await this.destroyDataTable("#mentor-mentee-table");
+        await this.destroyDataTable("#mentor-table");
+        this.mentee_list = ""
+        this.displayMentee = true;
+        this.displayMentor = false;
+        this.displayMentorMentee = false;
+        ele = document.getElementById('all-mentees')
+        ele.style.borderLeft = "5px solid #1B74E4";
+        ele = document.getElementById('all-mentees-mentors')
+        ele.style.borderLeft = "none";
+        ele = document.getElementById('all-mentors')
+        ele.style.borderLeft = "none";
+
+        var url = this.base_url + "/manager/mentee-list/" + this.user_id + "/";
+        var response = await this.axiosGetRequest(url);
+        console.log("Mentee list Response", response.data);
+        this.mentee_list = response.data.data;
+        await this.initializeDataTable("#mentee-table");
+      },
+      async showAllMentors() {
+        await this.destroyDataTable("#mentee-mentor-table");
+        await this.destroyDataTable("#mentee-table");
+        this.mentor_list = ""
+        this.displayMentor = true;
+        this.displayMentee = false;
+        this.displayMentorMentee = false;
+        ele = document.getElementById('all-mentors')
+        ele.style.borderLeft = "5px solid #1B74E4";
+        ele = document.getElementById('all-mentees')
+        ele.style.borderLeft = "none";
+        ele = document.getElementById('all-mentees-mentors')
+        ele.style.borderLeft = "none";
+
+        var url = this.base_url + "/manager/mentor-list/" + this.user_id + "/";
+        var response = await this.axiosGetRequest(url);
+        console.log("Mentor list Response", response.data);
+        this.mentor_list = response.data.data;
+        await this.initializeDataTable("#mentor-table");
+      },
+      async onManualAssign() {
+        this.matching_list = ""
+        this.loading = true
+        await this.destroyDataTable("#manual-assign-table")
+        var data = new FormData();
+        data.append("pool_id", this.$refs.pool.value);
+        data.append("journey_id", this.$refs.journey.value);
+        //data.append("company_id", this.$refs.company.value);
+        data.append("company_id", this.user_company_id);
+
+        var url = this.base_url + "/manager/manual-matching/" + this.user_id + "/";
+        response = await this.axiosPostRequest(url, data);
+        console.log("Manual Match Response", response.data);
+        //this.showManualAssign();
+        this.matching_list = response.data.data.user_list;
+        this.loading = false
+        await this.initializeDataTable("#manual-assign-table")
+
+      },
+      async showCheckPairs() {
+        this.mentor_mentee_list = ""
+        ele = document.getElementById('check-pairs')
+        this.displayCheckPairs = true;
+        this.displayMentorMentee = true;
+        ele.style.borderTop = "5px solid #1B74E4";
+        this.removeAutoMatch();
+        this.removeManualAssign();
+        this.removeMentorMatching();
+        this.removeMatchingSetup();
+
+        //await this.showAllMenteesMentors();
+        await this.sleep(300);
+        ele = document.getElementById('all-mentees-mentors')
+        ele.style.borderLeft = "5px solid #1B74E4";
+
+        var url = this.base_url + "/manager/mentor-mentee-list/" + this.user_id + "/";
+        var response = await this.axiosGetRequest(url);
+        console.log("Mentor mentee list Response", response.data);
+        this.mentor_mentee_list = response.data.data;
+        await this.initializeDataTable("#mentor-mentee-table");
+        //await this.destroyDataTable(this.tab_name)
+      },
+      async showManualAssign() {
+        ele = document.getElementById('manual-assign')
+        this.displayManualAssign = true;
+        ele.style.borderTop = "5px solid #1B74E4";
+
+        this.removeAutoMatch();
+        this.removeCheckPairs();
+        this.removeMentorMatching();
+        this.removeMatchingSetup();
+        this.matching_list = "";
+        this.company_list = "";
+        this.journey_list = "";
+        this.pool_list = "";
+        var url = this.base_url + "/manager/journey-list/" + this.user_id + "/?company_id=" + this.user_company_id;
+        response = await this.axiosGetRequest(url);
+        console.log("Journey list Response", response.data);
+        this.journey_list = response.data.data
+
+        //var url =  this.base_url+"/manager/program-data-list/"+this.user_id+"/";
+        //var response = await this.axiosGetRequest(url);
+        //console.log("Company list Response", response.data);
+        //this.company_list = response.data.company_list;
+
+        //await this.initializeDataTable("#manual-assign-table")
+      },
+      async showMentorMatching() {
+        ele = document.getElementById('mentor-matching')
+        this.displayMentorMatching = true;
+        ele.style.borderTop = "5px solid #1B74E4";
+        this.removeAutoMatch();
+        this.removeManualAssign();
+        this.removeCheckPairs();
+        this.removeMatchingSetup();
+
+        //var url =  this.base_url+"/manager/program-data-list/"+this.user_id+"/";
+        //var response = await this.axiosGetRequest(url);
+        //console.log("Company list Response", response.data);
+        //this.company_list = response.data.company_list;
+
+        this.showMatchingReport()
+
+      },
+      async showMatchingSetup() {
+        ele = document.getElementById('matching-setup')
+        this.displayMatchingSetup = true;
+        ele.style.borderTop = "5px solid #1B74E4";
+        this.removeAutoMatch();
+        this.removeManualAssign();
+        this.removeMentorMatching();
+        this.removeCheckPairs();
+        var url = this.base_url + "/manager/matching-questions/" + this.user_id + "/";
+        response = await this.axiosGetRequest(url);
+        console.log("Matching Setup list Response", response.data);
+        this.matching_setup_list = response.data.data
+
+        await this.initializeDataTable("#matching-setup-table")
+      },
+      async downloadUserReport(user_type) {
+        var data = new FormData();
+        data.append("journey_id", this.$refs.journey.value);
+        data.append("company_id", this.user_company_id);
+        data.append("user_type", user_type)
+        data.append("user_id", this.user_id)
+        if (this.$refs.journey.value == "") {
+          bootbox.alert("Please select a journey!")
+        }
+        else {
+          window.location.href = this.base_url + "/api-v1/all-user-data/" + user_type + "/" + this.$refs.journey.value + "/" + this.user_company_id + "/" + this.user_id + "/"
+        }
+      },
+    }
+  });
+
+</script>
+
+{% endblock js %}

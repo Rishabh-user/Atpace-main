@@ -1,0 +1,16 @@
+
+    <input type="hidden" name="ques" id="ques" value="{{question.id}}"/>
+    <div class="form-group">
+        <label class="question_label">{{ question.title }} {% if question.is_required is True %} * {% endif %}</label>
+        <input
+            type="range"
+            min="{{question.start_rating_scale}}"
+            max="{{question.end_rating_scale}}"
+            name="ans"
+            oninput="this.nextElementSibling.value = this.value"
+            {% if question.is_required %}
+            required
+            {% endif %}
+        />
+        <output style="margin-left:50px;">{{question.start_rating_scale}}</output>
+    </div>   

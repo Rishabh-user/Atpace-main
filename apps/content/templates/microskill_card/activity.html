@@ -1,0 +1,24 @@
+<section class="section" id="{{forloop.counter}}" data-id="{{data.id}}">
+    <div class="content">
+       <div class="row">
+        <div class="col-md-12 ">
+            <div class="content_card">
+                <label><i class="fa fa-tasks"></i> Activity <small>({{data.activity_type}})</small></label>
+                <h2>{{data.title}}</h2>
+                <h4>{{data.data|safe}}</h4>
+                <br>
+                {% if not data.is_submitted and request.session.user_type != 'Admin' %}
+                    <div class="form-group">
+                        <input class="form-group" type="file" name="activity_file" id="activity_file"/>
+                    </div>
+                    <button type="button" class="btn btn-info"  onclick="uploadActivityFile('{{channel.pk}}','{{data.id}}')">Submit</button>
+                    <br>
+                    <small>*Click on submit only when you have uploaded the final file. You won't be able to submit it again.</small>
+                {% elif request.session.user_type != 'Admin' %}
+                    <h4>Uploaded File:</h4>{{data.activity_file}} <a href="{{MEDIA_URL}}{{data.activity_file}}" target="__blank" download ><i class="fa fa-download"></i> Download</a>
+                {% endif %}
+            </div>
+        </div>   
+      </div>
+    </div>
+</section>

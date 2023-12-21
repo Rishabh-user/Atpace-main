@@ -1,0 +1,16 @@
+{% autoescape off %}
+You Session Is  Cancelled as per details below
+
+Mentor : {{ mentor_name }}
+
+Mentee/Coachee: {{ mentee_name }}
+
+Date of Session {{datetime}} {{time_zone}}
+
+click here to make changes 
+
+{{login_url}} 
+
+Regards team AtPace
+
+{% endautoescape %}

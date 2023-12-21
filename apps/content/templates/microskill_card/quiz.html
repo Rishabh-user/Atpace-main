@@ -1,0 +1,40 @@
+<section class=" section" id="{{forloop.counter}}" data-id="{{data.id}}">
+    <div class="box-header with-border">
+    </div>
+    <div class="content" >
+       <div class="row">
+        
+        <div class="col-md-12 ">
+          <div class="content_card">
+         <label><i class="fa fa-question"></i> Question <small>Multiple Choice Question</small></label>
+        <h2>{{data.title}}</h2>
+       <div id="question_options{{data.id}}">
+          {% for option in data.content_data_option.all %}
+          {% if data.poll_response %}
+           {% if data.poll_response.my_answer == option.option %}
+           
+             <button class="c_btn success quiz_option {% if data.poll_response.is_true %} right_answer {% else %} wrong_answer {% endif %} " value="{{option.option}}" disabled>{{option.option}}</button>
+             {% else %}
+             <button class="c_btn success quiz_option {% if data.poll_response.option == option.option %} right_answer {% endif %}" value="{{option.option}}" disabled>{{option.option}}</button>
+             {% endif %}
+           {% else %}
+           <button class="c_btn success quiz_option" value="{{option.option}}">{{option.option}}</button>
+          {% endif %}
+          {% endfor %}
+       
+      </div>
+      <div class="quiz_result quiz_result{{data.id}}">
+       <h4 class="title"> </h4>
+       <h5 class="result"></h5>
+     </div>
+    </div>
+   </div>
+
+        
+        
+        
+      </div>
+    </div>
+    
+    
+</section>

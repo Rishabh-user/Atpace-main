@@ -1,0 +1,181 @@
+{% extends 'base.html' %} {% load static %} 
+{% block title %} Activity {% endblock %} 
+{% load tags %}
+{% block css %} 
+  <link
+          rel="stylesheet"
+          href="{% static 'css/program_manager/program_manager.css' %}"
+  />
+  <style>
+    .capitalize {
+      text-transform: capitalize;
+    }
+    .mgt-10{
+      margin-top: 10px;
+    }
+    /* Create an active/current tablink class */
+    .tab div div.active {
+      border-top: 5px solid #1B74E4;
+    }
+    /* Style the tab content */
+    .tabcontent {
+      display: none;
+    }
+  </style>
+{% endblock css %} {% block content %}
+<div class="content-wrapper" id="vue-app">
+  <section class="content-header">
+    <h1>Activity</h1>
+  </section>
+  <section class="content">
+    <div class="row tab">
+      <div class="col-md-2">
+        <div class="small-box box-tab tab-links"  id="feedback-tab" @click="showFeedback()">
+          <div class="inner">
+            <h4>Feedback</h4>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <div class="small-box box-tab tab-links"  id="user-activity-tab" @click="showUserActivity()">
+          <div class="inner">
+            <h4>Activity</h4>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="feedback-content" class="tabcontent">
+    {% include 'Activity/feedback.html' %}
+    </div>
+    <div id="user-activity-content" class="tabcontent">
+    {% include 'Activity/user_activity.html' %}
+    </div>
+  </section>
+  {{ request.user.id|json_script:"user_id" }}
+  {{request.session.token|json_script:"token"}}
+  {{request.session.company_id|json_script:"company_id"}}
+  {{request.session.company_name|json_script:"company_name"}}
+  
+</div>
+{% endblock content %} {% block js %} 
+<script src="{% static 'bower_components/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
+<script type="text/javascript">
+  let app = new Vue({
+    el: "#vue-app",
+    delimiters: ['[[', ']]'],
+    data() {
+      return {
+        token:JSON.parse(document.getElementById('token').textContent),
+        auth:"",
+        base_url:window.location.origin,
+        user_id: JSON.parse(document.getElementById('user_id').textContent),
+        user_company_name: JSON.parse(document.getElementById('company_name').textContent),
+        user_company_id: JSON.parse(document.getElementById('company_id').textContent),
+        all_feedback: "",
+        activity_list: ""
+      };
+    },
+    mounted(){
+      this.showFeedback();
+    },
+    filters: {
+      formateTime: function (value) {
+        if (!value) return ''
+        //value = value.toString()
+        //console.log("time value", value)
+        return value
+      }
+    },
+    methods: {
+        axiosGetRequest: function(url){
+        this.auth = "Token "+this.token;
+        var config = {
+          method: "get",
+          url: url,
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': this.auth,
+          },
+        };
+        return axios(config)
+        },
+        axiosPostRequest: function(url, data){
+            this.auth = "Token "+this.token;
+            var config = {
+            method: "post",
+            url: url,
+            headers: {
+                "Content-Type": "multipart/form-data",
+                "Accept": "application/json",
+                'Authorization': this.auth,
+            },
+            data:data
+            };
+
+            return axios(config)
+        },
+        async destroyDataTable(id){
+            if($(id).DataTable()){
+            console.log("destroying", id);
+            $(id).DataTable().clear();
+            $(id).DataTable().destroy();
+            }
+        },
+        async initializeDataTable(id){
+            console.log("initializing");
+            await this.sleep(2000);
+            $(id).DataTable({
+            "dom": '<"table-pull-left"f><"table-pull-right"l>tip',
+            'destroy': true,
+            'paging'      : true,
+            'lengthChange': true,
+            'searching'   : true,
+            'ordering'    : true,
+            'info'        : true,
+            'autoWidth'   : false,
+            'retrieve':true,
+            'scrollX': true,
+            })
+        },
+        sleep: function(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        },
+        showTab(tabName){
+          var i, tabContent, tabLinks;
+          tabContent = document.getElementsByClassName("tabcontent");
+          for (i = 0; i < tabContent.length; i++) {
+            tabContent[i].style.display = "none";
+          }
+          tabLinks = document.getElementsByClassName("tab-links");
+          for (i = 0; i < tabLinks.length; i++) {
+            tabLinks[i].className = tabLinks[i].className.replace(" active", "");
+          }
+          document.getElementById(tabName+'-content').style.display = "block";
+          document.getElementById(tabName+'-tab').classList.add("active");
+        },
+        async showFeedback(){
+          this.all_feedback = ""
+          this.showTab('feedback');
+          await this.destroyDataTable('#feedback-table')
+          var url =  this.base_url+"/feedback/feedback-list/"+this.user_id+"/Learner/?company_id="+this.user_company_id;
+          response = await this.axiosGetRequest(url);
+          console.log("All Feedback Response", response.data);
+          this.all_feedback = response.data.feedback_list;
+          await this.initializeDataTable('#feedback-table')
+        },
+        async showUserActivity(){
+          this.activity_list = ""
+          this.showTab('user-activity');
+          await this.destroyDataTable('#activity-table')
+          var url =  this.base_url+"/api/all-activity/"+this.user_id+"/?content_type=Activity&user_type=Learner&company_id="+this.user_company_id;
+          response = await this.axiosGetRequest(url);
+          console.log("All Activity Response", response.data);
+          this.activity_list = response.data.data;
+          await this.initializeDataTable('#activity-table')
+        },
+    }
+  });
+</script>
+
+{% endblock js %}

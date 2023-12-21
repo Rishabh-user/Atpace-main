@@ -1,0 +1,120 @@
+{% extends 'base.html' %} {% load static %} {% block title %}Edit Feedback Template {% endblock %}
+{% load crispy_forms_tags %} {% block content %}
+<div class="content-wrapper">
+  <!-- Content Header (Page header) -->
+  <section class="content-header">
+    <h1>
+      Edit Feedback Template
+    </h1>
+    <ol class="breadcrumb">
+      <li><a href="#"><i class="fa fa-dashboard"></i> Feedback Template</a></li>
+      <li><a href="#">Edit</a></li>
+    </ol>
+  </section>
+
+  <!-- Main content -->
+  <section class="content">
+
+    <!-- Default box -->
+    <div class="box">
+      {% include 'component/error_message.html' %}
+      <div class="box-header with-border">
+        <h3 class="box-title">Edit Feedback Template</h3>
+
+      </div>
+      <div class="box-body">
+        <form method="post" action="{% url 'feedback:edit_feedback_template' template_id=feedback_template.id %}" enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="row">
+            <div class="col-md-12">
+              <div class="form-group">
+                <label>Name</label>
+                <input type="text" class="form-control" name="name" id="name"  value="{{feedback_template.name}}" required>
+              </div>
+              <div class="form-group">
+                <label>Short Descritpion</label>
+                <textarea class="textarea form-control" cols="40" rows="10" name="short_description" id="short_description" required>{{feedback_template.short_descritpion}}</textarea>
+              </div>
+              <div class="form-group">
+              {% if request.session.user_type == 'Admin' %}
+                <label>Company*</label>
+                <select class="form-control" name="company" id="company" required>
+                  {% for company in all_company %}
+                  <option value="{{company.pk}}" {% if journey_feedback.company.pk == company.pk %}selected{% endif %}>{{company.name}}</option>
+                  {% endfor %}
+                </select>
+              {% else %}
+                <input type="hidden" class="form-control" name="company" id="company" value="{{request.session.company_id}}" required>
+              {% endif %}  
+              </div>
+              <div class="form-group">
+                <label>Journey</label>
+                <select class="form-control" name="journey" id="journey" required>
+                  {% for journey in journey_list %}
+                    <option value="{{journey.pk}}" {% if journey_feedback.journey.pk == journey.pk %}selected{% endif %}>{{journey.title}}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Template for</label>
+                <select class="form-control" name="template_for" id="template_for" required>
+                  <option selected value="">Select</option>
+                  {% for choice in template_choice %}
+                  <option value="{{choice}}" {% if feedback_template.template_for == choice %}selected{% endif %}>{{choice}}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="form-group">
+                <input class="m-check-input" type="checkbox" class="form-control" name="is_draft" id="is_draft" {% if feedback_template.is_draft %}checked{% endif %}>
+                <label>Is Draft</label>
+              </div>
+              <div class="form-group">
+                <input class="m-check-input" type="checkbox" class="form-control" name="is_active" id="is_active" {% if feedback_template.is_active %}checked{% endif %}>
+                <label>Is Active</label>
+              </div>
+
+            </div>
+            <input type="submit" name="submit" value="Submit" class="btn btn-primary" id="btnSubmit"
+              style="margin-left:18px;">
+          </div>
+        </form>
+      </div>
+    </div>
+    <!-- /.box -->
+
+  </section>
+  <!-- /.content -->
+</div>
+{% endblock content %}
+
+{% block js %}
+<script src="{% static 'bower_components/ckeditor/ckeditor.js' %}"></script>
+<script type="text/javascript">
+  CKEDITOR.replace('short_description')
+  CKEDITOR.add
+</script>
+
+<script>
+  document.getElementById('company').onchange = function () {
+    $("#journey").empty();
+    $.ajax({
+      url: "/api/get-company-journey/",
+      type: 'POST',
+      data: { 'company_id': document.getElementById('company').value },
+      error: function (error) {
+        console.log("error", error)
+      },
+      success: function (data) {
+        console.log("data", data)
+        for (let i = 0; i < data.journey.length; i++) {
+          var option = document.createElement("option");
+          option.text = data.journey[i].title;
+          option.value = data.journey[i].id;
+          var select = document.getElementById("journey");
+          select.appendChild(option);
+        }
+      }
+    });
+  }
+</script>
+{% endblock %}

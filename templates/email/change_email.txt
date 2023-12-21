@@ -1,0 +1,11 @@
+{% autoescape off %}
+Hello,
+
+We received a request to update the email for your Growatpace account.
+
+Please use {{otp}} otp to verify your email
+
+Sincerely,
+The Growatpace Team
+
+{% endautoescape %}

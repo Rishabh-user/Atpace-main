@@ -1,0 +1,958 @@
+{% extends 'base.html' %} {% load static %} {% block css %}
+ <link
+      rel="stylesheet"
+      href="{% static 'css/users_app/users/user_mentor_dashboard.css' %}"
+    />
+{% comment %} .journey-list-progress div canvas{
+    margin-top:12px;
+  } {% endcomment %}
+{% endblock css %} {% block content %}
+
+<!-- Date Picker -->
+<link
+  rel="stylesheet"
+  href="{% static 'bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css' %}"
+/>
+<!-- Daterange picker -->
+<link
+  rel="stylesheet"
+  href="{% static 'bower_components/bootstrap-daterangepicker/daterangepicker.css' %}"
+/>
+<div class="content-wrapper" style="background-color:#F3F3F3;">
+  <!-- Content Header (Page header) -->
+  <section class="content-header">
+    <h1>
+      Dashboard
+      <small>User</small>
+    </h1>
+    <ol class="breadcrumb">
+      <li>
+        <a href="#"><i class="fa fa-home"></i> Home</a>
+      </li>
+      <li class="active">Dashboard</li>
+    </ol>
+  </section>
+
+  <!-- Main content -->
+  <section class="content">
+  {% if request.user.profile_assest_enable %}
+  {% include 'component/profile_alert.html' %}
+  {% endif %}
+    <!-- Info boxes -->
+    <div class="row">
+      <div class="col-md-6">
+        <div class="row">
+          <div class="col-md-4">
+            <div class="info-box compare-box remaining-box">
+                <img src="{% static 'images/icon/Overall_Engagement.png' %}" class="img-card">
+{#              <span class="compare-box-icon bg-black"#}
+{#                ><i class="fa fa-bar-chart" aria-hidden="true"></i#}
+{#              ></span>#}
+              <span class="compare-box-text">Overall Engagement</span>
+              {% comment %} {% if engagement_time == 0 %}
+                <span class="compare-box-number info-box-number"
+                >{{engagement_minutes}} min</span>
+              {% else %}
+                <span class="compare-box-number info-box-number"
+                >{{engagement_time}}h<small>/Weekly</small></span>
+              {% endif %}
+               {% endcomment %}
+               <span class="compare-box-number info-box-number"
+                >{{engagement_time}}</span>
+              <!-- /.info-box-content -->
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="info-box compare-box remaining-box">
+                <img src="{% static 'images/icon/Points_Score.png' %}" class="img-card">
+{#              <span class="compare-box-icon bg-black"#}
+{#                ><i class="fa fa-star"></i>#}
+{#              </span>#}
+              <span class="compare-box-text">Points Score</span>
+              <span class="compare-box-number info-box-number"
+                >{{total_points}}</span
+              >
+              <!-- /.info-box-content -->
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="info-box compare-box remaining-box">
+                <img src="{% static 'images/icon/Rank_Score.png' %}" class="img-card">
+{#              <span class="compare-box-icon bg-black"#}
+{#                ><i class="fa fa-users"></i#}
+{#              ></span>#}
+              <span class="compare-box-text">Rank Score</span>
+              <span class="compare-box-number info-box-number"
+                >{{user_rank}}</span
+              >
+              <!-- /.info-box-content -->
+            </div>
+          </div>
+        </div>
+        <!-- /.info-box -->
+      </div>
+      <!-- /.col -->
+      <div class="col-md-6">
+        <div class="row">
+          <div class="col-md-8">
+            <div class="info-box remaining-box" style="margin-bottom:-10px;">
+              <div class="">
+                <span class="badges-text">My Badges</span>
+                <div class="tile-container">
+                  {% for badge in badges %}
+{#                  <img#}
+{#                    class=""#}
+{#                    src="{{MEDIA_URL}}{{badge.current_badge.image}}"#}
+{#                    style="max-width: 60px; max-height: 60px"#}
+{#                  />#}
+                      <img src="{% static 'images/icon/Badge.png' %}" class="user-badge">
+                  {% endfor %}
+                </div>
+              </div>
+              <!-- /.info-box-content -->
+            </div>
+          </div>
+        </div>
+        <!-- /.info-box -->
+      </div>
+      <!-- /.col -->
+    </div>
+    <!-- /.row -->
+
+    <div class="row">
+      <div class="col-md-3">
+        <!-- Calendar -->
+        {% comment %}
+        <div class="box box-solid bg-green-gradient">
+          <div class="box-header">
+            <i class="fa fa-calendar"></i>
+
+            <h3 class="box-title">Calendar</h3>
+            <!-- tools box -->
+            <div class="pull-right box-tools"></div>
+            <!-- /. tools -->
+          </div>
+          <!-- /.box-header -->
+          <div class="box-body no-padding">
+            <!--The calendar -->
+            <div id="calendar" style="width: 100%"></div>
+          </div>
+          <!-- /.box-body -->
+          <div class="box-footer text-black">
+            <div class="row">
+              <div class="col-sm-6">
+                <!-- Progress bars -->
+                <div class="clearfix">
+                  <span class="pull-left">Task #1</span>
+                  <small class="pull-right">90%</small>
+                </div>
+                <div class="progress xs">
+                  <div
+                    class="progress-bar progress-bar-green"
+                    style="width: 90%"
+                  ></div>
+                </div>
+
+                <div class="clearfix">
+                  <span class="pull-left">Task #2</span>
+                  <small class="pull-right">70%</small>
+                </div>
+                <div class="progress xs">
+                  <div
+                    class="progress-bar progress-bar-green"
+                    style="width: 70%"
+                  ></div>
+                </div>
+              </div>
+              <!-- /.col -->
+              <div class="col-sm-6">
+                <div class="clearfix">
+                  <span class="pull-left">Task #3</span>
+                  <small class="pull-right">60%</small>
+                </div>
+                <div class="progress xs">
+                  <div
+                    class="progress-bar progress-bar-green"
+                    style="width: 60%"
+                  ></div>
+                </div>
+
+                <div class="clearfix">
+                  <span class="pull-left">Task #4</span>
+                  <small class="pull-right">40%</small>
+                </div>
+                <div class="progress xs">
+                  <div
+                    class="progress-bar progress-bar-green"
+                    style="width: 40%"
+                  ></div>
+                </div>
+              </div>
+              <!-- /.col -->
+            </div>
+            <!-- /.row -->
+          </div>
+        </div>
+        {% endcomment %}
+        <!-- /.box -->
+        <div class="box remaining-box dashboard-box">
+          <div class="box-header with-border bg-gradient dashboard-box">
+            <h3 class="box-title">Upcoming Schedules</h3>
+            <p>{{today}}</p>
+            {% comment %} <span class="pull-right" style="margin-right: 13px">
+                <strong><i class="bi bi-three-dots"></i></strong>
+              </span> {% endcomment %}
+              
+            {% comment %} <br />
+            <br />
+            <p>Calender</p> {% endcomment %}
+          </div>
+          <!-- /.box-header -->
+          <div class="box-body">
+            <div class="row">
+            <p class="" style="margin-left: 10px">
+                <span>{{schedule_count}} Schedule</span>
+              </p>
+              {% comment %} <span class="" style="margin-left: 13px">
+                <strong>Today Schedules</strong>
+              </span> {% endcomment %}
+              
+              {% for schedule in schedules %}
+                <div class="progress-group" style="margin-left: 13px">
+                  <span class=""><strong>Title: </strong>{{schedule.title}}</span><br>
+                  <span class="" 
+                    ><strong>Mentor: </strong>{{schedule.mentor}}</span
+                  >
+                  <p class="" style="margin-bottom:1px;"
+                    ><strong>Date: </strong>{{schedule.start_time.date}}</p
+                  >
+                  <p class="" style="margin-bottom:1px;"
+                    ><strong>Time: </strong>{{schedule.start_time.time}} to {{schedule.end_time.time}}</p
+                  >
+                  {% comment %} <a href="{{schedule.url}}" target="_blank" >
+                    <button class="btn btn-info" style="margin:1px;">Start call</button>
+                  </a> {% endcomment %}
+                  <a>
+                    <button class="btn btn-info" style="margin:1px;" onclick="ViewSlot('{{schedule.id}}', '{{schedule.title}}', '{{schedule.start_time.date}}','{{schedule.start_time.time}}', '{{schedule.end_time.date}}','{{schedule.end_time.time}}', '{{schedule.url}}', 'Mentor Session')">View</button>
+                  </a>
+                </div>
+                <br>
+              {% endfor %}
+              {% for schedule in collabarate %}
+                <div class="progress-group" style="margin-left: 13px">
+                  <span class=""><strong>Title: </strong>{{schedule.title}}</span><br>
+                  <span class="" 
+                    ><strong>Speaker: </strong>{{schedule.speaker}}</span
+                  >
+                  <p class="" style="margin-bottom:1px;"
+                    ><strong>Date: </strong>{{schedule.start_time.date}}</p
+                  >
+                  <p class="" style="margin-bottom:1px;"
+                    ><strong>Time: </strong>{{schedule.start_time.time}} to {{schedule.end_time.time}}</p
+                  >
+                  {% comment %} <a href="{{schedule.custom_url}}" target="_blank" >
+                    <button class="btn btn-info" style="margin:1px;">Start call</button>
+                  </a> {% endcomment %}
+                  <a>
+                    <button class="btn btn-info" style="margin:1px;" onclick="ViewSlot('{{schedule.id}}', '{{schedule.title}}','{{schedule.start_time.date}}', '{{schedule.start_time.time}}','{{schedule.end_time.date}}', '{{schedule.end_time.time}}', '{{schedule.custom_url}}', '{{schedule.type}}')">View</button>
+                  </a>
+                </div>
+                <br>
+              {% endfor %}
+
+              <!-- /.col -->
+            </div>
+            <!-- /.row -->
+          </div>
+          <!-- ./box-body -->
+        </div>
+        <!-- /.box -->
+      </div>
+      <!-- /.col -->
+      <div class="col-md-6">
+      {% if mentorship_goals %}
+      <div class="box">
+          <div class="box-header with-border bg-gradient">
+            <h3 class="box-title">Mentorship Goals</h3>
+          </div>
+          <!-- /.box-header -->
+          <div class="box-body no-padding">
+          <h4 style="padding-left:15px;">Main Goals</h4>
+          <div class="nav-tabs-custom">
+            <ul class="nav nav-tabs">
+              {% for category in category_list %}
+                {% if category == 'Gain Clarity' %}
+                  <li class="active"><a href="#tab_1" data-toggle="tab">Gain Clarity</a></li>
+                {% elif category == 'Learn' %}
+                  <li><a href="#tab_2" data-toggle="tab">Learn</a></li>
+                {% elif category == 'Health' %}
+                  <li><a href="#tab_3" data-toggle="tab">Health</a></li>
+                {% elif category == 'Follow Through' %}
+                  <li><a href="#tab_4" data-toggle="tab">Follow Through</a></li>
+                {% endif %}
+              {% endfor %}
+
+            </ul>
+            <div class="tab-content">
+              <div class="tab-pane active" id="tab_1">
+                <table class="table table-striped">
+                  <tr style="font-weight:bold">
+                  <td>Heading</td>
+                  <td>Due Date</td>
+                  <td>Status</td>
+                  <td>Action</td>
+                  </tr>
+                  {% for data in mentorship_goals %}
+                    {% if  data.goal.category == 'Gain Clarity' %}
+                    <tr>
+                      <td>{{data.goal.heading}}</td>
+                      <td>{{data.goal.complete_till.date}}</td>
+                      {% if data.status == '' %}
+                      <td><span class="label label-primary">Not Started</span></td>
+                      {% elif data.status == 'ApprovedByMentor' %}
+                      <td><span class="label label-success">Approved</span></td>
+                      {% elif data.status == 'RejectedByMentor' %}
+                      <td><span class="label label-danger">Rejected</span></td>
+                      {% elif data.status == 'RequestForApprove' %}
+                      <td><span class="label label-warning">Requested</span></td>
+                      {% elif data.status == 'Started' %}
+                      <td><span class="label label-primary">Started</span></td>
+                      {% elif data.status == 'Completed' %}
+                      <td><span class="label label-success">Completed</span></td>
+                      {% endif %}
+                      <td>
+                      <a href="{% url 'leaderboard:goal' %}">
+                        <button
+                          class="btn btn-info"
+                          style="margin: 0px"
+                        >
+                          View
+                        </button>
+                      </a>
+                      </td>
+                    </tr>
+                    {% endif %}
+                  {% endfor %}
+                </table>
+              </div>
+              <!-- /.tab-pane -->
+              <div class="tab-pane" id="tab_2">
+                <table class="table table-striped">
+                  <tr style="font-weight:bold">
+                  <td>Heading</td>
+                  <td>Due Date</td>
+                  <td>Status</td>
+                  <td>Action</td>
+                  </tr>
+                  {% for data in mentorship_goals %}
+                    {% if  data.goal.category == 'Learn' %}
+                    <tr>
+                      <td>{{data.goal.heading}}</td>
+                      <td>{{data.goal.complete_till.date}}</td>
+                      {% if data.status == '' %}
+                      <td><span class="label label-primary">Not Started</span></td>
+                      {% elif data.status == 'ApprovedByMentor' %}
+                      <td><span class="label label-success">Approved</span></td>
+                      {% elif data.status == 'RejectedByMentor' %}
+                      <td><span class="label label-danger">Rejected</span></td>
+                      {% elif data.status == 'RequestForApprove' %}
+                      <td><span class="label label-warning">Requested</span></td>
+                      {% elif data.status == 'Started' %}
+                      <td><span class="label label-primary">Started</span></td>
+                      {% elif data.status == 'Completed' %}
+                      <td><span class="label label-success">Completed</span></td>
+
+                      {% endif %}
+                      <td>
+                      <a href="{% url 'leaderboard:goal' %}">
+                        <button
+                          class="btn btn-info"
+                          style="margin: 0px"
+                        >
+                          View
+                        </button>
+                      </a>
+                      </td>
+                    </tr>
+                    {% endif %}
+                  {% endfor %}
+                </table>
+              </div>
+              <!-- /.tab-pane -->
+              <div class="tab-pane" id="tab_3">
+                <table class="table table-striped">
+                  <tr style="font-weight:bold">
+                  <td>Heading</td>
+                  <td>Due Date</td>
+                  <td>Status</td>
+                  <td>Action</td>
+                  </tr>
+                  {% for data in mentorship_goals %}
+                    {% if  data.goal.category == 'Health' %}
+                    <tr>
+                      <td>{{data.goal.heading}}</td>
+                      <td>{{data.goal.complete_till.date}}</td>
+                      {% if data.status == '' %}
+                      <td><span class="label label-primary">Not Started</span></td>
+                      {% elif data.status == 'ApprovedByMentor' %}
+                      <td><span class="label label-success">Approved</span></td>
+                      {% elif data.status == 'RejectedByMentor' %}
+                      <td><span class="label label-danger">Rejected</span></td>
+                      {% elif data.status == 'RequestForApprove' %}
+                      <td><span class="label label-warning">Requested</span></td>
+                      {% elif data.status == 'Started' %}
+                      <td><span class="label label-primary">Started</span></td>
+                      {% elif data.status == 'Completed' %}
+                      <td><span class="label label-success">Completed</span></td>
+
+                      {% endif %}
+                      <td>
+                      <a href="{% url 'leaderboard:goal' %}">
+                        <button
+                          class="btn btn-info"
+                          style="margin: 0px"
+                        >
+                          View
+                        </button>
+                      </a>
+                      </td>
+                    </tr>
+                    {% endif %}
+                  {% endfor %}
+                </table>
+              </div>
+              <!-- /.tab-pane -->
+              <div class="tab-pane" id="tab_4">
+                <table class="table table-striped">
+                  <tr style="font-weight:bold">
+                  <td>Heading</td>
+                  <td>Due Date</td>
+                  <td>Status</td>
+                  <td>Action</td>
+                  </tr>
+                  {% for data in mentorship_goals %}
+                    {% if  data.goal.category == 'Follow Through' %}
+                    <tr>
+                      <td>{{data.goal.heading}}</td>
+                      <td>{{data.goal.complete_till.date}}</td>
+                      {% if data.status == '' %}
+                      <td><span class="label label-primary">Not Started</span></td>
+                      {% elif data.status == 'ApprovedByMentor' %}
+                      <td><span class="label label-success">Approved</span></td>
+                      {% elif data.status == 'RejectedByMentor' %}
+                      <td><span class="label label-danger">Rejected</span></td>
+                      {% elif data.status == 'RequestForApprove' %}
+                      <td><span class="label label-warning">Requested</span></td>
+                      {% elif data.status == 'Started' %}
+                      <td><span class="label label-primary">Started</span></td>
+                      {% elif data.status == 'Completed' %}
+                      <td><span class="label label-success">Completed</span></td>
+
+                      {% endif %}
+                      <td>
+                      <a href="{% url 'leaderboard:goal' %}">
+                        <button
+                          class="btn btn-info"
+                          style="margin: 0px"
+                        >
+                          View
+                        </button>
+                      </a>
+                      </td>
+                    </tr>
+                    {% endif %}
+                  {% endfor %}
+                </table>
+              </div>
+            </div>
+            <!-- /.tab-content -->
+          </div>
+        </div>
+          <!-- ./box-body -->
+      </div>
+      {% endif %} 
+      {% if user_goals %}
+      <div class="box remaining-box dashboard-box">
+          <div class="box-header with-border bg-gradient dashboard-box">
+            <h3 class="box-title">User Goals</h3>
+          </div>
+          <!-- /.box-header -->
+          <div class="box-body no-padding">
+          <h4 style="padding-left:15px;">Main Goals</h4>
+          <div class="nav-tabs-custom">
+            <ul class="nav nav-tabs">
+              {% for category in user_goal_category_list %}
+                {% if category == 'Gain Clarity' %}
+                  <li class="active"><a href="#tab1" data-toggle="tab">Gain Clarity</a></li>
+                {% elif category == 'Learn' %}
+                  <li><a href="#tab2" data-toggle="tab">Learn</a></li>
+                {% elif category == 'Health' %}
+                  <li><a href="#tab3" data-toggle="tab">Health</a></li>
+                {% elif category == 'Follow Through' %}
+                  <li><a href="#tab4" data-toggle="tab">Follow Through</a></li>
+                {% endif %}
+              {% endfor %}
+
+            </ul>
+            <div class="tab-content">
+              <div class="tab-pane active" id="tab1">
+                <table class="table table-striped">
+                  <tr style="font-weight:bold">
+                  <td>Heading</td>
+                  <td>Today's Status</td>
+                  <td>Action</td>
+                  </tr>
+                  {% for data in user_goals %}
+                    {% if  data.goal.category == 'Gain Clarity' %}
+                    <tr>
+                      <td>{{data.goal.heading}}</td>
+                      {% if data.status %}
+                      <td><span class="label label-primary">{{data.status}}</span></td>
+                      {% else %}
+                      <td><span class="label label-primary">Not Logged</span></td>
+                      {% endif %}
+                      <td>
+                      <a href="{% url 'leaderboard:goal' %}">
+                        <button
+                          class="btn btn-info"
+                          style="margin: 0px"
+                        >
+                          View
+                        </button>
+                      </a>
+                      </td>
+                    </tr>
+                    {% endif %}
+                  {% endfor %}
+                </table>
+              </div>
+              <!-- /.tab-pane -->
+              <div class="tab-pane" id="tab2">
+                <table class="table table-striped">
+                  <tr style="font-weight:bold">
+                  <td>Heading</td>
+                  <td>Today's Status</td>
+                  <td>Action</td>
+                  </tr>
+                  {% for data in user_goals %}
+                    {% if  data.goal.category == 'Learn' %}
+                    <tr>
+                      <td>{{data.goal.heading}}</td>
+                      {% if data.status %}
+                      <td><span class="label label-primary">{{data.status}}</span></td>
+                      {% else %}
+                      <td><span class="label label-primary">Not Logged</span></td>
+                      {% endif %}
+                      <td>
+                      <a href="{% url 'leaderboard:goal' %}">
+                        <button
+                          class="btn btn-info"
+                          style="margin: 0px"
+                        >
+                          View
+                        </button>
+                      </a>
+                      </td>
+                    </tr>
+                    {% endif %}
+                  {% endfor %}
+                </table>
+              </div>
+              <!-- /.tab-pane -->
+              <div class="tab-pane" id="tab3">
+                <table class="table table-striped">
+                  <tr style="font-weight:bold">
+                  <td>Heading</td>
+                  <td>Today's Status</td>
+                  <td>Action</td>
+                  </tr>
+                  {% for data in user_goals %}
+                    {% if  data.goal.category == 'Health' %}
+                    <tr>
+                      <td>{{data.goal.heading}}</td>
+                      {% if data.status %}
+                      <td><span class="label label-primary">{{data.status}}</span></td>
+                      {% else %}
+                      <td><span class="label label-primary">Not Logged</span></td>
+                      {% endif %}
+                      <td>
+                      <a href="{% url 'leaderboard:goal' %}">
+                        <button
+                          class="btn btn-info"
+                          style="margin: 0px"
+                        >
+                          View
+                        </button>
+                      </a>
+                      </td>
+                    </tr>
+                    {% endif %}
+                  {% endfor %}
+                </table>
+              </div>
+              <!-- /.tab-pane -->
+              <div class="tab-pane" id="tab4">
+                <table class="table table-striped">
+                  <tr style="font-weight:bold">
+                  <td>Heading</td>
+                  <td>Today's Status</td>
+                  <td>Action</td>
+                  </tr>
+                  {% for data in user_goals %}
+                    {% if  data.goal.category == 'Follow Through' %}
+                    <tr>
+                      <td>{{data.goal.heading}}</td>
+                      {% if data.status %}
+                      <td><span class="label label-primary">{{data.status}}</span></td>
+                      {% else %}
+                      <td><span class="label label-primary">Not Logged</span></td>
+                      {% endif %}
+                      <td>
+                      <a href="{% url 'leaderboard:goal' %}">
+                        <button
+                          class="btn btn-info"
+                          style="margin: 0px"
+                        >
+                          View
+                        </button>
+                      </a>
+                      </td>
+                    </tr>
+                    {% endif %}
+                  {% endfor %}
+                </table>
+              </div>
+            </div>
+            <!-- /.tab-content -->
+          </div>
+        </div>
+          <!-- ./box-body -->
+      </div>
+      {% endif %} 
+      {% if journey_data %}
+       <div class="box remaining-box dashboard-box">
+          <div class="box-header with-border bg-gradient dashboard-box">
+            <h3 class="box-title">Journey Progress</h3>
+          </div>
+          <!-- /.box-header -->
+          <div class="box-body">
+            <div class="row">
+              {% comment %} <ul style="list-style:none; padding: 1px 1px 1px 1px; width:100%"> {% endcomment %}
+                {% for journey in journey_data  %}
+                  <div class="progress-group" style="width:100% position: relative;">
+                    <div class="progress-text journey-list" 
+                      >{{journey.name}}</div
+                    >
+                      <div style="background: #f0f2f5; margin: 5px; display: flex">
+                          <div class="journey-list-progress" style="width: {{ journey.progress }}%">
+
+                          </div>
+                          <div style="margin-left: 4px">
+                             <strong>{{ journey.progress }}%</strong>
+                          </div>
+
+
+                      </div>
+{#                    <div class="journey-list-progress" style="width: {{journey.progress}}%" >#}
+{#                    <input type="text" class="knob" data-readonly="true" value="{{journey.progress}}" data-width="40" data-height="40", data-margin-top="25"#}
+{#                      data-fgColor=" #3c8dbc">#}
+{#                    </div>#}
+                    
+
+              {% comment %} <div class="knob-label">Mail-Orders</div> {% endcomment %}
+                  </div>
+                {% endfor %}
+              {% comment %} </ul> {% endcomment %}
+
+              <!-- /.col -->
+            </div>
+            <!-- /.row -->
+          </div>
+          <!-- ./box-body -->
+        </div>
+        {% endif %}
+        {% if nextGoal %}
+        <div class="box remaining-box dashboard-box">
+            <div class="box-header with-border bg-gradient dashboard-box">
+              <h3 class="box-title">Journey Goal Progress</h3>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body no-padding">
+              <table class="table table-striped">
+              {% for goal in nextGoal %}
+                 <tr>
+                  <td>{{goal.title}}</td>
+                  <td><span class="badge bg-grey">{{goal.progress}}%</span></td>
+                  {% if goal.type == 'quest' %}
+                  <td><a href="{% url 'content:course_summary' pk=goal.id group=goal.channel_group %}"><button class="btn btn-info" style="margin:0px;" {% if not goal.is_grayedout %} disabled {% endif %}>Start</button></a></td>
+                  {% elif goal.type == 'survey' %}
+                  <td><a href="{% url 'survey:survey_instruction' channel=goal.journey_id  pk=goal.id %}"><button class="btn btn-info" style="margin:0px;" {% if not goal.is_grayedout %} disabled {% endif %}>Start</button></a></td>
+                  {% elif goal.type == 'assessment' %}
+                  <td><a href="{% url 'test_series:assessment_instruction' channel=goal.journey_id  pk=goal.id %}"><button class="btn btn-info" style="margin:0px;" {% if not goal.is_grayedout %} disabled {% endif %}>Start</button></a></td>
+                  {% elif goal.type == 'journals' %}
+                  <td><a href="{% url 'community:weekly_journals' pk=goal.id %}"><button class="btn btn-info" style="margin:0px;" {% if not goal.is_grayedout %} disabled {% endif %}>Start</button></a></td>
+                  {% endif %}
+                </tr>
+              {% endfor %} 
+              </table>
+
+              <!-- /.col -->
+            </div>
+            <!-- /.box-body -->
+          </div>
+        {% endif %}
+
+          <!-- ./box-body -->
+        {% comment %} <div class="row">
+          <div class="col-md-6">
+            <div class="box">
+              <div class="box-header with-border bg-blue">
+                <h3 class="box-title">To Dos</h3>
+              </div>
+              <!-- /.box-header -->
+              <div class="box-body">
+                <div class="row">
+                  <div class="progress-group">
+                    <span class="progress-text" style="margin-left: 13px"
+                      >Book a call</span
+                    >
+                  </div>
+                  <br />
+                  <div class="progress-group">
+                    <span class="progress-text" style="margin-left: 13px"
+                      >Complete Journal</span
+                    >
+                  </div>
+                  <br />
+                  <div class="progress-group">
+                    <span class="progress-text" style="margin-left: 13px"
+                      >Micro learning</span
+                    >
+                  </div>
+                  <br />
+                  <div class="progress-group">
+                    <span class="progress-text" style="margin-left: 13px"
+                      >Update Goals</span
+                    >
+                  </div>
+
+                  <!-- /.col -->
+                </div>
+                <!-- /.row -->
+              </div>
+              <!-- ./box-body -->
+            </div>
+          </div>
+         
+        </div> {% endcomment %}
+
+        <!-- /.box -->
+      </div>
+      <div class="col-md-3">
+        {% comment %} <div class="box">
+          <div class="box-header with-border bg-blue">
+            <h3 class="box-title">Mentorship Goals</h3>
+          </div>
+          <!-- /.box-header -->
+          <div class="box-body">
+            <div class="row">
+              <div class="progress-group">
+                <span class="progress-text" style="margin-left: 13px"
+                  >Goal 1</span
+                >
+              </div>
+              <br />
+              <div class="progress-group">
+                <span class="progress-text" style="margin-left: 13px"
+                  >Goal 2</span
+                >
+              </div>
+              <br />
+              <div class="progress-group">
+                <span class="progress-text" style="margin-left: 13px"
+                  >Goal 3</span
+                >
+              </div>
+              <br />
+              <div class="progress-group">
+                <span class="progress-text" style="margin-left: 13px"
+                  >Goal 4</span
+                >
+              </div>
+
+              <!-- /.col -->
+            </div>
+            <!-- /.row -->
+          </div>
+          <!-- ./box-body -->
+        </div> {% endcomment %}
+        <!-- /.box -->
+        <div class="box box-solid bg-green-gradient remaining-box dashboard-box">
+          <div class="box-header">
+            <i class="fa fa-calendar"></i>
+
+            <h3 class="box-title">Calendar</h3>
+            <!-- tools box -->
+            <div class="pull-right box-tools"></div>
+            <!-- /. tools -->
+          </div>
+          <!-- /.box-header -->
+          <div class="box-body no-padding">
+            <!--The calendar -->
+            <div id="calendar" style="width: 100%"></div>
+          </div>
+          <!-- /.box-body -->
+          <div class="box-footer text-black">
+            <div class="tile-container">
+              <div class="streak">
+                <span>Current Streak <span>
+                <p><span style="font-size:16px; font-weight:bold;">{{streak_count}}</span> Days </p>
+              </div>
+              <div class="streak">
+                <span>Goal Met</span>
+                <p><span style="font-size:18px; font-weight:bold;">100%</span> </p>
+              </div>
+              <div class="streak">
+               <span>Highest Streak</span>
+               <p><span style="font-size:16px; font-weight:bold;">{{best_streak}}</span> Days </p>
+              </div>
+            </div>
+            <!-- /.row -->
+          </div>
+        </div>
+        <div class="box remaining-box dashboard-box">
+              <div class="box-header with-border bg-gradient dashboard-box">
+                <h3 class="box-title">To Dos</h3>
+              </div>
+              <!-- /.box-header -->
+              <div class="box-body">
+                <div class="row">
+                  <div class="progress-group">
+                    <span class="progress-text" style="margin-left: 13px"
+                      >Book a call</span
+                    >
+                  </div>
+                  <br />
+                  <div class="progress-group">
+                    <span class="progress-text" style="margin-left: 13px"
+                      >Complete Journal</span
+                    >
+                  </div>
+                  <br />
+                  <div class="progress-group">
+                    <span class="progress-text" style="margin-left: 13px"
+                      >Micro learning</span
+                    >
+                  </div>
+                  <br />
+                  <div class="progress-group">
+                    <span class="progress-text" style="margin-left: 13px"
+                      >Update Goals</span
+                    >
+                  </div>
+
+                  <!-- /.col -->
+                </div>
+                <!-- /.row -->
+              </div>
+              <!-- ./box-body -->
+            </div>
+      </div>
+    </div>
+    <!-- /.row -->
+  </section>
+  <!-- /.content -->
+</div>
+<!-- jQuery 3 -->
+<script src="{% static 'bower_components/jquery/dist/jquery.min.js' %}"></script>
+<!-- jQuery UI 1.11.4 -->
+<script src="{% static 'bower_components/jquery-ui/jquery-ui.min.js' %}"></script>
+<!-- daterangepicker -->
+<script src="{% static 'bower_components/moment/min/moment.min.js' %}"></script>
+<script src="{% static 'bower_components/bootstrap-daterangepicker/daterangepicker.js' %}"></script>
+<!-- datepicker -->
+<script src="{% static 'bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js' %}"></script>
+<!-- AdminLTE dashboard demo (This is only for demo purposes) -->
+<script src="{% static 'dist/js/pages/dashboard.js' %}"></script>
+<!-- AdminLTE for demo purposes -->
+<script src="{% static 'dist/js/demo.js' %}"></script>
+
+{% endblock content %} {% block js %}
+<script>
+
+function ViewSlot(id, title, start_date, start_time, end_date, end_time, url, meeting_type){
+    bootbox.dialog({
+          title: meeting_type,
+          message: "<p>"+title+"-"+meeting_type+"-Click here To start"+"</p><br><strong>Start Time</strong>:- "+start_date+" "+start_time+"<br><strong>End Time</strong>:- "+end_date+" "+end_time+"<br><br><a href = "+url+" target='_blank' id='meeting_url_"+id+"'><button class='btn btn-info' > Start Call</button></a>",
+          size: 'large',
+          buttons: {
+              cancel: {
+                  label: "Delete Slot",
+                  className: 'btn-danger',
+                  callback: function(){
+                      if(meeting_type == 'Mentor Session'){
+                        console.log("hello")
+                        CancelSlot(id)
+                      }
+                      else{
+                        bootbox.alert("You don't have permission to delete this call")
+                      }
+                  }
+                }
+          }
+      });
+    }
+  
+  function CancelSlot(id){
+    bootbox.confirm({
+      message: "Do you want to Cancel this slot?",
+      buttons: {
+          confirm: {
+              label: 'Yes',
+              className: 'btn-success'
+          },
+          cancel: {
+              label: 'No',
+              className: 'btn-danger'
+          }
+      },
+      callback: function (result) {
+        
+          if(result == true){
+              $.ajax({
+                url:"{% url 'user:cancel_mentor_slot' %}",
+                type:"POST",
+                data:{pk:id, csrfmiddlewaretoken : "{{csrf_token}}" },
+                error: function(data){
+                  console.log(data)
+                  bootbox.alert('something is wrong');
+                },
+                beforeSend: function() {
+                  var dialog = bootbox.dialog({
+                      message: '<p class="text-center mb-0"><i class="fa fa-spin fa-cog"></i> working on your changes - please wait… </p>',
+                      closeButton: false
+                  });
+
+                  setTimeout(function(){
+                      dialog.modal('hide');
+                  }, 4000);
+              
+
+                },
+
+                success: function(data) {
+                  
+                  bootbox.alert("Your Appointment is Cancelled!", function(){ 
+                      location.reload()
+                  });
+                  
+                },
+              });
+            }
+          }
+      });
+    }
+
+
+  </script> 
+{% endblock js %}

@@ -1,0 +1,97 @@
+{% extends 'base.html' %} {% load static %} 
+ {% load tags %} 
+ {% block title %} Report {% endblock %}
+ {% block content %}
+ {% block css %}
+<link rel="stylesheet" href="{% static 'bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css' %}">
+{% endblock css %} 
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <h1>
+        Filter Assessment 
+      </h1>
+      <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i>Assessment</a></li>
+        <li><a href="#">Assessment Report</a></li>
+
+      </ol>
+    </section>
+  
+    <!-- Main content -->
+    <section class="content">
+  
+      <!-- Default box -->
+      <div class="box">
+        <div class="box-header with-border">
+          <h3 class="box-title">Filter Assessment</h3>
+
+        </div>
+        <div class="box-body">
+          {% if request.path == '/user-assessment/' %}
+          <form method="post" action="{% url 'api:all_assessment_csv' %}">
+          {% else %}
+          <form method="post" action="{% url 'api:all_survey_csv' %}">
+              {% endif %}
+            {% csrf_token %}
+
+            <div class="row">
+                <div class="col-md-12">
+                  <div class="form-group">
+                    <label>All Journey</label>
+                    <select class="form-control select2" id ="channel_id" name="channel_id" style="width: 100%;">
+                          <option selected="selected" value="">Select</option>
+                          {% for channel in request|all_channel %}
+                            <option value="{{channel.pk}}" {% if channel.pk == selected_channel_id.pk %} selected {% endif %}>{{channel.title}}</option>
+                          {% endfor %}
+                        </select>
+                      </div>
+                      {% if request.path == '/user-assessment/' %}
+                        <div class="form-group">
+                          <label>All Assessment</label>
+                          <select class="form-control select2" id ="assessment_id" name="assessment_id" style="width: 100%;">
+                            <option selected="selected" value="">Select</option>
+                            {% for assessment in request.user|all_assessment %}
+                            <option value="{{assessment.pk}}"> {{assessment.name}} </option>
+                            {% endfor %}  
+                          </select>
+                        </div>
+
+                        {% else %}
+                        <div class="form-group">
+                          <label>All Survey</label>
+                          <select class="form-control select2" id ="survey_id" name="survey_id" style="width: 100%;">
+                            <option selected="selected" value="">Select</option>
+                            {% for survey in request|all_survey %}
+                            <option value="{{survey.pk}}"> {{survey.name}} </option>
+                            {% endfor %}  
+                          </select>
+                        </div>
+                        {% endif %}
+                          <div class="form-group">
+                            <label>User</label>
+                            <select class="form-control select2" id ="user_id" name="user_id" style="width: 100%;">
+                              <option selected="selected" value=""></option>
+                              {% for user in request|get_all_user %}
+                                <option value="{{user.pk}}"> {% if user.company.all != None %} {{user.company.all|join:', '}}  -  {% endif %} {{user.first_name}} {{user.last_name}}, {{user.email}} </option>
+                             {% endfor %}  
+                            </select>
+                            </div>
+
+                  <!-- /.form-group -->
+                  <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+                
+               
+              </div>
+              <!-- /.row -->
+        </form>
+        </div>
+      </div>
+      <!-- /.box -->
+
+  
+    </section>
+    <!-- /.content -->
+  </div>
+  {% endblock content %}

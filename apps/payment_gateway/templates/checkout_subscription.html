@@ -1,0 +1,184 @@
+{% extends 'website/web_base.html' %} {% load static %} {% load tags %}
+{% block css %}
+
+<script src="https://js.braintreegateway.com/web/dropin/1.33.1/js/dropin.js"></script>
+<script src="https://js.braintreegateway.com/web/3.85.3/js/client.min.js"></script>
+<script src="https://js.braintreegateway.com/web/3.85.3/js/data-collector.min.js"></script>
+<script src="https://pay.google.com/gp/p/js/pay.js"></script>
+<script src="https://js.braintreegateway.com/web/3.85.3/js/google-payment.min.js"></script>
+<script src="https://js.braintreegateway.com/web/dropin/1.33.1/js/dropin.min.js"></script>
+
+<style>
+   .right{
+       float:right;
+   }
+   hr.line {
+  border-top: 1px solid;
+}
+
+
+</style>
+{% endblock css %} 
+{% block content %}
+<main>
+    <!-- page title area start -->
+    <section class="page__title-area pt-120 pb-90">
+       
+       <div class="container">
+          <div class="row">
+            <h2>Checkout</h2>
+             <div class="col-xxl-8 col-xl-8 col-lg-8">
+                <div class="course__wrapper">
+                   <div class="page__title-content mb-25">
+                    {% if messages %} 
+                        {% for message in messages %}
+                        <div class="alert-danger {{ message.tags }} alert-dismissible" role="alert" >
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true"></span>
+                            </button>
+                            {{ message }}
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+                   </div>
+
+                   <form id="payment-subscription-form" action="/checkout/subscription-payment" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" value="{{clientToken}}" id="client-token"/>
+                        <!-- Putting the empty container you plan to pass to
+                            `braintree.dropin.create` inside a form will make layout and flow
+                            easier to manage -->
+
+                        <div id="dropin-container"></div>
+                        <div class="course__enroll-btn">
+                           <button class="e-btn e-btn-7" id="btn" type="submit" >Complete Checkout</button>
+                        </div>
+                        {% comment %} <input class="button button--small button--green" type="submit" /> {% endcomment %}
+                        <!-- <button id="submit-button" class="button button--small button--green">Purchase</button> -->
+                        <input type="hidden" id="nonce" name="payment_method_nonce"/>
+                        <input type="hidden" value="{{pk}}" id="pk" name="order_pk"/>
+                        <input type="hidden" value="{{company}}" id="company" name="company_pk"/>
+                    </form>
+
+                    <h3 style="margin-top:40px; margin-bottom:20px;">Order Summary</h3>
+                    <div class="" style="" >
+                        <div class="row">
+                            {% comment %} <div class="col-md-1">
+                                <a href="">
+                                    <img src="{{MEDIA_URL}}{{journey.image}}" alt="" style="max-length:40px; max-width:40px;">
+                                </a>
+                            </div> {% endcomment %}
+                            <div class="col-md-9">
+                                <a href=""> <h5>{{subscription.title}}</h5></a>
+                                <p>{{subscription.short_description}}</p>
+                            </div>
+                            
+                            <div class="col-md-3">
+                            <a href="">&#36;{{subscription.price}}</a>
+                            </div>
+                        </div>
+                    </div>
+                   
+                </div>
+             </div>
+             <div class="col-xxl-4 col-xl-4 col-lg-4" style="margin-top:20px;">
+                <div class="course__sidebar pl-70 p-relative">
+                   <div class="course__shape">
+                      <img class="course-dot" src="assets/img/course/course-dot.png" alt="">
+                   </div>
+                   <div class="course__sidebar-widget-2 white-bg mb-20">
+                      <div class="course__video">
+                        <h3>Summary</h3>
+                        <p><span>Original Price:</span><span class="right">&#36;{{amount}}</span></p>
+                        <p><span>Discount:</span><span class="right">&#36;0</span></p>
+                        <hr class="line">
+                        <strong>Total</strong><strong class="right">&#36;{{amount}}</strong>
+                         
+                        {% comment %} <div class="course__enroll-btn">
+                           <button class="e-btn e-btn-7 w-100" type="submit">Complete Checkout</a>
+                        </div> {% endcomment %}
+                      </div>
+                   </div>
+               
+                </div>
+             </div>
+          </div>
+       </div>
+    </section>
+    <!-- page title area end -->
+
+    <!-- cta area start -->
+     {% include 'website/web_component/cta_area_card.html' %}
+     <!-- cta area end -->
+
+    <script>
+
+        const form = document.getElementById('payment-subscription-form');
+        const token = document.getElementById('client-token').value;
+        const pk = document.getElementById('pk').value;
+        const company = document.getElementById('company').value;
+        // console.log("Token", pk)
+        braintree.dropin.create({
+        authorization: token,
+        container: '#dropin-container',
+        paypal: {
+            flow: 'checkout',
+            amount: '10.00',
+            currency: 'USD'
+        },
+        applePay: {
+            displayName: 'My Store',
+            paymentRequest: {
+            total: {
+                label: 'My Store',
+                amount: '19.99'
+            },
+             // We recommend collecting billing address information, at minimum
+             // billing postal code, and passing that billing postal code with all
+             // Apple Pay transactions as a best practice.
+            requiredBillingContactFields: ["postalAddress"]
+            }
+        },
+        googlePay: {
+            googlePayVersion: 2,
+            merchantId: '632415832906167836',
+            transactionInfo: {
+            totalPriceStatus: 'FINAL',
+            totalPrice: '10',
+            currencyCode: 'USD'
+            },
+            allowedPaymentMethods: [{
+            type: 'CARD',
+            parameters: {
+                // We recommend collecting and passing billing address information with all Google Pay transactions as a best practice.
+                billingAddressRequired: true,
+                billingAddressParameters: {
+                format: 'FULL'
+                }
+            }
+            }]
+        }
+        }).then((dropinInstance) => {
+        form.addEventListener('submit', (event) => {
+            event.preventDefault();
+
+            dropinInstance.requestPaymentMethod().then((payload) => {
+            // Step four: when the user is ready to complete their
+            //   transaction, use the dropinInstance to get a payment
+            //   method nonce for the user's selected payment method, then add
+            //   it a the hidden field before submitting the complete form to
+            //   a server-side integration
+            document.getElementById('nonce').value = payload.nonce;
+            console.log("payload.nonce",payload)
+            form.submit();
+            document.getElementById("btn").disabled = true;
+            }).catch((error) => { throw error; });
+        });
+        }).catch((error) => {
+        // handle errors
+        });
+
+        
+    </script>
+ </main>
+{% endblock %}

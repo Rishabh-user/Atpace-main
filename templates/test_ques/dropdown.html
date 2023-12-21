@@ -1,0 +1,6 @@
+<div class="form-group">
+    <label class="question_label">[[question.title]] <span v-if="question.is_required">*</span> </label>
+    <select class="" :name="'answer'+[[question.id]]" id="ans" style="" ref="ans_val">
+    <option :value="option" v-for="option in question.options" :key="option">[[option]]</option>
+    </select>
+</div>

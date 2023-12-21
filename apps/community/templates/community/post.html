@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% load static %} {% load tags %}
+{% block css %} 
+  
+
+ 
+   {% endblock %}
+{% block sidebar %}
+<aside
+class="main-sidebar"
+style="
+  box-shadow: 0px 12px 7px #2329314d;
+  background-color: white;
+  border-radius: none;
+  backdrop-filter: blur(1.5px);
+  -webkit-backdrop-filter: blur(1.5px);
+  border-right: 1px solid #ababab;
+"
+>
+<!-- sidebar: style can be found in sidebar.less -->
+<section class="sidebar" style="background-color: #fff">
+  <ul class="sidebar-menu" data-widget="tree">
+    {% for data in content_data %}
+
+    {% endfor %}
+  </ul>
+</section>
+</aside>
+{% endblock sidebar %}
+{% block content %}
+      <!-- Content Wrapper. Contains page content -->
+      <div class="content-wrapper">
+        <section class="content-header">
+       
+          <h1>{{channel}}</h1>
+          <small style="font-size: 14px;"><b>These are the posts by the learners in the community. <br>You can post questions to the community or look at learning from others by clicking on the community button or menu on the side.Click on post title to enter post and interact. Click on return button to come back to this page.</b></small>
+            
+          <ol class="breadcrumb">
+            <!-- <li>
+              <a href="#"><i class="fa fa-dashboard"></i>Courses </a>
+            </li>
+            <li><a href="#">{{channel.title}}</a></li> -->
+            <a  href="{% cookie 'last_course_url' %}">
+              <button class="btn btn-warning"> Back to Course </button>
+            </a>
+          </ol>
+        </section>
+
+        <section class="content">
+            
+            <!-- Default box -->
+            
+              
+              {% for data in data %}
+              {% include 'community/community_post_detail.html' %}
+              {% endfor  %}
+              {% comment %} {% else %}
+              <div class="box">
+                <div class="box-header with-border">
+                  <h3 class="callout callout-danger lead" class="box-title">Community Alert!</h3>
+                </div>
+                <div class="box-body">
+                  <p>Dear {{request.user.first_name}},</p>
+                  <p>Below are the System generated credentials which you can use for first time login in Private community.</p>
+                  <p>Email: <b>{{request.user.email}}</b></p> 
+                  <p>Password: <b>Pass@1234</b></p> 
+                  <p><a href="https://login.circle.so/sign_up?request_host=community.growatpace.com&user%5Binvitation_token%5D=" target="myFrame">click here</a> for login to community</p>
+                  <p>After you click on the link you'll get verification mail on provided email address.</p> 
+                  <p>After your email verification you can come back here to access the community.</p>
+                    
+                  <p>Thank you for your understanding</p>
+                  <p>Team Atpace</p>
+                  </div>
+                <!-- /.box-body -->
+                <!-- /.box-footer-->
+                <iframe src="" style="width:100%; height:600px;" name="myFrame"></iframe>
+              </div>    
+                       
+              {% endif %} {% endcomment %}
+              
+              
+        
+          </section>
+      </div>
+{% endblock content %} 
+{% block js %}
+
+{% endblock %}
+  </body>
+</html>

@@ -1,0 +1,65 @@
+{% load static %}
+<div class="col-xxl-12">
+    <div class="course__item white-bg mb-30 fix">
+        <div class="row gx-0">
+            <div class="col-xxl-4 col-xl-4 col-lg-4">
+                <div class="course__thumb course__thumb-list w-img p-relative fix">
+                    <a href="{% url 'user:course_detail' course_id=journey.journey.pk %}">
+                        <img src="{{MEDIA_URL}}{{journey.journey.image}}" alt="">
+                    </a>
+                    <div class="course__tag">
+                        <a href="#">{{journey.journey.category}}</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xxl-8 col-xl-8 col-lg-8">
+                <div class="course__right">
+                    <div class="course__content course__content-4">
+                        <div class="course__meta d-flex align-items-center">
+                            <div class="course__lesson mr-20">
+                                {% if journey.content > 0 %}
+                                <span><i
+                                        class="far fa-book-alt"></i>{{journey.content}} Lesson</span>
+                                {% endif %}
+                            </div>
+                            <div class="course__rating">
+                               
+                            </div>
+                        </div>
+                        <h3 class="course__title">
+                            <a href="{% url 'user:course_detail' course_id=journey.journey.pk %}">{{journey.journey.journey.title}}</a>
+                        </h3>
+                        <div class="course__teacher d-flex align-items-center">
+                            {% if journey.journey.company %}
+                            <div class="course__teacher-thumb mr-15">
+                                <i class="fal fa-users"></i>
+                            </div>
+                            <h6><a href="#">{{journey.journey.company.name}}</a></h6>
+                            {% else %}
+                            <div class="course__teacher-thumb mr-15">
+                                <img src="{{journey.journey.created_by.avatar}}"
+                                     alt="">
+                            </div>
+                            <h6><a href="#">{{journey.journey.created_by.first_name}}
+                                {{journey.journey.created_by.last_name}}</a>
+                            </h6>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="course__more course__more-2 course__more-3 d-flex justify-content-between align-items-center">
+                        <div class="course__status">
+                            <span>Free</span>
+                        </div>
+                        <div class="course__btn">
+                            <a href="{% url 'user:course_detail' course_id=journey.journey.pk %}" class="link-btn">
+                                Know Details
+                                <i class="far fa-arrow-right"></i>
+                                <i class="far fa-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,53 @@
+{% extends 'base.html' %} {% load static %}
+{% block title %} Feedback Response Detail {% endblock %}
+{% load tags %}
+<!-- DataTables -->
+{% block css %}
+<link rel="stylesheet" href="{% static 'bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css' %}">
+{% endblock css %} 
+{% block content %}
+
+
+<div class="content-wrapper">
+  <section class="content-header">
+    <h1>
+        Feedback Response Detail
+    </h1> 
+    
+    <ol class="breadcrumb">
+      <li><a href="#"><i class="fa fa-dashboard"></i> Feedback Response</a></li>
+      <li><a href="#">Detail</a></li>
+    </ol>
+  </section>
+
+  <section class="content">
+    <div class="row">
+       <div class="col-xs-12">
+           <div class="box">
+             <div class="box-header">
+               <h3 class="box-title">Feedback Response Detail</h3>
+             </div>
+             <!-- /.box-header -->
+             <div class="box-body">
+                {% for data in data %}
+                    <div class="question-box">
+                        <span class="question"><h4><b>Q.&nbsp;{{data.ques.title}}</b></h4></span>
+                        <p class="ans" style="padding-left:20px;">{{data.ans.answer}}</p>
+                    </div>
+                {% endfor %}
+             </div>
+             <!-- /.box-body -->
+           </div>
+           <!-- /.box -->
+         </div>
+       <!-- /.col -->
+    </div>
+    <!-- /.row -->
+ </section>
+ 
+</div>
+{% endblock content %} 
+{% block js %}
+<script src="{% static 'bower_components/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
+{% endblock js %}

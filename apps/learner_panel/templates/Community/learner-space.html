@@ -1,0 +1,29 @@
+<div class="box">
+    <div class="box-header">
+        <h3 class="box-title">Space List</h3>
+    </div>
+    <div class="box-body">
+        <table id="space-table" class="table table-bordered table-hover">
+            <thead>
+            <tr>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Space Group</th>
+            <th>Privacy</th>
+            <th>View</th>
+            </tr>
+            </thead>
+            <tbody> 
+            <tr v-for="space in all_space" :key="space.id">
+            <td>[[space.name]]</td>
+            <td v-html="space.description">[[space.description]]</td>
+            <td>[[space.space_group]]</td>
+            <td>[[space.privacy]]</td>
+            <td>
+                <a :href="community_base_url+'/space-link/'+space.id" target="__blank"><button class="btn btn-primary">View</button></a>
+            </td>
+            </tr>
+        </table>
+    </div>
+    <!-- /.box-body -->
+</div>

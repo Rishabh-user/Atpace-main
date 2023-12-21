@@ -1,0 +1,22 @@
+name,label,points,comment,created_by,,
+Registration ,registration,100,Welcome to the atpace tribe ! Learn act and grow together !,admin,1,YES
+Joined a journey ,joined journey,200,Welcome to the course! You have received 200 @atpace points. Learn and grow your skills!,admin,1,YES
+Login to application for the first time,first login points,100,"Welcome to Atpace, You've achieved 100 @pace points Yay ! Kick off your journeys and quests.
+",admin,1,YES
+Login after a fix duration and not enrolled,login without enrollment,0,Come on into the tribe! Super excited to welcome you.,admin,0,NO
+Login to application,login after duration,0,lets get the 800 points banked in by completing this course!,admin,1,YES
+Signup,Premium Sign up,0,You are now onboard the Marketing Journey - lets go !.,admin,0,NO
+Signup,Premium Enrolled,500,You just claimed 500 @pace points for enrolling in Marketing Journey,admin,0,NO
+Completion of Journey Pre-Assessement,journey_pre_assessment,100,"Thanks for completing Pre-Assessment, You have received 100 @atpace points for this. Here are the few recommended journeys according to your pre-assessment.",admin,1,YES
+Pre-assessment,pre assess passed claim,100,Bravo! You've received 100 @atpace points on completion of Pre-Assessment.,admin,1,YES
+Completion of Post Assessment,post_assessment,100,Thanks for completing the Post-Assessment of the Microskill.You have received 100 @atpace points for this. Check out other related journey you might like ...,admin,1,YES
+Post Assessment,post_assessment claim,100,Hurrey! You've achieved 100 @pace points on completion of Microskill. Keep going,admin,1,YES
+Coachee,complete session1 claim,200," Congratulations!, You've completed the first session with your coach.",admin,0,NO
+Completion of first meeting with coach,first meeting,200,Congrats you've achieved 200 @pace points for completing the first session with your coach.,admin,0,NO
+Confirm meeting with coach,meeting with coach,200,"Wonderful!, Your appointment with coach is confirmed. You have received 200 @atpace points for this.",admin,1,YES
+Top contributor for the week,contributor,100,"Hurrah !, You've acheived 100 reward points for the top contributer of the week, Kudos !",admin,0,NO
+Most liked Question ,most liked question,200,"Wow!, Community loves your question question_link. Well done! Here are 200 @pace points for you.",admin,0,NO
+Notable Question,notable question,200,Very cool for asking most notable question question_link of the course_name. We have added 200 @pace points for that. Congratulations!,admin,0,NO
+Master resourceful,master resourceful,500,Hey ! You've just made 500 @atpace points on creating most useful notes of the course_name course.,admin,0,NO
+Completing courses consistently,consistent course completion,200,Awesome! you have received 200 @pace points on cosistently completing your courses. Keep learning and keep exploring.,admin,1,YES
+Successfully completion of Journey,journey completion claim,800,Congratulations! You've successfully completed the Journey. We have added 800 more @atpace points in your account. Do check out other related journey you like ...,admin,1,YES

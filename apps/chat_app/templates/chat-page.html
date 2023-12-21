@@ -1,0 +1,299 @@
+      <div class="row">
+        <div class="col-md-3">
+            <button class="btn btn-primary" data-toggle="modal" data-target="#create-group-manager" @click="getUserList" v-if="user_type == 'ProgramManager'">Create Group</button>
+            <button class="btn btn-primary" data-toggle="modal" data-target="#create-group-mentor" v-if="user_type == 'Mentor'">Create Group</button>
+            <div class="box box-warning direct-chat direct-chat-warning" style="min-height: 70vh; margin-top:7px;">
+            <div class="box-header with-border">
+                <h3 class="box-title"> Chat List</h3>
+              </div>
+              <div class="box-body" style="height: 60vh; margin:10px; overflow: scroll">
+                <ul class="products-list product-list-in-box" >
+                      <li class="item" v-for="(chat, index) in chat_list" :key="index">
+                        <div class="product-img">
+                          <img v-if="chat.avatar" :src="chat.avatar" alt="user Image" class="img-circle" @click="showChatMsg(chat.room_name)" style="cursor: pointer;">
+                          <img v-else src='/static/dist/img/avatar.png' alt="user Image" class="img-circle" @click="showChatMsg(chat.room_name)" style="cursor: pointer;">
+                        </div>
+                        <div class="product-info">
+                          <a id="room-name-submit" class="product-title" @click="showChatMsg(chat.room_name)" style="cursor: pointer;">[[chat.name]]</a>
+                            <br>
+                            <span v-if="chat.unread_msg > 0">[[chat.unread_msg]] unread message</span>
+                        </div>
+                      </li>
+                  </ul>
+              </div>
+            </div>
+        </div>
+        <div class="col-md-9" v-if="chat_msg">
+            <!-- DIRECT CHAT -->
+            <div class="box box-warning direct-chat direct-chat-warning" style="min-height: 70vh; margin-top:50px;">
+              <div class="box-header with-border">
+                <h3 class="box-title" v-if="chat_msg.room_details.room_type == 'OneToOne'">[[chat_msg.receiver_details.full_name]]</h3>
+                <h3 class="box-title" v-else>[[chat_msg.receiver_details.group_name]]</h3>
+                <button v-if="chat_msg.room_details.room_type == 'OneToMany'" class="btn" style="float:right;" data-toggle="modal" data-target="#modal-view-members" @click="getGroupMembers(chat_msg.room_details.room_name)">View Members</button>
+              </div>
+              <!-- /.box-header -->
+              <div class="box-body" style="height: 50vh;">
+                <!-- Conversations are loaded here -->
+                <div class="direct-chat-messages" style="height: 70vh; overflow: scroll" id="chat-msg-box" >
+                          <!-- Message to the right -->
+                          <div class="direct-chat-msg right" v-for="(chat, index) in chat_msg.data" :key="index" v-if="chat_msg.sender_details.id == chat.sender_id">
+                            <div class="direct-chat-info clearfix">
+                              <span class="direct-chat-name pull-right">[[chat.from_user]]</span>
+                              <span class="direct-chat-timestamp pull-left">[[chat.created_at]]</span>
+                            </div>
+                            <!-- /.direct-chat-info -->
+                            <img class="direct-chat-img" v-if="chat.sender_avatar" :src="chat.sender_avatar" alt="image">
+                            <img class="direct-chat-img" v-else src='/static/dist/img/avatar.png' alt="image">
+                            <!-- /.direct-chat-img -->
+                            <div class="direct-chat-text" v-if="chat.msg_type == 'TEXT'" v-html="chat.message">
+                              [[chat.message]]
+                            </div>
+                            <div class="pull-right" v-else-if="chat.msg_type == 'IMAGE'">
+                              <a :href="chat.file" target="_blank"><img :src="chat.file" width="300" height="300"></a>
+                            </div>
+                            <div class="pull-right row" v-else-if="chat.msg_type == 'PDF'" style="background-color: #efeeee;
+      border-radius: 10px;
+      margin-right: 10px;
+      text-align: center;">
+                              <div class="col-md-12 col-12" style="border-bottom: 1px solid gray;
+      padding: 20px;">
+                                [[chat.file_name]]
+                              </div> 
+                              <div class="col-md-6 col-12" style="padding: 13px; border-right: 1px solid">
+                               <a :href="chat.file" target="_blank"><button class="btn">Open</button></a>
+                              </div>
+                              <div class="col-md-6 col-12" style="padding: 13px;">
+                                <a :href="chat.file" target="_blank" Download><button class="btn">Download</button></a>
+                              </div>
+                              {% comment %} <a :href="chat.file" target="_blank"><embed type="application/pfd" :src="chat.file" width="300" height="300"></a> {% endcomment %}
+                            </div>
+                            <div class="pull-right" v-else-if="chat.msg_type == 'VIDEO'">
+                              <a :href="chat.file" target="_blank"><video width="300" height="300" controls><source :src="chat.file"></source></video></a>
+                            </div>
+                            <!-- /.direct-chat-text -->
+                          </div>
+                          <!-- /.direct-chat-msg -->
+
+                          <!-- Message. Default to the left -->
+                          <div class="direct-chat-msg" v-else>
+                            <div class="direct-chat-info clearfix">
+                              <span class="direct-chat-name pull-left" v-if="chat_msg.room_details.room_type == 'OneToOne'">[[chat.from_user]]</span>
+                              <span class="direct-chat-name pull-left" v-else>[[chat.from_user]]</span>
+                              <span class="direct-chat-timestamp pull-right">[[chat.created_at]]</span>
+                            </div>
+                            <!-- /.direct-chat-info -->
+                            <span v-if="chat_msg.room_details.room_type == 'OneToOne'">
+                              <img class="direct-chat-img" v-if="chat.receiver_avatar" :src="chat.sender_avatar" alt="image">
+                              <img class="direct-chat-img" v-else this.src='/static/dist/img/avatar.png' alt="image">
+                            </span>
+                            <span v-else>
+                              <img class="direct-chat-img" v-if="chat.sender_avatar" :src="chat.sender_avatar" alt="image">
+                              <img class="direct-chat-img" v-else this.src='/static/dist/img/avatar.png' alt="image">
+                            </span>
+
+                            <!-- /.direct-chat-img -->
+                            <div class="direct-chat-text" v-if="chat.msg_type == 'TEXT'" v-html="chat.message">
+                              [[chat.message]]
+                            </div>
+                            <div class="pull-left" v-else-if="chat.msg_type == 'IMAGE'">
+                              <a :href="chat.file" target="_blank"><img :src="chat.file" width="300" height="300"></a>
+                            </div>
+                            <div class="pull-left row" v-else-if="chat.msg_type == 'PDF'" style="background-color: #efeeee;
+      border-radius: 10px;
+      margin-left: 10px;
+      text-align: center;">
+                              <div class="col-md-12 col-12" style="border-bottom: 1px solid gray;
+      padding: 20px;">
+                                [[chat.file_name]]
+                              </div> 
+                              <div class="col-md-6 col-12" style="padding: 13px; border-right: 1px solid">
+                               <a :href="chat.file" target="_blank"><button class="btn">Open</button></a>
+                              </div>
+                              <div class="col-md-6 col-12" style="padding: 13px;">
+                                <a :href="chat.file" target="_blank" Download><button class="btn">Download</button></a>
+                              </div>
+                              {% comment %} <a :href="chat.file" target="_blank"><embed type="application/pfd" :src="chat.file" width="300" height="300"></a> {% endcomment %}
+                            </div>
+                            <div class="pull-left" v-else-if="chat.msg_type == 'VIDEO'">
+                              <a :href="chat.file" target="_blank"><video width="300" height="300" controls><source :src="chat.file"></source></video></a>
+                            </div>
+                            <!-- /.direct-chat-text -->
+                          </div>
+                          <!-- /.direct-chat-msg -->
+
+                  <div id="chat-box">
+
+                  </div>
+                </div>
+                <!--/.direct-chat-messages-->
+              </div>
+              <!-- /.box-body -->
+              <div class="mention-div-box" id="mention-div-box" style="display:none;">
+                <ul class="products-list product-list-in-box" >
+                    <li class="item mention-list" v-for="(member, index) in group_members_list" :key="index" style="" @click="addMentionMember(chat_msg.room_details.room_name, member.id, member.name)" v-if="member.id != user_id">
+                      <div class="mention-member-img" style="float: left;">
+                        <img v-if="member.avatar" :src="member.avatar" alt="user Image" class="img-circle" style="cursor: pointer;">
+                        <img v-else src="/static/dist/img/avatar.png" alt="user Image" class="img-circle" style="cursor: pointer;">
+                      </div>
+                      <div class="product-info" style="font-size:15px;">[[member.name]]</div>
+                    </li>
+                </ul>
+              </div>
+              <div class="box-footer">
+                <!-- <form action="#" method="post"> -->
+                  <div class="input-group">
+                    <label for="upload_file" style="font-size: 20px; cursor: pointer; float:left; margin:5px;"><i class="fa fa-paperclip" aria-hidden="true"></i></label>
+                    <input
+                      accept="image/*, video/mp4, application/*"
+                      type="file"
+                      name="upload_file"
+                      ref="chat_file"
+                      id="upload_file"
+                      style="display: none"
+                      @change="uploadFile"
+                    />
+                    <input id="chat-message-input" style="width:97%" type="text" name="message" placeholder="Type Message ..." class="form-control" v-model="msg" @keyup.enter="sendMessage()" @input="checkForMention(chat_msg.room_details.room_name, chat_msg.room_details.room_type)">
+                    <span class="input-group-btn">
+                          <button id="chat-message-submit" type="button" class="btn btn-warning btn-flat" style="margin-top:0px;" @click="sendMessage()">Send</button>
+                        </span>
+                  </div>
+                <!-- </form> -->
+              </div>
+
+              <!-- /.box-footer-->
+            </div>
+            <!--/.direct-chat -->
+          </div>
+          {% comment %} <div v-else>
+          <div class="overlay">
+            <i class="fa fa-refresh fa-spin"></i>
+          </div>
+        </div> {% endcomment %}
+        </div>
+      <div class="modal fade" id="create-group-manager" style="display: none;">
+        <div class="modal-dialog">
+          <form id="create_group" action="{% url 'user:create_group' %}" method="POST" enctype="multipart/form-data">
+          {% csrf_token %}
+          {% comment %} <form id="create_group"> {% endcomment %}
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">×</span></button>
+              <h4 class="modal-title">Create Group</h4>
+            </div>
+            <div class="modal-body">
+              <div class="form-group">
+                <label>Name</label>
+                <input class="form-control" id="name" type="text" name="name" required placeholder="Name"/>
+              </div>
+              <div class="form-group">
+                <label>Description</label>
+                <input class="form-control" id="description" type="text" name="description" required placeholder="Description"/>
+              </div>
+              <div class="form-group">
+                <label>Profile Photo</label>
+                <input class="form-control" id="image" type="file" name="image" accept="image/*"/>
+              </div> 
+              <div class="form-group">
+                <label>Add Members</label>
+                <select class="form-control select2" name="members" id="members" required style="width: 100%;" multiple>
+                  <option v-for="user in user_list" :key="user.id" :value="user.id">[[user.name]]</option>
+                </select>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+              <button type="submit" class="btn btn-primary">Save changes</button>
+            </div>
+          </div>
+        </form>
+          <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+      </div>
+      <!-- Group Members Modal -->
+      <div class="modal fade" id="modal-view-members" style="display: none;">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">×</span></button>
+              <h3 class="modal-title">[[group_members_list.length]] Members
+              <div v-if="user_id == group_chat_data.created_by_id">
+                <button class="btn" style="float:right; margin-right: 15px;" id="addMemberButton" @click="AddMemberList">Add Members</button>
+                <div id="add_group_members" style="display:none;">
+                  <select class="form-control select2" name="add-members" ref="add_members" required style="width: 100%;" multiple>
+                    <option v-for="user in user_list" :key="user.id" :value="user.id">[[user.name]]</option>
+                  </select>
+                  <button class="btn" style="float:right; margin-right: 15px; margin-top:5px;" id="addMemberButton" @click="AddGroupMember(group_chat_data.group_id)">Save</button>
+                </div>
+              </div>
+              </h3>
+            </div>
+            <div class="modal-body" style="height:60vh; overflow:scroll;">
+              <ul class="products-list product-list-in-box" >
+                  <li class="item" v-for="(member, index) in group_members_list" :key="index">
+                    <div class="product-img">
+                      <img v-if="member.avatar" :src="member.avatar" alt="user Image" class="img-circle" style="cursor: pointer;">
+                      <img v-else src="/static/dist/img/avatar.png" alt="user Image" class="img-circle" style="cursor: pointer;">
+                    </div>
+                    <div class="product-info">
+                      <a class="product-title" style="cursor: pointer;" :href="'/user/profile/'+member.id" target="_blank">[[member.name]]</a>
+                    </div>
+                    <div v-if="member.is_admin" style="float:right; margin-right: 15px;">
+                      <button class="btn">Group Admin</button>
+                    </div>
+                    <div v-else-if="user_id == group_chat_data.created_by_id" style="float:right;">
+                      <button class="btn" style="float:right; margin-right: 15px;" @click="removeMember(group_chat_data.group_id, member.id)">Remove</button>
+                    </div>
+                  </li>
+              </ul>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal fade" id="create-group-mentor" style="display: none;">
+    <div class="modal-dialog">
+        <form id="create_group" action="{% url 'user:create_group' %}" method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        {% comment %} <form id="create_group"> {% endcomment %}
+        <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span></button>
+            <h4 class="modal-title">Create Group</h4>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+            <label>Name</label>
+            <input class="form-control" id="name" type="text" name="name" required placeholder="Name"/>
+            </div>
+            <div class="form-group">
+            <label>Description</label>
+            <input class="form-control" id="description" type="text" name="description" required placeholder="Description"/>
+            </div>
+            <div class="form-group">
+            <label>Profile Photo</label>
+            <input class="form-control" id="image" type="file" name="image" accept="image/*"/>
+            </div> 
+            <div class="form-group">
+            <label>Add Members</label>
+            <select class="form-control select2" name="members" id="members" required style="width: 100%;" multiple>
+                    <option :value="mentee.mentee_id" v-for="(mentee, index) in mentees_list" :key="index">[[mentee.mentee_name]]</option>
+            </select>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary">Save changes</button>
+        </div>
+        </div>
+    </form>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>

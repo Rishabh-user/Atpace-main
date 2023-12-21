@@ -1,0 +1,158 @@
+{% extends 'base.html' %} {% load static %}
+{% block title %} Feedback Template List {% endblock %}
+{% load tags %}
+<!-- DataTables -->
+{% block css %}
+<link rel="stylesheet" href="{% static 'bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css' %}">
+{% endblock css %} 
+{% block content %}
+
+
+<div class="content-wrapper">
+  <section class="content-header">
+    <h1>
+        Feedback Template  {% include 'messages.html' %}
+    </h1> 
+    
+    <ol class="breadcrumb">
+      <li><a href="#"><i class="fa fa-dashboard"></i> Feedback Template</a></li>
+      <li><a href="#">List</a></li>
+    </ol>
+  </section>
+
+  <section class="content">
+    <div class="row">
+       <div class="col-xs-12">
+           <div class="box">
+             <div class="box-header">
+               <h3 class="box-title">Feedback Template List</h3>
+               <a href="{%url 'feedback:create_feedback_template' %}"><button class="btn btn-primary pull-right">Create Feedback Template</button></a>
+               
+             </div>
+            
+              
+              <!-- </div> -->
+             <!-- /.box-header -->
+             <div class="box-body">
+               <table id="example2" class="table table-bordered table-hover">
+                 <thead>
+                  <tr>
+                    <th>Id</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Template For</th>
+                    <th>Company</th>
+                    <th>Journey</th>
+                    <th>Is_Active</th>
+                    <th>Add Question</th>
+                    <th>Action</th>
+                  </tr>
+                 </thead>
+                 <tbody>
+                  {% for template in feedback_templates %}
+                  <tr>
+                    <td>{{forloop.counter }}</td>
+                    <td>{{template.feedback_template.name}}</td>
+                    <td>{{template.feedback_template.short_description|safe}}</td>
+                    <td>{{template.feedback_template.template_for}}</td>
+                    <td>{{template.company}}</td>
+                    <td>{{template.journey}}</td>
+                    <td>
+                        {% if template.feedback_template.is_active %}
+                          <kbd>Active</kbd>
+                        {% else %}
+                          <kbd>InActive</kbd>
+                        {% endif %}
+                        </td>
+                    <td><a href="{% url 'feedback:add_template_question' template_id=template.feedback_template.pk %}"> <button class="btn btn-primary"> Add Questions</button></a></td>
+                    <td>
+                    <div class="dropdown">
+                          <button class="btn bg-purple dropdown-toggle btn-select-option" type="button" data-toggle="dropdown" aria-expanded="true">Select an option<span class="caret"></span>
+                          </button>
+                          <ul class="dropdown-menu options-dropdown">
+                          
+                              <li>
+                                  <a href="{% url 'feedback:edit_feedback_template' template_id=template.feedback_template.id %}"><i class="fa fa-edit option-icon"></i>Edit</a>
+                              </li>
+                              <li>
+                                  {% comment %} <a href="{% url 'feedback:add_journey_to_feedback' %}" ><i class="option-icon"></i>Add to Journey</a> {% endcomment %}
+                              </li>
+                              <li>
+                                <a href="javascript:void(0)" class="template_id" id="{{template.feedback_template.id}}"><i class="fa fa-trash option-icon"></i>Delete</a>
+                              </li>
+                          </ul>
+                      </div></td>
+                  </tr>
+                  {% endfor %}
+                 </tfoot>
+               </table>
+             </div>
+             <!-- /.box-body -->
+           </div>
+           <!-- /.box -->
+ 
+          
+         </div>
+       <!-- /.col -->
+    </div>
+    <!-- /.row -->
+ </section>
+ 
+</div>
+{% endblock content %} 
+{% block js %}
+<script src="{% static 'bower_components/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
+<script>
+    $(function () {
+        $(".template_id").click(function(){
+          var id = $(this).attr("id");
+          console.log("template_id ",id)
+          bootbox.confirm({
+          message: "Are you sure to remove this record ?",
+          buttons: {
+              confirm: {
+                  label: 'Yes',
+                  className: 'btn-success'
+              },
+              cancel: {
+                  label: 'No',
+                  className: 'btn-danger'
+              }
+          },
+          callback: function (result) {
+              if(result == true){
+                $.ajax({
+                     url:  "{% url 'feedback:delete_feedback_template' %}",
+                     type: 'post',
+                     data: {template_id: id, csrfmiddlewaretoken : "{{csrf_token}}" },
+                     error: function() {
+                      bootbox.alert('Something is wrong');
+                     },
+                     success: function(data) {
+                          $("#"+id).remove();
+                          bootbox.alert("Record removed successfully");  
+                     }
+                });
+              }
+            }
+        });
+    });
+});
+      
+
+$(function () {
+ 
+  $('#example2').DataTable({
+    "dom": '<"table-pull-left"f><"table-pull-right"l>tip',
+    'paging'      : true,
+    'lengthChange': true,
+    'searching'   : true,
+    'ordering'    : true,
+    'info'        : true,
+    'autoWidth'   : true,
+    'scrollX'     : true
+  })
+})
+</script>
+{% endblock js %}

@@ -1,0 +1,31 @@
+{% extends 'base.html' %} {% load static %} 
+{% block title %} Analytics {% endblock %} 
+{% block css %} 
+
+{% endblock css %} {% block content %}
+<div class="content-wrapper" id="vue-app">
+  <section class="content-header">
+    <h1>Analytics</h1>
+  </section>
+  <section class="content">
+    <div class="row">
+    </div>
+  </section>
+  
+</div>
+{% endblock content %} {% block js %} 
+
+<script type="text/javascript">
+  let app = new Vue({
+    el: "#vue-app",
+    delimiters: ['[[', ']]'],
+    data() {
+      return {
+      };
+    },
+    methods: {
+    }
+  });
+</script>
+
+{% endblock js %}

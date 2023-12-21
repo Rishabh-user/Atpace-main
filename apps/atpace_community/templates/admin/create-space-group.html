@@ -1,0 +1,148 @@
+{% extends 'base.html' %} {% load static %} {% block title %} Space Group {% endblock %}
+ {% load crispy_forms_tags %} {% block content %}
+ {% block css %}
+<link rel="stylesheet" href="{% static 'bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css' %}">
+{% endblock css %} 
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <h1>
+        Space Group
+      </h1>
+      <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Settings</a></li>
+        <li><a href="#">Space Group</a></li>
+
+      </ol>
+    </section>
+    <!-- Main content -->
+    <section class="content">
+  
+      <!-- Default box -->
+      <div class="box">
+        <div class="box-header with-border">
+          {% if request.path == '/atpace-community/group-space/' %}
+          <h3 class="box-title">Create Space Group</h3>
+          {% else %}
+          <h3 class="box-title">Edit Space Group</h3>
+          {% endif %}
+        </div>
+        <div class="box-body">
+          {% crispy form %}
+  
+        </div>
+      </div>
+      <!-- /.box -->
+      {% if request.path == '/atpace-community/group-space/' %}
+      <div class="box">
+        <div class="box-header">
+          <h3 class="box-title">Space Group List</h3>
+          
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body">
+          <table id="example2" class="table table-bordered table-hover">
+            <thead>
+             <tr>
+               <th>Name</th>
+               <th>Description</th>
+               <th>Cover Image</th>
+               <th>Privacy</th>
+               <th>Active Status</th>
+               <th>Action</th>
+               
+             </tr>
+            </thead>
+            <tbody> 
+             {% for data in spacegroup %}
+             <tr>
+               <td>{{data.title}}</td>
+               <td>{{data.description}}</td>
+               <!-- <td><img src="{{MEDIA_URL}}{{data.cover_image}}" alt=""></td> -->
+               <td>{{data.cover_image}}</td>
+               <td>{{data.privacy}}</td>
+               <td>{{data.is_active}}</td>
+               
+               <td>
+                <div class="dropdown">
+                  <button class="btn bg-purple dropdown-toggle btn-select-option" type="button" data-toggle="dropdown" aria-expanded="true">Select an option<span class="caret"></span>
+                  </button>
+                  <ul class="dropdown-menu options-dropdown">
+                      <li>
+                          <a href="{% url 'atpace_community:edit_group_space' pk=data.id %}" ><i class="fa fa-edit option-icon"></i>Edit Group</a>
+                      </li>
+                      <li id="delete_data" data-id={{data.id}}>
+                          <a href="javascript:void(0)" ><i class="fa fa-trash option-icon"></i>Delete</a>
+                      </li>
+                </ul>
+              </div>
+              </td>
+
+             </tr>
+             {% endfor %}
+            </tfoot>
+          </table>
+        </div>
+        <!-- /.box-body -->
+      </div>
+      {% endif %}
+  
+    </section>
+    <!-- /.content -->
+  </div>
+  {% endblock content %}
+  {% block js %}
+<script src="{% static 'bower_components/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
+<script>
+
+  $(function () {
+    $("body").on("click","#delete_data",function(){
+      var id = $(this).data('id');
+      bootbox.confirm({
+      message: "Are you sure to remove this record ?",
+      buttons: {
+          confirm: {
+              label: 'Yes',
+              className: 'btn-success'
+          },
+          cancel: {
+              label: 'No',
+              className: 'btn-danger'
+          }
+      },
+      callback: function (result) {
+          if(result == true){
+            $.ajax({
+                 url:  "{% url 'atpace_community:delete_group_space' %}",
+                 type: 'POST',
+                 data: {id: id, csrfmiddlewaretoken : "{{csrf_token}}" },
+                 error: function() {
+                  bootbox.alert('Something is wrong');
+                 },
+                 success: function(data) {
+                      $("#"+id).remove();
+                      bootbox.alert("Record removed successfully");
+                 }
+              });
+          }
+      }
+  });
+  });
+  });
+  
+$(function () {
+ 
+  $('#example2').DataTable({
+    "dom": '<"table-pull-left"f><"table-pull-right"l>tip',
+    'paging'      : true,
+    'lengthChange': true,
+    'searching'   : true,
+    'ordering'    : true,
+    'info'        : true,
+    'autoWidth'   : true,
+    'scrollX'     : true
+  })
+})
+</script>
+{% endblock js %}

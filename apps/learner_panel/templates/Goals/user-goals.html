@@ -1,0 +1,198 @@
+<div class="box">
+    <div class="box-header with-border bg-grey">
+        <h3 class="box-title">User Goals</h3>
+        {% if request.session.user_type == "Admin" or request.session.user_type == "ProgramManager" %}
+            <button disabled class="btn btn-info pull-right" data-toggle="modal" data-target="#goal-modal">
+                Create Goal
+            </button>
+        {% elif request.session.user_type == "Learner" or request.session.user_type == "Mentor" %}
+            <button class="btn btn-info pull-right" data-toggle="modal" data-target="#goal-modal">
+                Create Goal
+            </button>
+        {% endif %}
+    </div>
+    <!-- /.box-header -->
+    <div class="box-body no-padding">
+        <table class="table table-striped">
+        <tr>
+        <th>Heading</th>
+        <th>Description</th>
+        <th><center>Action</center></th>
+        <th>Progress</th>
+        </tr>
+        {% comment %} {% if data.count == 0 %}
+        <tr>
+            <td class="text-center">No Goal</td>
+        </tr>
+        {% else %}  {% endcomment %}
+        <tr v-for="goal in all_user_goals" :key="goal.id">
+            <td>[[goal.heading]]</td>
+            <td style="width:500px;">[[goal.description]]</td>
+            <td>
+            <center>
+                {% if request.session.user_type == "Admin" or request.session.user_type == "ProgramManager" %}
+                    <button disabled class="btn btn-info"
+                            style="margin: 0px" data-toggle="modal" data-target="#modal-edit">
+                        Edit
+                    </button>
+                    <button disabled
+                            class="btn btn-danger"
+                            style="margin: 0px"
+                    >
+                        Delete
+                    </button>
+                {% elif request.session.user_type == "Learner" or request.session.user_type == "Mentor" %}
+                    <button class="btn btn-info" @click="getEditGoalData(goal.id)" style="margin: 0px"
+                            data-toggle="modal" data-target="#modal-edit">
+                        Edit
+                    </button>
+                    <button
+                            @click="deleteGoal(goal.id, base_url, user_id, token)"
+                            class="btn btn-danger"
+                            style="margin: 0px"
+                    >
+                        Delete
+                    </button>
+                {% endif %}
+            </center>
+            </td>
+            <td>
+            <div class="dropdown">
+                <button
+                style="margin: 0px"
+                class="btn dropdown-toggle btn-select-option"
+                type="button"
+                data-toggle="dropdown"
+                aria-expanded="true"
+                >
+                <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
+                </button>
+                <ul class="dropdown-menu options-dropdown" :id="'status-ul'+goal.id">
+                <div class="dropdown-div-menu" v-if="goal.today_status == '' || goal.today_status == 'None'">
+                    <li :id="'succeed'+goal.id">
+                        <a href="javascript:void(0)" @click="UserGoalLog(goal.id,'Completed', 'UserGoal')"
+                        ><i class="fa fa-check" aria-hidden="true"></i>Complete</a
+                        >
+                    </li>
+                    <li :id="'skip'+goal.id">
+                        <a href="javascript:void(0)" @click="UserGoalLog(goal.id,'Skipped', 'UserGoal')"
+                        ><i class="fa fa-arrow-right"></i>Skip</a
+                        >
+                    </li>
+                    <li :id="'fail'+goal.id">
+                        <a href="javascript:void(0)" @click="UserGoalLog(goal.id,'Failed', 'UserGoal')"
+                        ><i class="fa fa-times" aria-hidden="true"></i
+                        >Fail</a
+                        >
+                    </li>
+                </div>
+                <div v-else class="dropdown-div-menu">
+                    <li :id="'succeed'+goal.id" v-if="goal.today_status == 'Completed'">
+                    <a href="javascript:void(0)" data-id="goal.id"
+                        ><i class="fa fa-check" aria-hidden="true"></i> Completed</a
+                    >
+                    </li>  
+                    <li :id="'skip'+goal.id" v-else-if="goal.today_status == 'Skipped'">
+                    <a href="javascript:void(0)" data-id="goal.id"
+                        ><i class="fa fa-arrow-right" aria-hidden="true"></i> Skipped</a
+                    >
+                    </li>
+                    <li :id="'fail'+goal.id" v-else>
+                    <a href="javascript:void(0)" data-id="goal.id"
+                        ><i class="fa fa-times" aria-hidden="true"></i>
+                        Failed</a
+                    >
+                    </li>
+                </div>
+                <li>
+                    <a
+                    :href="'/leaderboard/user-goal-progress/'+goal.id"
+                    ><i class="fa fa-eye option-icon"></i>View Progress</a
+                    >
+                </li>
+                </ul>
+            </div>
+            </td>
+        </tr>
+        </table>
+    </div>
+    <!-- /.box-body -->
+</div>
+
+<div class="modal fade" id="goal-modal" style="display: none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+        <form id="Content_form" @submit.prevent="onCreateEditGoal">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span></button>
+            <h4 class="modal-title"><span v-if="goal_id_val">Edit</span><span v-else>Create</span> Goal</h4>
+        </div>
+        <div class="modal-body">
+            <input v-model="goal_id_val" type="hidden"/>
+            <div class="form-group">
+            <label for="heading" class="col-sm-2 control-label">Heading</label>
+                <input type="text" class="form-control" id="heading" list="heading_list" name="heading" v-model="heading" placeholder="Heading" required/>
+                {% comment %} <datalist id="heading_list">
+                <option value=''>Select</option>
+                {% for data in request.user|get_suggestion_goals %}
+                    <option  value="{{data.heading}}">{{data.heading}}</option>
+                {% endfor %}
+                </datalist> {% endcomment %}
+            </div>
+            <div class="form-group">
+            <label for="category" class="col-sm-2 control-label">Category</label>
+            <select class="form-control select2" name="category" id='category' ref="category" style="width: 100%;">
+                <option selected="selected" value="Gain Clarity" :selected="category_val == 'Gain Clarity'">Gain Clarity</option>
+                <option value="Health" :selected="category_val == 'Health'">Health</option>
+                <option value="Learn" :selected="category_val == 'Learn'">Learn</option>
+                <option value="Follow Through" :selected="category_val == 'Follow Through'">Follow Through</option>
+            </select>
+            </div>
+            <div class="form-group">
+            <label for="description" class="col-sm-2 control-label">Description</label>
+                <input type="text" class="form-control" id="description" name="description" v-model="description" placeholder="Description" required/>
+            </div>
+            <div class="form-group">
+            <label for="duration" class="col-md-12 control-label">Duration</label>
+                <div class="row">
+                <div class="col-md-6">
+                    <input type="number" class="form-control" id="duration_number" name="duration_number" v-model="duration_number" min="1" max="100" required/>
+                </div>
+                <div class="col-md-6">
+                    <select class="form-control select2" name="duration_time" id='duration_time' ref="duration_time" style="width: 100%;">
+                    <option selected="selected" value="Mins" :selected="duration_time_val == 'Mins'">Mins</option>
+                    <option value="Times" :selected="duration_time_val == 'Times'">Times</option>
+                    </select>
+                </div>
+                </div>
+            </div>
+            <div class="form-group">
+            <label for="frequency" class="col-sm-2 control-label">Frequency</label>
+            <select class="form-control select2" name="frequency" id='frequency' ref="frequency" style="width: 100%;">
+                <option selected="selected" value="Daily" :selected="frequency_val == 'Mins'">Daily</option>
+                <option value="Weekly" :selected="frequency_val == 'Weekly'">Weekly</option>
+                <option value="Monthly" :selected="frequency_val == 'Monthly'">Monthly</option>
+            </select>
+            </div>
+            <div class="form-group">
+            <label for="priority" class="col-sm-2 control-label">Priority</label>
+            <select class="form-control select2" name="priority" id='priority' ref="priority" style="width: 100%;">
+                <option value="High" :selected="priority_val == 'High'">High</option>
+                <option value="Medium" :selected="priority_val == 'Medium'">Medium</option>
+                <option value="Low" :selected="priority_val == 'Low'">Low</option>
+            </select>
+            </div>
+                
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+            <button type="submit" id="submitButton" class="btn btn-primary">Save changes</button>
+
+        </div>
+        </form>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>

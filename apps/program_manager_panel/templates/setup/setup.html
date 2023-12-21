@@ -1,0 +1,1266 @@
+{% extends 'base.html' %} {% load static %} 
+{% block title %} Setup {% endblock %} 
+{% load crispy_forms_tags %}
+{% load tags %}
+{% block css %} 
+<link
+    rel="stylesheet"
+    href="{% static 'css/program_manager/program_manager.css' %}"
+/>
+<style>
+    .capitalize {
+      text-transform: capitalize;
+    }
+  </style>
+{% endblock css %} {% block content %}
+<div class="content-wrapper" id="vue-app">
+  <div :class="'alert alert-dismissible '+[[alert_class]]" v-if="alert_msg" style="margin:10px;">
+    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+    <h4 style="margin-top:10px;"><i class="icon fa fa-warning"></i> Alert!</h4>
+    <a href="/manager/billing">[[alert_msg]]</a>
+  </div>
+  <section class="content-header">
+    <h1>Setup</h1>
+  </section>
+  <section class="content">
+    <div class="row">
+      {% comment %} <div class="col-md-2">
+        <div class="small-box box-tab" style="border-top: 5px solid #1B74E4;" @click="showJourney()" id="journey">
+          <div class="inner">
+            <h4>Journey</h4>
+          </div>
+        </div>
+      </div> {% endcomment %}
+      <div class="col-md-2">
+        <div class="small-box box-tab" @click="showPairing()" id="pairing" style="border-top: 5px solid #1B74E4;">
+          <div class="inner">
+            <h4>Pairing</h4>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <div class="small-box box-tab" @click="showSetupJourney()" id="setup-journey">
+          <div class="inner">
+            <h4>Journey</h4>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <div class="small-box box-tab" @click="showSignup()" id="signup">
+          <div class="inner">
+            <h4>Journey Page Setup</h4>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-2">
+        <div class="small-box box-tab" @click="showCommunity()" id="community">
+          <div class="inner">
+            <h4>Community</h4>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <div class="small-box box-tab" @click="showGamification()" id="gamification">
+          <div class="inner">
+            <h4>Gamification</h4>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <div class="small-box box-tab" @click="showCapacityRatio()" id="capacity-ratio">
+          <div class="inner">
+            <h4>Capacity Ratio Setup</h4>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <div class="small-box box-tab" @click="showMsgScheduler()" id="msg-scheduler">
+          <div class="inner">
+            <h4>Message Scheduler</h4>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <div class="small-box box-tab" @click="showFeedback()" id="feedback">
+          <div class="inner">
+            <h4>Feedback Template</h4>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div v-if="displaySignup">
+    {% include 'setup/signup.html' %}
+    </div>
+    {% comment %} <div v-if="displayJourney">
+    {% include 'setup/journey.html' %}
+    </div> {% endcomment %}
+    <div v-if="displayPairing">
+    {% include 'setup/pairing.html' %}
+    </div>
+    <div v-if="displayCommunity">
+    {% include 'setup/community.html' %}
+    </div>
+    <div v-if="displayGamification">
+    {% include 'setup/gamification.html' %}
+    </div>
+    <div v-if="displayCapacityRatio">
+    {% include 'setup/capacity_ratio_setup.html' %}
+    </div>
+    <div v-if="displaySetupJourney">
+    {% include 'setup/setup_journey.html' %}
+    </div>
+    <div v-if="displayMsgScheduler">
+    {% include 'setup/msg_scheduler.html' %}
+    </div>
+    <div v-if="displayFeedback">
+    {% include 'setup/feedback_template.html' %}
+    </div>
+  </section>
+  {{ request.user.id|json_script:"user_id" }}
+  {{request.session.token|json_script:"token"}}
+  {{request.session.company_id|json_script:"company_id"}}
+  {{request.session.company_name|json_script:"company_name"}}
+</div>
+<div class="modal fade" id="modal-skill-journey" style="display: none;">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form id="skill_journey_form">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">×</span></button>
+        <h4 class="modal-title">Save As</h4>
+      </div>
+      <div class="modal-body">
+          <input name="id" id="skill_journey_id" type="hidden" value=""/>
+          <div class="form-group">
+            <label>Journey Name</label>
+            <input type="text" class="form-control"  name="journey" id="skill_journey" required>
+          </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+        <button type="submit" id="replicateSkillChannel" class="btn btn-primary">Save changes</button>
+      </div>
+      </form>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div> 
+<div class="modal fade" id="modal-default" style="display: none;">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form id="journey_form">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span></button>
+          <h4 class="modal-title">Save As</h4>
+        </div>
+        <div class="modal-body">
+            <input name="id" id="journey_id" type="hidden" value=""/>
+            <div class="form-group">
+              <label>Journey Name</label>
+              <input type="text" class="form-control"  name="journey" id="journey" required>
+            </div>
+            <div class="form-group">
+              <input type="checkbox" class="form-check-input"  name="is_lite_signup_enable" id="is_lite_signup_enable" value="">
+              <label for="is_lite_signup_enable">Is lite signup enable</label>
+            </div>
+            <div class="form-group">
+              <input type="checkbox" class="form-check-input"  name="add_to_community" id="add_to_community" value="">
+              <label for="add_to_community">Add to community</label>
+            </div>
+            <div class="form-group">
+              <input type="checkbox" class="form-check-input"  name="show_on_website" id="show_on_website" value="">
+              <label for="show_on_website">Show on website</label>
+            </div>
+            <div class="form-group">
+              <input type="checkbox" class="form-check-input"  name="is_wp_required" id="is_wp_required" value="">
+              <label for="is_wp_required">Whatsapp notification required</label>
+            </div>
+            <div class="form-group">
+              <input type="checkbox" class="form-check-input"  name="profile_assessment" id="profile_assessment" value="">
+              <label for="profile_assessment">Replicate profile assessment</label>
+            </div>
+            <div class="form-group">
+              <input type="checkbox" class="form-check-input"  name="replicate_content" id="replicate_content" value="">
+              <label for="replicate_content">Replicate Content</label>
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+          <button type="submit" id="sumbitChannel" class="btn btn-primary">Save changes</button>
+        </div>
+      </form>
+      </div>
+      <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+  </div> 
+</div>
+{% endblock content %} {% block js %} 
+<script src="{% static 'bower_components/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
+<script type="text/javascript">
+  $(function () {
+    $("#replicateSkillChannel").on('click', function (event) {
+      var id = document.getElementById('skill_journey_id').value;
+      console.log("id ", id);
+      journey = $('#skill_journey').val();
+      console.log("journey ", journey);
+      var data = {
+        pk: id,
+        journey: journey,
+        csrfmiddlewaretoken : "{{csrf_token}}"
+      }
+      console.log("Data", data)
+      if (journey){
+        $.ajax({
+          url:  "{% url 'content:copy_skill_journey_data' %}",
+          type: 'post',
+          data: data,
+          error: function() {
+            bootbox.alert('Something is wrong');
+          },
+          success: function(data) {
+            if (data.success){
+            bootbox.alert(data.message);
+            window.location.reload();
+            }
+            else {
+              bootbox.alert(data.message);
+              window.location.reload();
+            }  
+          }
+        });
+      }
+      else {
+        bootbox.alert("Please specify new journey name");
+      }
+      event.preventDefault();
+    });
+  });
+  $(function () {
+    $("#sumbitChannel").on('click', function (event) {
+      var id = document.getElementById('journey_id').value;
+      console.log("id ", id);
+      journey = $('#journey').val();
+      console.log("journey ", journey);
+      var data = {
+        pk: document.getElementById('journey_id').value,
+        journey: $('#journey').val(),
+        is_lite_signup_enable: document.getElementById('is_lite_signup_enable').checked,
+        add_to_community: document.getElementById('add_to_community').checked,
+        show_on_website: document.getElementById('show_on_website').checked,
+        is_wp_required: document.getElementById('is_wp_required').checked,
+        profile_assessment: document.getElementById('profile_assessment').checked,
+        replicate_content: document.getElementById('replicate_content').checked,
+        csrfmiddlewaretoken : "{{csrf_token}}"
+      }
+      console.log("Data", data)
+      if (journey){
+        $.ajax({
+          url:  "{% url 'content:copy_journey_data' %}",
+          type: 'post',
+          data: data,
+          error: function() {
+            bootbox.alert('Something is wrong');
+          },
+          success: function(data) {
+            if (data.success){
+            bootbox.alert(data.message);
+            window.location.reload();
+            }
+            else {
+              bootbox.alert(data.message);
+              window.location.reload();
+            }  
+          }
+        });
+      }
+      else {
+        bootbox.alert("Please specify new journey name");
+      }
+      event.preventDefault();
+    });
+  });
+
+  const app = new Vue({
+    el: "#vue-app",
+    delimiters: ['[[', ']]'],
+    data() {
+      return {
+        displaySignup: false,
+        displayJourney: true,
+        displayPairing: true,
+        displayCommunity: false,
+        displayGamification: false,
+        displayCapacityRatio: false,
+        displaySetupJourney: false,
+        displayPoolSetup: false,
+        displayPoolAllocation: false,
+        displayBadges:false,
+        displayPoints:false,
+        displayCreateCapacity:false,
+        displayListCapacity:false,
+        displayCreateMsgScheduler:false,
+        displayListMsgScheduler:false,
+        displayFeedback:false,
+        title:"",
+        journey_list:"",
+        company_list:"",
+        is_active:true,
+        tag_list:"",
+        industry_list:"",
+        token:JSON.parse(document.getElementById('token').textContent),
+        user_id: JSON.parse(document.getElementById('user_id').textContent),
+        auth:"",
+        pool_setup_list:"",
+        selected_industry:[],
+        selected_tags:[],
+        displaySpace:"",
+        displaySpaceGroup:"",
+        description:"",
+        non_members_hidden:"",
+        is_hidden:"",
+        image:"",
+        space_group_list:"",
+        space_list:"",
+        journey_setup_list:"",
+        point_list:"",
+        points:"",
+        label:"",
+        badge_list:"",
+        badge_for:"",
+        subscription_list:"",
+        max_mentor:"",
+        max_mentees:"",
+        mentees_per_mentor:"",
+        capicity_ratio_list:"",
+        tab_name: "",
+        pool_allocation_list:"",
+        base_url:window.location.origin,
+        pool_allocation_length:"",
+        check_pool_allocation_list:[],
+        mentor_id:"",
+        mentor_name:"",
+        alert_msg:"",
+        alert_class:"",
+        setup_journey_list:"",
+        msg_scheduler_list:"",
+        displayMsgScheduler:false,
+        scheduler_time:"",
+        scheduler_day:"",
+        receiver:"",
+        receiver_platform:"",
+        scheduler_type:"",
+        receiver_list:"",
+        message:"",
+        scheduler_title:"",
+        start_date:"",
+        end_date:"",
+        user_company_name: JSON.parse(document.getElementById('company_name').textContent),
+        user_company_id: JSON.parse(document.getElementById('company_id').textContent),
+        journal_list:"",
+        feedback_list:""
+      };
+    },
+    mounted(){
+      this.showPoolSetup();
+      this.showAlert();
+    },
+    methods: {
+      axiosGetRequest: function(url){
+        this.auth = "Token "+this.token;
+        var config = {
+          method: "get",
+          url: url,
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': this.auth,
+          },
+        };
+        return axios(config)
+      },
+      axiosPostRequest: function(url, data){
+        this.auth = "Token "+this.token;
+        var config = {
+          method: "post",
+          url: url,
+          headers: {
+            "Content-Type": "multipart/form-data",
+            "Accept": "application/json",
+            'Authorization': this.auth,
+          },
+          data:data
+        };
+
+        return axios(config)
+      },
+      async showAlert(){
+        var url = this.base_url+"/manager/check-for-subscription/"+this.user_id+"/";
+        response = await this.axiosGetRequest(url);
+        console.log("Alert response", response.data)
+        if(response.data.message != "No alert available"){
+          this.alert_msg = response.data.message
+          this.alert_class = response.data.css_class
+        }
+      },
+      sleep: function(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+      },
+       async initializeDataTable(id){
+        //await this.destroyDataTable(this.tab_name)
+        //this.tab_name = id
+        //console.log("initializing", id);
+        await this.sleep(2000);
+        $(id).DataTable({
+          "dom": '<"table-pull-left"f><"table-pull-right"l>tip',
+          'destroy': true,
+          'paging'      : true,
+          'lengthChange': true,
+          'searching'   : true,
+          'ordering'    : true,
+          'info'        : true,
+         'autoWidth'   : false,
+         'retrieve':true,
+         'scrollX': true,
+        })
+      },
+      async destroyDataTable(id){
+        if($(id).DataTable()){
+          //console.log("destroying", id);
+          $(id).DataTable().clear();
+          $(id).DataTable().destroy();
+        }
+      },
+      async onCreatePoolSetup(){
+        for (let option of document.getElementById('tags').options)
+          {
+            if (option.selected) {
+                this.selected_tags.push(option.value);
+            }
+          }
+          for (let option of document.getElementById('industry').options)
+          {
+            if (option.selected) {
+                this.selected_industry.push(option.value);
+            }
+          }
+        var data = new FormData();
+        data.append("name", this.title);
+        data.append("journey", this.$refs.journey.value);
+        //data.append("company", this.$refs.company.value);
+        data.append("company", this.user_company_id);
+        data.append("pool_by", this.$refs.pool_by.value);
+        data.append("tags", this.selected_tags);
+        data.append("industry", this.selected_industry);
+        if(this.is_active){
+          data.append("is_active", this.is_active);
+        }
+        else{
+          data.append("is_active", false);
+        }
+        
+        var url =  this.base_url+"/manager/pool-setup/"+this.user_id+"/";
+
+        try{
+          response = await this.axiosPostRequest(url, data);
+          console.log("Pool Setup Response", response.data);
+          bootbox.alert(response.data.message);
+        }
+        catch(err){
+          console.log("error", err);
+          bootbox.alert(err.response.data.message);
+        }
+        await this.destroyDataTable('#pool-setup-table');
+        await this.showPoolSetup()
+      },
+      async onCapacityRatioSetup(){
+        
+        var data = new FormData();
+        if (this.$refs.subscription.value == "Select") {
+          bootbox.alert("Subscription field should not be empty");
+        } else {
+        data.append("subscription_id", this.$refs.subscription.value);
+        data.append("max_mentor", this.max_mentor);
+        data.append("max_learner", this.max_mentees);
+        data.append("learners_per_mentor", this.mentees_per_mentor);
+        
+        var url =  this.base_url+"/manager/mentor-mentee-ratio/"+this.user_id+"/";
+        try{
+          response = await this.axiosPostRequest(url, data);
+          console.log("Capacity ratio Setup Response", response.data);
+          this.mentees_per_mentor = response.data.default_ratio
+          bootbox.alert(response.data.message);
+        }
+        catch(err){
+          console.log("error", err);
+          bootbox.alert(err.response.data.message);
+        }
+        await this.destroyDataTable("#capacity-ratio-table");
+        this.showCapacityRatio()
+        }
+      },
+      async onCreateMsgScheduler(){
+        //console.log("data",this.user_company_id,"23", this.$refs.journey.value,"23d",this.$refs.scheduler_day.value,"23ds", this.scheduler_time,this.$refs.receiver.value, this.message, this.user_id )
+        var data = new FormData();
+
+        data.append("company", this.user_company_id);
+        if(this.$refs.journey.value != "select"){
+          data.append("journey_id", this.$refs.journey.value);
+          data.append("journal_id", this.$refs.journal.value);
+        }
+        data.append("scheduler_day", this.$refs.scheduler_day.value);
+        data.append("scheduler_time", this.scheduler_time);
+        data.append("start_date", this.start_date)
+        data.append("end_date", this.end_date)
+        data.append("title", this.scheduler_title)
+        data.append("receiver", this.$refs.receiver.value);
+        data.append("receiver_platform", this.$refs.receiver_platform.value);
+        data.append("scheduler_type", this.$refs.scheduler_type.value);
+        data.append("message", "Test");
+        data.append("created_by", this.user_id);
+
+        
+        var url =  this.base_url+"/manager/message-scheduler/"+this.user_id+"/";
+        try{
+          response = await this.axiosPostRequest(url, data);
+          console.log("Create Message Scheduler Response", response.data);
+          bootbox.alert(response.data.message);
+        }
+        catch(err){
+          console.log("error", err);
+          bootbox.alert(err.response.data.message);
+        }
+        await this.destroyDataTable("#msg-scheduler-table");
+        document.getElementById('msg-scheduler-form').reset()
+      },
+      getId(id, type){
+        console.log(id)
+        document.getElementById("skill_journey_id").value = id
+        if(type == 'MentoringJourney'){
+          document.getElementById("journey_id").value = id
+        }
+      },
+      async onCreatePoints(){
+        
+        var data = new FormData();
+        data.append("name", this.title);
+        data.append("label", this.label);
+        data.append("points", this.points);
+        data.append("comment", this.description);
+        
+        var url =  this.base_url+"/manager/all-points/"+this.user_id+"/";
+
+        try{
+          response = await this.axiosPostRequest(url, data);
+          console.log("Create Points Response", response.data);
+          bootbox.alert(response.data.message);
+        }
+        catch(err){
+          console.log("error", err);
+          bootbox.alert(err.response.data.message);
+        }
+        this.showPoints();
+      },
+      async onCreateBadge(){
+        
+        var data = new FormData();
+        data.append("name", this.title);
+        data.append("points_required", this.points);
+        data.append("description", this.description);
+        data.append("image", this.image);
+        data.append("badge_for", this.$refs.badge_for.value);
+        data.append("is_active", true);
+        
+        var url =  this.base_url+"/manager/all-badges/"+this.user_id+"/";
+        
+        try{
+          response = await this.axiosPostRequest(url, data);
+          console.log("Create badge Response", response.data);
+          bootbox.alert(response.data.message);
+        }
+        catch(err){
+          console.log("error", err);
+          bootbox.alert(err.response.data.message);
+        }
+        this.showBadges();
+      },
+      addStyleLeft(id){
+        ele = document.getElementById(id)
+        ele.style.borderLeft = "5px solid #1B74E4";
+      },
+      removeStyleLeft(id){
+        ele = document.getElementById('pool-allocation')
+        ele.style.borderLeft = "none";
+      },
+      async showPoolSetup(){
+        this.pool_setup_list = ""
+        this.journey_list = ""
+        this.tag_list = ""
+        this.industry_list = ""
+        await this.destroyDataTable('#pool-allocation-table')
+        
+        this.addStyleLeft('pool-setup')
+        this.removeStyleLeft('pool-allocation')
+        this.displayPoolSetup = true;
+        this.displayPoolAllocation = false;
+
+        var url = this.base_url+"/manager/pool-setup/"+this.user_id+"/";
+        let response = await this.axiosGetRequest(url);
+        console.log("Pool Setup list response", response.data)
+        this.pool_setup_list = response.data.data
+        console.log("pool setup list", this.pool_setup_list);
+
+        /*var url = this.base_url+"/manager/program-data-list/"+this.user_id+"/";
+        response = await this.axiosGetRequest(url);
+        console.log("Company list Response", response.data);
+        this.company_list = response.data.company_list*/
+
+        var url =  this.base_url+"/manager/journey-list/"+this.user_id+"/?company_id="+this.user_company_id;
+        response = await this.axiosGetRequest(url);
+        console.log("Journey list Response", response.data);
+        this.journey_list = response.data.data
+
+        var url =  this.base_url+"/manager/tags/"+this.user_id+"/";
+        response = await this.axiosGetRequest(url);
+        console.log("Tag list Response", response.data);
+        this.tag_list = response.data.data
+
+        var url =  this.base_url+"/manager/industry/"+this.user_id+"/";
+        response = await this.axiosGetRequest(url);
+        console.log("Industry list Response", response.data);
+        this.industry_list = response.data.data
+        //await this.sleep(2000);
+        await this.initializeDataTable('#pool-setup-table')
+      },
+      async showPoolAllocation(){
+        this.pool_allocation_list = ""
+        this.pool_allocation_length = ""
+        await this.destroyDataTable('#pool-setup-table')
+        ele = document.getElementById('pool-allocation')
+        ele.style.borderLeft = "5px solid #1B74E4";
+        ele = document.getElementById('pool-setup')
+        ele.style.borderLeft = "none";
+        this.displayPoolSetup = false;
+        this.displayPoolAllocation = true;
+
+        var url = this.base_url+"/manager/pool-allocation/"+this.user_id+"/";
+        let response = await this.axiosGetRequest(url);
+        console.log("Pool Allocation list response", response.data)
+        this.pool_allocation_list = response.data.data
+        this.pool_allocation_length = response.data.data.length
+
+        await this.initializeDataTable('#pool-allocation-table')
+      },
+      addImage(event){
+        console.log("image", event.target.files[0]);
+        this.image = event.target.files[0]
+      },
+      async onCreateSpaceGroup(){
+        
+        var data = new FormData();
+        data.append("title", this.title);
+        data.append("description", this.description);
+        data.append("cover_image", this.image);
+        data.append("privacy", this.$refs.privacy.value);
+        data.append("user_id", this.user_id);
+        if(this.non_members_hidden){
+          data.append("hidden_from_non_members", this.non_members_hidden);
+        }
+        else{
+          data.append("hidden_from_non_members", false);
+        }
+        if(this.is_hidden){
+          data.append("is_hidden", this.is_hidden);
+        }
+        else{
+          data.append("is_hidden", false);
+        }
+        if(this.is_active){
+          data.append("is_active", this.is_active);
+        }
+        else{
+          data.append("is_active", false);
+        }
+        
+        var url =  this.base_url+"/atpace-community/all-groups/?user_id="+this.user_id;
+
+        try{
+          response = await this.axiosPostRequest(url, data);
+          console.log("Space Group Response", response.data);
+          bootbox.alert(response.data.message);
+        }
+        catch(err){
+          console.log("error", err);
+          bootbox.alert(err.response.data.message);
+        }
+        this.showSpaceGroup()
+      },
+      getCheckbox(id){
+        console.log("hey", id)
+      },
+      updateMentorPool(mentor_id, mentor_name, checked_pool){
+        //console.log("mentor_id, mentor_name", mentor_id, mentor_name, checked_pool);
+        this.mentor_id = mentor_id;
+        this.mentor_name = mentor_name;
+        var pool = this.pool_setup_list;
+        for(let i=0; i<pool.length; i++){
+          //console.log("pools", this.$refs['chkbox_'+pool[i].id])
+          if(this.$refs['chkbox_'+pool[i].id]){
+            this.$refs['chkbox_'+pool[i].id][0].checked = false
+          }
+        }
+        for(let i=0; i<checked_pool.length; i++){
+          //console.log("checked pools", this.$refs['chkbox_'+checked_pool[i].pool_id])
+          if(this.$refs['chkbox_'+checked_pool[i].pool_id]){
+            this.$refs['chkbox_'+checked_pool[i].pool_id][0].checked = true
+          }
+        }
+      },
+      async onUpdateMentorPool(){
+        console.log("mentor_id", this.mentor_id);
+        //console.log("", this.$refs['mentor_checkbox_1'][0].checked, this.$refs.mentor_checkbox_1)
+        var pool = this.pool_setup_list;
+        var pool_selected = []
+        //console.log(pool, pool[0])
+        for(let i=0; i<pool.length; i++){
+          //console.log(pool[i])
+          if(this.$refs['chkbox_'+pool[i].id][0].checked){
+            pool_selected.push(this.$refs['chkbox_'+pool[i].id][0].value)
+          }
+        }
+        console.log("list", pool_selected)
+        
+        var data = new FormData();
+        data.append("mentor_id", this.mentor_id);
+        data.append("pool_id", pool_selected);
+
+        var url =  this.base_url+"/manager/update-mentor-pool/"+this.user_id+"/";
+
+        try{
+          response = await this.axiosPostRequest(url, data);
+          console.log("Update Pool Allocation Response", response.data);
+          bootbox.alert(response.data.message);
+        }
+        catch(err){
+          console.log("error", err);
+          bootbox.alert(err.response.data.message);
+        }
+        this.showPoolAllocation();
+      },
+      async onPoolAllocationMultiple(){
+        console.log("hello", this.$refs.select_pool.value);
+        console.log("hey", this.$refs['mentor_checkbox_1'][0].checked, this.$refs.mentor_checkbox_1)
+        for(var i=0; i<this.pool_allocation_length; i++){
+          console.log(this.$refs['mentor_checkbox_'+i][0].checked)
+          if(this.$refs['mentor_checkbox_'+i][0].checked){
+            this.check_pool_allocation_list.push(this.$refs['mentor_checkbox_'+i][0].value)
+          }
+        }
+        console.log("list", this.check_pool_allocation_list)
+        
+        var data = new FormData();
+        data.append("pool_id", this.$refs.select_pool.value);
+        data.append("mentor_id", this.check_pool_allocation_list);
+        
+
+        var url =  this.base_url+"/manager/add-mentor-pool/"+this.user_id+"/";
+
+        try{
+          response = await this.axiosPostRequest(url, data);
+          console.log("Add Mentor to Pool Response", response.data);
+          bootbox.alert(response.data.message);
+        }
+        catch(err){
+          console.log("error", err);
+          bootbox.alert(err.response.data.message);
+        }
+        this.showPoolAllocation();
+      },
+      async onCreateSpace(){
+        
+        var data = new FormData();
+        data.append("title", this.title);
+        data.append("description", this.description);
+        data.append("cover_image", this.image);
+        data.append("privacy", this.$refs.privacy.value);
+        data.append("user_id", this.user_id);
+        data.append("space_type", this.$refs.space_type.value);
+        data.append("space_group_id", this.$refs.space_group.value);
+        if(this.non_members_hidden){
+          data.append("hidden_from_non_members", this.non_members_hidden);
+        }
+        else{
+          data.append("hidden_from_non_members", false);
+        }
+        if(this.is_hidden){
+          data.append("is_hidden", this.is_hidden);
+        }
+        else{
+          data.append("is_hidden", false);
+        }
+        if(this.is_active){
+          data.append("is_active", this.is_active);
+        }
+        else{
+          data.append("is_active", false);
+        }
+        
+        var url =  this.base_url+"/atpace-community/all-space/?type=ProgramManager";
+
+        try{
+          response = await this.axiosPostRequest(url, data);
+          console.log("Create Space Response", response.data);
+          bootbox.alert(response.data.message);
+        }
+        catch(err){
+          console.log("error", err);
+          bootbox.alert(err.response.data.message);
+        }
+        this.showSpace()
+      },
+      async showSpaceGroup(){
+        await this.destroyDataTable("#space-table");
+        this.space_group_list = "";
+        ele = document.getElementById('space-group')
+        ele.style.borderLeft = "5px solid #1B74E4";
+        ele = document.getElementById('space')
+        ele.style.borderLeft = "none";
+        this.displaySpaceGroup = true;
+        this.displaySpace = false;
+
+        var url =  this.base_url+"/atpace-community/all-groups/?user_id="+this.user_id;
+        response = await this.axiosGetRequest(url);
+        console.log("Space Group list Response", response.data);
+        this.space_group_list = response.data.data.group_spaces
+
+        await this.initializeDataTable("#space-group-table");
+      },
+      async showSpace(){
+        await this.destroyDataTable("#space-group-table");
+        this.space_list = "";
+        this.space_group_list = ""
+        ele = document.getElementById('space')
+        ele.style.borderLeft = "5px solid #1B74E4";
+        ele = document.getElementById('space-group')
+        ele.style.borderLeft = "none";
+        this.displaySpaceGroup = false;
+        this.displaySpace = true;
+        var url = this.base_url+"/atpace-community/user-space/"+this.user_id+"/";
+        response = await this.axiosGetRequest(url);
+        console.log("Space list Response", response.data);
+        this.space_list = response.data.data.user_space
+
+        var url =  this.base_url+"/atpace-community/all-groups/?user_id="+this.user_id;
+        response = await this.axiosGetRequest(url);
+        console.log("Space Group list Response", response.data);
+        this.space_group_list = response.data.data.group_spaces
+        await this.initializeDataTable("#space-table");
+      },
+      async showPoints(){
+        await this.destroyDataTable("#badges-table");
+        this.point_list = ""
+        ele = document.getElementById('points')
+        ele.style.borderLeft = "5px solid #1B74E4";
+        ele = document.getElementById('badges')
+        ele.style.borderLeft = "none";
+        this.displayPoints = true;
+        this.displayBadges = false;
+
+        var url =  this.base_url+"/manager/all-points/"+this.user_id+"/";
+        response = await this.axiosGetRequest(url);
+        console.log("Points list Response", response.data);
+        this.point_list = response.data.data
+        await this.initializeDataTable("#points-table");
+      },
+      async showCreateCapacity(){
+        await this.destroyDataTable("#capacity-ratio-table");
+        ele = document.getElementById('createCapacity')
+        ele.style.borderLeft = "5px solid #1B74E4";
+        ele = document.getElementById('listCapacity')
+        ele.style.borderLeft = "none";
+        this.displayCreateCapacity = true;
+        this.displayListCapacity = false;
+
+//        var url =  this.base_url+"/manager/all-subscription/"+this.user_id+"/";
+//        response = await this.axiosGetRequest(url);
+//        console.log("Subscription list Response", response.data);
+//        this.subscription_list = response.data.data
+
+      },
+      async showCreateMsgScheduler(){
+        await this.destroyDataTable("#msg-scheduler-table");
+        this.journey_list = ""
+        ele = document.getElementById('createMsgScheduler')
+        ele.style.borderLeft = "5px solid #1B74E4";
+        ele = document.getElementById('listMsgScheduler')
+        ele.style.borderLeft = "none";
+        this.displayCreateMsgScheduler = true;
+        this.displayListMsgScheduler = false;
+
+        var url =  this.base_url+"/manager/journey-list/"+this.user_id+"/?journey_type=MentoringJourney&company_id="+this.user_company_id;
+        response = await this.axiosGetRequest(url);
+        console.log("Journey list Response", response.data);
+        this.journey_list = response.data.data
+
+      },
+      async showJournal(){
+        this.journal_list = ""
+        journey_id = this.$refs.journey.value
+        if(this.$refs.journey.value == "select"){
+          bootbox.alert("Please select journey")
+          return false
+        }
+        var url =  this.base_url+"/api/journey-journal/"+journey_id+"/";
+        response = await this.axiosGetRequest(url);
+        console.log("Journal list Response", response.data);
+        this.journal_list = response.data.data
+        if(this.journal_list.length==0){
+          bootbox.alert("No Journal available in this Journey")
+          return false
+        }
+
+      },
+      async showListCapacity(){
+        this.capicity_ratio_list = ""
+        ele = document.getElementById('listCapacity')
+        ele.style.borderLeft = "5px solid #1B74E4";
+        ele = document.getElementById('createCapacity')
+        ele.style.borderLeft = "none";
+        this.displayCreateCapacity = false;
+        this.displayListCapacity = true;
+        
+        var url =  this.base_url+"/manager/mentor-mentee-ratio/"+this.user_id+"/";
+        response = await this.axiosGetRequest(url);
+        console.log("Capacity list Response", response.data);
+        this.capicity_ratio_list = response.data.data
+
+        await this.initializeDataTable("#capacity-ratio-table");
+
+      },
+      async showListMsgScheduler(){
+        this.msg_scheduler_list = ""
+        ele = document.getElementById('listMsgScheduler')
+        ele.style.borderLeft = "5px solid #1B74E4";
+        ele = document.getElementById('createMsgScheduler')
+        ele.style.borderLeft = "none";
+        this.displayCreateMsgScheduler = false;
+        this.displayListMsgScheduler = true;
+        
+        var url = this.base_url+"/manager/message-scheduler/"+this.user_id+"/?company_id="+this.user_company_id;
+        let response = await this.axiosGetRequest(url);
+        console.log("Msg Scheduler List Response", response.data);
+        this.msg_scheduler_list = response.data.data
+
+        await this.initializeDataTable("#msg-scheduler-table");
+
+      },
+      async showBadges(){
+        await this.destroyDataTable("#badges-table");
+        this.badge_list = ""
+        ele = document.getElementById('badges')
+        ele.style.borderLeft = "5px solid #1B74E4";
+        ele = document.getElementById('points')
+        ele.style.borderLeft = "none";
+        this.displayPoints = false;
+        this.displayBadges = true;
+
+        var url =  this.base_url+"/manager/all-badges/"+this.user_id+"/";
+        response = await this.axiosGetRequest(url);
+        console.log("Badges list Response", response.data);
+        this.badge_list = response.data.data
+
+        await this.initializeDataTable("#badges-table");
+        
+      },
+      async removeSignup(){
+        ele = document.getElementById('signup')
+        this.displaySignup = false;
+        ele.style.borderTop = "none";
+        await this.destroyDataTable('#signup-table')
+      },
+      async removeFeedback(){
+        ele = document.getElementById('feedback')
+        this.displayFeedback = false;
+        ele.style.borderTop = "none";
+        await this.destroyDataTable('#feedback-table')
+      },
+      async removePairing(){
+        ele = document.getElementById('pairing')
+        this.displayPairing = false;
+        ele.style.borderTop = "none";
+        await this.destroyDataTable('#pool-allocation-table')
+        await this.destroyDataTable('#pool-setup-table')
+      },
+      removeCommunity: function(){
+        ele = document.getElementById('community')
+        this.displayCommunity = false;
+        ele.style.borderTop = "none";
+        ele = document.getElementById('space-group')
+        if(ele){
+          ele.style.borderLeft = "none";
+        }
+        ele = document.getElementById('space')
+        if(ele){
+          ele.style.borderLeft = "none";
+        }
+        this.displaySpaceGroup = false;
+        this.displaySpace = false;
+        this.destroyDataTable("#space-group-table");
+        this.destroyDataTable("#space-table");
+      },
+      removeGamification: function(){
+        ele = document.getElementById('gamification')
+        this.displayGamification = false;
+        ele.style.borderTop = "none";
+
+        ele = document.getElementById('points')
+        if(ele){
+          ele.style.borderLeft = "none";
+        }
+        ele = document.getElementById('badges')
+        if(ele){
+          ele.style.borderLeft = "none";
+        }
+        this.displayPoints = false;
+        this.displayBadges = false;
+        this.destroyDataTable("#points-table");
+        this.destroyDataTable("#badges-table");
+      },
+      async removeCapacityRatio(){
+        ele = document.getElementById('capacity-ratio')
+        this.displayCapacityRatio = false;
+        ele.style.borderTop = "none";
+        await this.destroyDataTable('#capacity-ratio-table')
+      },
+      async removeMsgScheduler(){
+        ele = document.getElementById('msg-scheduler')
+        this.displayMsgScheduler = false;
+        ele.style.borderTop = "none";
+        //await this.destroyDataTable('#capacity-ratio-table')
+      },
+      async removeSetupJourney(){
+        ele = document.getElementById('setup-journey')
+        this.displaySetupJourney = false;
+        ele.style.borderTop = "none";
+        await this.destroyDataTable('#setup-journey-table')
+      },
+      async showJourneyList(){
+        this.journey_list = ""
+        //console.log("journey list calling")
+        //this.company_id = this.$refs.company.value
+        this.company_id = this.user_company_id
+        var url =  this.base_url+"/manager/matching-data/"+this.user_id+"/?company_id="+this.company_id;
+        response = await this.axiosGetRequest(url);
+        console.log("Journey list Response", response.data);
+        this.journey_list = response.data.journey_list
+      },
+      async showSignup(){
+        this.journey_setup_list = ""
+        ele = document.getElementById('signup')
+        this.displaySignup = true;
+        ele.style.borderTop = "5px solid #1B74E4";
+        
+        this.removePairing();
+        this.removeCommunity();
+        this.removeGamification();
+        this.removeCapacityRatio();
+        this.removeSetupJourney();
+        this.removeMsgScheduler();
+        this.removeFeedback();
+
+        var url =  this.base_url+"/manager/journey-page-setup/"+this.user_id+"/";
+        response = await this.axiosGetRequest(url);
+        console.log("Journey Setup list Response", response.data);
+        this.journey_setup_list = response.data.data
+
+        await this.initializeDataTable('#signup-table')
+      },
+      showJourney: function(){
+        //ele = document.getElementById('journey')
+        //this.displayJourney = true;
+        //ele.style.borderTop = "5px solid #1B74E4";
+        this.removeSignup();
+        this.removePairing();
+        this.removeCommunity();
+        this.removeGamification();
+        this.removeCapacityRatio();
+        this.removeSetupJourney();
+        this.removeMsgScheduler();
+        this.removeFeedback();
+      },
+      showPairing: function(){
+        ele = document.getElementById('pairing')
+        this.displayPairing = true;
+        ele.style.borderTop = "5px solid #1B74E4";
+       
+        this.removeSignup();
+        this.removeCommunity();
+        this.removeGamification();
+        this.removeCapacityRatio();
+        this.removeSetupJourney();
+        this.showPoolSetup();
+        this.removeFeedback();
+      },
+      async showCommunity(){
+        ele = document.getElementById('community')
+        this.displayCommunity = true;
+        ele.style.borderTop = "5px solid #1B74E4";
+        this.removeSignup();
+        this.removePairing();
+        this.removeGamification();
+        this.removeCapacityRatio();
+        this.removeSetupJourney();
+        this.removeMsgScheduler();
+        this.removeFeedback();
+
+        await this.sleep(300);
+        await this.showSpaceGroup();
+
+      },
+      async showGamification(){
+        ele = document.getElementById('gamification')
+        this.displayGamification = true;
+        ele.style.borderTop = "5px solid #1B74E4";
+        this.removeSignup();
+        this.removePairing();
+        this.removeCommunity();
+        this.removeCapacityRatio();
+        this.removeSetupJourney();
+        this.removeMsgScheduler();
+        this.removeFeedback();
+
+        await this.sleep(300);
+        await this.showPoints();
+
+      },
+      async showCapacityRatio(){
+        this.subscription_list = ""
+        ele = document.getElementById('capacity-ratio')
+        this.capicity_ratio_list = "";
+        this.displayCapacityRatio = true;
+        ele.style.borderTop = "5px solid #1B74E4";
+        this.removeSignup();
+        this.removePairing();
+        this.removeCommunity();
+        this.removeGamification();
+        this.removeSetupJourney();
+        this.removeMsgScheduler();
+        this.removeFeedback();
+
+        var url = this.base_url+"/manager/company-subscription/"+this.user_id+"/"+this.user_company_id+"/";
+        let response = await this.axiosGetRequest(url);
+        console.log("On Company Response", response.data);
+        this.subscription_list = response.data.data
+        await this.sleep(300);
+        await this.showCreateCapacity();
+
+      },
+      async showMsgScheduler(){
+        ele = document.getElementById('msg-scheduler')
+        this.msg_scheduler_list = "";
+        this.displayMsgScheduler = true;
+        ele.style.borderTop = "5px solid #1B74E4";
+        this.removeSignup();
+        this.removePairing();
+        this.removeCommunity();
+        this.removeGamification();
+        this.removeSetupJourney();
+        this.removeCapacityRatio();
+        this.removeFeedback();
+
+        this.showCreateMsgScheduler();
+
+      },
+      async showFeedback(){
+        ele = document.getElementById('feedback')
+        this.feedback_list = "";
+        this.displayFeedback = true;
+        ele.style.borderTop = "5px solid #1B74E4";
+        this.removeSignup();
+        this.removePairing();
+        this.removeCommunity();
+        this.removeGamification();
+        this.removeSetupJourney();
+        this.removeCapacityRatio();
+        this.removeMsgScheduler();
+
+        var url = this.base_url+"/api/feedback-data/"+this.user_id+"/?company_id="+this.user_company_id;
+        let response = await this.axiosGetRequest(url);
+        console.log("Feedback Response", response.data);
+        this.feedback_list = response.data.data
+
+        await this.initializeDataTable("#feedback-table");
+      },
+      async onSelectSubscription(){
+        subscription = this.$refs.subscription.value
+        if (subscription == "Select") {
+          bootbox.alert("Subscription field should not be empty");
+        } else {
+
+        var url = this.base_url+"/manager/default-capacity-ratio/"+this.user_id+"/"+subscription+"/";
+        let response = await this.axiosGetRequest(url);
+        console.log("Default Capacity Ratio Response", response.data);
+        this.max_mentor = response.data.data.max_mentor
+        this.max_mentees = response.data.data.max_learner
+        this.mentees_per_mentor = response.data.data.learners_per_mentor
+        }
+      },
+      async onSelectCompany() {
+        //company = this.$refs.company.value
+        company = this.user_company_id
+        if (company == "Select") {
+          bootbox.alert("Company field should not be empty");
+        } else {
+        var url = this.base_url+"/manager/company-subscription/"+this.user_id+"/"+company+"/";
+        let response = await this.axiosGetRequest(url);
+        console.log("On Company Response", response.data);
+        this.subscription_list = response.data.data
+        }
+      },
+
+      async showSetupJourney(){
+        this.setup_journey_list = ""
+        ele = document.getElementById('setup-journey')
+        this.displaySetupJourney = true;
+        ele.style.borderTop = "5px solid #1B74E4";
+        this.removeSignup();
+        this.removePairing();
+        this.removeCommunity();
+        this.removeGamification();
+        this.removeCapacityRatio();
+        this.removeMsgScheduler();
+
+        var url = this.base_url+"/manager/my-journey-list/"+this.user_id+"/";
+        let response = await this.axiosGetRequest(url);
+        console.log("Setup Journey list Response", response.data);
+        this.setup_journey_list = response.data.data
+
+        await this.initializeDataTable("#setup-journey-table");
+      },
+      showReceiver(){
+        console.log("hii")
+        if(this.$refs.scheduler_type.value == 'Reminder_to_Journal'){
+          this.receiver_list = [
+            {"value": "Mentor", "title": "Mentor"},
+            {"value": "Mentee", "title": "Mentee"},
+            {"value": "Both", "title": "Mentor and Mentee"},
+          ]
+        }
+        else{
+          this.receiver_list = [
+            {"value": "Program Manager", "title": "Program Manager"},
+          ]
+        }
+        console.log("receiver", this.receiver_list)
+      }
+    }
+  });
+
+  
+</script>
+
+{% endblock js %}

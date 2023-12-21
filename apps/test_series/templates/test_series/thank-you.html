@@ -1,0 +1,45 @@
+{% extends 'base.html' %} {% block title %}Create User {% endblock %}
+ {% load crispy_forms_tags %} {% block content %}
+ <style>
+   .modal-footer{
+    display: grid ;
+    justify-content: center;
+  }
+  .modal-dialog{
+    margin-top: 25vh;
+  }
+ </style>
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      
+    </section>
+  
+    <!-- Main content -->
+    <div class="bootbox modal fade in" tabindex="-1" role="dialog" aria-hidden="true" style="display: block;">
+      <div class="modal-dialog">
+         <div class="modal-content">
+            <div class="modal-body">
+               <div class="bootbox-body">
+                  <div class="text-center pt-30 pb-20">
+                     <img src="/static/images/logo/logo.png" width="100">
+
+                     <h3 style="margin-top: 29px; margin-bottom: 0px;">All done</h3>
+                     <p style="padding:20px 0px;">Thanks for taking the Assessment.</p>
+                     {% if auto_check %}
+                        <p>Thank You, you have successfully completed the assessment</p>
+                        
+                     {% else %}
+                      <p>You will shortly receive an email confirmation at {{request.user.email}}</br>
+                        Please wait some time for our team to get back to you.</p>
+                     {% endif %}
+                  </div>                  
+               </div>
+            </div>
+            <div class="modal-footer"><a href="{% url 'content:browse_channel' %}"><button type="button" class="btn btn-primary pull-center bootbox-accept">Ok</button></a></div>
+         </div>
+      </div>
+   </div>    <!-- /.content -->
+  </div>
+  {% endblock content %}
+  

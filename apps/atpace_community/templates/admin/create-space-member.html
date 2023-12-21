@@ -1,0 +1,102 @@
+{% extends 'base.html' %} 
+{% load tags %} {% load static %}
+{% block title %}Create Space Member{% endblock %} 
+{% block content %}
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <h1>
+        Create Space Member
+        
+      </h1>
+      <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i>Space Member</a></li>
+        <li><a href="#">Create</a></li>
+      </ol>
+    </section>
+  
+    <!-- Main content -->
+    <section class="content">
+      {% include 'component/error_message.html' %}
+      <!-- Default box -->
+      <div class="box">
+        <div class="box-header with-border">
+          <h3 class="box-title">Create Space Member
+          </h3>
+        </div>
+        <div class="box-body">
+          <form method="post" action="" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="row">
+              <div class="col-md-12">
+                <div class="form-group">
+                  <label>Users</label>
+                  <select class="form-control" name="user" id="user" required multiple>
+                    <option selected value="">Select</option>
+                    {% for user in users %}
+                    <option value="{{user.pk}}">{{user.first_name}} {{user.last_name}}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>Space Group</label>
+                  <select class="form-control select2" name="space_group" id="space_group_id" required>
+                    {% for space_group in space_groups %}
+                    <option value="{{space_group.pk}}">{{space_group.title}}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+                <div class="form-group">
+                    <label>Spaces</label>
+                    <select class="form-control" name="space" id="space_id" required multiple>
+                      <option value=""></option>
+                    </select>
+                </div>
+                <div class="form-group">
+                  <label>User Type</label>
+                  <select class="form-control select2" name="user_type" id="user_type" required>
+                    <option value="Member">Member</option>
+                    <option value="Moderator">Moderator</option>
+                    <option value="Admin">Admin</option>
+                  </select>
+                </div>
+              </div>
+              <input type="submit" name="submit" value="Add" class="btn btn-primary" id="btnSubmit" style="margin-left:18px;">
+            </div>
+          </form>
+        </div>
+        <!-- /.box-body-->
+      </div>
+      <!-- /.box -->
+  
+    </section>
+    <!-- /.content -->
+  </div>
+  {% endblock content %}
+  {% block js %}
+  <script src="{% static 'bower_components/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+  <script src="{% static 'bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
+  <script>
+    document.getElementById('space_group_id').onchange = function(){
+      $("#space_id").empty();
+      $.ajax({
+          url:  "{% url 'atpace_community:get_spacegroup_space' %}",
+          type: 'GET',
+          data: {space_group: document.getElementById('space_group_id').value},
+          error: function(error) {
+            console.log("error", error)
+          },
+          success: function(data) {
+            console.log("data", data)
+            for(let i=0; i<data.space_list.length; i++){
+              var option = document.createElement("option");
+              option.text = data.space_list[i].title;
+              option.value = data.space_list[i].id;
+              var select = document.getElementById("space_id");
+              select.appendChild(option);
+            }
+          }
+      });
+    }
+  </script>
+  {% endblock js %}

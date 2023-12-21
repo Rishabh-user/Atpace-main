@@ -1,0 +1,28 @@
+{% load tags %}
+<h4 style="padding: 10px;">{{data.name}}</h4>
+<div class="box-header with-border">
+  <div class="user-block">
+    <img class="img-circle" src="{{request.user.avatar}}" alt="User Image">
+    <span class="username"><a href="#" style="color: black;">{{data.user_name}}</a></span>
+    <span class="description"> 
+     
+      {{ data.created_at }}
+     
+  </div>
+  <!-- /.user-block -->
+  
+  <!-- /.box-tools -->
+</div>
+<!-- /.box-header -->
+<div class="box-body">
+  <!-- post text -->
+  {% autoescape off %}
+    {{data.learning_journal}}
+    {% endautoescape %}
+  <!-- Social sharing buttons -->
+  <hr>
+  <!-- <button type="button" class="btn btn-default btn-xs"><i class="fa fa-share"></i> Share</button> -->
+  <!-- <button type="button" class="btn btn-default btn-xs"><i class="fa fa-thumbs-o-up"></i> Like</button>
+  <span class="pull-right text-muted">{% if data.likes_count != 0 %} {{data.likes_count}} {% endif %} likes -  comments({{data.comments_count}})</span> -->
+</div>
+<!-- /.box-body -->

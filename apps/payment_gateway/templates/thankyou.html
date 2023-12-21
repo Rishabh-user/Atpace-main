@@ -1,0 +1,50 @@
+{% extends 'full_base.html' %}
+{% load static %} {% load tags %}
+{% block css %} 
+  
+<style>
+  .img-cover {
+    height: 400px;
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+  }
+  .img-cover img {
+    position: absolute;
+    left: -1000%;
+    right: -1000%;
+    top: -1000%;
+    bottom: -1000%;
+    margin: auto;
+    /* min-height: 100%; */
+    min-width: 100%;
+  }
+  
+    </style>
+   
+
+    
+   {% endblock %}
+
+    {% block content %}
+
+      <div class="content-wrapper">
+        <section class="content-header text-center" style="padding: 120px 0;">
+            <img
+            class="lazy card_image"
+            src="{{image}}"
+            loading="lazy"
+            width="20%"
+            style="max-width: 20%; max-height: 10% padding-bottom:20px;"
+            />
+            <br>
+            <h1 style="padding-top:20px;">Payment is successful</h1>
+            <p>{{message}}</p>
+            <a href="{% url 'user:user-dashboard' %}" class="btn btn-primary">Go to dashboard</a>
+        </section>
+      </div>
+ 
+{% endblock content %} 
+
+  </body>
+</html>

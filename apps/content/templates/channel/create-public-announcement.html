@@ -1,0 +1,170 @@
+{% extends 'base.html' %} 
+{% load tags %} {% load static %}
+{% block title %}Create Public Announcement{% endblock %} 
+{% block content %}
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <h1>
+        Create Public Announcement
+        
+      </h1>
+      <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Public Announcement</a></li>
+        <li><a href="#">Create</a></li>
+      </ol>
+    </section>
+  
+    <!-- Main content -->
+    <section class="content">
+      {% include 'component/error_message.html' %}
+      <!-- Default box -->
+      <div class="box">
+        <div class="box-header with-border">
+          <h3 class="box-title">Create Public Announcement
+          </h3>
+        </div>
+        <div class="box-body">
+          <form method="post" action="" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="row">
+              <div class="col-md-12">
+                <div class="form-group">
+                  <label>Company</label>
+                  <select class="form-control" name="company" id="company" required>
+                    <option selected value="">Select</option>
+                    {% for company in request.user|all_company %}
+                    <option value="{{company.pk}}">{{company.name}}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>Journey</label>
+                  <select class="form-control select2" name="journey" id="journey" required>
+                    <option selected value="">Select</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                    <label>Announcement Type</label>
+                    <select class="form-control select2" name="type" id="type" required>
+                        <option selected value="">Select</option>
+                        {% for type in request.user|public_annouce_type %}
+                      <option value="{{type}}" {% if type == "Advertisement" %}disabled{% endif %}>{{type}}</option>
+                      {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group" id="data_id"></div>
+                <div class="form-group">
+                  <label>Topic</label>
+                  <input type="text" class="form-control"  name="topic" id="topic" required>
+                </div>
+                <div class="form-group">
+                  <label>Summary</label>
+                  <input type="text" class="form-control"  name="summary" id="summary" required>
+                </div>
+                <div class="form-group">
+                  <label>Cover Image</label>
+                  <input type="file" id="cover_image" name="cover_image" required>
+                </div>
+
+              </div>
+              <input type="submit" name="submit" value="Submit" class="btn btn-primary" id="btnSubmit" style="margin-left:18px;">
+            </div>
+          </form>
+        </div>
+        <!-- /.box-body-->
+      </div>
+      <!-- /.box -->
+  
+    </section>
+    <!-- /.content -->
+  </div>
+  {% endblock content %}
+  {% block js %}
+  <script src="{% static 'bower_components/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+  <script src="{% static 'bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
+  <script>
+    $("#company").change(function(){
+    console.log("company_id: ",$("#company").val())
+      var formData = {
+        company_id: $("#company").val(),
+        csrfmiddlewaretoken:"{{csrf_token}}"
+      };
+      $.ajax({
+        type: "POST",
+        url: '{% url "content:journey_list" %}',
+        data: formData,
+        encode: true,
+      }).done(function (data) {
+        $("#journey").empty();
+        $("#data_id").empty();
+        if(data){
+            console.log("data ",data.journey_list)
+            $.each(data.journey_list, function(key, value){ 
+                $("#journey").append("<option value=" + value['pk'] + ">" + value['name'] + "</option>");
+          });
+        }
+      })
+    });
+
+    $("#type").change(function(){
+        type = $("#type").val(),
+        journey_id = $("#journey").val(),
+        console.log("type: ",$("#type").val())
+        console.log("journey_id: ",$("#journey").val())
+          var formData = {
+            journey_id: $("#journey").val(),
+            csrfmiddlewaretoken:"{{csrf_token}}"
+          };
+          $.ajax({
+            type: "POST",
+            url: '{% url "content:journey_all_content" %}',
+            data: formData,
+            encode: true,
+          }).done(function (data) {
+            $("#data_id").empty();
+
+            if(data){
+                console.log("data ",data)
+                if(type == "Journey"){      
+                  $("#data_id").html('<input class="form-control select2" type="hidden" id="quest" name="topic_id" required style="width: 100%;" value="'+journey_id+'">')
+                  console.log(data);
+                  $.each(function(){ 
+                      $("#quest").append('<option value=' + value['id'] + '>' + value['title'] + '</option>');
+                });
+              }
+              else if(type == "MicroSkill"){      
+                  $("#data_id").html(' <div class="form-group"><label>Select Micro Skill</label><select class="form-control select2" id="quest" name="topic_id" required style="width: 100%;" ><option selected="selected" value="">Select</option></select></div>')
+                  console.log(data);
+                  $.each(data.content_list,function(key, value){ 
+                      $("#quest").append('<option value=' + value['id'] + '>' + value['title'] + '</option>');
+                });
+              }
+             else if(type == "Survey"){      
+                $("#data_id").html(' <div class="form-group"><label>Select Survey</label><select class="form-control select2" id="survey" name="topic_id" required style="width: 100%;" ><option selected="selected" value="">Select</option></select></div>')
+                console.log(data);
+                $.each(data.survey_list,function(key, value){ 
+                    $("#survey").append('<option value=' + value['id'] + '>' + value['title'] + '</option>');
+                });
+              }
+             else if(type == "ProfileAssessment"){      
+                  $("#data_id").html(' <div class="form-group"><label>Select ProfileAssessment</label><select class="form-control select2" id="assessment" name="topic_id" required style="width: 100%;"><option selected="selected"  value="">Select</option></select></div>')
+                  console.log(data);
+                  $.each(data.assessment_list,function(key, value){ 
+                      $("#assessment").append('<option value=' + value['id'] + '>' + value['title'] + '</option>');
+                  });
+                }
+             else if(type == "MentoringJournals"){      
+                $("#data_id").html(' <div class="form-group"><label>Select Mentoring Journal</label><select class="form-control select2" id="journal" name="topic_id" required style="width: 100%;" ><option selected="selected" value="">Select</option></select></div>')
+                console.log(data);
+                  $.each(data.journal_list,function(key, value){ 
+                  $("#journal").append('<option value=' + value['id'] + '>' + value['title'] + '</option>');
+              });
+            }
+
+            }
+          })
+        });
+    
+  </script>
+  {% endblock js %}

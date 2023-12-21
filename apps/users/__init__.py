@@ -1,0 +1,2 @@
+class UserTypes:
+    pass

@@ -1,0 +1,5 @@
+{% load static %} {% load tags %}
+<div class="course__description-list mb-45">
+  <h4>{% if order.type == "pdpa_label" %}{{order.data}}{% endif %}</h4>
+  {% if order.type == "pdpa_description" %}{{order.data|safe}}{% endif %}
+</div>

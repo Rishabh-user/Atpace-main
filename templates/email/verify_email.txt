@@ -1,0 +1,7 @@
+{% autoescape off %}
+Welcome to the AtPace Academy, {{ user.first_name }}!
+Please Verify your email to get verified.
+
+{{ protocol }}://{{ domain }}{% url 'user:verify_email' uidb64=uid token=token %}
+
+{% endautoescape %}

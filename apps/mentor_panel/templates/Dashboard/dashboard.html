@@ -1,0 +1,103 @@
+{% extends 'base.html' %} {% load static %} 
+{% block title %} Dashboard {% endblock %} 
+{% load tags %}
+{% block css %} 
+  <link
+          rel="stylesheet"
+          href="{% static 'css/program_manager/program_manager.css' %}"
+  />
+  <style>
+    .capitalize {
+      text-transform: capitalize;
+    }
+    /* Create an active/current tablink class */
+    .tab div div.active {
+      border-top: 5px solid #1B74E4;
+    }
+    /* Style the tab content */
+    .tab-content {
+      display: none;
+    }
+  </style>
+{% endblock css %} {% block content %}
+<div class="content-wrapper" id="vue-app">
+  <section class="content-header">
+    <h1>Dashboard</h1>
+  </section>
+  <section class="content">
+    <div class="row tab">
+      <div class="col-md-2">
+        <div class="small-box box-tab tab-links"  id="matrices-tab" @click="showTab('matrices')">
+          <div class="inner">
+            <h4>Metrices</h4>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <div class="small-box box-tab tab-links"  id="goals-tab" @click="showTab('goals')">
+          <div class="inner">
+            <h4>Goals</h4>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <div class="small-box box-tab tab-links"  id="journey-tab" @click="showTab('journey')">
+          <div class="inner">
+            <h4>Journey</h4>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <div class="small-box box-tab tab-links"  id="journey-progress-tab" @click="showTab('journey-progress')">
+          <div class="inner">
+            <h4>Journey Progress</h4>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="matrices-content" class="tab-content">
+    {% include 'Dashboard/matrices.html' %}
+    </div>
+    <div id="goals-content" class="tab-content">
+    {% include 'Dashboard/goals.html' %}
+    </div>
+    <div id="journey-content" class="tab-content">
+    {% include 'Dashboard/journey.html' %}
+    </div>
+    <div id="journey-progress-content" class="tab-content">
+    {% include 'Dashboard/journey_progress.html' %}
+    </div>
+  </section>
+  
+</div>
+{% endblock content %} {% block js %} 
+
+<script type="text/javascript">
+  let app = new Vue({
+    el: "#vue-app",
+    delimiters: ['[[', ']]'],
+    data() {
+      return {
+
+      };
+    },
+    methods: {
+        showTab(tabName){
+          var i, tabContent, tabLinks;
+          tabContent = document.getElementsByClassName("tab-content");
+          for (i = 0; i < tabContent.length; i++) {
+            tabContent[i].style.display = "none";
+          }
+          tabLinks = document.getElementsByClassName("tab-links");
+          for (i = 0; i < tabLinks.length; i++) {
+            tabLinks[i].className = tabLinks[i].className.replace(" active", "");
+          }
+          document.getElementById(tabName+'-content').style.display = "block";
+          document.getElementById(tabName+'-tab').classList.add("active");
+        },
+
+    }
+  });
+</script>
+
+{% endblock js %}

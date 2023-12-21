@@ -1,0 +1,30 @@
+<section class="section" id="{{forloop.counter}}">
+  <!-- <div class="content" style="width:100%"> -->
+  <div class="row">
+    <!-- <div class="col-md-12 "> -->
+    <div class="content_card pdf-content clearfix">
+      <div class="col-md-2 col-sm-2">
+        <i class="fa fa-link fa-4x"></i>
+      </div>
+      <div class="col-md-10 col-sm-10">
+        <h3>{{data.title}}</h3>
+        <p>{{data.data}}</p>
+        <p>
+          
+          <a {% if data.link_data.new_tab_open == "true" %} target="_blank" {% endif %} 
+            {% if data.link_data.link_type == "Internal" %}
+                href="{% url 'user:profile_assessment' pk=request.user.id %}"
+            {% else %}
+              href="{{data.link_data.external_redirection_page}}"
+            {% endif %}
+            ><button class="btn btn-primary go_back"  style="color: white">
+              Click Here
+            </button></a
+          >
+        </p>
+      </div>
+    </div>
+  </div>
+  <!-- </div> -->
+  <!-- </div> -->
+</section>

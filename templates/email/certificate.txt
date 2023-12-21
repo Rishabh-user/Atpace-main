@@ -1,0 +1,13 @@
+{% autoescape off %}
+
+Dear {{user_name}},
+
+Congratulations on completing {{journey}}! 🌟 Your hard work and dedication have paid off, and we are thrilled for your achievement!
+
+Embrace this success, and know that exciting opportunities lie ahead.
+
+Best wishes for a bright future!
+
+Regards Team AtPace.
+
+{% endautoescape %}

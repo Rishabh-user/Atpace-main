@@ -1,0 +1,135 @@
+{% extends 'base.html' %} 
+{% load tags %} {% load static %}
+{% block title %}Create Certificate Data{% endblock %} 
+{% block content %}
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <h1>
+        Create Certificate Data
+        
+      </h1>
+      <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i>Certificate</a></li>
+        <li><a href="#">Create</a></li>
+      </ol>
+    </section>
+  
+    <!-- Main content -->
+    <section class="content">
+      {% include 'component/error_message.html' %}
+      <!-- Default box -->
+      <div class="box">
+        <div class="box-header with-border">
+          <h3 class="box-title">Create Certificate Data
+          </h3>
+        </div>
+        <div class="box-body">
+          <form method="post" action="" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="row">
+              <div class="col-md-12">
+                <div class="form-group">
+                  <label>Company</label>
+                    <select class="form-control" name="company" id="company" required>
+                        {% for company in request.user|all_company %}
+                        <option value="{{company.pk}}" {% if certificate_data.journey.company.pk == company.pk %}selected{% endif %}>{{company.name}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                  <label>Journey</label>
+                  <select class="form-control" name="journey" id="journey" required>
+                    <option selected value="{{certificate_data.journey.pk}}">{{certificate_data.journey.title}}</option>
+                </select>
+                </div>
+                <div class="form-group" id="data_id"></div>
+                <div class="form-group">
+                  <label>Title</label>
+                  <input type="text" class="form-control"  name="title" id="title" value="{{certificate_data.title}}" required>
+                </div>
+                <div class="form-group">
+                    <label>Certificate_for</label>
+                    <input type="text" class="form-control"  name="Certificate_for" id="Certificate_for" value="{{certificate_data.Certificate_for}}" required>
+                </div>
+                <div class="form-group">
+                  <label>Certificate File</label><br>
+                  {% if certificate_data.file %}
+                  <input type="image" name="file" src="{{MEDIA_URL}}{{certificate_data.file}}" width="100px" required>
+                  {% endif %}
+                <input type="file" id="file" name="file">
+                </div>
+                <div class="form-group">
+                    <label>Role</label>
+                    <input type="text" class="form-control"  name="role" id="role" value="{{certificate_data.role}}" required>
+                </div>
+                <div class="row">
+                <div class="form-group col-md-6">
+                    <label>From Date</label>
+                    <input type="date" class="form-control"  name="from_date" id="from_date" value="{{from_date}}" required>
+                </div>
+                <div class="form-group col-md-6">
+                  <label>To Date</label>
+                  <input type="date" class="form-control"  name="till_date" id="till_date" value="{{till_date}}" required>
+              </div>
+            </div>
+              </div>
+              {% for authorizer in authorizers_data %}
+              <div id="authoriser_details">
+                <div class="form-group col-md-12">
+                  <label>Authorizer Name</label>
+                    <input type="text" class="form-control"  name="authorizer_name[]" id="authorizer_name" value="{{authorizer.name}}" required>
+                  </div>
+                  <div class="form-group col-md-12">
+                    <label>Authorizer Headline</label>
+                    <input type="text" class="form-control"  name="authorizer_headline[]" id="authorizer_headline" value="{{authorizer.headline}}" required>
+                  </div>
+                  <div class="form-group col-md-12">
+                    <label>Authorizer Signature </label><br>
+                    {% if authorizer.sign %}
+                    <input type="image" name="authorizer_sign[]" src="{{MEDIA_URL}}{{authorizer.sign}}" width="100px" required>
+                    {% endif %}
+                    <input type="file" id="authorizer_sign" name="authorizer_sign[]" >
+                  </div>
+              </div>
+              {% endfor %}
+              <input type="submit" name="submit" value="Submit" class="btn btn-primary" id="btnSubmit" style="margin-left:16px;">
+            </div>
+          </form>
+        </div>
+        <!-- /.box-body-->
+      </div>
+      <!-- /.box -->
+  
+    </section>
+    <!-- /.content -->
+  </div>
+  {% endblock content %}
+  {% block js %}
+  <script src="{% static 'bower_components/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+  <script src="{% static 'bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
+  <script>
+    $("#company").change(function(){
+    console.log("company_id: ",$("#company").val())
+      var formData = {
+        company_id: $("#company").val(),
+        csrfmiddlewaretoken:"{{csrf_token}}"
+      };
+      $.ajax({
+        type: "POST",
+        url: '{% url "content:journey_list" %}',
+        data: formData,
+        encode: true,
+      }).done(function (data) {
+        $("#journey").empty();
+        $("#data_id").empty();
+        if(data){
+            console.log("data ",data.journey_list)
+            $.each(data.journey_list, function(key, value){ 
+                $("#journey").append("<option value=" + value['pk'] + ">" + value['name'] + "</option>");
+          });
+        }
+      })
+    });
+</script>
+{% endblock js %}

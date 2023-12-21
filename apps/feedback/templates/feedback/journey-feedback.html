@@ -1,0 +1,371 @@
+{% extends 'base.html' %} 
+{% load tags %} 
+{% block title %}Create {% if request.path == '/user/create/' %} User  {% else %} Admin {% endif %} {% endblock %} 
+{% load crispy_forms_tags %} {% block content %}
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <h1>
+        Add Feedback To Journey
+      </h1>
+      {% comment %} <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Assessment Question</a></li>
+        <li><a href="#">Create</a></li>
+      </ol> {% endcomment %}
+    </section>
+  
+    <!-- Main content -->
+    <section class="content">
+      {% include 'component/error_message.html' %}
+      <!-- Default box -->
+      <div class="box">
+        <div class="box-header with-border">
+          <h3 class="box-title">Add Feedback To Journey
+          </h3>
+        </div>
+        <div class="box-body">
+          <form  id="create_assessment" method="POST" action="{% url 'feedback:add_journey_to_feedback' %}">
+            {% csrf_token %}
+            <div class="row">
+              <div class="col-md-12">
+                <div class="form-group">
+                  <label>Journey</label>
+                  <select class="form-control select2" name="journey" id="journey" onchange="journey_data()">
+                    <option selected value="">Select</option>
+                    {% for channel in request.user|all_mentoring_selfpaced_channel %}
+                      <option value="{{channel.pk}}" >{{channel.title}}</option>
+                    {% endfor %}
+                  </select>
+                </div><br>
+                 <div class="form-group" id="quest">
+                    <label>MicroSkill</label>
+                    <div class="row">
+                      <div class="col-md-6">
+                        <div class="form-group">
+                           <label>Select MicroSkill</label>
+                           <select class="form-control select2 quest_id"  id="quest" name="quest[]" required style="width: 100%;">
+                              <option selected="selected" value="">Select</option>
+                           </select>
+                        </div>
+                     </div>
+                     <div class="col-md-6">
+                        <div class="form-group">
+                           <label>Select Feedback Template</label>
+                           <select class="form-control select2"  id="quest_feedback" name="quest_feedback[]" required style="width: 100%;">
+                              <option selected="selected" value="">Select</option>
+                              {% for feedback in request.user|feedback_template %}
+                              <option value="{{feedback.pk}}">{{feedback.name}}</option>
+                              {% endfor %}
+                           </select>
+                        </div>
+                     </div>
+                    </div>
+                  </div>
+                  <div>
+                     <button class="add_form_field" onclick="addOption('MicroSkill')" style="margin-left:18px;">Add New Field &nbsp; 
+                       <span style="font-size:16px; font-weight:bold;">+ </span>
+                     </button>
+                  </div><br>
+
+                  <div class="form-group" id="assessment">
+                     <label>Assessment</label>
+                     <div class="row">
+                       <div class="col-md-6">
+                        <div class="form-group">
+                           <label>Select Assessment</label>
+                           <select class="form-control select2 assessment_id"  id="assessment" name="assessment[]" required style="width: 100%;">
+                              <option selected="selected" value="">Select</option>
+                           </select>
+                        </div>
+                     </div>
+                      <div class="col-md-6">
+                         <div class="form-group">
+                            <label>Select Feedback Template</label>
+                            <select class="form-control select2"  id="assessment_feedback" name="assessment_feedback[]" required style="width: 100%;">
+                               <option selected="selected" value="">Select</option>
+                               {% for feedback in request.user|feedback_template %}
+                               <option value="{{feedback.pk}}">{{feedback.name}}</option>
+                               {% endfor %}
+                            </select>
+                         </div>
+                      </div>
+                     </div>
+                   </div>
+                   <div>
+                      <button class="add_form_field" style="margin-left:18px;" onclick="addOption('Assessment')">Add New Field &nbsp; 
+                        <span style="font-size:16px; font-weight:bold;">+ </span>
+                      </button>
+                   </div><br>
+
+                   <div class="form-group" id="survey">
+                     <label>Survey</label>
+                     <div class="row">
+                       <div class="col-md-6">
+                        <div class="form-group">
+                           <label>Select Survey</label>
+                           <select class="form-control select2 survey_id"  id="survey" name="survey[]" required style="width: 100%;">
+                              <option selected="selected" value="">Select</option>
+                           </select>
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                         <div class="form-group">
+                            <label>Select Feedback Template</label>
+                            <select class="form-control select2"  id="survey_feedback" name="survey_feedback[]" required style="width: 100%;">
+                               <option selected="selected" value="">Select</option>
+                               {% for feedback in request.user|feedback_template %}
+                               <option value="{{feedback.pk}}">{{feedback.name}}</option>
+                               {% endfor %}
+                            </select>
+                         </div>
+                      </div>
+                     </div>
+                   </div>
+                   <div>
+                      <button class="add_form_field" style="margin-left:18px;" onclick="addOption('Survey')">Add New Field &nbsp; 
+                        <span style="font-size:16px; font-weight:bold;">+ </span>
+                      </button>
+                   </div><br>
+
+                   <div class="form-group" id="mentoring_journal">
+                     <label>Mentoring Journal</label>
+                     <div class="row">
+                       <div class="col-md-6">
+                        <div class="form-group">
+                           <label>Select Mentoring Journal</label>
+                           <select class="form-control select2 journal_id"  id="journal" name="journal[]" required style="width: 100%;">
+                              <option selected="selected" value="">Select</option>
+                           </select>
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                         <div class="form-group">
+                            <label>Select Feedback Template</label>
+                            <select class="form-control select2"  id="feedback_journal" name="feedback_journal[]" required style="width: 100%;">
+                               <option selected="selected" value="">Select</option>
+                               {% for feedback in request.user|feedback_template %}
+                               <option value="{{feedback.pk}}">{{feedback.name}}</option>
+                               {% endfor %}
+                            </select>
+                         </div>
+                      </div>
+                     </div>
+                   </div>
+                   <div>
+                      <button class="add_form_field" style="margin-left:18px;" onclick="addOption('Mentoring Journal')">Add New Field &nbsp; 
+                        <span style="font-size:16px; font-weight:bold;">+ </span>
+                      </button>
+                   </div><br>
+                   <div class="form-group">
+                     <label>Course Completion Template</label>
+                       {% comment %} <div class="form-group">
+                         <label>Select Feedback Template</label> {% endcomment %}
+                         <select class="form-control select2"  id="end_journey" name="end_journey" required style="width: 100%;">
+                           <option selected="selected" value="">Select</option>
+                           {% for feedback in request.user|feedback_template %}
+                           <option value="{{feedback.pk}}">{{feedback.name}}</option>
+                           {% endfor %}
+                         </select>
+                   </div>
+
+                <div class="form-group">
+                  <label>Group Call Template</label>
+                    {% comment %} <div class="form-group">
+                      <label>Select Feedback Template</label> {% endcomment %}
+                      <select class="form-control select2"  id="group_call" name="group_call" required style="width: 100%;">
+                        <option selected="selected" value="">Select</option>
+                        {% for feedback in request.user|feedback_template %}
+                        <option value="{{feedback.pk}}">{{feedback.name}}</option>
+                        {% endfor %}
+                      </select>
+                </div>
+
+                <div class="form-group">
+                  <label>Live Call Template</label>
+                    {% comment %} <div class="form-group">
+                      <label>Select Feedback Template</label> {% endcomment %}
+                      <select class="form-control select2"  id="live_call" name="live_call" required style="width: 100%;">
+                        <option selected="selected" value="">Select</option>
+                        {% for feedback in request.user|feedback_template %}
+                        <option value="{{feedback.pk}}">{{feedback.name}}</option>
+                        {% endfor %}
+                      </select>
+                     {% comment %} </div> {% endcomment %}
+                  </div>
+                <div class="form-group">
+                  <label>One To One Call Template</label>
+                    {% comment %} <div class="form-group">
+                      <label>Select Feedback Template</label> {% endcomment %}
+                      <select class="form-control select2"  id="one_to_one" name="one_to_one" required style="width: 100%;">
+                        <option selected="selected" value="">Select</option>
+                        {% for feedback in request.user|feedback_template %}
+                        <option value="{{feedback.pk}}">{{feedback.name}}</option>
+                        {% endfor %}
+                      </select>
+                {% comment %} </div> {% endcomment %}
+              </div>
+
+                <div class="form-group">
+                    <input class="m-check-input" type="checkbox" class="form-control" name="is_active" id="is_active">
+                    <label>Is Active</label>                    
+                </div>
+              </div>
+            </div>
+            {% comment %} </div> {% endcomment %}
+            <div class="col-md-12">
+              <input type="submit" name="submit" value="Submit" class="btn btn-primary" id="btnSubmit" style="margin-left:18px;">
+            </div>
+         </div>
+          </form>
+        </div>
+        <!-- /.box-body-->
+      </div>
+      <!-- /.box -->
+  
+    </section>
+    <!-- /.content -->
+  </div>
+  {% endblock content %}
+  {% block js %}
+   <script>
+      function journey_data(){
+         journey = document.getElementById('journey').value
+         console.log("journey_content ",journey)
+         $.ajax({
+            url:  "{% url 'feedback:journey_content' %}",
+            type: 'post',
+            data: {journey: journey, csrfmiddlewaretoken : "{{csrf_token}}" },
+            success: function(data) {
+               console.log("data ",data)
+               $.each(data['content_list'], function(key, value) {
+                  //console.log("key",key,"value", value, "data", value.id, "data1", value['id'])
+                  $('.quest_id').append('<option value="'+value['id']+'">'+value['title']+'</option>');
+             });
+                $.each(data['assessment_list'], function(key, value) {
+                  //console.log("key",key,"value", value, "data", value.id, "data1", value['id'])
+                  $('.assessment_id').append('<option value="'+value['id']+'">'+value['title']+'</option>');
+             });
+                $.each(data['survey_list'], function(key, value) {
+                  //console.log("key",key,"value", value, "data", value.id, "data1", value['id'])
+                  $('.survey_id').append('<option value="'+value['id']+'">'+value['title']+'</option>');
+             });
+                $.each(data['journal_list'], function(key, value) {
+                  //console.log("key",key,"value", value, "data", value.id, "data1", value['id'])
+                  $('.journal_id').append('<option value="'+value['id']+'">'+value['title']+'</option>');
+             });
+            }
+         })
+      }
+      function addOption(type){
+         console.log("calling")
+         var max_fields = 5;
+         
+         var x = 1;
+         if (x < max_fields) {
+             x++;
+             console.log("x ",x)
+             //$(wrapper).append()
+             if (type == "MicroSkill"){
+               console.log("click")
+               $('#quest').append('<div class="col-md-6">\
+                  <div class="form-group">\
+                     <label>Select MicroSkill</label>\
+                     <select class="form-control select2 quest_id"  id="quest" name="quest[]" required style="width: 100%;">\
+                        <option selected="selected" value="">Select</option>\
+                     </select>\
+               </div>\
+            </div>\
+            <div class="col-md-6">\
+               <div class="form-group">\
+                  <label>Select Feedback Template</label>\
+                  <select class="form-control select2"  id="quest_feedback" name="quest_feedback[]" required style="width: 100%;">\
+                     <option selected="selected" value="">Select</option>\
+                     {% for feedback in request.user|feedback_template %}\
+                     <option value="{{feedback.pk}}">{{feedback.name}}</option>\
+                     {% endfor %}\
+                  </select>\
+               </div>\
+            </div>');
+         }
+         else if (type == "Assessment"){
+            console.log("click1")
+            $('#assessment').append('<div class="col-md-6">\
+               <div class="form-group">\
+                  <label>Select Assessment Template</label>\
+                  <select class="form-control select2"  id="assessment" name="assessment[]" required style="width: 100%;">\
+                     <option selected="selected" value="">Select</option>\
+                     {% for assessment in request.user|all_assessment %}\
+                     <option value="{{assessment.pk}}">{{assessment.name}}</option>\
+                     {% endfor %}\
+                  </select>\
+            </div>\
+         </div>\
+            <div class="col-md-6">\
+               <div class="form-group">\
+                  <label>Select Feedback Template</label>\
+                  <select class="form-control select2"  id="assessment_feedback" name="assessment_feedback[]" required style="width: 100%;">\
+                     <option selected="selected" value="">Select</option>\
+                     {% for feedback in request.user|feedback_template %}\
+                     <option value="{{feedback.pk}}">{{feedback.name}}</option>\
+                     {% endfor %}\
+                  </select>\
+               </div>\
+            </div>')
+         }
+         else if (type == "Survey"){
+            console.log("click2")
+            $('#survey').append('<div class="col-md-6">\
+               <div class="form-group">\
+                  <label>Select Survey</label>\
+                  <select class="form-control select2"  id="survey" name="survey[]" required style="width: 100%;">\
+                     <option selected="selected" value="">Select</option>\
+                     {% for survey in request.user|all_survey %}\
+                     <option value="{{survey.pk}}">{{survey.name}}</option>\
+                     {% endfor %}\
+                  </select>\
+            </div>\
+         </div>\
+            <div class="col-md-6">\
+               <div class="form-group">\
+                  <label>Select Feedback Template</label>\
+                  <select class="form-control select2"  id="survey_feedback" name="survey_feedback[]" required style="width: 100%;">\
+                     <option selected="selected" value="">Select</option>\
+                     {% for feedback in request.user|feedback_template %}\
+                     <option value="{{feedback.pk}}">{{feedback.name}}</option>\
+                     {% endfor %}\
+                  </select>\
+               </div>\
+            </div>')
+         }
+         else if (type == "Mentoring Journal"){
+            console.log("click3")
+            $('#mentoring_journal').append('<div class="col-md-6">\
+               <div class="form-group">\
+                  <label>Select Journal Template</label>\
+                  <select class="form-control select2"  id="journal" name="journal[]" required style="width: 100%;">\
+                     <option selected="selected" value="">Select</option>\
+                     {% for journal in request.user|weekly_journal_template %}\
+                     <option value="{{journal.pk}}">{{journal.title}}</option>\
+                     {% endfor %}\
+                  </select>\
+            </div>\
+         </div>\
+            <div class="col-md-6">\
+               <div class="form-group">\
+                  <label>Select Feedback Template</label>\
+                  <select class="form-control select2"  id="feedback_journal" name="feedback_journal[]" required style="width: 100%;">\
+                     <option selected="selected" value="">Select</option>\
+                     {% for feedback in request.user|feedback_template %}\
+                     <option value="{{feedback.pk}}">{{feedback.name}}</option>\
+                     {% endfor %}\
+                  </select>\
+               </div>\
+            </div>')
+         }
+         }
+      }
+
+   </script>
+   {% endblock js %}
+  
+  

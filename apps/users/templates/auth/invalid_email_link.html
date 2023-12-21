@@ -1,0 +1,54 @@
+{% extends 'website/web_base.html' %} {% load static %}
+{% block content %}
+      <main>
+
+         <!-- sign up area start -->
+         <section class="signup__area po-rel-z1 pt-100 pb-145">
+            <div class="sign__shape">
+               <img class="man-1" src="assets/img/icon/sign/man-1.png" alt="">
+               <img class="man-2" src="assets/img/icon/sign/man-2.png" alt="">
+               <img class="circle" src="assets/img/icon/sign/circle.png" alt="">
+               <img class="zigzag" src="assets/img/icon/sign/zigzag.png" alt="">
+               <img class="dot" src="assets/img/icon/sign/dot.png" alt="">
+               <img class="bg" src="assets/img/icon/sign/sign-up.png" alt="">
+            </div>
+            <div class="container">
+                <div class="row">
+                    <div class="col-xxl-8 offset-xxl-2 col-xl-8 offset-xl-2">
+                       <div class="section__title-wrapper text-center mb-55">
+                          <h2 class="section__title">Please verify your email first!</h2>
+                          
+                       </div>
+                    </div>
+                 </div>
+                 {% if request.path == '/verify-email/' %}
+                 <div class="row">
+                  
+                    <div class="col-xxl-6 offset-xxl-3 col-xl-6 offset-xl-3 col-lg-8 offset-lg-2">
+                       <div class="sign__wrapper white-bg">
+                        <p>Verification Email Sent, Please check provided email addess.</p>
+  
+                       </div>
+                    </div>
+                 </div>
+                </div>
+                 
+                 {% else %}
+                 <div class="row">
+                 
+                   <div class="col-xxl-6 offset-xxl-3 col-xl-6 offset-xl-3 col-lg-8 offset-lg-2">
+                      <div class="sign__wrapper white-bg">
+                       <p>Url Expired or it might be a invalid request. Please try again after generating New Url.</p>
+                           <br>
+                           <button class="e-btn w-100" ><a href="{% url 'user:resend_verify_email' %}">Resend Verification Link</button>
+                      </div>
+                   </div>
+                </div>
+                {% endif %}
+            </div>
+         </section>
+         <!-- sign up area end -->
+         
+      </main>
+{% endblock content %}
+  

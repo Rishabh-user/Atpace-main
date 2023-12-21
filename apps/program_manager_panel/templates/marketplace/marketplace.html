@@ -1,0 +1,295 @@
+{% extends 'base.html' %} {% load static %} 
+{% block title %} Marketplace {% endblock %} 
+{% load tags %}
+{% block css %} 
+<link
+          rel="stylesheet"
+          href="{% static 'css/program_manager/program_manager.css' %}"
+  />
+  <style>
+    .capitalize {
+      text-transform: capitalize;
+    }
+    .anchor{
+      display: block;
+      padding: 3px 20px;
+      clear: both;
+      font-weight: 400;
+      line-height: 1.42857143;
+      color: #333;
+      white-space: nowrap;
+    }
+    .anchor:hover{
+      background-color:#c2c0c0;
+    }
+  </style>
+{% endblock css %} {% block content %}
+<div class="content-wrapper" id="vue-app">
+  <div :class="'alert alert-dismissible '+[[alert_class]]" v-if="alert_msg" style="margin:10px;">
+    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+    <h4 style="margin-top:10px;"><i class="icon fa fa-warning"></i> Alert!</h4>
+    <a href="/manager/billing">[[alert_msg]]</a>
+  </div>
+  <section class="content-header">
+    <h1>Marketplace</h1>
+  </section>
+  <section class="content">
+    <div class="row">
+      <div class="col-md-2">
+        <div class="small-box box-tab" style="border-top: 5px solid #1B74E4;" @click="showMarketplace()" id="marketplace">
+          <div class="inner">
+            <h4>Upload Mentor File</h4>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <div class="small-box box-tab" @click="showMentorList()" id="mentor-list">
+          <div class="inner">
+            <h4>Mentor List</h4>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <div class="small-box box-tab" @click="showReviewRequest()" id="review-request">
+          <div class="inner">
+            <h4>Review Request</h4>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div v-if="displayUploadMentor">
+    {% include 'marketplace/upload_mentor.html' %}
+    </div>
+    <div v-if="displayMentorList">
+    {% include 'marketplace/marketplace-mentor-list.html' %}
+    </div>
+    <div v-if="displayReviewRequest">
+    {% include 'marketplace/review-request.html' %}
+    </div>
+  </section>
+  {{ request.user.id|json_script:"user_id" }}
+  {{request.session.token|json_script:"token"}}
+  {{request.session.company_id|json_script:"company_id"}}
+  {{request.session.company_name|json_script:"company_name"}}
+  {{request.session.timezone|json_script:"timezone"}}
+    <div class="modal fade" id="modal-progress" style="display: none;">
+      <div class="modal-dialog">
+          <div class="modal-content">
+                <div class="modal-body">
+                    <p class="text-center mb-0"><i class="fa fa-spin fa-cog"></i> Uploading data, Please wait!</p>
+                </div>
+          </div>
+          <!-- /.modal-content -->
+      </div>
+    <!-- /.modal-dialog -->
+    </div>
+</div>
+{% endblock content %} {% block js %} 
+<script src="{% static 'bower_components/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
+<script type="text/javascript">
+  
+  const app = new Vue({
+    el: "#vue-app",
+    delimiters: ['[[', ']]'],
+    data() {
+      return {
+        displayUploadMentor: true,
+        displayMentorList: false,
+        displayReviewRequest: false,
+        token:JSON.parse(document.getElementById('token').textContent),
+        auth:"",
+        user_id: JSON.parse(document.getElementById('user_id').textContent),
+        base_url:window.location.origin,
+        user_company_name: JSON.parse(document.getElementById('company_name').textContent),
+        user_company_id: JSON.parse(document.getElementById('company_id').textContent),
+        timezone: JSON.parse(document.getElementById('timezone').textContent),
+        alert_msg: "",
+        mentor_list: "",
+        review_request_list :""
+      };
+    },
+    mounted(){
+      this.showMarketplace();
+      this.showAlert();
+    },
+    methods: {
+      axiosGetRequest: function(url){
+        this.auth = "Token "+this.token;
+        var config = {
+          method: "get",
+          url: url,
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': this.auth,
+          },
+        };
+        return axios(config)
+      },
+      axiosPostRequest: function(url, data){
+        this.auth = "Token "+this.token;
+        var config = {
+          method: "post",
+          url: url,
+          headers: {
+            "Content-Type": "multipart/form-data",
+            "Accept": "application/json",
+            'Authorization': this.auth,
+          },
+          data:data
+        };
+
+        return axios(config)
+      },
+      axiosPutRequest: function(url, data){
+        this.auth = "Token "+this.token;
+        var config = {
+          method: "put",
+          url: url,
+          headers: {
+            "Content-Type": "multipart/form-data",
+            "Accept": "application/json",
+            'Authorization': this.auth,
+          },
+          data:data
+        };
+
+        return axios(config)
+      },
+      async showAlert(){
+        var url = this.base_url+"/manager/check-for-subscription/"+this.user_id+"/";
+        response = await this.axiosGetRequest(url);
+        console.log("Alert response", response.data)
+        if(response.data.message != "No alert available"){
+          this.alert_msg = response.data.message
+          this.alert_class = response.data.css_class
+        }
+      },
+      async destroyDataTable(id){
+        if($(id).DataTable()){
+          console.log("destroying", id);
+          $(id).DataTable().clear();
+          $(id).DataTable().destroy();
+        }
+      },
+      async initializeDataTable(id){
+        console.log("initializing");
+        await this.sleep(2000);
+        $(id).DataTable({
+          "dom": '<"table-pull-left"f><"table-pull-right"l>tip',
+          'destroy': true,
+          'paging'      : true,
+          'lengthChange': true,
+          'searching'   : true,
+          'ordering'    : false,
+          'info'        : true,
+         'autoWidth'   : false,
+         'retrieve':true,
+         'scrollX': true,
+        })
+      },
+      sleep: function(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+      },
+      async removeUploadMentor(){
+        ele = document.getElementById('marketplace')
+        this.displayUploadMentor = false;
+        ele.style.borderTop = "none";
+      },
+      async removeMentorList(){
+        ele = document.getElementById('mentor-list')
+        this.displayMentorList = false;
+        ele.style.borderTop = "none";
+        await this.destroyDataTable('#mentor-list-table')
+      },
+      async removeReviewRequest(){
+        ele = document.getElementById('review-request')
+        this.displayReviewRequest = false;
+        ele.style.borderTop = "none";
+
+        await this.destroyDataTable('#review-request-table')
+      },
+      async showMarketplace(){
+        ele = document.getElementById('marketplace')
+        this.displayUploadMentor = true;
+        ele.style.borderTop = "5px solid #1B74E4";
+
+        this.removeReviewRequest();
+        this.removeMentorList();
+
+      },
+      async showMentorList(){
+        this.mentor_list = []
+        ele = document.getElementById('mentor-list')
+        this.displayMentorList = true;
+        ele.style.borderTop = "5px solid #1B74E4";
+        
+        this.removeUploadMentor();
+        this.removeReviewRequest();
+
+        var url = this.base_url+"/manager/marketplace-mentor-list/"+this.user_id+"?company_id="+this.user_company_id;
+        let response = await this.axiosGetRequest(url);
+        console.log("Mentor List Response", response.data);
+        this.mentor_list = response.data.data
+        await this.initializeDataTable('#mentor-list-table')
+
+      },
+      async showReviewRequest(){
+        this.review_request_list = []
+        ele = document.getElementById('review-request')
+        this.displayReviewRequest = true;
+        ele.style.borderTop = "5px solid #1B74E4";
+        this.removeMentorList();
+        this.removeUploadMentor();
+
+        var url = this.base_url+"/manager/review-mentor-for-marketplace/"+this.user_id+"?company_id="+this.user_company_id;
+        let response = await this.axiosGetRequest(url);
+        console.log("Review Request Response", response.data);
+        this.review_request_list = response.data.review_mentor_list
+        await this.initializeDataTable('#review-request-table')
+
+        
+      },
+      async approveRejectRequest(id, status){
+        console.log("approve", id, status)
+        var data = new FormData();
+        data.append("mentor_id", id)
+        data.append("status", status)
+        var url = this.base_url+"/manager/approve-reject-marketplace-mentor/"+this.user_id+"/";
+        response = await this.axiosPostRequest(url, data);
+        console.log("Review Response", response.data);
+        bootbox.alert("Request "+ status+" successfully!");
+      },
+      async showProgressModal(){
+        if(document.getElementById("file").value){
+          $("#modal-progress").modal('show')
+        }
+      },
+      async sendEmail(mentor_id){
+        var data = new FormData();
+        data.append("mentor_id", mentor_id)
+        data.append("user_id", this.user_id)
+        var url = this.base_url+"/mentor/marketplace-invite-email/";
+        response = await this.axiosPostRequest(url, data);
+        console.log("Send EmailResponse", response.data);
+        bootbox.alert(response.data.message);
+        this.showMentorList()
+      },
+      async publishMentor(mentor_id, is_publish){
+        var data = new FormData();
+        data.append("mentor_id", mentor_id)
+        data.append("user_id", this.user_id)
+        data.append("is_publish", is_publish)
+        var url = this.base_url+"/mentor/publish-to-marketplace/";
+        response = await this.axiosPostRequest(url, data);
+        console.log("Publish Response", response.data);
+        bootbox.alert(response.data.message);
+        this.showMentorList()
+      }
+    }
+  });
+
+  
+</script>
+
+{% endblock js %}

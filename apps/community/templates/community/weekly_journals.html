@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+{% load static %} {% load tags %}
+{% block css %} 
+  
+
+ 
+   {% endblock %}
+{% block sidebar %}
+<aside
+class="main-sidebar"
+style="
+  box-shadow: 0px 12px 7px #2329314d;
+  background-color: white;
+  border-radius: none;
+  backdrop-filter: blur(1.5px);
+  -webkit-backdrop-filter: blur(1.5px);
+  border-right: 1px solid #ababab;
+"
+>
+<!-- sidebar: style can be found in sidebar.less -->
+<section class="sidebar" style="background-color: #fff">
+  <ul class="sidebar-menu" data-widget="tree">
+    {% for data in content_data %}
+
+    {% endfor %}
+  </ul>
+</section>
+</aside>
+{% endblock sidebar %}
+{% block content %}
+      <!-- Content Wrapper. Contains page content -->
+      <div class="content-wrapper">
+        <section class="content-header">
+          <h1>{{learning_journals.name}} - Learning Journal</h1>
+          <p></p>
+        </section>
+
+        <section class="content">
+          
+            <!-- Default box -->
+            <div class="box">
+              
+              <div class="box-header with-border">
+                <h3 class="box-title">{{learning_journals.name}}
+                  
+      
+                </h3>
+                
+               
+              </div>
+              <div class="box-body">
+                
+                <form method="post" enctype="multipart/form-data">
+                  {% csrf_token %}
+                <textarea id="editor1" class="form-control textarea" name="key_pont" rows="10" cols="80" placeholder="Enter Key Points">
+                     {{learning_journals.learning_journal}}
+                  
+                </textarea>
+                {% for attachment in attachments %}
+                {% if attachment.image_upload %}
+                <img src="{{MEDIA_URL}}{{attachment.image_upload}}" width="200">
+                <a hx-get="{% url 'community:delete_attachment' attachment_id=attachment.id %}" hx-confirm="Are you sure you wish to remove user from journey?">
+                  <button type="button" class="delete_file">Delete Image</button>
+                </a>
+            {% else %}
+                <a href="{{MEDIA_URL}}{{attachment.file_upload}}" download="download">
+                  <div class="box_icon">
+                    <span class="icon_i" style="display: inline" ><span icon_align="left">
+                      <i class="fa-solid fa-file"></i>
+                      </span></span>
+                    <div class="box_text">
+                        <h3>{{ attachment.file_upload.file}}</h3>
+                    </div></a>
+                    <a hx-get="{% url 'community:delete_attachment' attachment_id=attachment.id %}" hx-confirm="Are you sure you wish to remove user from journey?">
+                      <button type="button" class="delete_file">Delete File</button>
+                    </a>
+                    {% endif %}
+              {% endfor %}
+              <br>
+              <br>
+                <label>Browse and select a file</label>&nbsp;&nbsp;
+							  <input type="file" name="file" multiple>
+
+                <button type="submit" id="sumbitContent" name="submit_content" class="btn btn-primary ">Submit </button>
+                <button type="submit" id="save_draft" name="save_draft" class="btn btn-primary "> Save as Draft </button>
+              </form>
+              </div>
+              <!-- /.box-footer-->
+            </div>
+            <!-- /.box -->
+        
+          </section>
+      </div>
+{% endblock content %} 
+{% block js %}
+<script>
+  $(function () {
+    // Replace the <textarea id="editor1"> with a CKEditor
+    //bootstrap WYSIHTML5 - text editor
+    $('.textarea').wysihtml5({
+      toolbar: {
+    "font-styles": true, // Font styling, e.g. h1, h2, etc.
+    "emphasis": true, // Italics, bold, etc.
+    "lists": true, // (Un)ordered lists, e.g. Bullets, Numbers.
+    "html": false, // Button which allows you to edit the generated HTML.
+    "link": false, // Button to insert a link.
+    "image": false, // Button to insert an image.
+    "color": false, // Button to change color of font
+    "blockquote": true, // Blockquote
+
+  }
+    })
+  })
+  $(document).on("click", ".delete_file", function(){
+  location.reload();      
+});
+  </script>
+{% endblock %}
+  </body>
+</html>

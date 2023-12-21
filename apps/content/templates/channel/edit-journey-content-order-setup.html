@@ -1,0 +1,155 @@
+{% extends 'base.html' %}  {% load static %} {% load tags %} {% block title %} Journey Content Setup {% endblock %} 
+{% load crispy_forms_tags %} {% block content %}
+    <div class="content-wrapper">
+      <!-- Content Header (Page header) -->
+      <section class="content-header">
+        <h1>
+            Journey Content Setup
+    
+        </h1>
+        <ol class="breadcrumb">
+          <li><a href="#"><i class="fa fa-dashboard"></i> Skill</a></li>
+          <li><a href="#">Journey Content Setup</a></li>
+        </ol>
+      </section>
+    
+      <!-- Main content -->
+      <section class="content">
+    
+        <!-- Default box -->
+        <div class="box">
+          <div class="box-header with-border">
+            <h3 class="box-title">Journey Content Setup</h3>
+            
+            <a href="{%url 'content:list_journey_page_setup' %}"><button class="btn btn-primary pull-right">Journey Content Setup List</button></a>
+
+          </div>
+          <div class="box-body">
+            {% include 'component/error_message.html' %}
+          
+            <form method="post" action="">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-md-12">
+                      <div class="form-group">
+                        <label>Journey</label>
+                        <select class="form-control select2" id ="channel" name="channel" required style="width: 100%;" disabled>
+                          <option selected="selected">Select</option>
+                          {% for channel in request.session.user_type|all_mentoring_selfpaced_channel:request.session.company_id %}
+                          <option value="{{channel.pk}}" {% if content_setup.journey.pk == channel.pk %}selected{% endif %}>{{channel.title}}</option>
+                          {% endfor %}
+                        </select>
+                      </div>
+                      <div class="form-group">
+                        <label>Short description</label>
+                        <input type="text" class="form-control"  name="short_description" id="short_description" value="{{content_setup.journey.short_description}}">
+                      </div>
+                      <div class="form-group">
+                        <label>Description</label>
+                        <textarea name="description" cols="40" rows="10" id="editor_description" class="textarea form-control" >{{content_setup.journey.description}}</textarea>
+                      </div>
+                      <div class="form-group">
+                        <label>What we learn</label>
+                        <textarea name="what_we_learn" cols="40" rows="10" id="what_we_learn" class="textarea form-control" >{{content_setup.journey.what_we_learn}}</textarea>
+                      </div>
+                      <div class="form-group">
+                        <label>Tags</label>
+                        <input type="text" class="form-control"  name="tags" id="tags" value="{{content_setup.journey.tags}}">
+                      </div>
+                      <div class="form-group">
+                        <label>Is Profile Assessment Required</label>
+                        <input class="m-check-input" type="checkbox" class="form-control"  name="profle_assest_enable" id="profle_assest_enable" {% if content_setup.journey.profle_assest_enable %}checked{% endif %}>
+                      </div>
+                      {% for data in ordering %}
+                        {% if data.type == "overview" %}
+                            <div class="form-group">
+                              <label>Overview Text</label>
+                              <textarea class="textarea form-control" cols="40" rows="10" name="overview" id="overview">{{data.data}}</textarea>
+                            </div>
+                            <div class="form-group">
+                              <input type="text" class="form-control" placeholder="Display Order" name="overview_order" value="{{data.display_order}}" id="overview_order">
+                          </div>
+                          {% endif %}
+                          {% if data.type == "learn_label" %}
+                            <div class="form-group">
+                              <label>Learn Label Text</label>
+                              <input type="text" class="form-control"  name="learn_label" value="{{data.data}}" id="learn_label">
+                            </div>
+                            <div class="form-group">
+                                <input type="text" class="form-control"  placeholder="Display Order" name="learn_label_order" value="{{data.display_order}}" id="learn_label_order">
+                            </div>
+                            {% endif %}
+                            {% if data.type == "pdpa_label" %}
+                            <div class="form-group">
+                              <label>Pdpa Label Text</label>
+                              <input type="text" class="form-control"  name="pdpa_label" value="{{data.data}}" id="pdpa_label">
+                            </div>
+                              <div class="form-group">
+                              <input type="text" class="form-control"  placeholder="Display Order" name="pdpa_label_order" value="{{data.display_order}}" id="pdpa_label_order">
+                            </div>
+                            {% endif %}
+                            {% if data.type == "video_url" %}
+                              <div class="form-group">
+                                <label>Add Vide Url Link</label>
+                                <input type="text" class="form-control"  name="video_url" value="{{data.data}}" id="video_url">
+                              </div>
+                              <div class="form-group">
+                                  <input type="text" class="form-control"  placeholder="Display Order" name="video_url_order" value="{{data.display_order}}" id="video_url_order">
+                              </div>
+                              {% endif %}
+                              {% if data.type == "cta_button_title" %}
+                            <div class="form-group">
+                              <label>Cta Button Text</label>
+                              <input type="text" class="form-control"  name="cta_button_title" value="{{data.data}}" id="cta_button_title">
+                            </div>
+                            <div class="form-group">
+                              <label>Cta Button Action</label>
+                              <input type="text" class="form-control"  name="cta_button_action" value="{{data.cta_button_action}}" id="cta_button_action">
+                            </div>
+                                <div class="form-group">
+                                <input type="text" class="form-control"  placeholder="Display Order" name="cta_button_title_order" value="{{data.display_order}}" id="cta_button_title_order">
+                            </div>
+                            {% endif %}
+                            {% if data.type == "pdpa_description" %}
+                            <div class="form-group">
+                              <label>Pdpa Description Text</label>
+                              <textarea class="textarea form-control" cols="40" rows="10" name="pdpa_description" id="pdpa_description">{{data.data}}</textarea>
+                            </div>
+                            <div class="form-group">
+                              <input type="text" class="form-control"  placeholder="Display Order" name="pdpa_description_order" value="{{data.display_order}}" id="pdpa_description_order">
+                            </div>
+                            {% endif %}
+                            {% endfor %}
+                            <div class="form-group">
+                              <input class="m-check-input" type="checkbox" class="form-control"  name="is_draft" id="is_draft" {% if content_setup.is_draft %}checked{% endif %}>
+                              <label for="is_draft">Save as Draft</label>
+                            </div>
+                            <!-- /.form-group -->
+                            <button type="submit" id="sumbitContent" class="btn btn-primary">Save changes</button>
+                    </div>
+                </div>
+                <!-- /.row -->
+            </form>
+    
+          </div>
+         
+        </div>
+        <!-- /.box -->
+    
+      </section>
+      <!-- /.content -->
+    </div>
+    {% endblock content %}
+    {% block js %}
+    <script src="{% static 'bower_components/ckeditor/ckeditor.js' %}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.15/js/intlTelInput.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/htmx/1.7.0/htmx.min.js" integrity="sha512-etqA0KankuxrlSeZDYycQBY/D/KWZn0YZjlsjAo7kCEBTy1gg+DwmR6icxtOpqDBOzm2P00/lSIXEu7K+zvNsg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+CKEDITOR.replace('editor_description')
+CKEDITOR.replace('what_we_learn')
+CKEDITOR.replace('overview')
+CKEDITOR.replace('pdpa_description')
+CKEDITOR.add
+
+  </script>
+  {% endblock js %}

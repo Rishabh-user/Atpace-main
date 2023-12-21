@@ -1,0 +1,49 @@
+<div class="box">
+    <div class="box-header">
+    <h3 class="box-title">Mentor List</h3>
+    </div>
+    <!-- /.box-header -->
+    <div class="box-body">
+    <table id="mentor-table" class="table table-bordered table-hover">
+        <thead>
+        <tr>
+            <th>SNo.</th>
+            <th>Mentor Name</th>
+            <th>Mentor Email</th>
+            {% comment %} <th>Mentee Name</th>
+            <th>Mentee Email</th> {% endcomment %}
+            <th>Journey</th>
+            <th>Type</th>
+            <th>Is assigned</th>
+            <th>Is revoked</th>
+            <th>Assigned Date</th>
+            <th>Revoked Date</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr v-for="(mentor, index) in mentor_list" :key="mentor.id">
+            <td>[[index+1]]</td>
+            <td>[[mentor.mentor_name]]</td>
+            <td>[[mentor.mentor_email]]</td>
+            {% comment %} <td>
+                <div v-for="(mentee, index) in mentor.mentee_list" :key="index">
+                    [[mentee.name]],
+                </div>
+            </td>
+            <td>
+                <div v-for="(mentee, index) in mentor.mentee_list" :key="index">
+                    [[mentee.email]],
+                </div>
+            </td> {% endcomment %}
+            <td>[[mentor.journey_name]]</td>
+            <td>[[mentor.type]]</td>
+            <td class="capitalize">[[mentor.is_assign]]</td>
+            <td class="capitalize">[[mentor.is_revoked]]</td>
+            <td>[[mentor.assign_date]]</td>
+            <td><div v-if="mentor.is_revoked">[[mentor.revoke_date]]</div></td>
+        </tr>
+        </tbody>
+    </table>
+    </div>
+    <!-- /.box-body -->
+</div>

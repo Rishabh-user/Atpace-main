@@ -1,0 +1,50 @@
+ <div class="box">
+      <div class="box-header">
+        <h3 class="box-title">Mentor List</h3>
+      </div>
+      <!-- /.box-header -->
+      <div class="box-body">
+        <table id="mentor-coaches-table" class="table table-bordered table-hover">
+          <thead>
+          <tr>
+            <th>Full Name</th>
+            <th>Username</th>
+            <th>Profile Heading</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Journey</th>
+            <th>Action</th>
+        </tr>
+          </thead>
+          <tbody>
+            <tr v-for="mentor in mentor_list" :key="mentor.id">
+              <td class="capitalize">[[mentor.first_name]] [[mentor.last_name]]</td>
+              <td>[[mentor.username]]</td>
+              <td>[[mentor.profile_heading]]</td>
+              <td>[[mentor.email]]</td>
+              <td>[[mentor.phone]]</td>
+              <td>[[mentor.journey]]</td>
+              <td>
+                <div class="dropdown">
+                  <button class="btn bg-purple dropdown-toggle btn-select-option" type="button" data-toggle="dropdown" aria-expanded="true">Select an option                                            <span class="caret"></span>
+                  </button>
+                  <ul class="dropdown-menu options-dropdown">
+                    <li>
+                      <a :href="'/user-mentor-profile/'+mentor.id">Open Profile</a>
+                    </li>
+                    <li>
+                      <a :href="'/chat/'+mentor.room">Chat</a>
+                    </li>
+                    {% comment %} <li>
+                      <a :href="'/feedback/feedback-form/Mentor/'+mentor.id+'/'">Feedback</a>
+                    </li> {% endcomment %}
+                  </ul>
+                </div>
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+      <!-- /.box-body -->
+    </div>
+    <!-- /.box -->

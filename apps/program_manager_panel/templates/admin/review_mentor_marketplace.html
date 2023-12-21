@@ -1,0 +1,180 @@
+{% extends 'base.html' %} {% load static %}
+Subscription List 
+{% load tags %}
+<!-- DataTables -->
+{% block css %}
+<link rel="stylesheet" href="{% static 'bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css' %}">
+<style>
+    .capitalize {
+      text-transform: capitalize;
+    }
+    .anchor{
+      display: block;
+      padding: 3px 20px;
+      clear: both;
+      font-weight: 400;
+      line-height: 1.42857143;
+      color: #333;
+      white-space: nowrap;
+    }
+    .anchor:hover{
+      background-color:#c2c0c0;
+    }
+  </style>
+{% endblock css %} 
+{% block content %}
+
+
+<div class="content-wrapper" id="vue-app">
+  <section class="content-header">
+    <h1>
+        Review Mentor
+    </h1>
+    <ol class="breadcrumb">
+      <li><a href="#"><i class="fa fa-dashboard"></i> Review</a></li>
+      <li><a href="#">Mentor</a></li>
+      <li class="active">List</li>
+    </ol>
+  </section>
+
+  <section class="content">
+    <div class="row">
+       <div class="col-xs-12">
+           <div class="box">
+                <div class="box-header">
+                <h3 class="box-title">Review Request List</h3>
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body">
+                <table id="review-request-table" class="table table-bordered table-hover">
+                    <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Date</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="list in review_request_list" :key="list.id">
+                        <td class="capitalize"><a :href="'/user/profile/'+list.id" target="_blank">[[list.name]]</a></td>
+                        <td>[[list.email]]</td>
+                        <td>[[list.phone]]</td>
+                        <td>[[list.date_of_request]]</td>
+                        <td>
+                        <div class="dropdown">
+                            <button class="btn bg-purple dropdown-toggle btn-select-option" type="button" data-toggle="dropdown" aria-expanded="true">Select an option                                            <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu options-dropdown">
+                                <li @click="approveRejectRequest(list.id, 'approve')" class="anchor"><i class="fa fa-pencil option-icon"></i>Approve</li>
+                                <li @click="approveRejectRequest(list.id, 'reject')" class="anchor"><i class="fa fa-times option-icon"></i>Reject</li>
+                                <li class="anchor"><a :href="'/user/advance-profile-preview/'+list.id" target="_blank"><i class="fa fa-eye option-icon"></i>View</a></li>
+                            </ul>
+                        </div>
+                        </td>
+                        </tr>
+                </table>
+                </div>
+                <!-- /.box-body -->
+            </div>
+            <!-- /.box -->
+         </div>
+       <!-- /.col -->
+    </div>
+    <!-- /.row -->
+ </section>
+  {{ request.user.id|json_script:"user_id" }}
+  {{request.session.token|json_script:"token"}}
+</div>
+{% endblock content %} 
+{% block js %} 
+    <script src="{% static 'bower_components/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>    
+    <script type="text/javascript">
+    let app = new Vue({
+        el: "#vue-app",
+        delimiters: ['[[', ']]'],
+        data() {
+        return {
+            token:JSON.parse(document.getElementById('token').textContent),
+            auth:"",
+            base_url:window.location.origin,
+            user_id: JSON.parse(document.getElementById('user_id').textContent),
+            review_request_list: ""
+        };
+        },
+        mounted(){
+            this.showReviewRequest();
+        },
+        methods: {
+            axiosGetRequest: function(url){
+            this.auth = "Token "+this.token;
+            var config = {
+            method: "get",
+            url: url,
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': this.auth,
+            },
+            };
+            return axios(config)
+            },
+            axiosPostRequest: function(url, data){
+                this.auth = "Token "+this.token;
+                var config = {
+                method: "post",
+                url: url,
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                    "Accept": "application/json",
+                    'Authorization': this.auth,
+                },
+                data:data
+                };
+                return axios(config)
+            },
+            async initializeDataTable(id){
+                console.log("initializing");
+                await this.sleep(2000);
+                $(id).DataTable({
+                "dom": '<"table-pull-left"f><"table-pull-right"l>tip',
+                'destroy': true,
+                'paging'      : true,
+                'lengthChange': true,
+                'searching'   : true,
+                'ordering'    : false,
+                'info'        : true,
+                'autoWidth'   : false,
+                'retrieve':true,
+                'scrollX': true,
+                })
+            },
+            sleep: function(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            },
+            async showReviewRequest(){
+                this.review_request_list = []
+                var url = this.base_url+"/manager/review-mentor-for-marketplace/"+this.user_id
+                let response = await this.axiosGetRequest(url);
+                console.log("Review Request Response", response.data);
+                this.review_request_list = response.data.review_mentor_list
+                await this.initializeDataTable('#review-request-table')
+            },
+            async approveRejectRequest(id, status){
+                console.log("approve", id, status)
+                var data = new FormData();
+                data.append("mentor_id", id)
+                data.append("status", false)
+                if(status == 'approve'){
+                data.append("status", true)
+                }
+                var url = this.base_url+"/manager/approve-reject-marketplace-mentor/"+this.user_id+"/";
+                response = await this.axiosPostRequest(url, data);
+                console.log("Review Response", response.data);
+                bootbox.alert("Request "+ status+"ed successfully!");
+            },
+        }
+    });
+    </script>
+{% endblock js %} 

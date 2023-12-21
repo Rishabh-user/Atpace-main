@@ -1,0 +1,25 @@
+<div class="box">
+        <div class="box-header with-border">
+          <h3 class="box-title">Journey List</h3>
+
+        </div>
+        <div class="box-body">
+         <form method="post" action="{% url 'program_manager:assessment_response_report' %}">
+             {% csrf_token %}
+             <select class="form-control select2" name="journey" required>
+                <option value="" selected>Select</option>
+                <option
+                      v-bind:value="journey.id"
+                      v-for="journey in journey_list"
+                      :key="journey.id"
+                >
+                  [[journey.name]] 
+                </option>
+             </select>
+             <button type="submit" class="btn btn-primary">Submit</button>
+         </form>
+  
+        </div>
+      </div>
+      <!-- /.box -->
+ 

@@ -1,0 +1,386 @@
+{% extends 'base.html' %} {% load static %} 
+{% block title %} Goals {% endblock %} 
+{% load tags %}
+{% block css %} 
+  <link
+          rel="stylesheet"
+          href="{% static 'css/program_manager/program_manager.css' %}"
+  />
+  <style>
+    .capitalize {
+      text-transform: capitalize;
+    }
+    .mgt-10{
+      margin-top: 10px;
+    }
+    /* Create an active/current tablink class */
+    .tab div div.active {
+      border-top: 5px solid #1B74E4;
+    }
+    /* Style the tab content */
+    .tabcontent {
+      display: none;
+    }
+    .dropdown-div-menu>li>a {
+      display: block;
+      padding: 3px 20px;
+      clear: both;
+      font-weight: 400;
+      line-height: 1.42857143;
+      color: #777;
+    }
+    .dropdown-div-menu > li > a > .fa, .dropdown-div-menu > li > a > .ion {
+      margin-right: 10px;
+    }
+  </style>
+{% endblock css %} {% block content %}
+<div class="content-wrapper" id="vue-app">
+  <section class="content-header">
+    <h1>Goals</h1>
+  </section>
+  <section class="content">
+    <div class="row tab">
+      <div class="col-md-2">
+        <div class="small-box box-tab tab-links"  id="user-goals-tab" @click="showGoals()">
+          <div class="inner">
+            <h4>Goals</h4>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <div class="small-box box-tab tab-links"  id="mentorship-goals-tab" @click="showMentorshipGoals()">
+          <div class="inner">
+            <h4>Mentorship Goals</h4>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <div class="small-box box-tab tab-links"  id="graphs-tab" @click="showGraphs()">
+          <div class="inner">
+            <h4>Graphs</h4>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="user-goals-content" class="tabcontent">
+    {% include 'Goals/user-goals.html' %}
+    </div>
+    <div id="graphs-content" class="tabcontent">
+    {% include 'Goals/graphs.html' %}
+    </div>
+    <div id="mentorship-goals-content" class="tabcontent">
+    {% include 'Goals/mentorship-goals.html' %}
+    </div>
+  </section>
+  {{ request.user.id|json_script:"user_id" }}
+  {{request.session.token|json_script:"token"}}
+  {{request.session.company_id|json_script:"company_id"}}
+  {{request.session.company_name|json_script:"company_name"}}
+  
+</div>
+{% endblock content %} {% block js %} 
+<script src="{% static 'bower_components/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
+<script type="text/javascript">
+  let app = new Vue({
+    el: "#vue-app",
+    delimiters: ['[[', ']]'],
+    data() {
+      return {
+        token:JSON.parse(document.getElementById('token').textContent),
+        auth:"",
+        base_url:window.location.origin,
+        user_id: JSON.parse(document.getElementById('user_id').textContent),
+        user_company_name: JSON.parse(document.getElementById('company_name').textContent),
+        user_company_id: JSON.parse(document.getElementById('company_id').textContent),
+        all_mentorship_goals:"",
+        all_user_goals:"",
+        heading:"",
+        description:"",
+        duration_number:"",
+        category_val:"",
+        duration_time_val:"",
+        priority_val:"",
+        frequency_val:"",
+        goal_id_val:"",
+      };
+    },
+    mounted(){
+      this.showGoals();
+    },
+    filters: {
+      formateTime: function (value) {
+        if (!value) return ''
+        //value = value.toString()
+        //console.log("time value", value)
+        return value
+      }
+    },
+    methods: {
+        axiosGetRequest: function(url){
+        this.auth = "Token "+this.token;
+        var config = {
+          method: "get",
+          url: url,
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': this.auth,
+          },
+        };
+        return axios(config)
+        },
+        axiosPostRequest: function(url, data){
+            this.auth = "Token "+this.token;
+            var config = {
+            method: "post",
+            url: url,
+            headers: {
+                "Content-Type": "multipart/form-data",
+                "Accept": "application/json",
+                'Authorization': this.auth,
+            },
+            data:data
+            };
+
+            return axios(config)
+        },
+        async destroyDataTable(id){
+            if($(id).DataTable()){
+            console.log("destroying", id);
+            $(id).DataTable().clear();
+            $(id).DataTable().destroy();
+            }
+        },
+        async initializeDataTable(id){
+            console.log("initializing");
+            await this.sleep(2000);
+            $(id).DataTable({
+            "dom": '<"table-pull-left"f><"table-pull-right"l>tip',
+            'destroy': true,
+            'paging'      : true,
+            'lengthChange': true,
+            'searching'   : true,
+            'ordering'    : true,
+            'info'        : true,
+            'autoWidth'   : false,
+            'retrieve':true,
+            'scrollX': true,
+            })
+        },
+        sleep: function(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        },
+        showTab(tabName){
+          var i, tabContent, tabLinks;
+          tabContent = document.getElementsByClassName("tabcontent");
+          for (i = 0; i < tabContent.length; i++) {
+            tabContent[i].style.display = "none";
+          }
+          tabLinks = document.getElementsByClassName("tab-links");
+          for (i = 0; i < tabLinks.length; i++) {
+            tabLinks[i].className = tabLinks[i].className.replace(" active", "");
+          }
+          document.getElementById(tabName+'-content').style.display = "block";
+          document.getElementById(tabName+'-tab').classList.add("active");
+        },
+        async showMentorshipGoals(){
+          this.showTab('mentorship-goals');
+          var url =  this.base_url+"/api/mentorship-goals/?user_type=Learner&user_id="+this.user_id+"&company_id="+this.user_company_id;
+          response = await this.axiosGetRequest(url);
+          console.log("All MentorshipGoals Response", response.data);
+          this.all_mentorship_goals = response.data.mentorship_goals;
+        },
+        async showGoals(){
+          this.showTab('user-goals');
+          //await this.destroyDataTable('#mentorship-goals-table')
+          var url =  this.base_url+"/api/user-goals/"+this.user_id;
+          response = await this.axiosGetRequest(url);
+          console.log("All Goals Response", response.data);
+          this.all_user_goals = response.data.data;
+          //await this.initializeDataTable('#user-goals-table')
+        },
+        async showGraphs(){
+          this.showTab('graphs');
+          //await this.destroyDataTable('#all-user-goals-table')
+          var userGoalUrl =  this.base_url+"/api/user-goals-chart/"+this.user_id;
+          userGoalResponse = await this.axiosGetRequest(userGoalUrl);
+          console.log("User Graphs Response", userGoalResponse.data);
+          var mentorshipGoalUrl =  this.base_url+"/api/mentorship-goals-chart/"+this.user_id+"/?company_id="+this.user_company_id;
+          mentorshipGoalResponse = await this.axiosGetRequest(mentorshipGoalUrl);
+          console.log("Mentorship Graphs Response", mentorshipGoalResponse.data);
+          "use strict";
+          // USER GOAL DONUT CHART
+          var donut = new Morris.Donut({
+            element: 'user-goal-donut-chart',
+            resize: true,
+            colors: ["#3c8dbc", "#f56954", "#00a65a", "#432342"],
+            data: userGoalResponse.data.user_goal_donut_chart,
+            hideHover: 'auto'
+          });
+          //USER GOAL BAR CHART
+          var bar = new Morris.Bar({
+            element: 'user-goal-bar-chart',
+            resize: true,
+            data: userGoalResponse.data.user_goal_bar_chart,
+            barColors: ['#00a65a','#f39c12', '#dd4b39'],
+            xkey: 'name',
+            ykeys: ['completed', 'skipped', 'failed'],
+            labels: ['Completed', 'Skipped', 'Failed'],
+            hideHover: 'auto'
+          });
+          // Mentorship Goal Category DONUT CHART
+          var donut = new Morris.Donut({
+            element: 'mentorship-goal-category-chart',
+            resize: true,
+            colors: ["#3c8dbc", "#f56954", "#00a65a", "#432342"],
+            data: mentorshipGoalResponse.data.mentorship_goal_category_chart,
+            hideHover: 'auto'
+          });
+          // Mentorship Goal Status DONUT CHART
+          var donut = new Morris.Donut({
+            element: 'mentorship-goal-status-chart',
+            resize: true,
+            colors: ["#3c8dbc", "#f56954", "#00a65a"],
+            data: mentorshipGoalResponse.data.mentorship_goal_status_chart,
+            hideHover: 'auto'
+          });
+          //Mentorship Goal Progress BAR CHART
+          var bar = new Morris.Bar({
+            element: 'mentorship-goal-progress-chart',
+            resize: true,
+            data: mentorshipGoalResponse.data.mentorship_goal_progress_chart,
+            barColors: ['#3c8dbc'],
+            xkey: 'name',
+            ykeys: ['progress'],
+            labels: ['Progress'],
+            hideHover: 'auto'
+            
+          });
+          //await this.initializeDataTable('#all-graphs-table')
+        },
+        async onCreateEditGoal(){
+        //await this.destroyDataTable("#auto-match-table")
+        var data = new FormData();
+        data.append("heading", this.heading);
+        data.append("description", this.description);
+        data.append("duration_number", this.duration_number);
+        data.append("duration_time", this.$refs.duration_time.value);
+        data.append("category", this.$refs.category.value);
+        data.append("priority_level", this.$refs.priority.value);
+        data.append("frequency", this.$refs.frequency.value);
+        if(this.goal_id_val){
+          var url =  this.base_url+"/api/update-user-goal/"+this.user_id+"/"+this.goal_id_val+"/";
+        }
+        else{
+          var url =  this.base_url+"/api/user-goals/"+this.user_id+"/";
+        }
+        response = await this.axiosPostRequest(url, data);
+        console.log("Goal Create Edit Response", response.data);
+        $('#goal-modal').modal("hide");
+        this.showGoals();
+        this.goal_id_val = ""
+        this.heading = ""
+        this.description = ""
+        this.duration_number = ""
+        this.category_val = ""
+        this.priority_val = ""
+        this.duration_time_val = ""
+        this.frequency_val = ""
+        //await this.initializeDataTable("#auto-match-table");
+      },
+      async getEditGoalData(id){
+        console.log("id", id)
+        $('#goal-modal').modal("show");
+        this.goal_id_val = id
+        var url =  this.base_url+"/api/get-delete-goal/"+this.user_id+"/"+id;
+        response = await this.axiosGetRequest(url);
+        console.log("All Goals Response", response.data);
+        this.heading = response.data.heading
+        this.description = response.data.description
+        this.duration_number = response.data.duration_number
+        this.category_val = response.data.category
+        this.priority_val = response.data.priority_level
+        this.duration_time_val = response.data.duration_time
+        this.frequency_val = response.data.frequency
+      },
+      async deleteGoal(id, base_url, user_id, token) {
+      bootbox.confirm({
+        message: "Are you sure to delete this goal?",
+        buttons: {
+          confirm: {
+            label: "Yes",
+            className: "btn-success",
+          },
+          cancel: {
+            label: "No",
+            className: "btn-danger",
+          },
+        },
+        callback: function (result) {
+          if (result == true) {
+            console.log("id",id)
+            var url = base_url+"/api/get-delete-goal/"+user_id+"/"+id+"/";
+            var auth = "Token "+token;
+            var config = {
+            method: "delete",
+            url: url,
+            headers: {
+                "Content-Type": "multipart/form-data",
+                "Accept": "application/json",
+                'Authorization': auth,
+            },
+            };
+            axios(config)
+              .then((response) => {
+                console.log("response", response)
+                bootbox.alert("Goal deleted successfully!");
+                location.reload()
+              })
+              .catch((error) => {
+                console.log("error", error);
+                bootbox.alert("Something Went Wrong!");
+              });
+            }
+          }
+      });
+    },
+    async UserGoalLog(id, status, type) {
+      console.log("id", id, status, type);
+      var ele_succeed = document.getElementById("succeed"+id);
+      var ele_skip = document.getElementById("skip"+id);
+      var ele_fail = document.getElementById("fail"+id);
+      var ul = document.getElementById("status-ul");
+      var data = new FormData()
+      data.append("user_id", this.user_id)
+      data.append("status", status)
+      data.append("goal_id",id)
+      var url = this.base_url+"/api/log-goal-progress/";
+      try{
+        var response = await this.axiosPostRequest(url, data)
+        console.log("on log goal progress response", response.data)
+        if(status == 'Completed'){
+          ele_succeed.innerHTML = '<a href="javascript:void(0)" data-id='+id+'><i class="fa fa-check" aria-hidden="true"></i><span> Completed </span></a>'
+          ele_skip.remove();
+          ele_fail.remove();
+        }
+        if(status == 'Skipped'){
+          ele_skip.innerHTML = '<a href="javascript:void(0)" data-id='+id+'><i class="fa fa-arrow-right" aria-hidden="true"></i><span> Skipped </span></a>'
+          ele_succeed.remove();
+          ele_fail.remove();
+        }
+        if(status == 'Failed'){
+          ele_fail.innerHTML = '<a href="javascript:void(0)" data-id='+id+'><i class="fa fa-times" aria-hidden="true"></i><span> Failed </span></a>'
+          ele_skip.remove();
+          ele_succeed.remove();
+        }
+      }
+      catch(err){
+        console.log("err", err)
+        bootbox.alert("Something is wrong");
+      }
+    },
+    }
+  });
+</script>
+
+{% endblock js %}

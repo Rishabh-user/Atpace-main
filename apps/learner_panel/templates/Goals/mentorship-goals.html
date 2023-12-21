@@ -1,0 +1,49 @@
+<div class="box">
+    <div class="box-header with-border bg-grey">
+        <h3 class="box-title">Mentorship Goals</h3>
+    </div>
+    <div class="box-body no-padding">
+        <table class="table table-striped">
+        <tr>
+        <th>Heading</th>
+        <th>Due Date</th>
+        <th>Progress</th>
+        <th>Status</th>
+        <th>View</th>
+        </tr>
+        <tr v-for="goal in all_mentorship_goals" :key="goal.id">
+            <td>[[goal.heading]]</td>
+            <td>
+            <span class="label label-danger" v-if="goal.is_expired">Expired</span>
+            <span v-else>[[goal.due_date]]</span>
+            </td>
+            <td>
+            <div class="progress progress-sm">
+                <div class="progress-bar progress-bar-primary progress-bar-striped" role="progressbar" :aria-valuenow="goal.progress" aria-valuemin="0" aria-valuemax="100" :style="'width:'+goal.progress+'%'">
+                </div>
+            </div>
+            </td>
+            <td>
+                <span class="label label-primary" v-if="goal.status='Started'">Started</span>
+                <span class="label label-success" v-else-if="goal.status='ApprovedByMentor'">Approved</span>
+                <span class="label label-danger" v-else-if="goal.status='RejectedByMentor'">Rejected</span>
+                <span class="label label-warning" v-else-if="goal.status='RequestForApprove'">Requested</span>
+                <span class="label label-success" v-else-if="goal.status='Completed'">Completed</span>
+                <span class="label label-primary" v-else>Not Started</span>
+            </td>
+            <td>
+            <a :href="'/leaderboard/mentorship-goal-detail/'+goal.goal_id">
+            <button
+                class="btn btn-info"
+                style="margin: 0px; display:inline;"
+            >
+                View Details
+            </button>
+            </a>
+            </td>
+            
+        </tr>
+        </table>
+    </div>
+    <!-- /.box-body -->
+</div>

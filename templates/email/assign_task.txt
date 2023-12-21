@@ -1,0 +1,15 @@
+{% autoescape off %}
+{{user}},
+
+You have received a new message / assignment from {{manager}}
+
+Task: {{task_name}}  
+Start Time: {{start_time}}
+Description: {{description}}
+
+For more details view your calendar
+
+Regards
+Program team
+
+{% endautoescape %}

@@ -1,0 +1,216 @@
+{% extends 'website/web_base.html' %} {% load static %} {% load tags %}
+{% block css %}
+
+<style>
+   .right{
+       float:right;
+   }
+   hr.line {
+  border-top: 1px solid;
+}
+
+.remove-btn:hover{
+   cursor:pointer;
+   color:black;
+}
+.remove-btn{
+   color:#2b4eff;
+}
+.amount{
+   color:#2b4eff;
+}
+
+
+
+
+</style>
+{% endblock css %} 
+{% block content %}
+<main>
+
+    <!-- page title area start -->
+    <section class="page__title-area pt-120 pb-90">
+       
+       <div class="container">
+          <div class="row">
+            {% if carts.count == 0 %}
+               <h2>Shopping Cart</h2>
+               <h5>Your cart is empty. Keep shopping to find a course!</h5>
+               <div class="course__enroll-btn">
+                  <a href="/" class="e-btn e-btn-7">Keep Shopping</a>
+               </div>
+            
+            {% else %} 
+             <div class="col-xxl-8 col-xl-8 col-lg-8">
+                <div class="course__wrapper">
+                   <div class="page__title-content mb-25">
+                      <div class="page__title-breadcrumb">                            
+                          <nav aria-label="breadcrumb">
+                            <ol class="breadcrumb">
+                              <li class="breadcrumb-item"><a href="{% url 'user:index' %}">Home</a></li>
+                              <li class="breadcrumb-item"><a href="{% url 'user:program' %}">Cart</a></li>
+                            </ol>
+                            <h2>Shopping Cart</h2>
+                            
+                          </nav>
+                      </div>
+                   </div>
+
+                     {% for cart in carts %}
+         
+                     <div class="card cart" style="padding:15px; margin:4px;" >
+                           <div class="row">
+                              <div class="col-md-3">
+                                 <a href="{% url 'user:course_detail' course_id=cart.journey.pk %}">
+                                       <img src="{{MEDIA_URL}}{{cart.journey.image}}" alt="" style="max-length:120px; max-width:120px;">
+                                 </a>
+                              </div>
+                              <div class="col-md-6">
+                                 <a href="{% url 'user:course_detail' course_id=cart.journey.pk %}"> <h5>{{cart.journey.title}}</h5></a>
+                                 <span>{{cart.journey.short_description}}</span>
+                                 <p><b><span>Instructor : </span></b>{{cart.journey.created_by.first_name}} {{cart.journey.created_by.last_name}}</p>
+                              </div>
+                              <div class="col-md-2 remove-btn">
+                              <span onclick="removeJourneyFromCart('{{cart.journey.id}}')">Remove</span>
+                              </div>
+                              <div class="col-md-1 amount">
+                              <span>&#36;{{cart.journey.amount}}</span>
+                              </div>
+
+                           </div>
+                     
+                     </div>
+                     
+                     
+                     {% endfor %}
+
+                  
+
+                   <div class="course__related" style="margin-top:25px;">
+                      <div class="row">
+                         <div class="col-xxl-12">
+                            <div class="section__title-wrapper mb-40">
+                               <h2 class="section__title">Related <span class="yellow-bg yellow-bg-big">Course<img src="assets/img/shape/yellow-bg.png" alt=""></span></h2>
+                               <p>You don't have to struggle alone, you've got our assistance and help.</p>
+                            </div>
+                         </div>
+                      </div>
+                      <div class="row">
+                         <div class="col-xxl-12">
+                            <div class="course__slider swiper-container pb-60">
+                               <div class="swiper-wrapper">
+                                  {% for related_journey in  related_journeys %}
+                                    {% for related_journey in related_journey  %}
+                                    
+                                       <div class="course__item course__item-3 swiper-slide white-bg mb-30 fix">
+                                          <div class="course__thumb w-img p-relative fix">
+                                             <a href="{% url 'user:course_detail' course_id=related_journey.pk %}">
+                                                <img src="{{MEDIA_URL}}{{related_journey.image}}" alt="" height="250">
+                                             </a>
+                                             <div class="course__tag">
+                                                <a href="#">{{related_journey.category}}</a>
+                                             </div>
+                                          </div>
+                                          <div class="course__content">
+                                             <h3 class="course__title"><a href="{% url 'user:course_detail' course_id=related_journey.pk %}">{{related_journey.title}}</a></h3>
+                                             <div class="course__teacher d-flex align-items-center">
+                                                {% if journey.company %}
+                                                <div class="course__teacher-thumb mr-15">
+                                                   <i class="fal fa-users"></i>
+                                                </div>
+                                                <h6><a href="#">{{related_journey.company.name}}</a></h6>
+                                                {% else %}
+                                                <div class="course__teacher-thumb mr-15">
+                                                   <img 
+                                                   onerror="this.onerror=null; this.src='{{MEDIA_URL}}{{request.user.avatar}}'"
+                                                   src="{{related_journey.created_by.avatar}}" alt="">
+                                                </div>
+                                                <h6><a href="#">{{related_journey.created_by.first_name}}{{related_journey.created_by.last_name}}</a></h6>
+                                                {% endif %}
+                                             </div>
+                                          </div>
+                                          <div class="course__more d-flex justify-content-between align-items-center">
+                                             <div class="course__status">
+                                                {% if related_journey.is_paid %}
+                                                   <span>&#36;{{related_journey.amount}}</span> 
+                                                {% else %}
+                                                   <span>Free</span> 
+                                                {% endif %}
+                                             </div>
+                                             <div class="course__btn">
+                                                <a href="{% url 'user:course_detail' course_id=related_journey.pk %}" class="link-btn">
+                                                   Know Details
+                                                   <i class="far fa-arrow-right"></i>
+                                                   <i class="far fa-arrow-right"></i>
+                                                </a>
+                                             </div>
+                                          </div>
+                                       </div>
+                                    {% endfor %}
+                                  {% endfor %}
+                               </div>
+                               <!-- Add Pagination -->
+                               <div class="swiper-pagination"></div>
+                            </div>
+                         </div>
+                      </div>
+                   </div>
+                </div>
+             </div>
+             <div class="col-xxl-4 col-xl-4 col-lg-4" style="margin-top:100px;">
+                <div class="course__sidebar pl-70 p-relative">
+                   <div class="course__shape">
+                      <img class="course-dot" src="assets/img/course/course-dot.png" alt="">
+                   </div>
+                   <div class="course__sidebar-widget-2 white-bg mb-20">
+                      <div class="course__video">
+                      <h3>Summary</h3>
+                        {% for cart in carts %}
+                           
+                           <p><span>{{cart.journey.title}}:</span><span class="right">&#36;{{cart.journey.amount}}</span></p>
+                           
+                        {% endfor %}
+                        <hr class="line">
+                        <p><span>Discount:</span><span class="right">&#36;0</span></p>
+                        
+                        <strong>Total</strong><strong class="right" style="margin-bottom:25px;">&#36;{{total_amount}}</strong>
+                         {% comment %} <hr class="line"> {% endcomment %}
+                         <div class="course__enroll-btn">
+                           <a href="/checkout/buy" class="e-btn e-btn-7 w-100">Checkout <i class="far fa-arrow-right"></i></a>
+                        </div>
+                      </div>
+                   </div>
+               
+                </div>
+             </div>
+             {% endif %}
+          </div>
+       </div>
+    </section>
+    <!-- page title area end -->
+
+     <!-- cta area start -->
+     {% include 'website/web_component/cta_area_card.html' %}
+     <!-- cta area end -->
+
+     <script>
+     function removeJourneyFromCart(journey_id){
+        console.log(journey_id)
+        $.ajax({
+                 url:  "{% url 'payment_gateway:remove_journey_from_cart' %}",
+                 type: 'POST',
+                 data: {id: journey_id, csrfmiddlewaretoken : "{{csrf_token}}" }, 
+                 success: function(data) {
+                  console.log("success",data)
+                  location.reload();
+                 },
+                 error: function(data) {
+                  console.log("error",data)
+                 }
+              });
+     }
+     </script>
+
+
+ </main>
+{% endblock %}

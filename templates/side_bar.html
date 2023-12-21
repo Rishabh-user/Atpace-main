@@ -1,0 +1,783 @@
+{% load static %} {% load tags %}
+{% block css %}
+<style>
+  .sidebar-icon-img {
+    margin-right: 10px;
+    width: 28px;
+  }
+</style>
+{% endblock %}
+
+<aside class="main-sidebar " style="box-shadow: 0px 12px 7px #2329314d; background-color: white; border-radius: none;     background: rgba(187, 176, 176, 0.137);
+backdrop-filter: blur( 1.5px );
+-webkit-backdrop-filter: blur( 1.5px ); border-right: 1px solid #ababab;">
+  <!-- sidebar: style can be found in sidebar.less -->
+  <section class="sidebar">
+    <!-- Sidebar user panel -->
+    <div class="user-panel">
+      <div class="pull-left image">
+        <img src="{{MEDIA_URL}}{{request.user.avatar}}" onerror="this.onerror=null; this.src='{{request.user.avatar}}'"
+          class="img-circle" alt="User Image" />
+      </div>
+      <div class="pull-left info">
+        <p>{{ request.user.first_name }} {{ request.user.last_name }}</p>
+        <a href="#"><i class="fa fa-circle text-success"></i> Online</a>
+      </div>
+    </div>
+    <!-- sidebar menu: : style can be found in sidebar.less -->
+    <ul class="sidebar-menu" data-widget="tree">
+      <li class="header our_background_color">MAIN NAVIGATION</li>
+
+      <li class="">
+        <a href="{% url 'user:user-dashboard' %}"> <img class="sidebar-icon-img"
+            src="{% static 'images/icon/admin/dashboard.png' %}"><span><strong>Dashboard</strong></span> </a>
+      </li>
+      {% comment %} <li class="{% active 'leaderboard:system_goals' %}">
+        <a href="{% url 'leaderboard:system_goals'%}">
+          <i class="fa fa-file-text-o"></i> <span>Goal</span>
+        </a>
+      </li> {% endcomment %}
+      <li class="{% active 'content:user-content' %}">
+        <a href="{% url 'content:user-content'%}">
+          <img class="sidebar-icon-img" src="{% static 'images/icon/admin/my-content.png' %}"> <span><strong> My
+              Content</strong></span>
+        </a>
+      </li>
+      <li class="{% active 'content:pending_content' %}">
+        <a href="{% url 'content:pending_content'%}">
+          <img class="sidebar-icon-img" src="{% static 'images/icon/admin/course-approval.png' %}"> <span><strong>
+              Course Approval</strong></span>
+        </a>
+      </li>
+
+      <li class="{% active 'content:all-content' %}">
+        <a href="{% url 'content:all-content'%}">
+          <img class="sidebar-icon-img" src="{% static 'images/icon/admin/all-content.png' %}"><span><strong> All
+              Content</strong></span>
+        </a>
+      </li>
+
+
+
+      <li
+        class="treeview {% active 'survey:create-survey' %} {% active 'survey:survey-list' %} {% active 'survey:user_survey_attempt'%} {% active 'survey:all_survey_report' %}">
+        <a href="#">
+          <img class="sidebar-icon-img" src="{% static 'images/icon/admin/survey.png' %}"><span><strong> Survey
+            </strong></span>
+          <span class="pull-right-container">
+            <i class="fa fa-angle-left pull-right"></i>
+          </span>
+        </a>
+        <ul class="treeview-menu">
+          <li class="{% active 'survey:create-survey' %}">
+            <a href="{% url 'survey:create-survey'%}"><i class="fa fa-circle-o"></i>Create Survey</a>
+          </li>
+          <li class="{% active 'survey:survey-list' %}">
+            <a href="{% url 'survey:survey-list'%}"><i class="fa fa-circle-o"></i>Show All Survey</a>
+          </li>
+          <li class="{% active 'survey:user_survey_attempt' %}">
+            <a href="{% url 'survey:user_survey_attempt'%}"><i class="fa fa-circle-o"></i>User Survey Response</a>
+          </li>
+          <li class="{% active 'survey:all_survey_report' %}">
+            <a href="{% url 'survey:all_survey_report'%}"><i class="fa fa-circle-o"></i>User Survey Report</a>
+          </li>
+        </ul>
+      </li>
+      <li
+        class="treeview {% active 'test_series:create-test' %} {% active 'test_series:test-list' %} {% active 'test_series:user_test_attempt' %} {% active 'user:assessment_report' %}">
+        <a href="#">
+          <img class="sidebar-icon-img" src="{% static 'images/icon/admin/assessment.png' %}"> <span><strong>
+              Assessment</strong> </span>
+          <span class="pull-right-container">
+            <i class="fa fa-angle-left pull-right"></i>
+          </span>
+        </a>
+        <ul class="treeview-menu">
+          <li class="{% active 'test_series:create-test' %}">
+            <a href="{% url 'test_series:create-test'%}"><i class="fa fa-circle-o"></i>Create Assessment</a>
+          </li>
+          <li class="{% active 'test_series:test-list' %}">
+            <a href="{% url 'test_series:test-list'%}"><i class="fa fa-circle-o"></i>Show All Assessment</a>
+          </li>
+          <li class="{% active 'test_series:user_test_attempt' %}">
+            <a href="{% url 'test_series:user_test_attempt'%}"><i class="fa fa-circle-o"></i>User Assessment
+              Response</a>
+          </li>
+          <li class="{% active 'user:assessment_report' %}">
+            <a href="{% url 'user:assessment_report'%}"><i class="fa fa-circle-o"></i>User Assessment Report</a>
+          </li>
+        </ul>
+      </li>
+      <li class="{% active 'content:all_activity' %}">
+        <a href="{% url 'content:all_activity'%}">
+          <img class="sidebar-icon-img" src="{% static 'images/icon/activity.png' %}"> <span><strong>
+              Activity</strong></span>
+        </a>
+      </li>
+      <li
+        class="treeview {% active 'user:create_role' %} {% active 'content:create_channel_group' %} {% active 'content:channel_group' %} {% active 'content:create-sub-channel' %} {% active 'content:sub_channel_list' %}"
+        style="height: auto">
+        <a href="#">
+          <img class="sidebar-icon-img" src="{% static 'images/icon/admin/skill-hierarchy.png' %}"> <span><strong> Skill
+              Hierarchy</strong></span>
+          <span class="pull-right-container">
+            <i class="fa fa-angle-left pull-right"></i>
+          </span>
+        </a>
+
+        <ul class="treeview-menu ">
+          <li class="{% active 'user:create_role' %}">
+            <a href="{% url 'user:create_role' %}"> <i class="fa fa-circle-o"></i> <span>User Roles</span> </a>
+          </li>
+          <li
+            class="treeview {% active 'content:create-sub-channel' %} {% active 'content:sub_channel_list' %} {% active 'content:sub_channel_list' %}"
+            style="height: auto">
+            <a href="#"><i class="fa fa-circle-o"></i> Skill
+              <span class="pull-right-container">
+                <i class="fa fa-angle-left pull-right"></i>
+              </span>
+            </a>
+            <ul class="treeview-menu">
+              <li class="{% active 'content:create-sub-channel' %}">
+                <a href="{% url 'content:create-sub-channel' %}"><i class="fa fa-circle-o"></i>Create Skill</a>
+              </li>
+              <li class="{% active 'content:sub_channel_list' %}">
+                <a href="{% url 'content:sub_channel_list' %}"><i class="fa fa-circle-o"></i>Skill List</a>
+              </li>
+            </ul>
+          </li>
+          <li class="treeview {% active 'content:create_channel_group' %} {% active 'content:channel_group' %}"
+            style="height: auto">
+            <a href="#"><i class="fa fa-circle-o"></i> Proficiency Level
+              <span class="pull-right-container">
+                <i class="fa fa-angle-left pull-right"></i>
+              </span>
+            </a>
+            <ul class="treeview-menu">
+              <li class="{% active 'content:channel_group' %}">
+                <a href="{%url 'content:channel_group' %}"><i class="fa fa-circle-o"></i> All Proficiency Levels
+                </a>
+              </li>
+              <li class="{% active 'content:create_channel_group' %}">
+                <a href="{% url 'content:create_channel_group' %}"><i class="fa fa-circle-o"></i> Create Proficiency
+                  Level
+                </a>
+              </li>
+            </ul>
+          </li>
+
+        </ul>
+      </li>
+      <li
+        class="treeview {% active 'survey:create_label' %} {% active 'content:join_request' %} {% active 'content:create-channel' %} {% active 'content:channel_list' %} {% active 'content:mentoring_journey' %} {% active 'content:create_journey_page_setup' %} {% active 'content:list_journey_page_setup' %} {% active 'content:config_course' %}"
+        style="height: auto">
+        <a href="#">
+          <img class="sidebar-icon-img" src="{% static 'images/icon/admin/journey_setup.png' %}"> <span><strong> Journey
+              Setup</strong></span>
+          <span class="pull-right-container">
+            <i class="fa fa-angle-left pull-right"></i>
+          </span>
+        </a>
+
+        <ul class="treeview-menu ">
+
+          <li
+            class="treeview {% active 'content:join_request' %} {% active 'content:create-channel' %} {% active 'content:channel_list' %} {% active 'content:mentoring_journey' %}"
+            style="height: auto">
+            <a href="#"><i class="fa fa-circle-o"></i> Journey
+              <span class="pull-right-container">
+                <i class="fa fa-angle-left pull-right"></i>
+              </span>
+            </a>
+
+            <ul class="treeview-menu">
+              <li class="{% active 'content:create-channel' %}">
+                <a href="{% url 'content:create-channel' %}"><i class="fa fa-circle-o"></i> Create Journey
+                </a>
+              </li>
+
+              <li class="{% active 'content:channel_list' %}">
+                <a href="{% url 'content:channel_list' %}"><i class="fa fa-circle-o"></i> Journey List</a>
+              </li>
+              <li class="{% active 'content:mentoring_journey' %}">
+                <a href="{% url 'content:mentoring_journey' %}"><i class="fa fa-circle-o"></i> Mentoring Journey
+                  List</a>
+              </li>
+              <li class="{% active 'content:mentoring_journey' %}">
+                <a href="{% url 'content:self_paced_journey' %}"><i class="fa fa-circle-o"></i> Self Paced Journey
+                  List</a>
+              </li>
+
+
+              <li class="{% active 'content:join_request' %}">
+                <a href="{% url 'content:join_request' %}"><i class="fa fa-circle-o"></i> Join Request</a></a>
+
+              </li>
+            </ul>
+          </li>
+
+          <li
+            class="treeview {% active 'content:create_journey_page_setup' %} {% active 'content:list_journey_page_setup' %}"
+            style="height: auto">
+            <a href="#"><i class="fa fa-circle-o"></i> Journey Page Setup
+              <span class="pull-right-container">
+                <i class="fa fa-angle-left pull-right"></i>
+              </span>
+            </a>
+
+            <ul class="treeview-menu">
+              <li class="{% active 'content:create_journey_page_setup' %}">
+                <a href="{% url 'content:create_journey_page_setup' %}"><i class="fa fa-circle-o"></i> Create Journey
+                  Setup
+                </a>
+              </li>
+
+              <li class="{% active 'content:list_journey_page_setup' %}">
+                <a href="{% url 'content:list_journey_page_setup' %}"><i class="fa fa-circle-o"></i> Journey Setup
+                  List</a>
+              </li>
+
+            </ul>
+          </li>
+          <li class="{% active 'content:config_course' %}">
+            <a href="{% url 'content:config_course' %}"><i class="fa fa-circle-o"></i> Journey Pathway
+            </a>
+          </li>
+          <li class="{% active 'survey:create_label' %}">
+            <a href="{% url 'survey:create_label' %}">
+              <i class="fa fa-circle-o"></i> Journey Level
+            </a>
+          </li>
+
+        </ul>
+      </li>
+      <li class="treeview {% active 'content:create_content' %} " style="height: auto">
+        <a href="#"> <img class="sidebar-icon-img" src="{% static 'images/icon/admin/microskill.png' %}"><span><strong>
+              Microskill</strong></span>
+          <span class="pull-right-container">
+            <i class="fa fa-angle-left pull-right"></i>
+          </span>
+        </a>
+        <ul class="treeview-menu">
+          <li class="{% active 'content:create_content' %}">
+            <a href="{%url 'content:create_content' %}"><i class="fa fa-circle-o"></i> Create Microcontent
+            </a>
+          </li>
+
+        </ul>
+      </li>
+      <li
+        class="treeview {% active 'payment_gateway:show-payment' %} {% active 'payment_gateway:company_subscription' %}"
+        style="height: auto">
+        <a href="#"> <img class="sidebar-icon-img" src="{% static 'images/icon/admin/payment.png' %}"><span><strong>
+              Payments</strong></span>
+          <span class="pull-right-container">
+            <i class="fa fa-angle-left pull-right"></i>
+          </span>
+        </a>
+        <ul class="treeview-menu">
+          <li class="{% active 'payment_gateway:show-payment' %}">
+            <a href="{%url 'payment_gateway:show-payment' %}"><i class="fa fa-circle-o"></i> Journey Enrollment Payment
+            </a>
+          </li>
+          <li class="{% active 'payment_gateway:company_subscription' %}">
+            <a href="{%url 'payment_gateway:company_subscription' %}"><i class="fa fa-circle-o"></i> Company
+              Subscription Payment
+            </a>
+          </li>
+
+        </ul>
+      </li>
+
+      {% comment %} <li class="{% active 'payment_gateway:show-payment' %}">
+        <a href="{% url 'payment_gateway:show-payment' %}"> <img class="sidebar-icon-img"
+            src="{% static 'images/icon/admin/payment.png' %}"> <span><strong> Payment</strong></span> </a>
+      </li> {% endcomment %}
+      <li class="{% active 'user:chat' %}">
+        <a href="{% url 'user:chat' %}"> <img class="sidebar-icon-img"
+            src="{% static 'images/icon/admin/chat.png' %}"><span><strong> Chat</strong></span> </a>
+      </li>
+      <li class="header our_background_color">ATPACE COMMUNITY</li>
+      <li class="treeview {% active 'atpace_community:group_space' %}">
+        <a href="#">
+          <img class="sidebar-icon-img" src="{% static 'images/icon/admin/space-groups.png' %}"> <span><strong> Space
+              Groups</strong></span>
+          <span class="pull-right-container">
+            <i class="fa fa-angle-left pull-right"></i>
+          </span>
+        </a>
+        <ul class="treeview-menu ">
+          <li class="{% active 'atpace_community:group_space' %}">
+            <a href="{% url 'atpace_community:group_space' %}"><i class="fa fa-circle-o"></i>Space Group</a>
+          </li>
+        </ul>
+      </li>
+      <li class="treeview {% active 'atpace_community:create_space' %} {% active 'atpace_community:space_list' %}">
+        <a href="#">
+          <img class="sidebar-icon-img" src="{% static 'images/icon/admin/spaces.png' %}"> <span><strong> Spaces
+            </strong> </span>
+          <span class="pull-right-container">
+            <i class="fa fa-angle-left pull-right"></i>
+          </span>
+        </a>
+        <ul class="treeview-menu ">
+          <li class="{% active 'atpace_community:create_space' %}">
+            <a href="{% url 'atpace_community:create_space' %}"><i class="fa fa-circle-o"></i>Create Space</a>
+          </li>
+          <li class="{% active 'atpace_community:space_list' %}">
+            <a href="{% url 'atpace_community:space_list' %}"><i class="fa fa-circle-o"></i>Space List</a>
+          </li>
+        </ul>
+      </li>
+      <li
+        class="treeview {% active 'atpace_community:create_space_member' %} {% active 'atpace_community:space_member_list' %} {% active 'atpace_community:invite_list' %}">
+        <a href="#">
+          <img class="sidebar-icon-img" src="{% static 'images/icon/admin/spaces-members.png' %}"> <span><strong> Spaces
+              Members</strong></span>
+          <span class="pull-right-container">
+            <i class="fa fa-angle-left pull-right"></i>
+          </span>
+        </a>
+        <ul class="treeview-menu ">
+          <li class="{% active 'atpace_community:create_space_member' %}">
+            <a href="{% url 'atpace_community:create_space_member' %}"><i class="fa fa-circle-o"></i>Create Space
+              Member</a>
+          </li>
+
+          <li class="{% active 'atpace_community:space_member_list' %}">
+            <a href="{% url 'atpace_community:space_member_list' %}"><i class="fa fa-circle-o"></i>Space Member List</a>
+          </li>
+
+          <li class="{% active 'atpace_community:invite_list' %}">
+            <a href="{% url 'atpace_community:invite_list' %}"><i class="fa fa-circle-o"></i>Invite Members List</a>
+          </li>
+        </ul>
+      </li>
+      <li class="treeview {% active 'atpace_community:report_list' %}">
+        <a href="#">
+          <img class="sidebar-icon-img" src="{% static 'images/icon/admin/report-post-record.png' %}"> <span><strong>
+              Report Post Record</strong></span>
+          <span class="pull-right-container">
+            <i class="fa fa-angle-left pull-right"></i>
+          </span>
+        </a>
+        <ul class="treeview-menu ">
+          <li class="{% active 'atpace_community:report_list' %}">
+            <a href="{% url 'atpace_community:report_list' %}"><i class="fa fa-circle-o"></i>Report Post List</a>
+          </li>
+        </ul>
+      </li>
+
+      <li class="header our_background_color">User Settings</li>
+      <li
+        class="treeview {% active 'user:create-user' %} {% active 'user:create-bulk-user' %} {% active 'user:user-list' %} {% active 'user:user-journeys-list' %} {% active 'user:inactive_user_list' %} {% active 'user:allote-channel' %}">
+        <a href="#">
+          <img class="sidebar-icon-img" src="{% static 'images/icon/admin/user-management.png' %}"> <span><strong> User
+              Management</strong></span>
+          <span class="pull-right-container">
+            <i class="fa fa-angle-left pull-right"></i>
+          </span>
+        </a>
+        <ul class="treeview-menu ">
+          <li class="{% active 'user:create-user' %}">
+            <a href="{% url 'user:create-user' %}"><i class="fa fa-circle-o"></i>Add User</a>
+          </li>
+          <li class="{% active 'user:create-bulk-user' %}">
+            <a href="{% url 'user:create-bulk-user' %}"><i class="fa fa-circle-o"></i>Upload Bulk User</a>
+          </li>
+
+          <li class="{% active 'user:user-journeys-list' %}">
+            <a href="{% url 'user:user-journeys-list' %}"><i class="fa fa-circle-o"></i>User Journeys</a>
+          </li>
+          <li class="{% active 'user:user-list' %}">
+            <a href="{% url 'user:user-list' %}"><i class="fa fa-circle-o"></i>Show Active User</a>
+          <li class="{% active 'user:inactive_user_list' %}">
+            <a href="{% url 'user:inactive_user_list' %}"><i class="fa fa-circle-o"></i>Show Inactive User</a>
+          </li>
+          <li class="{% active 'user:allote-channel' %}">
+            <a href="{% url 'user:allote-channel' %}"><i class="fa fa-circle-o"></i>Allot Journeys</a>
+          </li>
+        </ul>
+      </li>
+      <li class="treeview {% active 'user:create_company' %} {% active 'user:company_list' %}">
+        <a href="#">
+          <img class="sidebar-icon-img" src="{% static 'images/icon/admin/manage-community.png' %}"><span><strong>
+              Manage Community</strong></span>
+          <span class="pull-right-container">
+            <i class="fa fa-angle-left pull-right"></i>
+          </span>
+        </a>
+        <ul class="treeview-menu">
+          <li class="{% active 'user:create_company' %}">
+            <a href="{% url 'user:create_company' %}"><i class="fa fa-circle-o"></i>Add Community</a>
+          </li>
+          <li class="{% active 'user:company_list' %}">
+            <a href="{% url 'user:company_list' %}"><i class="fa fa-circle-o"></i> All Community</a>
+          </li>
+        </ul>
+      </li>
+      <li class="header our_background_color">Admin Settings</li>
+      <li class="{% active 'user:create_admin' %}">
+        <a href="{% url 'user:create_admin' %}"><img class="sidebar-icon-img"
+            src="{% static 'images/icon/admin/add-admin.png' %}"> <span><strong> Add Admin</strong></span></a>
+      </li>
+      <li
+        class="treeview {% active 'user:admin_list' %} {% active 'user:mentor_list' %} {% active 'user:content_creator_list' %}">
+        <a href="#">
+          <img class="sidebar-icon-img" src="{% static 'images/icon/admin/show-admin.png' %}"> <span><strong> Show
+              Admin</strong></span>
+          <span class="pull-right-container">
+            <i class="fa fa-angle-left pull-right"></i>
+          </span>
+        </a>
+        <ul class="treeview-menu ">
+          <li class="{% active 'user:admin_list' %}">
+            <a href="{% url 'user:admin_list' %}"><i class="fa fa-circle-o"></i> Admin
+            </a>
+          </li>
+
+          <li class="{% active 'user:mentor_list' %}">
+            <a href="{% url 'user:mentor_list' %}"><i class="fa fa-circle-o"></i> Mentor</a>
+          </li>
+          <li class="{% active 'user:content_creator_list' %}">
+            <a href="{% url 'user:content_creator_list' %}"><i class="fa fa-circle-o"></i> Program Manager</a>
+          </li>
+        </ul>
+      </li>
+
+      {% if request.user.is_superuser %}
+      <li class="header our_background_color">Settings</li>
+      <li class="treeview ">
+        <a href="#">
+          <img class="sidebar-icon-img" src="{% static 'images/icon/admin/setup-journals-templates.png' %}">
+          <span><strong> Setup Journals Templates </strong></span>
+          <span class="pull-right-container">
+            <i class="fa fa-angle-left pull-right"></i>
+          </span>
+        </a>
+        <ul class="treeview-menu ">
+          <li class="">
+            <a href="{% url 'community:create_journal_template' %}"><i class="fa fa-circle-o"></i> Create Templates
+            </a>
+          </li>
+
+          <li class="">
+            <a href="{% url 'community:journals_templates_list' %}"><i class="fa fa-circle-o"></i> Templates List</a>
+          </li>
+
+        </ul>
+      </li>
+      <li class="treeview ">
+        <a href="#">
+          <img class="sidebar-icon-img" src="{% static 'images/icon/admin/coupon-code.png' %}"> <span><strong> Coupon
+              Code</strong></span>
+          <span class="pull-right-container">
+            <i class="fa fa-angle-left pull-right"></i>
+          </span>
+        </a>
+        <ul class="treeview-menu ">
+          <li class="">
+            <a href="{% url 'user:create_coupon' %}"><i class="fa fa-circle-o"></i>Create Coupon Code</a>
+          </li>
+
+          <li class="">
+            <a href="{% url 'user:list_coupon' %}"><i class="fa fa-circle-o"></i>Coupon Code List</a>
+          </li>
+
+        </ul>
+      </li>
+      <li class="treeview ">
+        <a href="#">
+          <img class="sidebar-icon-img" src="{% static 'images/icon/admin/profile-assessment.png' %}"><span><strong>
+              Profile Assessment</strong></span>
+          <span class="pull-right-container">
+            <i class="fa fa-angle-left pull-right"></i>
+          </span>
+        </a>
+        <ul class="treeview-menu ">
+          <li class="">
+            <a href="{% url 'user:create_assessment' %}"><i class="fa fa-circle-o"></i>Create Assessment</a>
+          </li>
+
+          <li class="">
+            <a href="{% url 'user:assessment_list' %}"><i class="fa fa-circle-o"></i>Assessment List</a>
+          </li>
+
+        </ul>
+      </li>
+      <li class="treeview ">
+        <a href="#">
+          <img class="sidebar-icon-img" src="{% static 'images/icon/admin/badges.png' %}"> <span><strong> Badges
+            </strong></span>
+          <span class="pull-right-container">
+            <i class="fa fa-angle-left pull-right"></i>
+          </span>
+        </a>
+        <ul class="treeview-menu ">
+          <li class="">
+            <a href="{% url 'leaderboard:create_badge' %}"><i class="fa fa-circle-o"></i>Create Badge</a>
+          </li>
+
+          <li class="">
+            <a href="{% url 'leaderboard:badges_list' %}"><i class="fa fa-circle-o"></i>badges List</a>
+            {% comment %}
+          </li>
+          <li class="">
+            <a href="{% url 'leaderboard:points_list' %}"><i class="fa fa-circle-o"></i>ALL points</a>
+          </li> {% endcomment %}
+
+        </ul>
+      </li>
+      <li class="treeview ">
+        <a href="#">
+          <img class="sidebar-icon-img" src="{% static 'images/icon/admin/points.png' %}"> <span><strong> Points
+            </strong></span>
+          <span class="pull-right-container">
+            <i class="fa fa-angle-left pull-right"></i>
+          </span>
+        </a>
+        <ul class="treeview-menu ">
+          <li class="">
+            <a href="{% url 'leaderboard:create_points' %}"><i class="fa fa-circle-o"></i>Create Point</a>
+          </li>
+
+          <li class="">
+            <a href="{% url 'leaderboard:points_list' %}"><i class="fa fa-circle-o"></i>Points List</a>
+          </li>
+
+        </ul>
+      </li>
+      <li class="treeview ">
+        <a href="#">
+          <img class="sidebar-icon-img" src="{% static 'images/icon/admin/streaks.png' %}"> <span><strong> Streaks
+            </strong></span>
+          <span class="pull-right-container">
+            <i class="fa fa-angle-left pull-right"></i>
+          </span>
+        </a>
+        <ul class="treeview-menu ">
+          <li class="">
+            <a href="{% url 'leaderboard:create_streak_points' %}"><i class="fa fa-circle-o"></i>Create Streak
+              Points</a>
+          </li>
+
+          <li class="">
+            <a href="{% url 'leaderboard:streak_points_list' %}"><i class="fa fa-circle-o"></i>Streak Points List</a>
+          </li>
+
+        </ul>
+      </li>
+      <li class="treeview ">
+        <a href="#">
+          <img class="sidebar-icon-img" src="{% static 'images/icon/admin/public-announcement.png' %}">
+          <span><strong>Public Announcement</strong></span>
+          <span class="pull-right-container">
+            <i class="fa fa-angle-left pull-right"></i>
+          </span>
+        </a>
+        <ul class="treeview-menu ">
+          <li class="">
+            <a href="{% url 'content:public_announcement' %}"><i class="fa fa-circle-o"></i>Create Public
+              Announcement</a>
+          </li>
+
+          <li class="">
+            <a href="{% url 'content:public_announcement_list' %}"><i class="fa fa-circle-o"></i>Public Announcement
+              List</a>
+          </li>
+        </ul>
+      </li>
+      <li class="treeview ">
+        <a href="#">
+          <img class="sidebar-icon-img" src="{% static 'images/icon/admin/setup-subscription.png' %}"><span><strong>
+              Setup Subscriptions</strong></span>
+          <span class="pull-right-container">
+            <i class="fa fa-angle-left pull-right"></i>
+          </span>
+        </a>
+        <ul class="treeview-menu ">
+          <li class="">
+            <a href="{% url 'program_manager:create_subscription' %}"><i class="fa fa-circle-o"></i> Create Subscription
+            </a>
+          </li>
+
+          <li class="">
+            <a href="{% url 'program_manager:subscription_list' %}"><i class="fa fa-circle-o"></i>Subscription List</a>
+          </li>
+          <li class="">
+            <a href="{% url 'program_manager:subscription_offer' %}"><i class="fa fa-circle-o"></i> Create Subscription
+              Offer
+            </a>
+          </li>
+
+          <li class="">
+            <a href="{% url 'program_manager:subscription_offer_list' %}"><i class="fa fa-circle-o"></i>Subscription
+              Offer List</a>
+          </li>
+          <li class="">
+            <a href="{% url 'program_manager:mentor_mentee_ratio' %}"><i class="fa fa-circle-o"></i> Create Mentor
+              Mentee Ratio
+            </a>
+          </li>
+
+          <li class="">
+            <a href="{% url 'program_manager:mentor_mentee_ratio_list' %}"><i class="fa fa-circle-o"></i>Mentor Mentee
+              Ratio List</a>
+          </li>
+        </ul>
+      </li>
+      <li class="treeview ">
+        <a href="#">
+          <img class="sidebar-icon-img" src="{% static 'images/icon/certificate.png' %}"><span><strong> Setup
+              Certificate</strong></span>
+          <span class="pull-right-container">
+            <i class="fa fa-angle-left pull-right"></i>
+          </span>
+        </a>
+        <ul class="treeview-menu ">
+          <li class="">
+            <a href="{% url 'content:create_certificate' %}"><i class="fa fa-circle-o"></i> Create Certificate
+            </a>
+          </li>
+
+          <li class="">
+            <a href="{% url 'content:certificate_list' %}"><i class="fa fa-circle-o"></i>Certificate List</a>
+          </li>
+        </ul>
+      </li>
+      <li class="treeview ">
+        <a href="#">
+          <img class="sidebar-icon-img"
+            src="{% static 'images/icon/admin/setup-feedback-template.png' %}"><span><strong> Setup Feedback
+              Template</strong></span>
+          <span class="pull-right-container">
+            <i class="fa fa-angle-left pull-right"></i>
+          </span>
+        </a>
+        <ul class="treeview-menu ">
+          <li class="">
+            <a href="{% url 'feedback:create_feedback_template' %}"><i class="fa fa-circle-o"></i> Create Feedback
+              Template
+            </a>
+          </li>
+
+          <li class="">
+            <a href="{% url 'feedback:feedback_template_list' %}"><i class="fa fa-circle-o"></i>Feedback Template
+              List</a>
+          </li>
+          <li class="">
+            <a href="{% url 'feedback:feedback_response' %}"><i class="fa fa-circle-o"></i>Feedback Response</a>
+          </li>
+        </ul>
+      </li>
+      <li class="">
+        <a href="{% url 'user:user_profile_check' %}"><img class="sidebar-icon-img"
+            src="{% static 'images/icon/admin/user-reporting.png' %}"><span><strong> User Reporting</strong></span></a>
+      </li>
+      <li class="">
+        <a href="{% url 'atpace_community:content_review_list' %}"><img class="sidebar-icon-img"
+            src="{% static 'images/icon/admin/user-contain-review.png' %}"><span><strong>User Content
+              Review</strong></span></a>
+      </li>
+      <li class="">
+        <a href="{% url 'utils:category' %}"><img class="sidebar-icon-img"
+            src="{% static 'images/icon/admin/category.png' %}"><span><strong> Category</strong></span></a>
+      </li>
+      <li class="">
+        <a href="{% url 'utils:industry' %}"><img class="sidebar-icon-img"
+            src="{% static 'images/icon/admin/Industry.png' %}"><span><strong> Industry</strong></span></a>
+      </li>
+      <li class="">
+        <a href="{% url 'utils:tags' %}"><img class="sidebar-icon-img"
+            src="{% static 'images/icon/admin/tags.png' %}"><span><strong> Tags</strong></span></a>
+      </li>
+      <li class="">
+        <a href="{% url 'utils:pool' %}"><img class="sidebar-icon-img"
+            src="{% static 'images/icon/admin/pool-setup.png' %}"><span><strong> Pool Setup</strong></span></a>
+      </li>
+      <li class="">
+        <a href="{% url 'utils:matching' %}"><img class="sidebar-icon-img"
+            src="{% static 'images/icon/admin/pool-allocation.png' %}"><span><strong> Pool
+              Allocation</strong></span></a>
+      </li>
+      <li class="">
+        <a href="{% url 'user:manual_assign' %}"><img class="sidebar-icon-img"
+            src="{% static 'images/icon/admin/manual-assign.png' %}"><span><strong> Manual Assign</strong></span></a>
+      </li>
+      <li class="">
+        <a href="{% url 'utils:email_list' %}"><img class="sidebar-icon-img"
+            src="{% static 'images/icon/admin/send-mail-list.png' %}"><span><strong> Send Mail List</strong></span></a>
+      </li>
+      <li class="">
+        <a href="{% url 'user:matching_mentor' %}"><img class="sidebar-icon-img"
+            src="{% static 'images/icon/admin/matching-page.png' %}"><span><strong> Matching Page</strong></span></a>
+      </li>
+      <li class="{% active 'content:program_announce_wp_report' %}">
+        <a href="{% url 'content:program_announce_wp_report' %}"> <img class="sidebar-icon-img"
+            src="{% static 'images/icon/admin/whatsapp-message-records.png' %}"> <span><strong> Whatsapp Message
+              Records</strong></span> </a>
+      </li>
+      <li class="{% active 'utils:url_shortner' %}">
+        <a href="{% url 'utils:url_shortner' %}"> <img class="sidebar-icon-img"
+            src="{% static 'images/icon/admin/url.png' %}"> <span><strong> Url Shortner</strong></span> </a>
+      </li>
+      <li
+        class="treeview {% active 'mentor:create_list_mentoring_types' %} {% active 'mentor:create_list_target_audience' %}">
+        <a href="#">
+          <img class="sidebar-icon-img" src="{% static 'images/icon/marketplace.png' %}"><span><strong>
+              Marketplace</strong></span>
+          <span class="pull-right-container">
+            <i class="fa fa-angle-left pull-right"></i>
+          </span>
+        </a>
+        <ul class="treeview-menu">
+          <li class="">
+            <a href="{% url 'mentor:create_list_mentoring_types' %}"><i class="fa fa-circle-o"></i>Mentoring Types</a>
+          </li>
+          <li class="">
+            <a href="{% url 'mentor:create_list_target_audience' %}"><i class="fa fa-circle-o"></i>Target Audience</a>
+          </li>
+          <li class="">
+            <a href="{% url 'program_manager:admin_review_mentor_marketplace' %}"><i class="fa fa-circle-o"></i>Review
+              Mentor</a>
+          </li>
+        </ul>
+      </li>
+      <li class="{% active 'utils:log_file' %}">
+        <a href="{% url 'utils:log_file' %}"> <img class="sidebar-icon-img"
+            src="{% static 'images/icon/admin/url.png' %}"> <span><strong>Logs</strong></span> </a>
+      </li>
+
+      {% endif %}
+
+      {% if request.user.is_superuser %}
+      <li class="header our_background_color">Web Settings</li>
+      <li class="{% active 'web_app:general_settings' %}">
+        <a href="{% url 'web_app:general_settings' %}"><img class="sidebar-icon-img"
+            src="{% static 'images/icon/admin/general-setting.png' %}"><span><strong> General
+              Settings</strong></span></a>
+      </li>
+      <li class="{% active 'web_app:homepage_journey' %}">
+        <a href="{% url 'web_app:homepage_journey' %}"><img class="sidebar-icon-img"
+            src="{% static 'images/icon/admin/homepage-journey.png' %}"><span><strong> Homepage
+              Journey</strong></span></a>
+      </li>
+      <li class="{% active 'web_app:team_members' %}">
+        <a href="{% url 'web_app:team_members' %}"><img class="sidebar-icon-img"
+            src="{% static 'images/icon/admin/team-members.png' %}"><span><strong> Team Members</strong></span></a>
+      </li>
+      <li class="{% active 'web_app:add_testimonial' %}">
+        <a href="{% url 'web_app:add_testimonial' %}"><img class="sidebar-icon-img"
+            src="{% static 'images/icon/admin/add-testimonials.png' %}"><span><strong> Add
+              Testimonial</strong></span></a>
+      </li>
+      <li class="{% active 'web_app:contace_messages' %}">
+        <a href="{% url 'web_app:contace_messages' %}"><img class="sidebar-icon-img"
+            src="{% static 'images/icon/admin/contact.png' %}"><span><strong> Contact US</strong></span> </a>
+      </li>
+      {% endif %}
+
+    </ul>
+  </section>
+  <!-- /.sidebar -->
+</aside>

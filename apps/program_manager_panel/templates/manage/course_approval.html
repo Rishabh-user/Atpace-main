@@ -1,0 +1,52 @@
+<div class="box">
+             <div class="box-header">
+               <h3 class="box-title">Courses List</h3>
+             </div>
+             <!-- /.box-header -->
+             <div class="box-body">
+                  <table id="course-table" class="table table-bordered table-hover">
+                    <thead>
+                    <tr>
+                      <tr>
+                        <th>Title</th>
+                        <th>Icon</th>
+                        <th>Status</th>
+                        <th>Journey</th>
+                        <th>Last Update</th>
+                        <th>Action</th>
+                      </tr>
+                      
+                    </tr>
+                    </thead>
+                    <tbody>
+                      
+                      <tr v-for="content in course_approval" :key="content.id">
+                        <td>[[content.content_title]]</td>
+                        <td><img :src="content.content_image" width="100px"></td>
+                        <td>[[content.status]]</td>
+                        <td>Journey: [[content.channel_title]]  Level: [[content.channel_grouptitle]]</td>
+                        <td>[[content.updated_at]]</td>
+                        <td>
+                          <div class="dropdown">
+                            <button class="btn bg-purple dropdown-toggle btn-select-option" type="button" data-toggle="dropdown" aria-expanded="true">Select an option                                            <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu options-dropdown">
+                                <li v-if="content.status != 'Live'" @click="approveRejectCourse(content.id, 'Approve')" style="padding:3px 20px;">
+                                    <i class="fa fa-check option-icon"></i><span style="margin-left:10px;">Approve</span>
+                                </li>
+                                <li v-if="content.status != 'Live'" @click="approveRejectCourse(content.id, 'reject')" style="padding:3px 20px;">
+                                  <i class="fa fa-remove option-icon"></i><span style="margin-left:10px;">Reject</span>
+                                </li>
+                                <li>
+                                  <a :href="'/content/'+content.content_id"><i class="fa fa-eye option-icon"></i>View</a>
+                                </li> 
+                            </ul>
+                        </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+             </div>
+             <!-- /.box-body -->
+           </div>
+           <!-- /.box -->

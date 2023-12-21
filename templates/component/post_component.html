@@ -1,0 +1,48 @@
+{% load tags %}
+      
+        <a href="{% url 'community:journey_post_details' channel=channel.pk post_id=data.id %}"> <h4 style="padding: 10px;">{{data.name}}</h4></a>
+        <div class="box-header with-border">
+          <div class="user-block">
+            <img class="img-circle" src="{{request.user.avatar}}" alt="User Image">
+            <span class="username"><a href="#" style="color: black;">{{data.user_name}}</a></span>
+            <span class="description"> {% if channel.is_community_required %}
+              {{ data.created_at|get_type }}
+              {% else %}
+              {{ data.created_at }}
+              {% endif %}</span>
+          </div>
+          <!-- /.user-block -->
+          {% if data.user_email == request.email %}
+          <div class="box-tools">
+            <button type="button" class="btn btn-box-tool" data-toggle="tooltip" title="" data-original-title="Mark as read">
+              <i class="fa fa-circle-o"></i></button>
+            <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+            </button>
+            <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+          </div>
+          {% endif %}
+          <!-- /.box-tools -->
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body">
+          <!-- post text -->
+          {% autoescape off %}
+          
+          {% if channel.is_community_required %}
+            {% if data.record_type == "LearningJournal"%}
+            {{data.body}}
+            {% else %}
+            {{data.body.body}}
+            {% endif %}
+            {% else %}
+            {{data.body}}
+            {% endif %}
+        {% endautoescape %}
+          <!-- Social sharing buttons -->
+          <hr>
+          <!-- <button type="button" class="btn btn-default btn-xs"><i class="fa fa-share"></i> Share</button> -->
+          <button type="button" class="btn btn-default btn-xs"><i class="fa fa-thumbs-o-up"></i> Like</button>
+          <span class="pull-right text-muted">{% if data.likes_count != 0 %} {{data.likes_count}} {% endif %} likes -  comments({{data.comments_count}})</span>
+        </div>
+        <!-- /.box-body -->
+     

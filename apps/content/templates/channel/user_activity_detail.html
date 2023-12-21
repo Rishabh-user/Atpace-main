@@ -1,0 +1,156 @@
+{% extends 'base.html' %} {% load static %} 
+{% block title %} User Activity {% endblock %} 
+{% load tags %}
+{% block css %} 
+  <link
+          rel="stylesheet"
+          href="{% static 'css/program_manager/program_manager.css' %}"
+  />
+  <style>
+    .capitalize {
+      text-transform: capitalize;
+    }
+    .mgt-10{
+      margin-top: 10px;
+    }
+    /* Create an active/current tablink class */
+    .tab div div.active {
+      border-top: 5px solid #1B74E4;
+    }
+    /* Style the tab content */
+    .tabcontent {
+      display: none;
+    }
+  </style>
+{% endblock css %} {% block content %}
+<div class="content-wrapper" id="vue-app">
+  <section class="content-header">
+    <h1> User Activity</h1>
+  </section>
+  <section class="content">
+    <div class="box">
+        <div class="box-header">
+            <h3 class="box-title">User Activity List</h3>
+        </div>
+        <div class="box-body">
+            <table id="activity-table" class="table table-bordered table-hover">
+                <thead>
+                <tr>
+                <th>Title</th>
+                <th>Journey</th>
+                <th>User</th>
+                {% comment %} <th>Is Review</th> {% endcomment %}
+                <th>View</th>
+                </tr>
+                </thead>
+                <tbody> 
+                <tr v-for="(activity, index) in activity_list" :key="activity.id">
+                <td class="capitalize">[[activity.title]]</td>
+                <td class="capitalize">[[activity.journey_title]]</td>
+                <td class="capitalize">[[activity.submitted_by]]</td>
+                {% comment %} <td class="capitalize">[[activity.is_review]]</td> {% endcomment %}
+                <td><a :href="activity.upload_file" target="_blank" download>View</a></td>
+                </tr>
+            </table>
+        </div>
+        <!-- /.box-body -->
+    </div>
+  </section>
+  {{ request.user.id|json_script:"user_id" }}
+  {{request.session.token|json_script:"token"}}
+  {{request.session.company_id|json_script:"company_id"}}
+  {{request.session.company_name|json_script:"company_name"}}
+  {{activity_id|json_script:"activity_id"}}
+  {{user_type|json_script:"user_type"}}
+  
+</div>
+{% endblock content %} {% block js %} 
+<script src="{% static 'bower_components/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
+<script type="text/javascript">
+  let app = new Vue({
+    el: "#vue-app",
+    delimiters: ['[[', ']]'],
+    data() {
+      return {
+        token:JSON.parse(document.getElementById('token').textContent),
+        auth:"",
+        base_url:window.location.origin,
+        user_id: JSON.parse(document.getElementById('user_id').textContent),
+        user_company_name: JSON.parse(document.getElementById('company_name').textContent),
+        user_company_id: JSON.parse(document.getElementById('company_id').textContent),
+        activity_id:JSON.parse(document.getElementById('activity_id').textContent),
+        user_type:JSON.parse(document.getElementById('user_type').textContent),
+        activity_list: ""
+      };
+    },
+    mounted(){
+      this.showUserActivity();
+    },
+    methods: {
+        axiosGetRequest: function(url){
+        this.auth = "Token "+this.token;
+        var config = {
+          method: "get",
+          url: url,
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': this.auth,
+          },
+        };
+        return axios(config)
+        },
+        axiosPostRequest: function(url, data){
+            this.auth = "Token "+this.token;
+            var config = {
+            method: "post",
+            url: url,
+            headers: {
+                "Content-Type": "multipart/form-data",
+                "Accept": "application/json",
+                'Authorization': this.auth,
+            },
+            data:data
+            };
+
+            return axios(config)
+        },
+        async destroyDataTable(id){
+            if($(id).DataTable()){
+            console.log("destroying", id);
+            $(id).DataTable().clear();
+            $(id).DataTable().destroy();
+            }
+        },
+        async initializeDataTable(id){
+            console.log("initializing");
+            await this.sleep(2000);
+            $(id).DataTable({
+            "dom": '<"table-pull-left"f><"table-pull-right"l>tip',
+            'destroy': true,
+            'paging'      : true,
+            'lengthChange': true,
+            'searching'   : true,
+            'ordering'    : true,
+            'info'        : true,
+            'autoWidth'   : false,
+            'retrieve':true,
+            'scrollX': true,
+            })
+        },
+        sleep: function(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        },
+        async showUserActivity(){
+          await this.destroyDataTable('#activity-table')
+          var url =  this.base_url+"/api/activity-user/"+this.user_id+"/"+this.activity_id+"/?user_type="+this.user_type+"&company_id="+this.user_company_id;
+          response = await this.axiosGetRequest(url);
+          console.log("All Activity Response", response.data);
+          this.activity_list = response.data.data;
+          await this.initializeDataTable('#activity-table')
+        },
+    }
+  });
+</script>
+
+{% endblock js %}

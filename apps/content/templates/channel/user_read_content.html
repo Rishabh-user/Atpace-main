@@ -1,0 +1,542 @@
+{% extends 'base_with_empty_sidebar.html' %}
+{% load static %} {% load tags %}
+{% block css %} 
+
+
+
+    <style>
+     
+      /* Blue */
+      .c_info {
+        border-color: #2196f3;
+        color: dodgerblue;
+      }
+
+      .c_info:hover {
+        background: #2196f3;
+        color: white;
+      }
+
+      .wrong_answer {
+        border-color: #e8453c !important;
+        background-color: #e7acac !important;
+      }
+
+      .right_answer {
+        border-color: #6ceb96 !important;
+        background-color: #96f1bc !important;
+      }
+      .quiz_result {
+        background-color: #f2f0f0;
+        padding: 15px;
+        display: none;
+      }
+      .content {
+        min-height: auto;
+      }
+    </style>
+  
+    <style>
+     
+  .section {
+   padding: 15px;
+  }
+
+ 
+  section.content{
+min-height: calc(100vh - 33px);
+justify-content: center;
+align-items: center;
+margin: 0 auto;
+display: block;
+margin-top: 1%;
+width: 100%;
+max-width: 750px;
+
+}
+
+  .c_poll_btn {
+    border: 1px solid black;
+    background-color: white;
+    color: black;
+    font-size: 16px;
+    cursor: pointer;
+    width: 100%;
+    margin-bottom: 10px;
+  }
+  .c_btn {
+    border: 1px solid black;
+    background-color: white;
+    color: black;
+    padding: 9px 28px;
+    font-size: 16px;
+    cursor: pointer;
+    width: 100%;
+    margin-bottom: 10px;
+  }
+  /* //Nick Css */
+  .section {
+    justify-content: center !important;
+    align-items: center !important;
+    display: flex !important;
+  }
+
+
+  .padding-x-48 {
+    padding: 0 48px;
+  }
+  .box-header {
+    padding: 10px 0;
+  }
+  @media only screen and (max-width: 600px) {
+    .content_card {
+      padding: 12px;
+      width: 100%;
+      max-width: 750px;
+      min-width: unset;
+    }
+    iframe.content_card {
+      width: 100%;
+      min-width: 100%;
+    }
+    .content {
+      width: 100%;
+    }
+    .row {
+      padding: 0px;
+      margin-left: -2px;
+      margin-right: 0px;
+    }
+    .card_image {
+      width: 100% !important;
+    }
+  }
+  @media (max-width: 1200px) {
+    .padding-x-48 {
+      padding: 0;
+    }
+    .content_card {
+      /* max-width: 400px; */
+      max-width: unset;
+      width: 100%;
+      /* min-width: 630px; */
+      min-width: unset;
+      
+    }
+    .card_image {
+      width: 60%;
+    }
+    .row {
+      width: 100%;
+      min-width: 100%;
+      margin-left: -3px;
+      margin-right: -5px;
+    }
+    
+  }
+  .pdf-content svg {
+    width: 100%;
+    max-width: 80px;
+  }
+  .pdf-content > div {
+    padding: 0;
+  }
+  .img-cover {
+    height: 400px;
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+  }
+  .img-cover img {
+    position: absolute;
+    left: -1000%;
+    right: -1000%;
+    top: -1000%;
+    bottom: -1000%;
+    margin: auto;
+    /* min-height: 100%; */
+    min-width: 100%;
+  }
+  
+    </style>
+   
+
+    <style>
+      .read_content_link{
+        padding: 5px !important;
+        font-family: 'Nunito', sans-serif;
+        font-size-adjust: 0.58;
+        border-bottom: 1px solid gray;
+      }
+      .ques-progress-bar{
+        border: 2px solid #337ab7;
+        padding: 7px 20px;
+        font-weight: 800;
+        color: black;
+        border-radius: 5px;
+        box-shadow: 1px 1px 1px 1px #337ab7;
+        margin-right: 20px;
+      }
+    </style>
+   {% endblock %}
+{% block sidebar %}
+<aside
+class="main-sidebar"
+style="
+  box-shadow: 0px 12px 7px #2329314d;
+  background-color: white;
+  border-radius: none;
+  backdrop-filter: blur(1.5px);
+  -webkit-backdrop-filter: blur(1.5px);
+  border-right: 1px solid #ababab;
+"
+>
+<!-- sidebar: style can be found in sidebar.less -->
+<section class="sidebar" style="background-color: #fff">
+  <ul class="sidebar-menu" style="margin-top: 5px;" data-widget="tree">
+    {% for content_data in content_data %}
+    <li class="read_content_link" {% if data.id == content_data.pk  %} style="    background-color: #b8b8b8;" {% endif %}>
+      <a
+        href="{% url 'content:read_content' pk=content.pk group=group.pk %}?page={{content_data.display_order}}"
+       style="padding: 0px 5px 5px 0px;">
+        {% if content_data.type == "Text" %}
+        <img src="{% static 'images/icon/text.png' %}" width="30"  style="border-radius: 30%;" />
+        <span style="color: #000; white-space: initial; ">
+          {{content_data.title}} (3:00)</span
+        >
+        {% elif content_data.type == "Image" %}
+        <img src="{% static 'images/icon/image.png' %}" width="30"  style="border-radius: 30%;" />
+        <span style="color: #000;  white-space: initial; "
+          >{{content_data.title}} (1:00)</span
+        >
+        {% elif content_data.type == "Video" %}
+        <img src="{% static 'images/icon/video.png' %}" width="30"  style="border-radius: 30%;"/>
+        <span style="color: #000;  white-space: initial; "
+          >{{content_data.title}} {{data.id}} {{content_data.pk}} (5:00)</span
+        >
+        {% elif content_data.type == "YtVideo" %}
+        <img src="{% static 'images/icon/link.png' %}" width="30"  style="border-radius: 30%;" />
+        <span style="color: #000; white-space: initial; "
+          >{{content_data.title}} (5:00)</span
+        >
+        {% elif content_data.type == "Link" %}
+        <img src="{% static 'images/icon/link.png' %}" width="30"  style="border-radius: 30%;" />
+        <span style="color: #000; white-space: initial; "
+          >{{content_data.title}} (5:00)</span
+        >
+        {% elif content_data.type == "Quiz" %}
+        <img src="{% static 'images/icon/quiz.png' %}" width="30"   style="border-radius: 30%;"/>
+        <span style="color: #000;  white-space: initial; "
+          >{{content_data.title}} (2:00)</span
+        >
+        {% elif content_data.type == "Poll" %}
+        <img src="{% static 'images/icon/poll.png' %}" width="30"  style="border-radius: 30%;" />
+        <span style="color: #000;  white-space: initial; "
+          >{{content_data.title}} (1:00)</span
+        >
+        {% elif content_data.type == "Pdf" %}
+        <img src="{% static 'images/icon/pdf.png' %}" width="30"  style="border-radius: 30%;" />
+        <span style="color: #000; white-space: initial; "
+          >{{content_data.title}} (5:00)</span
+        >
+        {% elif content_data.type == "Activity" %}
+        <img src="{% static 'images/icon/pdf.png' %}" width="30"  style="border-radius: 30%;" />
+        <span style="color: #000; white-space: initial; "
+          >{{content_data.title}} (10:00)</span
+        >
+        {% endif %}
+      </a>
+    </li>
+
+    {% endfor %}
+  </ul>
+</section>
+
+</aside>
+{% endblock sidebar %}
+{% block content %}
+      <!-- Content Wrapper. Contains page content -->
+      <div class="content-wrapper">
+        <section class="content-header">
+          <a href="{% url 'user:user-dashboard' %}"><button class="btn btn-primary pull-right">Go to dashboard</button></a>
+          <div class="ques-progress-bar pull-right">
+            <span>{{page_no}}</span>/
+            <span>{{content_data.count}}</span>
+          </div>
+          <h1>{{content}} </h1>
+          <p></p>
+        </section>
+
+        <section class="content">
+          {% comment %} {% for data in data %} {% endcomment %}
+          <div class="row content_data" data-id="{{data.id}}">
+            <!-- <div class="col-md-12"> -->
+
+            <!-- User image -->
+            {% if data.type == "Text" %} 
+              {% include 'microskill_card/text.html' %} 
+            {% elif data.type == "Video" %} 
+              {% include 'microskill_card/video.html' %} 
+            {% elif data.type == "Image" %} 
+              {% include 'microskill_card/image.html' %} 
+            {% elif data.type == "YtVideo" %} 
+              {% include 'microskill_card/yt_video.html' %} 
+            {% elif data.type == "Link" %} 
+              {% include 'microskill_card/system_link.html' %} 
+            {% elif data.type == "Pdf" %} 
+              {% include 'microskill_card/pdf.html' %} 
+            {% elif data.type == "Quiz" %} 
+              {% include 'microskill_card/quiz.html' %} 
+            {% elif data.type == "Poll" %} 
+              {% include 'microskill_card/poll.html' %} 
+            {% elif data.type == "Activity" %} 
+              {% include 'microskill_card/activity.html' %} 
+            {% elif data.type == "Activity" %} 
+              {% include 'microskill_card/activity.html' %} 
+            {% endif %}
+            <!-- </div> -->
+          </div >
+          
+        
+          {% comment %} {% endfor %}  {% endcomment %}
+          {% include 'microskill_card/previous_next_button.html' %}
+          <div class="content_card">
+            <h3> Your Key Learning For this Course</h3>
+           
+        
+          <form method="post" action="{% url 'community:add_learning_journal' %}">
+            {% csrf_token %}
+            <div class="modal-body">  
+              
+              <div class="row">
+                <div class="col-md-12">
+                <div class="form-group">
+                  <input type="hidden" id="learning_journal_id" name="learning_journal_id" value="{{learning_journals.pk}}">
+                  <input type="hidden" id="journey" name="journey" value= "{{parent_check.channel_id}}">
+                  <input type="hidden" id="content" name="content" value= "{{content.pk}}">
+                  <input type="hidden" id="group" name="group" value= "{{group.pk}}">
+                  <input type="hidden" id="card_id" name="card_id" value= "{{page_obj.number}}">
+                  
+                  <textarea id="" name="learning_journal" style="width: 100%; height: 130px; font-size: 14px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;" rows="10" class="form-control textarea" placeholder="Enter Learning Journal" required>{{learning_journals.learning_journal}}</textarea>
+                </div> 
+            </div>  
+            <div class="col-md-2">
+              
+              <button type="submit" id="sumbitContent" class="btn btn-info" style="margin: 0px;">{% if messages %} {% for message in messages %}
+{{ message }}
+                {% endfor %} {% else %} Save {% endif %}</button>
+             
+            </div>
+          </div>
+          </div>
+          
+          </form>
+        </div>
+        </section>
+      </div>
+      {% include 'microskill_card/floting_button.html' %}
+      {% include 'component/community-ask-question.html' %}
+{% endblock content %} 
+
+      {% block js %}
+<script type="text/javascript">                 
+$(function () {
+    // Replace the <textarea id="editor1"> with a CKEditor
+    //bootstrap WYSIHTML5 - text editor
+    $('.textarea').wysihtml5({
+      toolbar: {
+    "font-styles": true, // Font styling, e.g. h1, h2, etc.
+    "emphasis": true, // Italics, bold, etc.
+    "lists": true, // (Un)ordered lists, e.g. Bullets, Numbers.
+    "html": false, // Button which allows you to edit the generated HTML.
+    "link": false, // Button to insert a link.
+    "image": false, // Button to insert an image.
+    "color": false, // Button to change color of font
+    "blockquote": true, // Blockquote
+
+  }
+    })
+  })
+ 
+ 
+        $("#Content_form").submit(function (event) {
+          var formData = {
+            status: $("#status").val(),
+            content_id: "{{content.pk}}",
+            csrfmiddlewaretoken:"{{csrf_token}}"
+          };
+          
+          $.ajax({
+            type: "POST",
+            url: '{% url "content:update_status" %}',
+            data: formData,
+            encode: true,
+          }).done(function (data) {
+            
+          });
+      
+          // event.preventDefault();
+        });
+      
+      $(document).on("click", ".quiz_option", function(){
+        var option = $(this).val();
+        
+        var id = $(this).parents("section").attr('data-id');
+        $('#question_options'+'id'+' *').attr('disabled', true);
+         oThis= $(this);
+        var form_data = new FormData();
+            var csrfmiddlewaretoken = "{{csrf_token}}"; 
+            form_data.append("id", id);
+            form_data.append("option", option);
+            form_data.append("csrfmiddlewaretoken", csrfmiddlewaretoken);
+            $.ajax({
+              type: "POST",
+              url: "{% url 'content:quiz_answer' %}",
+              data: form_data,
+              contentType: false,
+                      cache: false,
+                      processData: false,
+              success: function(data){
+                if(data.correct_answer){
+      
+                  oThis.addClass("right_answer");
+                  $(".quiz_result"+id+" .title").text("Correct !");
+                  $(".quiz_result"+id+" .result").text("");
+                  } else {
+                    oThis.addClass("wrong_answer");
+                  $(".quiz_result"+id+" .title").text("Not exactly")
+                  $(".quiz_result"+id+" .result").text("Correct Answer is" + data.answer);
+                  }		
+                  $(".quiz_result"+id).css("display", "block");
+            }
+          });
+      });
+      
+      $(document).on("click", ".poll_option_q", function(){
+        var option = $(this).children().attr("data-value");
+        var id = $(this).parents("section").attr('data-id');
+        var q_id = $(this).children().attr("id");
+        $('.poll_option').parent().css('pointer-events','none');
+        
+         oThis= $(this);
+         var form_data = new FormData();
+            var csrfmiddlewaretoken = "{{csrf_token}}"; 
+            form_data.append("id", id);
+            form_data.append("option", option);
+            form_data.append("csrfmiddlewaretoken", csrfmiddlewaretoken);
+            $.ajax({
+              type: "POST",
+              url: "{% url 'content:poll_answer' %}",
+              data: form_data,
+              contentType: false,
+                      cache: false,
+                      processData: false,
+              success: function(data){
+                console.log(data);  
+                data.forEach(obj => {
+                  if(obj['count'] != 0){
+                    // $("#poll_option"+obj['id']+" span").append(Math.floor(obj['count'])+"%")
+                    $("#poll_option"+obj['id']).css("width", obj['count']+"%");
+                    $("#poll_option"+obj['id']).css("background-color", "#6ceb96");
+                  }
+                  // Object.entries(obj).forEach(([key, value]) => {
+                  //     console.log(`${key["id"]} ${value}`);
+                  //     // 
+                  // });
+             
+          });
+              }
+          });
+        
+          
+      
+      
+      
+      
+      });
+
+      $("#ask_question").submit(function (event) {
+    
+    var formData = {
+      title: $("#title").val(),
+      description : $("#description").val(),
+      journey: $("#channel").val(),
+      content: $("#content").val(),
+      csrfmiddlewaretoken:"{{csrf_token}}"
+    };
+    console.log(formData);
+    $.ajax({
+      type: "POST",
+      url: '{% url "community:ask_question" %}',
+      data: formData,
+      encode: true,
+    }).done(function (data) {
+      bootbox.alert({
+          message: data,
+          callback: function () {
+              location.reload()
+          }
+      })
+    });
+
+    event.preventDefault();
+  });
+
+  $("#add_learning_journal").submit(function (event) {
+    // alert(document.getElementById("user_learning_journal").value);
+    var formData = {
+      learning_journal:$('textarea[name="learning_journal"]').val(),
+      learning_journal_id:$("#learning_journal_id").val(),
+      journey: $("#channel").val(),
+      content: $("#content").val(),
+      csrfmiddlewaretoken:"{{csrf_token}}"
+    };
+    console.log(formData);
+    $.ajax({
+      type: "POST",
+      url: '{% url "community:add_learning_journal" %}',
+      data: formData,
+      encode: true,
+    }).done(function (data) {
+      bootbox.alert({
+          message: data,
+          callback: function () {
+              location.reload()
+          }
+      })
+    });
+
+    event.preventDefault();
+  });
+
+    function uploadActivityFile(channel, content){
+      var form_data = new FormData();
+      form_data.append("journey", channel)
+      form_data.append("content_data", content)
+      form_data.append("activity_file", document.getElementById("activity_file").files[0])
+      form_data.append("csrfmiddlewaretoken", "{{csrf_token}}");
+
+      $.ajax({
+        type: "POST",
+        url: '{% url "content:upload_activity_file" %}',
+        data: form_data,
+        contentType: false,
+        cache: false,
+        processData: false,
+      }).done(function (data) {
+        bootbox.alert({
+            message: data,
+            callback: function () {
+                location.reload()
+            }
+        })
+      });
+    }
+      
+          </script>
+          
+
+          
+          {% endblock %}
+  </body>
+</html>

@@ -1,0 +1,102 @@
+{% extends 'base.html' %} {% load static %} {% block title %} Journey Level {% endblock %}
+ {% load crispy_forms_tags %} {% block content %}
+ {% block css %}
+<link rel="stylesheet" href="{% static 'bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css' %}">
+{% endblock css %} 
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <h1>
+        Journey Level
+      </h1>
+      <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Journey</a></li>
+        <li><a href="#">Journey Level</a></li>
+
+      </ol>
+    </section>
+  
+    <!-- Main content -->
+    <section class="content">
+  
+      <!-- Default box -->
+      <div class="box">
+        <div class="box-header with-border">
+          <h3 class="box-title">{% if 'create-level/' in request.path %}Create{% else %}Edit {% endif %} Journey Level</h3>
+
+        </div>
+        <div class="box-body">
+          {% crispy form %}
+  
+        </div>
+      </div>
+      <!-- /.box -->
+      {% if 'create-level/' in request.path %}
+        <div class="box">
+          <div class="box-header">
+            <h3 class="box-title">Level List</h3>
+            
+          </div>
+          <!-- /.box-header -->
+          <div class="box-body">
+            <table id="example2" class="table table-bordered table-hover">
+              <thead>
+              <tr>
+                <th>SNo</th>
+                <th>Level</th>
+                <th>Is Active</th>
+                <th>Action</th>
+              </tr>
+              </thead>
+              <tbody>
+              {% for level in levels %}
+              <tr>
+                <td>{{forloop.counter }}</td>
+                <td>{{level.label}}</td>
+                <td><kbd>{{level.is_active}}</kbd></td>
+                <td>
+                <div class="dropdown">
+                      <button class="btn bg-purple dropdown-toggle btn-select-option" type="button" data-toggle="dropdown" aria-expanded="true">Select an option                                            <span class="caret"></span>
+                      </button>
+                      <ul class="dropdown-menu options-dropdown">
+                        <li>
+                          <a href="{% url 'survey:update-level' pk=level.pk %}"><i class="fa fa-edit option-icon"></i>Edit</a>
+                      </li>
+                          <li>
+                              <a href="{% url 'survey:delete-level' pk=level.pk %}"><i class="fa fa-trash option-icon"></i>Delete</a>
+                          </li>
+                      </ul>
+                  </div></td>
+              </tr>
+              {% endfor %}
+              </tfoot>
+            </table>
+          </div>
+          <!-- /.box-body -->
+        </div>
+      {% endif %}
+    </section>
+    <!-- /.content -->
+  </div>
+  {% endblock content %}
+  {% block js %}
+<script src="{% static 'bower_components/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
+<script>
+
+
+$(function () {
+ 
+  $('#example2').DataTable({
+    "dom": '<"table-pull-left"f><"table-pull-right"l>tip',
+    'paging'      : true,
+    'lengthChange': true,
+    'searching'   : true,
+    'ordering'    : true,
+    'info'        : true,
+    'autoWidth'   : true,
+    'scrollX'     : true
+  })
+})
+</script>
+{% endblock js %}

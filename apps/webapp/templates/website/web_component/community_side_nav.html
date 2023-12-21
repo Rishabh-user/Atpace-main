@@ -1,0 +1,26 @@
+<div class="col-md-3">
+                
+    {% for space_group in all_spaces %}
+   <div class="card">
+       <div class="card-body">
+           <div class="h5">{{space_group.space_group_name}}</div>
+       </div>
+       
+       {% for space in space_group.space %}
+       
+       <ul class="list-group list-group-flush">
+           <li class="list-group-item">
+               
+             <a href="{{space.url}}" target="_blank"> 
+              
+               <div class="h6 text-muted">  {% if space.is_private %}
+                   <i class="fa fa-lock"></i>
+                   {% else %}
+                   <i class="fa fa-hashtag"></i>
+                   {% endif %}   {{space.name}}</div></a>
+           </li>
+       </ul>
+       {% endfor %}
+   </div>
+   {% endfor %}             
+</div>

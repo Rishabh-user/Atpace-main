@@ -1,0 +1,41 @@
+<div class="box">
+    <div class="box-header">
+    <h3 class="box-title">Mentee List</h3>
+    </div>
+    <!-- /.box-header -->
+    <div class="box-body">
+    <table id="mentee-table" class="table table-bordered table-hover">
+        <thead>
+        <tr>
+            <th>SNo.</th>
+            <th>Mentee Name</th>
+            <th>Mentee Email</th>
+            {% comment %} <th>Mentor Name</th>
+            <th>Mentor Email</th> {% endcomment %}
+            <th>Journey</th>
+            <th>Type</th>
+            <th>Is assigned</th>
+            <th>Is revoked</th>
+            <th>Assigned Date</th>
+            <th>Revoked Date</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr v-for="(mentee, index) in mentee_list" :key="mentee.id">
+            <td>[[index+1]]</td>
+            <td>[[mentee.mentee_name]]</td>
+            <td>[[mentee.mentee_email]]</td>
+            {% comment %} <td>[[mentee.mentor_name]]</td>
+            <td>[[mentee.mentor_email]]</td> {% endcomment %}
+            <td>[[mentee.journey_name]]</td>
+            <td>[[mentee.user_type]]</td>
+            <td class="capitalize">[[mentee.is_assign]]</td>
+            <td class="capitalize">[[mentee.is_revoked]]</td>
+            <td>[[mentee.assign_date]]</td>
+            <td><div v-if="mentee.is_revoked">[[mentee.revoke_date]]</div></td>
+        </tr>
+        </tbody>
+    </table>
+    </div>
+    <!-- /.box-body -->
+</div>

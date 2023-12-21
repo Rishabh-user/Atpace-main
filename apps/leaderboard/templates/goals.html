@@ -1,0 +1,988 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load tags %} 
+{% block title %}Goal {% endblock %} {% comment %} {%
+load crispy_forms_tags %} {% endcomment %} {% block content %}
+<div class="content-wrapper">
+  <!-- Content Header (Page header) -->
+  <section class="content-header">
+    <h1>Goal</h1>
+  </section>
+
+  <!-- Main content -->
+  <section class="content">
+  <div class="row">
+    <div class="col-md-12">
+      <div class="box">
+        <div class="box-header with-border bg-grey">
+          <h3 class="box-title">Goals</h3>
+          {% comment %} <button class="btn-primary pull-right" onclick="createGoal()"> {% endcomment %}
+          {% comment %} <button class="btn btn-info pull-right" style="margin:0;" data-toggle="modal" data-target="#modal-default">
+            Create Goal
+          </button> {% endcomment %}
+            {% if request.session.user_type == "Admin" or request.session.user_type == "ProgramManager" %}
+                <button disabled class="btn btn-info pull-right" data-toggle="modal" data-target="#modal-default">
+                    Create Goal
+                </button>
+            {% elif request.session.user_type == "Learner" or request.session.user_type == "Mentor" %}
+                <button class="btn btn-info pull-right" data-toggle="modal" data-target="#modal-default">
+                    Create Goal
+                </button>
+            {% endif %}
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body no-padding">
+          <table class="table table-striped">
+            <tr>
+            <th>Heading</th>
+            <th>Description</th>
+            <th><center>Action</center></th>
+            <th>Progress</th>
+            </tr>
+            {% if data.count == 0 %}
+            <tr>
+              <td class="text-center">No Goal</td>
+            </tr>
+            {% else %} {% for data in data %}
+            <tr>
+              <td>{{data.goal.heading}}</td>
+              <td style="width:500px;">{{data.goal.description}}</td>
+              <td>
+                {% comment %} <button
+                  onclick="viewGoal('{{data.goal.id}}')"
+                  class="btn btn-info"
+                  style="margin: 0px"
+                >
+                  View
+                </button> {% endcomment %}
+                <center>
+                    {% if request.session.user_type == "Admin" or request.session.user_type == "ProgramManager" %}
+                        <button disabled class="btn btn-info" onclick="viewGoal('{{ data.goal.id }}')"
+                                style="margin: 0px" data-toggle="modal" data-target="#modal-edit">
+                            Edit
+                        </button>
+                        <button disabled
+                                onclick="deleteGoal('{{ data.goal.id }}')"
+                                class="btn btn-danger"
+                                style="margin: 0px"
+                        >
+                            Delete
+                        </button>
+                    {% elif request.session.user_type == "Learner" or request.session.user_type == "Mentor" %}
+                        <button class="btn btn-info" onclick="viewGoal('{{ data.goal.id }}')" style="margin: 0px"
+                                data-toggle="modal" data-target="#modal-edit">
+                            Edit
+                        </button>
+                        <button
+                                onclick="deleteGoal('{{ data.goal.id }}')"
+                                class="btn btn-danger"
+                                style="margin: 0px"
+                        >
+                            Delete
+                        </button>
+                    {% endif %}
+
+
+
+
+                </center>
+              </td>
+              <td>
+                <div class="dropdown">
+                  <button
+                    style="margin: 0px"
+                    class="btn dropdown-toggle btn-select-option"
+                    type="button"
+                    data-toggle="dropdown"
+                    aria-expanded="true"
+                  >
+                    <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
+                  </button>
+                  <ul class="dropdown-menu options-dropdown" id="status-ul{{data.goal.id}}">
+                  {% if data.status == '' or data.status == 'None' %}
+                    <li id="succeed{{data.goal.id}}">
+                      <a href="javascript:void(0)" onclick="UserGoalLog('{{data.goal.id}}','Completed', 'UserGoal')"
+                        ><i class="fa fa-check" aria-hidden="true"></i>Complete</a
+                      >
+                    </li>
+                    <li id="skip{{data.goal.id}}">
+                      <a href="javascript:void(0)" onclick="UserGoalLog('{{data.goal.id}}','Skipped', 'UserGoal')"
+                        ><i class="fa fa-arrow-right"></i>Skip</a
+                      >
+                    </li>
+                    <li id="fail{{data.goal.id}}">
+                      <a href="javascript:void(0)" onclick="UserGoalLog('{{data.goal.id}}','Failed', 'UserGoal')"
+                        ><i class="fa fa-times" aria-hidden="true"></i
+                        >Fail</a
+                      >
+                    </li>
+                  {% else %}
+                    {% if data.status == 'Completed' %}
+                      <li id="succeed{{data.goal.id}}">
+                        <a href="javascript:void(0)" data-id="{{data.goal.id}}" onclick="UndoGoalLog(this)"
+                          ><i class="fa fa-undo" aria-hidden="true"></i> Undo Complete</a
+                        >
+                      </li>  
+                    
+                    {% elif data.status == 'Skipped' %}
+                      <li id="skip{{data.goal.id}}">
+                        <a href="javascript:void(0)" data-id="{{data.goal.id}}" onclick="UndoGoalLog(this)"
+                          ><i class="fa fa-undo" aria-hidden="true"></i> Undo Skip</a
+                        >
+                      </li>
+                    {% else %}
+                      <li id="fail{{data.goal.id}}" >
+                        <a href="javascript:void(0)" data-id="{{data.goal.id}}" onclick="UndoGoalLog(this)"
+                          ><i class="fa fa-undo" aria-hidden="true"></i>
+                          Undo Fail</a
+                        >
+                      </li>
+                    {% endif %}
+                  {% endif %}
+                    
+                    
+                    <li>
+                      <a
+                        href="{%url 'leaderboard:user_goal_progress' pk=data.goal.id %}"
+                        ><i class="fa fa-eye option-icon"></i>View Progress</a
+                      >
+                    </li>
+                  </ul>
+                </div>
+              </td>
+            </tr>
+            {% endfor %} {% endif %}
+          </table>
+        </div>
+        <!-- /.box-body -->
+      </div>
+    </div>
+    <div class="col-md-12">
+      <div class="box">
+        <div class="box-header with-border bg-grey">
+          <h3 class="box-title">Mentorship Goals</h3>
+        </div>
+        <div class="box-body no-padding">
+          <table class="table table-striped">
+            <tr>
+            <th>Heading</th>
+            {% comment %} <th>Description</th> {% endcomment %}
+            <th>Due Date</th>
+            <th>Progress</th>
+            <th>Status</th>
+            <th>View</th>
+            </tr>
+            {% if mentorship_goals.count == 0 %}
+            <tr>
+              <td class="text-center">No Goal</td>
+            </tr>
+            {% else %} {% for data in mentorship_goals %}
+            <tr>
+              <td>{{data.goal.heading}}</td>
+              {% comment %} <td>{{data.goal.description}}</td> {% endcomment %}
+              <td>
+              {% if data.is_expired == "Yes" %}
+              <span class="label label-danger">Expired</span>
+              {% else %}
+              {{data.goal.complete_till.date}}
+              {% endif %}
+              </td>
+              <td>
+                <div class="progress progress-sm">
+                  <div class="progress-bar progress-bar-primary progress-bar-striped" role="progressbar" aria-valuenow="{{data.progress_percentage}}" aria-valuemin="0" aria-valuemax="100" style="width: {{data.progress_percentage}}%">
+                  </div>
+                </div>
+              </td>
+              <td>
+                  {% if data.status == '25%_done' %}
+                  <div class="col-xs-6 col-md-3 text-center">
+                    <input type="hidden" class="knob" value="25" data-width="45" data-height="45" data-thickness="0.3" data-fgColor="#3c8dbc">
+                  </div>
+                  {% elif data.status == '50%_done' %}
+                  <div class="col-xs-6 col-md-3 text-center">
+                    <input type="hidden" class="knob" value="50" data-width="45" data-height="45" data-thickness="0.3" data-fgColor="#3c8dbc">
+                  </div>
+                  {% elif data.status == '75%_done' %}
+                  <div class="col-xs-6 col-md-3 text-center">
+                    <input type="hidden" class="knob" value="75" data-width="45" data-height="45" data-thickness="0.3" data-fgColor="#3c8dbc">
+                  </div>
+                  {% elif data.status == 'Started' %}
+                  <span class="label label-primary">Started</span>
+                  {% elif data.status == 'ApprovedByMentor' %}
+                  <span class="label label-success">Approved</span>
+                  {% elif data.status == 'RejectedByMentor' %}
+                  <span class="label label-danger">Rejected</span>
+                  {% elif data.status == 'RequestForApprove' %}
+                  <span class="label label-warning">Requested</span>
+                  {% elif data.status == '' or data.status == 'None' %}
+                  <span class="label label-primary">Not Started</span>
+                  {% elif data.status == 'Completed' %}
+                  <span class="label label-success">Completed</span>
+                  {% endif %}
+
+                {% comment %} <div class="dropdown">
+                  <button
+                    style="margin: 0px"
+                    class="btn dropdown-toggle btn-select-option"
+                    type="button"
+                    data-toggle="dropdown"
+                    aria-expanded="true"
+                  >
+                    <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
+                  </button>
+                  <ul class="dropdown-menu options-dropdown" id="status-ul{{data.goal.id}}">
+                  {% if data.status == 'ApprovedByMentor' %}
+                    <li id="succeed{{data.goal.id}}">
+                      <a href="javascript:void(0)"
+                        ><i class="fa fa-check" aria-hidden="true"></i>Approved</a
+                      >
+                    </li>
+                  {% elif data.status == 'RejectedByMentor' %}
+                    <li id="succeed{{data.goal.id}}">
+                      <a href="javascript:void(0)"
+                        ><i class="fa fa-times" aria-hidden="true"></i>Rejected</a
+                      >
+                    </li>
+                  {% elif data.status == 'RequestForApprove' %}
+                    <li id="succeed{{data.goal.id}}">
+                      <a href="javascript:void(0)"
+                        ><i class="fa fa-undo" aria-hidden="true"></i>Requested</a
+                      >
+                    </li>
+                  {% endif %}
+                  {% if data.status == '' or data.status == 'None' %}
+                    <li id="succeed{{data.goal.id}}">
+                      <a href="javascript:void(0)" onclick="UserGoalLog('{{data.goal.id}}','Completed', 'MentorshipGoal')"
+                        ><i class="fa fa-check" aria-hidden="true"></i>Complete</a
+                      >
+                    </li>
+                  {% endif %}
+                    
+                  </ul>
+                </div> {% endcomment %}
+              </td>
+              <td>
+                {% comment %} <button
+                  onclick="viewGoal('{{data.goal.id}}')"
+                  class="btn btn-info"
+                  style="margin: 0px"
+                >
+                  View
+                </button> {% endcomment %}
+                {% comment %} <button class="btn btn-info" onclick="viewGoal('{{data.goal.id}}')" style="margin: 0px" data-toggle="modal" data-target="#modal-edit">
+                View</button> {% endcomment %}
+                {% comment %} <button
+                  onclick="showCommentGoalModal('{{data.goal.id}}')"
+                  class="btn btn-warning"
+                  style="margin: 0px; display:inline;"
+                >
+                  Comment
+                </button> {% endcomment %}
+                <a href="{% url 'leaderboard:mentorship_goal_detail' pk=data.goal.id %}">
+                <button
+                  class="btn btn-info"
+                  style="margin: 0px; display:inline;"
+                >
+                  View Details
+                </button>
+                </a>
+              </td>
+              
+            </tr>
+            {% endfor %} {% endif %}
+          </table>
+        </div>
+        <!-- /.box-body -->
+      </div>
+    </div>
+    {{goal_log|json_script:"goal_log" }}
+
+    <div class="col-md-8">
+      <div class="box">
+        <div class="box-header with-border bg-grey">
+          <h3 class="box-title">Goal Progress</h3>
+
+         
+        </div>
+        <div class="box-body chart-responsive">
+          <div class="chart" id="bar-chart" style="height: 300px;"></div>
+        </div>
+        <!-- /.box-body -->
+      </div>
+    </div>
+
+    {{category_list|json_script:"category_list" }}
+
+    <div class="col-md-4">
+      <!-- DONUT CHART -->
+          <div class="box">
+            <div class="box-header with-border bg-grey">
+              <h3 class="box-title">User Goal Category</h3>
+
+             
+            </div>
+            <div class="box-body chart-responsive">
+              <div class="chart" id="sales-chart" style="height: 300px; position: relative;"></div>
+            </div>
+            <!-- /.box-body -->
+          </div>
+          <!-- /.bo
+          x -->
+    </div>
+    {{mentorship_goal_category_chart|json_script:"mentorship_goal_category_chart" }}
+
+    {{mentorship_goal_progress_chart|json_script:"mentorship_goal_progress_chart" }}
+
+    <div class="col-md-8">
+      <div class="box ">
+        <div class="box-header with-border bg-grey">
+          <h3 class="box-title">Mentorship Goal Progress</h3>
+
+          
+        </div>
+        <div class="box-body chart-responsive">
+          <div class="chart" id="mentorship-goal-progress" style="height: 300px;"></div>
+        </div>
+        <!-- /.box-body -->
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <!-- Mentorship Goal Category DONUT CHART -->
+          <div class="box ">
+            <div class="box-header with-border bg-grey">
+              <h3 class="box-title">Mentorship Goal Category</h3>
+
+              
+            </div>
+            <div class="box-body chart-responsive">
+              <div class="chart" id="mentorship-category-chart" style="height: 300px; position: relative;"></div>
+            </div>
+            <!-- /.box-body -->
+          </div>
+          <!-- /.bo
+          x -->
+    </div>
+    {{mentorship_goal_status_chart|json_script:"mentorship_goal_status_chart" }}
+
+    <div class="col-md-4">
+      <!-- Mentorship Goal Status DONUT CHART -->
+          <div class="box ">
+            <div class="box-header with-border bg-grey">
+              <h3 class="box-title">Mentorship Goal Status</h3>
+
+              
+            </div>
+            <div class="box-body chart-responsive">
+              <div class="chart" id="mentorship-status-chart" style="height: 300px; position: relative;"></div>
+            </div>
+            <!-- /.box-body -->
+          </div>
+          <!-- /.bo
+          x -->
+    </div>
+   
+  </div>
+  </section>
+  <div class="modal fade" id="modal-default" style="display: none;">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <form id="Content_form">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">×</span></button>
+              <h4 class="modal-title">Create Goal</h4>
+            </div>
+            <div class="modal-body">
+              <div class="form-group">
+                <label for="heading" class="col-sm-2 control-label">Heading</label>
+                  <input type="text" class="form-control" id="heading" list="heading_list" name="heading" placeholder="Heading" required/>
+                  <datalist id="heading_list">
+                    <option value=''>Select</option>
+                    {% for data in request.user.id|get_suggestion_goals %}
+                        <option  value="{{data.heading}}">{{data.heading}}</option>
+                    {% endfor %}
+                  </datalist>
+              </div>
+              <div class="form-group">
+                <label for="category" class="col-sm-2 control-label">Category</label>
+                <select class="form-control select2" name="category" id='category' style="width: 100%;">
+                  <option selected="selected" value="Gain Clarity">Gain Clarity</option>
+                  <option value="Health">Health</option>
+                  <option value="Learn">Learn</option>
+                  <option value="Follow Through">Follow Through</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="description" class="col-sm-2 control-label">Description</label>
+                  <input type="text" class="form-control" id="description" name="description" placeholder="Description" required/>
+              </div>
+              <div class="form-group">
+                <label for="duration" class="col-md-12 control-label">Duration</label>
+                  <div class="row">
+                    <div class="col-md-6">
+                      <input type="number" class="form-control" id="duration_number" name="duration_number" min="1" max="100" required/>
+                    </div>
+                    <div class="col-md-6">
+                      <select class="form-control select2" name="duration_time" id='duration_time' style="width: 100%;">
+                        <option selected="selected" value="Mins">Mins</option>
+                        <option value="Times">Times</option>
+                      </select>
+                    </div>
+                  </div>
+              </div>
+              <div class="form-group">
+                <label for="frequency" class="col-sm-2 control-label">Frequency</label>
+                <select class="form-control select2" name="frequency" id='frequency' style="width: 100%;">
+                  <option selected="selected" value="Daily">Daily</option>
+                  <option value="Weekly">Weekly</option>
+                  <option value="Monthly">Monthly</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="priority" class="col-sm-2 control-label">Priority</label>
+                <select class="form-control select2" name="priority" id='priority' style="width: 100%;">
+                  <option value="High">High</option>
+                  <option value="Medium" selected="selected">Medium</option>
+                  <option value="Low">Low</option>
+                </select>
+              </div>
+                 
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+              <button type="submit" id="submitButton" class="btn btn-primary">Save changes</button>
+
+            </div>
+          </form>
+          </div>
+          <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+  </div>
+  <div class="modal fade" id="modal-edit" style="display: none;">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <form id="edit_form">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">×</span></button>
+                <h4 class="modal-title" id="edit-goal">Edit Goal</h4>
+              </div>
+              <div class="modal-body">
+                <input type="hidden" class="form-control" id="edit-id" required name="id"/>
+                <div class="form-group">
+                  <label for="heading" class="col-sm-2 control-label">Heading</label>
+                    <input type="text" class="form-control" id="edit-heading" required name="heading" placeholder="Heading"/>
+                </div>
+                <div class="form-group">
+                  <label for="category" class="col-sm-2 control-label">Category</label>
+                  <select class="form-control select2" name="category" required id='edit-category' style="width: 100%;">
+                    <option value="Gain Clarity">Gain Clarity</option>
+                    <option value="Health">Health</option>
+                    <option value="Learn">Learn</option>
+                    <option value="Follow Through">Follow Through</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="description" class="col-sm-2 control-label">Description</label>
+                    <input type="text" class="form-control" required id="edit-description" name="description" placeholder="Description"/>
+                </div>
+                <div class="form-group">
+                  <label for="duration" class="col-md-12 control-label">Duration</label>
+                    <div class="row">
+                      <div class="col-md-6">
+                        <input type="number" class="form-control" required id="edit-duration_number" name="duration_number" min="1" max="100"/>
+                      </div>
+                      <div class="col-md-6">
+                        <select class="form-control select2" name="duration_time" required id='edit-duration_time' style="width: 100%;">
+                          <option value="Mins">Mins</option>
+                          <option value="Times">Times</option>
+                        </select>
+                      </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                  <label for="frequency" class="col-sm-2 control-label">Frequency</label>
+                  <select class="form-control select2" name="frequency" required id='edit-frequency' style="width: 100%;">
+                    {% comment %} <option value="Hourly">Hourly</option> {% endcomment %}
+                    <option value="Daily">Daily</option>
+                    <option value="Weekly">Weekly</option>
+                    <option value="Monthly">Monthly</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="priority" class="col-sm-2 control-label">Priority</label>
+                  <select class="form-control select2" name="priority" required id='edit-priority' style="width: 100%;">
+                    <option value="High">High</option>
+                    <option value="Medium">Medium</option>
+                    {% comment %} <option value="Normal">Normal</option> {% endcomment %}
+                    <option value="Low">Low</option>
+                  </select>
+                </div>
+                  
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+                <button type="submit" id="editContent" class="btn btn-primary">Save changes</button>
+
+              </div>
+            </form>
+          </div>
+          <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+  </div>
+  <div class="modal fade" id="modal-comment" style="display: none;">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <form id="Content_form">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">×</span></button>
+              <h4 class="modal-title">Comment</h4>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" class="form-control" id="goal-id" required name="id" value="{{goal}}"/>
+              <div class="form-group">
+                <label for="comment" class="col-sm-2 control-label">Comment</label>
+                  <input type="text" class="form-control" required id="comment" name="comment" placeholder="Comment"/>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+              <button type="submit" id="submitComment" class="btn btn-primary">Done</button>
+
+            </div>
+          </form>
+          </div>
+          <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+  </div>
+</div>
+  <!-- /.content -->
+</div>
+
+
+{% endblock content %} {% block js %}
+
+{% comment %} <script>
+  $("#heading").on("blur", function () {
+    console.log("heading list data value")
+    var val = this.value;
+    console.log("heading", val)
+    $.ajax({
+      url: "{% url 'leaderboard:suggestion_goal'  %}",
+      type: "get",  
+      data: {name:val},
+      //error: function () {
+        //bootbox.alert("Something is wrong");
+      //},
+      success: function (data) {
+        console.log("data",data)
+        document.getElementById("heading").value = data.heading;
+        document.getElementById("description").value = data.description;
+        document.getElementById("category").value = data.category;
+        document.getElementById("frequency").value = data.frequency;
+        document.getElementById("priority").value = data.priority;
+        document.getElementById("duration_time").value = data.duration_time;
+        document.getElementById("duration_number").value = data.duration_number;
+      },
+    });
+  })
+</script> {% endcomment %}
+<script>
+  $(function () {
+    const goal_log = JSON.parse(document.getElementById("goal_log").textContent);
+    const category_list = JSON.parse(document.getElementById("category_list").textContent);
+    const mentorship_goal_category_chart = JSON.parse(document.getElementById("mentorship_goal_category_chart").textContent);
+    const mentorship_goal_status_chart = JSON.parse(document.getElementById("mentorship_goal_status_chart").textContent);
+    const mentorship_goal_progress_chart = JSON.parse(document.getElementById("mentorship_goal_progress_chart").textContent);
+    // console.log("goal_log", goal_log)
+    "use strict";
+    //DONUT CHART
+    var donut = new Morris.Donut({
+      element: 'sales-chart',
+      resize: true,
+      colors: ["#3c8dbc", "#f56954", "#00a65a", "#432342"],
+      data: category_list,
+      hideHover: 'auto'
+    });
+    // Mentorship Goal Category DONUT CHART
+    var donut = new Morris.Donut({
+      element: 'mentorship-category-chart',
+      resize: true,
+      colors: ["#3c8dbc", "#f56954", "#00a65a", "#432342"],
+      data: mentorship_goal_category_chart,
+      hideHover: 'auto'
+    });
+    // Mentorship Goal Status DONUT CHART
+    var donut = new Morris.Donut({
+      element: 'mentorship-status-chart',
+      resize: true,
+      colors: ["#3c8dbc", "#f56954", "#00a65a"],
+      data: mentorship_goal_status_chart,
+      hideHover: 'auto'
+    });
+    //BAR CHART
+    var bar = new Morris.Bar({
+      element: 'bar-chart',
+      resize: true,
+      data: goal_log,
+      barColors: ['#00a65a','#f39c12', '#dd4b39'],
+      xkey: 'name',
+      ykeys: ['completed', 'skipped', 'failed'],
+      labels: ['Completed', 'Skipped', 'Failed'],
+      hideHover: 'auto'
+      
+    });
+    //Mentorship Goal Progress BAR CHART
+    var bar = new Morris.Bar({
+      element: 'mentorship-goal-progress',
+      resize: true,
+      data: mentorship_goal_progress_chart,
+      barColors: ['#3c8dbc'],
+      xkey: 'name',
+      ykeys: ['progress'],
+      labels: ['Progress'],
+      hideHover: 'auto'
+      
+    });
+    
+  });
+$("#submitButton").click(function (event) {
+    console.log("calling")
+    document.getElementById("submitButton").disabled = true;
+    heading = $("#heading").val();
+    description = $("#description").val();
+    category = $("#category").val();
+    frequency = $("#frequency").val()
+    priority = $("#priority").val()
+    duration_number = $("#duration_number").val()
+    duration_time = $("#duration_time").val()
+
+    var formData = {
+      heading: heading,
+      description : description,
+      category : category,
+      goal_type:"User Driven",
+      frequency : frequency,
+      priority : priority,
+      duration_number : duration_number,
+      duration_time : duration_time,
+      csrfmiddlewaretoken:"{{csrf_token}}"
+    };
+    console.log(formData);
+    $.ajax({
+      type: "POST",
+      url: '{% url "leaderboard:goal" %}',
+      data: formData,
+      encode: true,
+    }).done(function (data) {
+      bootbox.alert({
+          message: "Goal Created Successfully",
+          callback: function () {
+              location.reload()
+          }
+      })
+    });
+
+    event.preventDefault();
+});
+
+$("#editContent").click(function (event) {
+    document.getElementById("editContent").disabled = true;
+    id = $("#edit-id").val();
+    heading = $("#edit-heading").val();
+    description = $("#edit-description").val();
+    category = $("#edit-category").val();
+    frequency = $("#edit-frequency").val()
+    priority = $("#edit-priority").val()
+    duration_number = $("#edit-duration_number").val()
+    duration_time = $("#edit-duration_time").val()
+
+    var formData = {
+      id: id,
+      heading: heading,
+      description : description,
+      category : category,
+      frequency : frequency,
+      priority : priority,
+      duration_number : duration_number,
+      duration_time : duration_time,
+      goal_type : "User Driven",
+      csrfmiddlewaretoken:"{{csrf_token}}"
+    };
+    console.log(formData);
+    $.ajax({
+      type: "POST",
+      url: '{% url "leaderboard:view_goal" %}',
+      data: formData,
+      encode: true,
+    }).done(function (data) {
+      console.log("data 708", data)
+      if(data == "Failed"){
+        msg = "Something went wrong"
+      }
+      else{
+        msg = "Goal Edited Successfully"
+      }
+      bootbox.alert({
+          message: msg,
+          callback: function () {
+              location.reload()
+          }
+      })
+    });
+
+    event.preventDefault();
+});
+  function UndoGoalLog(d){
+    var id = d.getAttribute("data-id")
+    ul = document.getElementById('status-ul'+id)
+    var ele_succeed = document.getElementById("succeed"+id);
+    var ele_skip = document.getElementById("skip"+id);
+    var ele_fail = document.getElementById("fail"+id);
+
+    console.log("calling", id, ele_fail, ele_skip, ele_succeed)
+    $.ajax({
+      url: "{% url 'leaderboard:user_goal_log' %}",
+      type: "post",
+      data: { id: id, status: "None", csrfmiddlewaretoken: "{{csrf_token}}" },
+      error: function () {
+        bootbox.alert("Something is wrong");
+      },
+      success: function (data) {
+        if(ele_fail){
+          ele_fail.remove();
+        }
+        if(ele_skip){
+          ele_skip.remove();
+        }
+        if(ele_succeed){
+          ele_succeed.remove();
+        }
+        ul.innerHTML  += ('<li id="succeed'+id+'"><a href="javascript:void(0)" data-id='+id+' onclick="GoalLogCompleted(this)"><i class="fa fa-check" aria-hidden="true"></i><span> Complete </span></a></li>')
+        ul.innerHTML  += ('<li id="skip'+id+'"><a href="javascript:void(0)" data-id='+id+' onclick="GoalLogSkipped(this)"><i class="fa fa-arrow-right"></i><span> Skip </span></a></li>')
+        ul.innerHTML  += ('<li id="fail'+id+'"><a href="javascript:void(0)" data-id='+id+' onclick="GoalLogFailed(this)"><i class="fa fa-times" aria-hidden="true"></i><span> Fail </span></a></li>')
+        console.log("data", data);
+      },
+    });
+  }
+  function GoalLogCompleted(d){
+    var id = d.getAttribute("data-id")
+    UserGoalLog(id, 'Completed');
+  }
+  function GoalLogSkipped(d){
+    var id = d.getAttribute("data-id")
+    UserGoalLog(id, 'Skipped');
+  }
+  function GoalLogFailed(d){
+    var id = d.getAttribute("data-id")
+    UserGoalLog(id, 'Failed');
+  }
+  function UserGoalLog(id, status, type) {
+    console.log("id", id, status, type);
+    var ele_succeed = document.getElementById("succeed"+id);
+    var ele_skip = document.getElementById("skip"+id);
+    var ele_fail = document.getElementById("fail"+id);
+    var ul = document.getElementById("status-ul");
+
+    $.ajax({
+      url: "{% url 'leaderboard:user_goal_log' %}",
+      type: "post",
+      data: { id: id, status: status, csrfmiddlewaretoken: "{{csrf_token}}" },
+      error: function () {
+        bootbox.alert("Something is wrong");
+      },
+      success: function (data) {
+        if(type == 'MentorshipGoal' & status == 'Completed'){
+          ele_succeed.innerHTML = '<a href="javascript:void(0)" data-id='+id+'><i class="fa fa-undo" aria-hidden="true"></i><span> Requested </span></a>'
+            //ele_skip.remove();
+            //ele_fail.remove();
+        }
+        else{
+          if(status == 'Completed'){
+            ele_succeed.innerHTML = '<a href="javascript:void(0)" data-id='+id+' onclick="UndoGoalLog(this)"><i class="fa fa-undo" aria-hidden="true"></i><span> Undo Completed </span></a>'
+            ele_skip.remove();
+            ele_fail.remove();
+          }
+          if(status == 'Skipped'){
+            ele_skip.innerHTML = '<a href="javascript:void(0)" data-id='+id+' onclick="UndoGoalLog(this)"><i class="fa fa-undo" aria-hidden="true"></i><span> Undo Skipped </span></a>'
+            ele_succeed.remove();
+            ele_fail.remove();
+          }
+          if(status == 'Failed'){
+            ele_fail.innerHTML = '<a href="javascript:void(0)" data-id='+id+' onclick="UndoGoalLog(this)"><i class="fa fa-undo" aria-hidden="true"></i><span> Undo Failed </span></a>'
+            ele_skip.remove();
+            ele_succeed.remove();
+          }
+        }
+        
+        //if(status == 'None'){
+          //ul.innerHTML = '<li><a href="javascript:void(0)" ><i class="fa fa-check" aria-hidden="true"></i>Complete</a></li>'
+        //}
+        console.log("data", data);
+      },
+    });
+  }
+
+  function createGoal() {
+    var dialog = bootbox.dialog({
+      title: "Create Goal",
+      message:
+        '<form class="form-horizontal" action="/leaderboard/goal/" method="POST">{% csrf_token %}<div class="box-body"><div class="form-group"><label for="heading" class="col-sm-2 control-label">Heading</label><div class="col-sm-10"><input type="text" class="form-control" id="heading" name="heading" placeholder="Heading"/></div></div><div class="form-group"><label for="description" class="col-sm-2 control-label">Description</label><div class="col-sm-10"><input type="text" class="form-control" id="description" name="description" placeholder="Description"/></div></div> <div class="form-group"><label for="frequency" class="col-sm-2 control-label">Frequency</label><div class="col-sm-5"><select class="form-control" name="frequency"><option value="Hourly">Hourly</option><option selected="selected" value="Daily">Daily</option><option value="Weekly">Weekly</option><option value="Monthly">Monthly</option></select></div></div><div class="form-group"><label for="frequency" class="col-sm-2 control-label">Priority</label><div class="col-sm-5"><select class="form-control" name="priority"><option value="High">High</option><option value="Medium">Medium</option><option selected="selected" value="Normal">Normal</option><option value="Low">Low</option></select></div></div><div class="box-footer"><button type="submit" class="btn btn-primary pull-right">Create</button></div></form>',
+      size: "medimum",
+    });
+  }
+
+  function viewGoal(id) {
+    // console.log("id",id)
+    $.ajax({
+      url: "{% url 'leaderboard:view_goal' %}",
+      type: "get",
+      data: { id: id },
+      error: function () {
+        bootbox.alert("Something is wrong");
+      },
+      success: function (data) {
+        console.log("data",data)
+        if(data.type == 'Mentorship'){
+          document.getElementById("edit-goal").innerText = "View Goal";
+          document.getElementById("editContent").style.display = "none";
+        }
+        document.getElementById("edit-id").value = data.id;
+        document.getElementById("edit-heading").value = data.heading;
+        document.getElementById("edit-description").value = data.description;
+        document.getElementById("edit-category").value = data.category;
+        document.getElementById("edit-frequency").value = data.frequency;
+        document.getElementById("edit-priority").value = data.priority;
+        document.getElementById("edit-duration_time").value = data.duration_time;
+        document.getElementById("edit-duration_number").value = data.duration_number;
+       
+      },
+    });
+  }
+
+  function deleteGoal(id) {
+    bootbox.confirm({
+      message: "Are you sure to delete this goal ?",
+      buttons: {
+        confirm: {
+          label: "Yes",
+          className: "btn-success",
+        },
+        cancel: {
+          label: "No",
+          className: "btn-danger",
+        },
+      },
+      callback: function (result) {
+        if (result == true) {
+          $.ajax({
+            url: "{% url 'leaderboard:delete_goal' %}",
+            type: "post",
+            data: { id: id, csrfmiddlewaretoken: "{{csrf_token}}" },
+            error: function () {
+              bootbox.alert("Something is wrong");
+            },
+            success: function (data) {
+              console.log("data", data);
+              bootbox.alert("Goal deleted successfully");
+              location.reload();
+            },
+          });
+        }
+      },
+    });
+  }
+  $("#submitComment").click(function (event) {
+    console.log("calling")
+    document.getElementById("submitComment").disabled = true;
+    id = $("#goal-id").val();
+    comment = $("#comment").val();
+
+    var formData = {
+      id: id,
+      comment: comment,
+      csrfmiddlewaretoken:"{{csrf_token}}"
+    };
+    console.log(formData);
+    $.ajax({
+      type: "POST",
+      url: '{% url "leaderboard:mentorship_goal_comment" %}',
+      data: formData,
+      encode: true,
+    }).done(function (data) {
+      bootbox.alert("Commented")
+      location.reload()
+
+    });
+
+    event.preventDefault();
+});
+
+function showCommentGoalModal(id){
+    $("#modal-comment").modal("show")
+    document.getElementById("goal-id").value = id;
+  }
+  
+</script>
+<!-- page script -->
+<!-- jQuery Knob -->
+<script src="{% static 'bower_components/jquery-knob/js/jquery.knob.js' %}"></script>
+<script>
+  $(function () {
+    /* jQueryKnob */
+
+    $(".knob").knob({
+      draw: function () {
+        // "tron" case
+        if (this.$.data('skin') == 'tron') {
+
+          var a = this.angle(this.cv)  // Angle
+              , sa = this.startAngle          // Previous start angle
+              , sat = this.startAngle         // Start angle
+              , ea                            // Previous end angle
+              , eat = sat + a                 // End angle
+              , r = true;
+
+          this.g.lineWidth = this.lineWidth;
+
+          this.o.cursor
+          && (sat = eat - 0.3)
+          && (eat = eat + 0.3);
+
+          if (this.o.displayPrevious) {
+            ea = this.startAngle + this.angle(this.value);
+            this.o.cursor
+            && (sa = ea - 0.3)
+            && (ea = ea + 0.3);
+            this.g.beginPath();
+            this.g.strokeStyle = this.previousColor;
+            this.g.arc(this.xy, this.xy, this.radius - this.lineWidth, sa, ea, false);
+            this.g.stroke();
+          }
+
+          this.g.beginPath();
+          this.g.strokeStyle = r ? this.o.fgColor : this.fgColor;
+          this.g.arc(this.xy, this.xy, this.radius - this.lineWidth, sat, eat, false);
+          this.g.stroke();
+
+          this.g.lineWidth = 2;
+          this.g.beginPath();
+          this.g.strokeStyle = this.o.fgColor;
+          this.g.arc(this.xy, this.xy, this.radius - this.lineWidth + 1 + this.lineWidth * 2 / 3, 0, 2 * Math.PI, false);
+          this.g.stroke();
+
+          return false;
+        }
+      }
+    });
+    /* END JQUERY KNOB */
+
+  });
+  
+</script>
+{% endblock js %}

@@ -1,0 +1,11 @@
+name,description,image,created_by,points_required,badge_for,is_active,label
+Best commentor of the week,test,static/images/Badges/Copy of Best commentator of the week.png,admin,500,User,True,first login points
+First time login,test,static/images/Badges/Copy of First time login.png,admin,600,User,True,first login points
+Most helpful to others,test,static/images/Badges/Copy of most helpful to other.png,admin,1100,User,True,first login points
+Most liked question,test,static/images/Badges/Copy of most liked question.png,admin,1600,User,True,first login points
+Most notable question,test,static/images/Badges/Copy of Most Notable Question.png,admin,2100,User,True,first login points
+Most resourceful,test,static/images/Badges/Copy of most recourceful.png,admin,3100,User,True,first login points
+Sharemaster,test,static/images/Badges/Copy of Sharemaster.png,admin,4100,User,True,first login points
+Skill guru,test,static/images/Badges/Copy of Skill Guru.png,admin,5100,User,True,first login points
+Super coach legendary,test,static/images/Badges/Copy of Super coach Legendary.png,admin,897100,User,True,first login points
+Super connector or conversational,test,static/images/Badges/Copy of Super Connector - conversational.png,admin,7500,User,True,first login points

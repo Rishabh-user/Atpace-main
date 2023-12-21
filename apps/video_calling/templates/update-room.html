@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Update Room</title>
+    </head>
+    <body>
+        <div>
+            <h1 style="text-align: center;">{{request.user.username}}</h1>
+            <hr>
+        </div>
+        
+        <form method="POST" action="{% url 'update-room' %}">   {% csrf_token %}
+            <label id="name">Name</label>
+            <input type="text" name="name"><br>
+            <label id="privacy">Privacy</label>
+            <input type="radio" id="privacy" name="privacy" value="private">
+            <label for="html">Private</label>
+            <input type="radio" id="privacy" name="privacy" value="public">
+            <label for="css">Public</label><br>
+            <button type="submit">Update Room</button><br>
+        </form>
+    </body>
+</html>

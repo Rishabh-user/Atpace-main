@@ -1,0 +1,1185 @@
+{% extends 'base.html' %} {% load static %} 
+{% block title %} Mentees {% endblock %} 
+{% load tags %}
+{% block css %} 
+  <link
+          rel="stylesheet"
+          href="{% static 'css/program_manager/program_manager.css' %}"
+  />
+  <link
+    rel="stylesheet"
+    href="{% static 'bower_components/fullcalendar/dist/fullcalendar.min.css' %}"
+  />
+  <link
+    rel="stylesheet"
+    href="{% static 'bower_components/fullcalendar/dist/fullcalendar.print.min.css' %}"
+    media="print"
+  />
+  <style>
+    .capitalize {
+      text-transform: capitalize;
+    }
+    .mgt-10{
+      margin-top: 10px;
+    }
+    /* Create an active/current tablink class */
+    .tab div div.active {
+      border-top: 5px solid #1B74E4;
+    }
+    /* Style the tab content */
+    .tabcontent {
+      display: none;
+    }
+    .pdf-div{
+      background-color: #efeeee;
+      border-radius: 10px;
+      margin-right: 10px;
+      text-align: center;
+    }
+    .pdf-name{
+      border-bottom: 1px solid gray;
+      padding: 20px;
+    }
+    .open-btn{
+      padding: 13px; 
+      border-right: 1px solid;
+    }
+    .download-btn{
+      padding: 13px;
+    }
+  </style>
+{% endblock css %} {% block content %}
+<div class="content-wrapper" id="vue-app">
+  <section class="content-header">
+    <h1>Mentees</h1>
+  </section>
+  <section class="content">
+    <div class="row tab">
+      <div class="col-md-2">
+        <div class="small-box box-tab tab-links"  id="mentees-coachees-tab" @click="showMenteesCoachees()">
+          <div class="inner">
+            <h4>Mentees</h4>
+          </div>
+        </div>
+      </div>
+      {% comment %} <div class="col-md-2">
+        <div class="small-box box-tab tab-links"  id="book-session-tab" @click="showBookSession()">
+          <div class="inner">
+            <h4>Book Mentor Session</h4>
+          </div>
+        </div>
+      </div> {% endcomment %}
+      {% comment %} <div class="col-md-2">
+        <div class="small-box box-tab tab-links"  id="calender-tab" @click="showCalender()">
+          <div class="inner">
+            <h4>Calendar/Session</h4>
+          </div>
+        </div>
+      </div> {% endcomment %}
+      <div class="col-md-2">
+        <div class="small-box box-tab tab-links"  id="chat-tab" @click="showChat()">
+          <div class="inner">
+            <h4>Chat</h4>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="book-session-content" class="tabcontent">
+    {% include 'Mentor/book-mentor-session.html' %}
+    </div>
+    <div id="mentees-coachees-content" class="tabcontent">
+    {% include 'Mentor/mentees-coachees.html' %}
+    </div>
+    <div id="calender-content" class="tabcontent">
+    {% include 'Mentor/mentor-calender-session.html' %}
+    </div>
+    <div id="chat-content" class="tabcontent">
+    {% include 'chat-page.html' %}
+    </div>
+  </section>
+  <div class="modal fade" id="modal-update-task-status" style="display: none;" @click.self="close">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form @submit.prevent="UpdateTaskStatus()" id="update-task-status-form">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span></button>
+                        <h4 class="modal-title">Update Status</h4>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" id="task_id"  value="">
+                        <div class="form-group">
+                            <label>Status</label>
+                            <select class="form-control select2" ref="task_status" type="text" name="task_status" style="width: 100%;">
+                                <option value="In Progress">In Progress</option>
+                                <option value="Done">Done</option>
+                            </select>
+                        </div> 
+                        <div class="form-group">
+                            <label>Comment</label>
+                            <textarea class="form-control" v-model="comment" id="comment" name="comment" required></textarea>
+                        </div> 
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default pull-left" data-dismiss="modal" @click="close">Close</button>
+                        <button class="btn btn-primary">Save changes</button>
+                    </div>
+                </form>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+    <!-- /.modal-dialog -->
+    </div>
+    {% if request.session.dashbordId %}
+        <h3>{{ request.session.dashbordId|json_script:"user_id" }}</h3>
+    {% else %}
+        <h3>{{ request.user.id|json_script:"user_id" }}</h3>
+    {% endif %}
+  {{request.session.token|json_script:"token"}}
+  {{request.session.company_id|json_script:"company_id"}}
+  {{request.session.company_name|json_script:"company_name"}}
+  {{request.session.timezone|json_script:"timezone"}}
+  {{request.session.user_type|json_script:"user_type"}}
+  <div class="modal fade" id="modal-create-event" style="display: none;">
+          <div class="modal-dialog">
+              <div class="modal-content">
+                  <form @submit.prevent="CreateEvent()" id="create-event-form">
+                      <div class="modal-header">
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">×</span></button>
+                          <h4 class="modal-title">Create Event</h4>
+                      </div>
+                      <div class="modal-body">
+                          <div class="form-group">
+                              <label>Title</label> 
+                              <input v-model="title" class="form-control" id="title" type="text" name="title" required placeholder="Title"/>
+                          </div> 
+                          <div class="form-group">
+                              <label for="" class="control-label">Journey</label>
+                              <select class="form-control select2" ref="journey" name="journey" id='journey' style="width: 100%;">
+                                <option value="" selected>Select</option>
+                                  <option 
+                                  v-bind:value="journey.journey_id" 
+                                  v-for="(journey, index) in journey_list" 
+                                  :key="index">
+                                  [[journey.title]]
+                                  </option>
+                              </select>
+                          </div>
+                          <input value="" id="start" type="hidden"/>
+                          <input value="" id="end" type="hidden"/>
+                          <input v-model="event_id" id="event_id" type="hidden"/>
+                      </div>
+                      <div class="modal-footer">
+                          <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+                          <button class="btn btn-primary">Save changes</button>
+                      </div>
+                  </form>
+              </div>
+              <!-- /.modal-content -->
+          </div>
+      <!-- /.modal-dialog -->
+      </div>
+  </div>
+</div>
+{% endblock content %} {% block js %} 
+ 
+<script src="{% static 'bower_components/moment/moment.js' %}"></script>
+<script src="{% static 'bower_components/fullcalendar/dist/fullcalendar.min.js' %}"></script>
+<script src="{% static 'bower_components/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
+<script type="text/javascript">
+  let app = new Vue({
+    el: "#vue-app",
+    delimiters: ['[[', ']]'],
+    data() {
+      return {
+        token:JSON.parse(document.getElementById('token').textContent),
+        auth:"",
+        base_url:window.location.origin,
+        user_id: JSON.parse(document.getElementById('user_id').textContent),
+        user_company_name: JSON.parse(document.getElementById('company_name').textContent),
+        user_company_id: JSON.parse(document.getElementById('company_id').textContent),
+        timezone: JSON.parse(document.getElementById('timezone').textContent),
+        user_type: JSON.parse(document.getElementById('user_type').textContent),
+        mentees_list:"",
+        chat_list:"",
+        chat_msg:"",
+        msg:"",
+        connection:"",
+        chat_room_name:"",
+        book_mentor_session:"",
+        name:"",
+        description:"",
+        profile_photo:"",
+        members:"",
+        group_members_list:"",
+        group_chat_data:"",
+        user_list:"",
+        journey_list:"",
+        title:"",
+        event_id:"",
+        comment:""
+      };
+    },
+    mounted(){
+      this.showMenteesCoachees();
+    },
+    filters: {
+      formateTime: function (value) {
+        if (!value) return ''
+        //value = value.toString()
+        //console.log("time value", value)
+        return value
+      }
+    },
+    methods: {
+        axiosGetRequest: function(url){
+        this.auth = "Token "+this.token;
+        var config = {
+          method: "get",
+          url: url,
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': this.auth,
+          },
+        };
+        return axios(config)
+        },
+        axiosPostRequest: function(url, data){
+            this.auth = "Token "+this.token;
+            var config = {
+            method: "post",
+            url: url,
+            headers: {
+                "Content-Type": "multipart/form-data",
+                "Accept": "application/json",
+                'Authorization': this.auth,
+            },
+            data:data
+            };
+
+            return axios(config)
+        },
+        async destroyDataTable(id){
+            if($(id).DataTable()){
+            $(id).DataTable().clear();
+            $(id).DataTable().destroy();
+            }
+        },
+        async initializeDataTable(id){
+            await this.sleep(2000);
+            $(id).DataTable({
+            "dom": '<"table-pull-left"f><"table-pull-right"l>tip',
+            'destroy': true,
+            'paging'      : true,
+            'lengthChange': true,
+            'searching'   : true,
+            'ordering'    : true,
+            'info'        : true,
+            'autoWidth'   : false,
+            'retrieve':true,
+            'scrollX': true,
+            })
+        },
+        sleep: function(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        },
+        showTab(tabName){
+          var i, tabContent, tabLinks;
+          tabContent = document.getElementsByClassName("tabcontent");
+          for (i = 0; i < tabContent.length; i++) {
+            tabContent[i].style.display = "none";
+          }
+          tabLinks = document.getElementsByClassName("tab-links");
+          for (i = 0; i < tabLinks.length; i++) {
+            tabLinks[i].className = tabLinks[i].className.replace(" active", "");
+          }
+          document.getElementById(tabName+'-content').style.display = "block";
+          document.getElementById(tabName+'-tab').classList.add("active");
+        },
+        async showMenteesCoachees(){
+          this.showTab('mentees-coachees');
+          var url =  this.base_url+"/api/mentor-mentees/"+this.user_id+"?company_id="+this.user_company_id;
+          response = await this.axiosGetRequest(url);
+          this.mentees_list = response.data.mentee_details
+          await this.initializeDataTable('#mentees-coachees-table')
+        },
+        async showBookSession(){
+          this.showTab('book-session');
+          await this.destroyDataTable('#mentees-coachees-table')
+          var data = new FormData();
+          data.append("user_id", this.user_id)
+          data.append("company_id", this.user_company_id)
+          data.append("timezone", this.timezone)
+          var url =  this.base_url+"/api/web-avaiable-slots/";
+          response = await this.axiosPostRequest(url, data);
+          this.book_mentor_session = response.data.response
+          await this.initializeDataTable('#book-session-table')
+        },
+        async showCalender(){
+          this.getJourney()
+          // Generate a random UUID
+          //const random_uuid = uuidv4();
+          this.event_id = uuidv4();
+            
+          function uuidv4() {
+              return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'
+              .replace(/[xy]/g, function (c) {
+                  const r = Math.random() * 16 | 0, 
+                      v = c == 'x' ? r : (r & 0x3 | 0x8);
+                  return v.toString(16);
+              });
+          }
+          this.showTab('calender');
+          var url =  this.base_url+"/api/mentor-calendar/"+this.user_id+"/?company_id="+this.user_company_id+"&timezone="+this.timezone;
+          response = await this.axiosGetRequest(url);
+          console.log("Mentor Calendar Response", response)
+          var calender_event_list = response.data.data
+          var url2 =  this.base_url+"/manager/task-list/"+this.user_id+"?company_id="+this.user_company_id+"&timezone="+this.timezone;
+          response2 = await this.axiosGetRequest(url2);
+          console.log("task list Response2", response2.data);
+          for(let i=0; i<response2.data.data.length; i++){
+            calender_event_list.push(response2.data.data[i])
+          }
+          var events = [];
+          for(let i=0; i<calender_event_list.length; i++){
+            //console.log(calender_event_list[i]['start'], calender_event_list[i]['end'])
+            start_time = calender_event_list[i]['start'].split("+")[0]
+            end_time = calender_event_list[i]['end'].split("+")[0]
+            events.push({
+              id             :  calender_event_list[i]['id'],
+              title          :  calender_event_list[i]['title'],
+              start          :  start_time,
+              end            :  end_time,
+              meeting_type   : "mentor_calendar",
+              session_type   : calender_event_list[i]['call_type'],
+              type           : calender_event_list[i]['type'],
+              url            : calender_event_list[i]['url'],
+              allDay         : false,
+              backgroundColor: calender_event_list[i]['backgroundColor'], //Primary (light-blue)
+              borderColor    : calender_event_list[i]['borderColor'], //Primary (light-blue)
+              slot_status    : calender_event_list[i]['slot_status'],
+              type           : calender_event_list[i]['type'],
+              description    : calender_event_list[i]['description'],
+              task_status    : calender_event_list[i]['task_status'],
+              is_speaker     : calender_event_list[i]['is_speaker']
+            })
+          }
+          var date = new Date()
+          var d    = date.getDate(),
+              m    = date.getMonth(),
+              y    = date.getFullYear()
+          //remove old data
+          $('#calendar').fullCalendar('removeEvents');
+          //Getting new event json data
+          $("#calendar").fullCalendar('addEventSource', events);
+          //Updating new events
+          $('#calendar').fullCalendar('rerenderEvents');
+          var calendar = $('#calendar').fullCalendar({
+            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone, 
+            header    : {
+              left  : 'prev,next today',
+              center: 'title',
+              right : 'month,agendaWeek,agendaDay'
+            },
+            defaultView: 'agendaWeek',
+            buttonText: {
+              today: 'today',
+              month: 'month',
+              week : 'week',
+              day  : 'day'
+            },
+            slotDuration: '00:05:00',
+            eventLimit: true,
+            events    : events,
+            eventRender: function(event, element, view) {
+              if (event.allDay === 'true') {
+              event.allDay = true;
+              } else {
+              event.allDay = false;
+              }
+            },
+            selectable: true,
+            selectHelper: true,
+            select: function(start, end, allDay) {
+            if(start.isBefore(moment())) {
+                $('#calendar').fullCalendar('unselect');
+                bootbox.alert("You are selecting previous date or time.")
+                return false;
+            }
+            //var title = prompt('Event Title:');
+            $('#modal-create-event').modal('show')
+            document.getElementById('start').value = $.fullCalendar.formatDate(start, "Y-MM-DD HH:mm:ss");
+            document.getElementById('end').value = $.fullCalendar.formatDate(end, "Y-MM-DD HH:mm:ss");
+            // if (title) {
+            //   var start = $.fullCalendar.formatDate(start, "Y-MM-DD HH:mm:ss");
+            //   var end = $.fullCalendar.formatDate(end, "Y-MM-DD HH:mm:ss");
+            //   console.log(start, end, title);
+            //   create_event(start, end, title, random_uuid);
+            //   calendar.fullCalendar('renderEvent',
+            //   {
+            //     title: title,
+            //     start: start,
+            //     end: end,
+            //     allDay: allDay,
+            //     id:random_uuid,
+            //     session_type: "Mentor Session"
+            //   },
+            //   true
+            //   );
+            // }
+            // calendar.fullCalendar('unselect');
+            },
+
+            editable  : true,
+            eventDrop: function(event, delta) {
+              var start = $.fullCalendar.formatDate(event.start, "Y-MM-DD HH:mm:ss");
+              var end = $.fullCalendar.formatDate(event.end, "Y-MM-DD HH:mm:ss");
+              console.log(start, end);
+              update_event(start, end, event.title, event.id);
+            },
+            selectHelper: true,
+            droppable : true, // this allows things to be dropped onto the calendar !!!
+            eventClick: function(event) {
+              var date = new Date().toJSON().slice(0, 10)
+              event_expired = false
+              if(date > $.fullCalendar.formatDate(event.start, "YYYY-MM-DD")){
+                event_expired = true
+              }
+              if(event.type == 'task'){
+                var dialog = bootbox.dialog({
+                  title: event.type+"<button class='btn pull-right' style='background-color:#24a0ed; color:white;'>"+event.task_status+"</button>",
+                  message: "<p>"+event.title+"</p><br><strong>Start Time</strong>:-"+$.fullCalendar.formatDate(event.start, "Y-MM-DD HH:mm:ss")+"<br><strong>End Time</strong>:-"+$.fullCalendar.formatDate(event.end, "Y-MM-DD HH:mm:ss")+"<br><strong>Description:-</strong>"+event.description,
+                  size: 'large',
+                  buttons: {
+                     ok: {
+                       label: "Update Status",
+                       className: 'btn-info',
+                       callback: function(){
+                          console.log("hello", event.id)
+                          document.getElementById("task_id").value = event.id
+                          $("#modal-update-task-status").modal('show')
+                       }
+                     }
+                  }
+                 });
+              }
+              else {
+                if(event_expired == true){
+                  var dialog = bootbox.dialog({
+                    title: event.session_type,
+                    message: "<p>"+event.title+"</p><br><strong>Start Time</strong>:-"+$.fullCalendar.formatDate(event.start, "Y-MM-DD HH:mm:ss")+"<br><strong>End Time</strong>:-"+$.fullCalendar.formatDate(event.end, "Y-MM-DD HH:mm:ss")+"<br><br><a href = "+event.url+" target='_blank' id='meeting_url_"+event.id+"'><button class='btn btn-info' disabled> Start Call</button></a>",
+                    size: 'large',
+                    buttons: {
+                        cancel: {
+                          label: "Delete Slot",
+                          className: 'btn-danger',
+                          callback: function(){
+                              console.log("mentor session", event.session_type)
+                              if(event.slot_status == 'Available'){
+                                console.log("Available")
+                                MentorDeleteSlot(event.id)
+                              }
+                              else if(event.session_type == 'Mentor Session' || event.type == 'mentor_calendar'){
+                                console.log("hello")
+                                MentorCancelSlot(event.id)
+                              }
+                              else{
+                                bootbox.alert("You don't have permission to delete this call")
+                              }
+                          }
+                        }
+                    }
+                });
+              }
+              else{
+                var dialog = bootbox.dialog({
+                  title: event.session_type,
+                  message: "<p>"+event.title+"</p><br><strong>Start Time</strong>:-"+$.fullCalendar.formatDate(event.start, "Y-MM-DD HH:mm:ss")+"<br><strong>End Time</strong>:-"+$.fullCalendar.formatDate(event.end, "Y-MM-DD HH:mm:ss")+"<br><br><a href = "+event.url+" target='_blank' id='meeting_url_"+event.id+"'><button class='btn btn-info' > Start Call</button></a>",
+                  size: 'large',
+                  buttons: {
+                      cancel: {
+                        label: "Delete Slot",
+                        className: 'btn-danger',
+                        callback: function(){
+                            console.log("mentor session", event.session_type)
+                            if(event.session_type == 'LiveStreaming' || 'GroupStreaming'){
+                              RemoveUserSlot(event.id, event.session_type, event.is_speaker)
+                            }
+                            else{
+                              if(event.slot_status == 'Available'){
+                                MentorDeleteSlot(event.id)
+                              }
+                              else if(event.session_type == 'Mentor Session' || event.type == 'mentor_calendar'){
+                                MentorCancelSlot(event.id)
+                              }
+                              else{
+                                bootbox.alert("You don't have permission to delete this call")
+                              }
+                            }
+                        }
+                      }
+                  }
+              });
+              }
+            }
+            if(event.url){
+              return false
+            } else {
+              $("#meeting_url_"+event.id).hide()
+            }
+            },
+            eventResize: function(event) {
+              var start = $.fullCalendar.formatDate(event.start, "Y-MM-DD HH:mm:ss");
+              var end = $.fullCalendar.formatDate(event.end, "Y-MM-DD HH:mm:ss");
+              update_event(start, end, event.title, event.id);
+            }
+          })
+          
+          function create_event(start, end, title, random_uuid){
+              var form_data = new FormData();
+              var csrfmiddlewaretoken = "{{csrf_token}}";
+              form_data.append("start", start);
+              form_data.append("end", end);
+              form_data.append("title", title);
+              form_data.append("id", random_uuid)
+
+              form_data.append("csrfmiddlewaretoken", csrfmiddlewaretoken);
+              $.ajax({
+                url: "{% url 'user:add_events' %}",
+                data: form_data,
+                type: "POST",
+                contentType: false,
+                cache: false,
+                processData: false,
+                success: function() {
+                  bootbox.alert("Available Slot Created");
+                }
+              });
+          }
+          function update_event(start, end, title, id){
+            var form_data = new FormData();
+                var csrfmiddlewaretoken = "{{csrf_token}}";
+                form_data.append("start", start);
+                form_data.append("end", end);
+                form_data.append("title", title);
+                form_data.append("id", id);
+                form_data.append("csrfmiddlewaretoken", csrfmiddlewaretoken);
+
+              $.ajax({
+                url: "{% url 'user:update_events' %}",
+                data: form_data ,
+                type: "POST",
+                contentType: false,
+                cache: false,
+                processData: false,
+                success: function(json) {
+
+                bootbox.alert("Your Session is Reschedule. ", function(){
+                    location.reload()
+                });
+                }
+              });
+          }
+          function MentorCancelSlot(id){
+            bootbox.confirm({
+              message: "Do you want to Cancel this slot?",
+              buttons: {
+                  confirm: {
+                      label: 'Yes',
+                      className: 'btn-success'
+                  },
+                  cancel: {
+                      label: 'No',
+                      className: 'btn-danger'
+                  }
+              },
+              callback: function (result) {
+                  if(result == true){
+                      $.ajax({
+                        url:"{% url 'user:cancel_mentor_slot' %}",
+                        type:"POST",
+                        data:{pk:id, csrfmiddlewaretoken : "{{csrf_token}}", timezone:Intl.DateTimeFormat().resolvedOptions().timeZone },
+                        error: function(data){
+                          bootbox.alert('something is wrong');
+                        },
+                        beforeSend: function() {
+                          var dialog = bootbox.dialog({
+                              message: '<p class="text-center mb-0"><i class="fa fa-spin fa-cog"></i> working on your changes - please wait… </p>',
+                              closeButton: false
+                          });
+
+                          setTimeout(function(){
+                              dialog.modal('hide');
+                          }, 4000);
+
+
+                        },
+                        success: function(data) {
+                          bootbox.alert("Your Appointment is Cancelled!", function(){
+                            location.reload()
+                        });
+                        },
+                      });
+                    }
+                  }
+              });
+            }
+            function RemoveUserSlot(id, slot_type, is_speaker){
+              if(is_speaker){
+                bootbox.alert("Slot can not be deleted as you are speaker of this call.")
+              }
+              else{
+                bootbox.confirm({
+                  message: "Do you want to Delete this slot?",
+                  buttons: {
+                      confirm: {
+                          label: 'Yes',
+                          className: 'btn-success'
+                      },
+                      cancel: {
+                          label: 'No',
+                          className: 'btn-danger'
+                      }
+                  },
+                  callback: function (result) {
+                      if(result == true){
+                          $.ajax({
+                            url:"{% url 'user:remove_user_slot' %}",
+                            type:"POST",
+                            data:{pk:id, slot_type:slot_type, csrfmiddlewaretoken : "{{csrf_token}}", timezone:Intl.DateTimeFormat().resolvedOptions().timeZone },
+                            error: function(data){
+                              bootbox.alert('something is wrong');
+                            },
+                            beforeSend: function() {
+                              var dialog = bootbox.dialog({
+                                  message: '<p class="text-center mb-0"><i class="fa fa-spin fa-cog"></i> working on your changes - please wait… </p>',
+                                  closeButton: false
+                              });
+
+                              setTimeout(function(){
+                                  dialog.modal('hide');
+                              }, 4000);
+
+
+                            },
+                            success: function(data) {
+                              bootbox.alert("Your Slot is Deleted!", function(){
+                                location.reload()
+                            });
+                            },
+                          });
+                        }
+                      }
+                  });
+                }
+            }
+            function MentorDeleteSlot(id){
+            console.log("id", id);
+            bootbox.confirm({
+              message: "Do you want to delete this slot?",
+              buttons: {
+                  confirm: {
+                      label: 'Yes',
+                      className: 'btn-success'
+                  },
+                  cancel: {
+                      label: 'No',
+                      className: 'btn-danger'
+                  }
+              },
+              callback: function (result) {
+                  if(result == true){
+                      $.ajax({
+                        url:"{% url 'user:delete_mentor_slot' %}",
+                        type:"POST",
+                        data:{pk:id, csrfmiddlewaretoken : "{{csrf_token}}" },
+                        error: function(data){
+                          console.log(data)
+                          bootbox.alert('something is wrong');
+                        },
+                        beforeSend: function() {
+                          var dialog = bootbox.dialog({
+                              message: '<p class="text-center mb-0"><i class="fa fa-spin fa-cog"></i> working on your changes - please wait… </p>',
+                              closeButton: false
+                          });
+
+                          setTimeout(function(){
+                              dialog.modal('hide');
+                          }, 4000);
+
+
+                        },
+                        success: function(data) {
+                          console.log(data)
+                          bootbox.alert("Your Appointment is Deleted!", function(){
+                            location.reload()
+                        });
+                        },
+                      });
+                    }
+                  }
+              });
+            }
+        },
+        async showChat(){
+          this.showTab('chat');
+          var url =  this.base_url+"/manager/chat-list/"+this.user_id+"/?user_type=Mentor";
+          response = await this.axiosGetRequest(url);
+          this.chat_list = response.data.data
+        },
+        async showChatMsg(room_name){
+          this.chat_room_name = room_name
+          this.chat_msg = ""
+          var url =  this.base_url+"/manager/chat-msg/"+this.user_id+"/"+room_name+"/?user_type=Mentor&timezone="+this.timezone;
+          response = await this.axiosGetRequest(url);
+          this.chat_msg = response.data
+          
+          if (this.connection) {
+            this.connection.close();
+            document
+              .querySelectorAll(".direct-chat-msg")
+              .forEach((el) => el.remove());
+          }
+          await this.sleep(2000);
+          let chat_msg_box = document.getElementById("chat-msg-box");
+          if(chat_msg_box){
+            chat_msg_box.scrollTop = chat_msg_box.scrollHeight;
+          }
+          this.connectSocket();
+      },
+      sendMessage: function () {
+       console.log(this.connection);
+       console.log("msg", this.msg);
+        if (this.msg != "") {
+          //this.connection.send(this.msg);
+          const data = {
+            'message': this.msg,
+            'msg_type': "TEXT"
+          };
+          this.connection.send(JSON.stringify(data));
+          this.msg = "";
+          if(this.mention_member_list != []){
+            var formdata = new FormData();
+            formdata.append("group_id", this.mention_group_id);
+            formdata.append("member_id_list", this.mention_member_list);
+            var url =  this.base_url+"/manager/send-notification-to-mention-user/" + this.user_id + "/"
+            try{
+              response = this.axiosPostRequest(url, formdata);
+              this.mention_member_list = []
+              //console.log("Send Notification To Mention User Response", response.data);
+            }
+            catch(err){
+              console.log("error", err);
+            }
+          }
+        }
+      },
+      connectSocket: function () {
+        console.log(
+          "Starting connection to WebSocket Server",
+          window.location.host
+        );
+        var protocol = window.location.protocol;
+        if (protocol == "http:") {
+          this.socket_server = "ws";
+        } else {
+          this.socket_server = "wss";
+        }
+
+        let socketUrl =
+          this.socket_server +
+          "://" +
+          window.location.host +
+          "/ws/chat/" +
+          this.user_id+
+          "/" +
+          this.chat_room_name +
+          "/";
+
+        console.log("socketURL", socketUrl, this.socket_server, this.base_url, window.location.host);
+        this.connection = new WebSocket(socketUrl);
+
+        this.connection.onmessage = function (event) {
+          var currentdate = new Date().toLocaleString();
+          console.log("on message", event);
+          const chat = document.querySelector('#chat-box');
+          const parsedMessage = JSON.parse(event.data);
+          console.log("parsedMessage", parsedMessage)
+
+          let chatUrl = event.target.url;
+          chatUrl = chatUrl.split("/");
+          let logged_user = chatUrl[5];
+
+          const chat_box = document.getElementById("chat-box");
+          const right_div = document.createElement('div');
+          right_div.classList.add('direct-chat-msg');
+          const chat_div = document.createElement('div');
+          chat_div.classList.add('direct-chat-info', 'clearfix');
+          const chat_span = document.createElement('span');
+          const time_span = document.createElement('span');
+          var float = "right"
+
+          if (logged_user != parsedMessage.sender_user_id) {
+            console.log("left")
+            chat_span.classList.add('direct-chat-name', 'pull-left');
+            chat_span.textContent = parsedMessage.sender_user;
+            time_span.classList.add('direct-chat-timestamp', 'pull-right');
+            float = "left"
+          }
+          if (logged_user == parsedMessage.sender_user_id) {
+            console.log("right")
+            right_div.classList.add('right');
+            chat_span.classList.add('direct-chat-name', 'pull-right');
+            chat_span.textContent = parsedMessage.sender_user;
+            time_span.classList.add('direct-chat-timestamp', 'pull-left');
+          }
+
+          time_span.textContent = currentdate;
+          chat_div.append(chat_span);
+          chat_div.append(time_span);
+          const msg_div = document.createElement('div');
+          console.log("parsedMessage.msg_type", parsedMessage.msg_type)
+
+          if(parsedMessage.msg_type ==  'TEXT'){
+            msg_div.classList.add('direct-chat-text');
+            msg_div.innerHTML = parsedMessage.message;
+          }
+          else if(parsedMessage.msg_type == 'IMAGE'){
+            msg_div.style.float = float;
+            const imageElement = document.createElement('img');
+            imageElement.src = parsedMessage.file_url;
+            imageElement.width= "300"
+            imageElement.height = "300"
+            console.log("parsedMessage.file_url", parsedMessage.file_url)
+            msg_div.appendChild(imageElement);
+          }
+          else if(parsedMessage.msg_type == 'PDF'){
+            console.log("inside pdf")
+            msg_div.style.float = float;
+            msg_div.classList.add('row', 'pdf-div')
+            const pdfElement = document.createElement('div');
+            pdfElement.classList.add('col-md-12', 'col-12')
+            pdfElement.textContent = parsedMessage.file_name;
+            pdfElement.fontSize = "19px";
+            pdfElement.classList.add('pdf-name')
+            const fileOpenElement = document.createElement('div');
+            fileOpenElement.classList.add('col-md-6', 'col-12', 'open-btn')
+            var fileOpenText = document.createElement('a');
+            fileOpenText.setAttribute('href', parsedMessage.file_url);
+            fileOpenText.innerText = "Open";
+            //const fileOpenText = document.createTextNode('Open');
+
+            const fileDownloadElement = document.createElement('div');
+            fileDownloadElement.classList.add('col-md-6', 'col-12', 'download-btn')
+            var fileDownloadText = document.createElement('a');
+            fileDownloadText.setAttribute('href', parsedMessage.file_url);
+            fileDownloadText.innerText = "Download";
+            //const fileDownloadText = document.createTextNode('Download');
+            fileDownloadElement.appendChild(fileDownloadText);
+
+            fileOpenElement.appendChild(fileOpenText);
+            msg_div.appendChild(pdfElement);
+            msg_div.appendChild(fileOpenElement);
+            msg_div.appendChild(fileDownloadElement);
+          }
+          else if(parsedMessage.msg_type == 'VIDEO'){
+            msg_div.style.float = float;
+            const videoElement = document.createElement('video');
+            //videoElement.controls = true;
+            videoElement.width = '200';
+            videoElement.height = '200';
+            const sourceElement = document.createElement('source');
+            sourceElement.src = parsedMessage.file_url;
+            sourceElement.type = 'video/mp4';
+            videoElement.appendChild(sourceElement);
+            const fileNameElement = document.createElement('div');
+            const fileNameText = document.createTextNode(parsedMessage.file_name);
+            fileNameElement.appendChild(fileNameText);
+            msg_div.appendChild(fileNameElement);
+            msg_div.appendChild(videoElement);
+          }
+          
+          right_div.append(chat_div)
+          right_div.append(msg_div)
+          chat_box.append(right_div)
+          let chat_msg_box = document.getElementById("chat-msg-box");
+          function scrollBottom(element) {
+            element.scroll({ top: element.scrollHeight, behavior: "smooth" });
+          }
+          scrollBottom(chat_msg_box);
+        };
+
+        this.connection.onopen = function (event) {
+          // console.log(event);
+          console.log(
+            "Successfully connected to the echo websocket server...",
+            event
+          );
+        };
+      },
+      close(){
+        console.log("maodal closed")
+        this.comment = "" 
+      },
+      async UpdateTaskStatus(){
+        console.log("update", document.getElementById("task_id").value, this.comment, this.$refs.task_status.value)
+        var data = new FormData();
+        data.append("task_id", document.getElementById("task_id").value)
+        data.append("comment", this.comment)
+        data.append("task_status", this.$refs.task_status.value)
+        url = this.base_url+"/manager/update-task-status/"+this.user_id+"/";
+        response = await this.axiosPostRequest(url, data);
+        console.log("Update Task Status Response", response.data);
+        bootbox.alert("Task Status Updated Successfully!");
+        $("#modal-update-task-status").modal("hide")
+        await this.showCalender();
+
+      },
+      async BookSlot(session_id, mentor_id, start_date_time, end_date_time, title, user_id, base_url, token){
+        bootbox.confirm({
+          message: "Do you want to book this slot?",
+          buttons: {
+              confirm: {
+                  label: 'Yes',
+                  className: 'btn-success'
+              },
+              cancel: {
+                  label: 'No',
+                  className: 'btn-danger'
+              }
+          },
+          callback: function (result) {
+            
+              if(result == true){
+                  var data = new FormData();
+                  data.append("user_id", user_id)
+                  data.append("mentor_id",mentor_id)
+                  data.append("id", session_id)
+                  data.append("start_date_time", start_date_time)
+                  data.append("end_date_time", end_date_time)
+                  data.append("title", title)
+                  data.append("timezone", this.timezone)
+                  var url = base_url+"/api/book-appoinments/";
+                  var auth = "Token "+token;
+                  var config = {
+                  method: "post",
+                  url: url,
+                  headers: {
+                      "Content-Type": "multipart/form-data",
+                      "Accept": "application/json",
+                      'Authorization': auth,
+                  },
+                  data:data
+                  };
+                  axios(config)
+                    .then((response) => {
+                      console.log("response", response)
+                      location.reload()
+                    })
+                    .catch((error) => {
+                      console.log("error", error);
+                    });
+                }
+              }
+          });
+        },
+
+        async CancelSlot(session_id, mentor_id, title, user_id, base_url, token){
+          bootbox.confirm({
+            message: "Do you want to Cancel this slot?",
+            buttons: {
+                confirm: {
+                    label: 'Yes',
+                    className: 'btn-success'
+                },
+                cancel: {
+                    label: 'No',
+                    className: 'btn-danger'
+                }
+            },
+            callback: function (result) { 
+                if(result == true){
+                    var data = new FormData();
+                    data.append("user_id", user_id)
+                    data.append("mentor_id",mentor_id)
+                    data.append("id", session_id)
+                    data.append("title", title)
+                    var url = base_url+"/api/cancel-appoinments/";
+                    var auth = "Token "+token;
+                    var config = {
+                    method: "post",
+                    url: url,
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                        "Accept": "application/json",
+                        'Authorization': auth,
+                    },
+                    data:data
+                    };
+                    axios(config)
+                      .then((response) => {
+                        console.log("response", response)
+                        //location.reload()
+                      })
+                      .catch((error) => {
+                        console.log("error", error);
+                      });
+                    }
+                }
+            });
+          },
+          async AddMemberList(){
+            document.getElementById("add_group_members").style.display = "block";
+            document.getElementById("addMemberButton").style.display = "none";
+            var url = this.base_url+"/manager/program-data-list/"+this.user_id+"/";
+            response = await this.axiosGetRequest(url);
+            console.log("User list Response", response.data);
+            this.user_list = response.data.user_list
+          },
+          async getGroupMembers(group_id){
+            console.log("calling", group_id)
+            var url = this.base_url+"/manager/groupchat-members-list/"+group_id+"/?user_id="+this.user_id;
+            response = await this.axiosGetRequest(url);
+            console.log("Group Member Response", response.data);
+            this.group_members_list = response.data.data.member_list;
+            this.group_chat_data = response.data.data;
+          },
+          async removeMember(group_id, member_id){
+            console.log(group_id, member_id)
+            var data = new FormData();
+            data.append("group_id", group_id);
+            data.append("member_id", member_id)
+            var url =  this.base_url+"/manager/remove-groupchat-member/" + this.user_id + "/"
+            try{
+              response = await this.axiosPostRequest(url, data);
+              console.log("Remove Group Chat Response", response.data);
+              bootbox.alert("Group Member Removed successfully!");
+              await this.getGroupMembers(group_id)
+            }
+            catch(err){
+              console.log("error", err);
+              bootbox.alert(err.response.data.message);
+            } 
+          },
+          async AddGroupMember(group_id){
+            member_list = []
+            for(i=0; i<this.$refs.add_members.length; i++){
+              if(this.$refs.add_members[i].selected){
+                member_list.push(this.$refs.add_members[i].value)
+              }
+            }
+            var data = new FormData();
+            data.append("group_id", group_id);
+            data.append("member_id_list", member_list)
+            var url =  this.base_url+"/manager/add-groupchat-member/" + this.user_id + "/"
+            try{
+              response = await this.axiosPostRequest(url, data);
+              console.log("Add Group Chat Member Response", response.data);
+              bootbox.alert("Group Member Added successfully!");
+              await this.getGroupMembers(group_id)
+              document.getElementById("add_group_members").style.display = "none";
+              document.getElementById("addMemberButton").style.display = "block";
+            }
+            catch(err){
+              console.log("error", err);
+              bootbox.alert(err.response.data.message);
+            } 
+          },
+          async checkForMention(group_id, room_type){
+            if(room_type == 'OneToMany'){
+              console.log("this.msg", this.msg)
+              if(this.msg.includes(" @") || (this.msg == '@')){
+                console.log("includes.....")
+                await this.getGroupMembers(group_id);
+                document.getElementById("mention-div-box").style.display = "block";
+              }
+              else{
+                document.getElementById("mention-div-box").style.display = "none";
+              }
+            }
+          },
+          async addMentionMember(group_id, member_id, member_name){
+            console.log("mention memebr", group_id, member_id, member_name)
+            this.msg = this.msg+member_name;
+            this.mention_group_id = group_id
+            document.getElementById("mention-div-box").style.display = "none";
+            // this.mention_member_list.push({
+            //   "id":member_id,
+            //   "name":member_name
+            // })
+            this.mention_member_list.push(member_id)
+          },
+          uploadFile(event){
+            console.log("file",this.$refs.chat_file.files[0])
+            console.log("json file",JSON.stringify(this.$refs.chat_file.files[0]))
+            socket = this.connection
+            const file = event.target.files[0];
+            var file_type = 'Text'
+            if(file.type.includes('image')){
+              file_type = 'IMAGE'
+            }
+            else if(file.type.includes('application')){
+              file_type = 'PDF'
+            }
+            else if(file.type.includes('video')){
+              file_type = 'VIDEO'
+            }
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const fileContent = event.target.result;
+                const base64Data = btoa(fileContent);
+                const data = {
+                  'file_content': base64Data,
+                  'file_name': file.name,
+                  'msg_type': file_type,
+                  'file_type':  file.type
+                };
+                socket.send(JSON.stringify(data));
+            };
+            reader.readAsBinaryString(file);
+          },
+          async CreateEvent(){
+            console.log("data", this.title, this.$refs.journey.value)
+            var data = new FormData()
+            data.append("title", this.title)
+            data.append("journey_id", this.$refs.journey.value)
+            data.append("company", this.user_company_id)
+            data.append("id", this.event_id)
+            data.append("start_time", document.getElementById('start').value)
+            data.append("end_time", document.getElementById('end').value)
+            data.append("mentor_id", this.user_id)
+            data.append("timezone", this.timezone)
+            
+            var url =  this.base_url+"/api/create-event";
+            try{
+              response = await this.axiosPostRequest(url, data);
+              console.log("Create Event Response", response.data);
+              bootbox.alert("Event created successfully!");
+              this.title = "" 
+              this.$refs.journey.value = null
+              $("#modal-create-event").modal('hide');
+              this.showCalender();
+            }
+            catch(err){
+              console.log("error", err);
+              if(err.response.data.message){
+                bootbox.alert(err.response.data.message);
+              }
+              else{
+                bootbox.alert("Something Went Wrong");
+              }
+            } 
+          },
+          async getJourney(){
+            var url =  this.base_url+"/api/mentor-journeys/"+this.user_id+"?company_id="+this.user_company_id;
+            response = await this.axiosGetRequest(url);
+            console.log("Journey List Response", response.data);
+            this.journey_list = response.data.journey_details;
+          }
+    }
+  });
+</script>
+
+{% endblock js %}

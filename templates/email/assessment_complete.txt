@@ -1,0 +1,23 @@
+Dear {{name}},
+
+Thank You for your application to participate as a {{user_role}} in our {{journey_name}}
+
+The Next Steps
+
+Once we have responses, we will collate all applications & assess suitability, based on the criteria set.
+
+We will conduct & complete the Mentee & Mentor matching, based on criteria & keep you updated on the next steps.
+
+Keep a look out for the messages coming through from the platform on your WhatsApp and emails. 	
+
+If you have any further questions or concerns, relating to this program, please do connect with either {{program_team_1}} or {{program_team_2}} 
+via this email address: {{program_team_email}}
+
+You can connect with the community on http://forum.growatpace.com/{{space_id}}
+
+We look forward to connecting with you soon,
+
+Regards
+{{program_team_1}}
+Master Program Manager
+Powered by AtPace Programs

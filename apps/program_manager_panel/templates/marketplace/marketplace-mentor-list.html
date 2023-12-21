@@ -1,0 +1,38 @@
+ <div class="box">
+    <div class="box-header">
+    <h3 class="box-title">Mentor List</h3>
+    </div>
+    <!-- /.box-header -->
+    <div class="box-body">
+    <table id="mentor-list-table" class="table table-bordered table-hover">
+        <thead>
+        <tr>
+            <th>Full Name</th>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Publish on MarketPlace(Mentor) </th>
+            <th>Marketplace Status</th>
+            <th>Send Invite Email</th>
+            <th>Publish on MarketPlace</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr v-for="(list, index) in mentor_list" :key="index">
+            <td class="capitalize"><a :href="'/user/profile/'+list.id" target="_blank">[[list.name]]</a></td>
+            <td>[[list.username]]</td>
+            <td>[[list.email]]</td>
+            <td>[[list.phone]]</td>
+            <td class="capitalize">[[list.mentor_publish_on_marketplace]]</td>
+            <td>[[list.marketplace_status]]</td>
+            <td v-if="list.marketplace_status == 'None'"><a class="" @click="sendEmail(list.id)">Send Email</a></td>
+            <td v-else>Invited</td>
+            <td class="capitalize" v-if="list.admin_publish_on_marketplace"><a class="" @click="publishMentor(list.id, false)">Unpublish</a></td>
+            <td v-else-if="list.marketplace_status == 'Approved'"><a class="" @click="publishMentor(list.id, true)">Publish</a></td>
+            <td v-else>Approve First</td>
+            </tr>
+    </table>
+    </div>
+    <!-- /.box-body -->
+</div>
+<!-- /.box -->

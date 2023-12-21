@@ -1,0 +1,115 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+  <head>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+      <title>Atpace Invite</title>
+      <link
+              rel="stylesheet"
+              href="{% static 'css/atpace_community/AtPaceEmail/invite_user.css' %}"
+      />
+  </head>
+  <body>
+    <table class="email-wrapper" width="100%" cellpadding="0" cellspacing="0">
+      <tr>
+        <td align="center">
+          <table
+            class="email-content"
+            width="100%"
+            cellpadding="0"
+            cellspacing="0"
+          >
+            <!-- Logo -->
+            <tr>
+              <td class="email-masthead">
+                <img
+                  src="http://growatpace.com/static/website/img/logo.png"
+                  class="logo"
+                />
+
+              </td>
+            </tr>
+            <!-- Email Body -->
+            <tr>
+              <td class="email-body" width="100%">
+                <table
+                  class="email-body_inner"
+                  align="center"
+                  width="570"
+                  cellpadding="0"
+                  cellspacing="0"
+                >
+                  <!-- Body content -->
+                  <tr>
+                    <td class="content-cell">
+
+                      <p>
+                        <h6>Hello ,</h6>
+
+                <p>You're invited by {{user_name}} to join Community</p>
+                <p>Below is you Invitation link to join the AtPace Community</p>
+
+                      </p>
+                      <!-- Action -->
+                      <table
+                        class="body-action"
+                        align="center"
+                        width="100%"
+                        cellpadding="0"
+                        cellspacing="0"
+                      >
+                        <tr>
+                          <td align="center">
+                            <div>
+                              <a href="{{url}}" class="button button--orange"
+                                style="color:black;">Accept Invite</a
+                              >
+                            </div>
+                          </td>
+                        </tr>
+                      </table>
+                      <p>Thanks,<br />The Atpace Team</p>
+                      <!-- Sub copy -->
+                      <table class="body-sub">
+                        <tr>
+                          <td>
+                            <p class="sub">
+                              If you’re having trouble clicking the button, copy
+                              and paste the URL below into your web browser.
+                            </p>
+                            <p class="sub"><a href="{{url}}">{{url}}</a></p>
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <table
+                  class="email-footer"
+                  align="center"
+                  width="570"
+                  cellpadding="0"
+                  cellspacing="0"
+                >
+                  <tr>
+                    <td class="content-cell">
+                      <p class="sub center">
+                         Atpace
+                        <br />
+                      </p>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

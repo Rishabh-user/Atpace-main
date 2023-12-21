@@ -1,0 +1,76 @@
+from django.urls import path
+from apps.leaderboard.models import MentorshipGoalComment
+from apps.leaderboard.views import (
+    BadgeCreate,
+    CreatePoints,
+    BadgeList,
+    ALLPointsList,
+    DeleteBadge,
+    DeletePoints,
+    EditBadge,
+    EditPoints,
+    ALLStreakPointsList,
+    DeleteStreakPoints,
+    CreateStreakPoints,
+    EditStreakPoints,
+    start_engagement,
+    end_engagement,
+    Goals,
+    suggested_goals_data,
+    view_goal,
+    delete_goal,
+    Leaderboard,
+    UserGoalProgress,
+    SystemGoals,
+    DeleteSystemGoal,
+    CreateSystemGoal,
+    JourneyContent,
+    mentorship_goal_comment,
+    ViewComment,
+    approve_learner_goal,
+    MentorshipGoalDetail,
+    GoalSetting
+
+    # ViewSystemGoal
+)
+from apps.leaderboard.goal import user_goal_log, assign_journey_to_goal
+
+app_name = 'leaderboard'
+urlpatterns = [
+    path('create-points/', CreatePoints.as_view(), name='create_points'),
+    path('points-list/', ALLPointsList.as_view(), name='points_list'),
+    path('edit-points/<uuid:pk>/', EditPoints.as_view(), name='edit_points'),
+    path('delete-points/<uuid:pk>/', DeletePoints, name='delete_points'),
+    path('create-badge/', BadgeCreate.as_view(), name='create_badge'),
+    path('badges-list/', BadgeList.as_view(), name='badges_list'),
+    path('edit-badge/<uuid:pk>/', EditBadge.as_view(), name='edit_badge'),
+    path('delete-badge/<uuid:pk>/', DeleteBadge, name='delete_badge'),
+    path('streak-points-list/', ALLStreakPointsList.as_view(), name='streak_points_list'),
+    path('delete-streak-points/<uuid:pk>/', DeleteStreakPoints, name='delete_streak_points'),
+    path('create-streak-points/', CreateStreakPoints.as_view(), name='create_streak_points'),
+    path('edit-streak-points/<uuid:pk>/', EditStreakPoints.as_view(), name='edit_streak_points'),
+    path('start-engagement/', start_engagement, name="start_engagement"),
+    path('end-engagement/', end_engagement, name="end_engagement"),
+    path('goal/', Goals.as_view(), name='goal'),
+    path('goal/<str:pk>/', Goals.as_view(), name='goal_with_id'),
+    path('view-goal/', view_goal, name='view_goal'),
+    path('mentorship-goal-comment/', mentorship_goal_comment, name='mentorship_goal_comment'),
+    path('delete-goal/', delete_goal, name='delete_goal'),
+    path('leaderboard/', Leaderboard.as_view(), name="leaderboard"),
+    path('user-goal-log/', user_goal_log, name='user_goal_log'),
+    path('user-goal-progress/<uuid:pk>/', UserGoalProgress.as_view(), name='user_goal_progress'),
+    # path('user-goal-progress/', UserGoalProgress, name='user_goal_progress'),
+    path('system-goals/', SystemGoals.as_view(), name="system_goals"),
+    path('delete-system-goal/', DeleteSystemGoal.as_view(), name="delete_system_goal"),
+    path('create-system-goal/', CreateSystemGoal.as_view(), name="create_system_goal"),
+    path('journey-content/', JourneyContent.as_view(), name='journey_content'),
+    path('assign-journey-to-goal/', assign_journey_to_goal, name='assign_journey_to_goal'),
+    path('suggestion-goal/', suggested_goals_data, name='suggestion_goal'),
+    # path('view-system-goal/', ViewSystemGoal.as_view(), name='view_system_goal'),
+    path('view-comment/<uuid:pk>/', ViewComment.as_view(), name='view_comment'),
+    path('approve-learner-goal/', approve_learner_goal, name='approve_learner_goal'),
+    path('mentorship-goal-detail/<uuid:pk>/', MentorshipGoalDetail.as_view(), name='mentorship_goal_detail'),
+    path('goal-setting/', GoalSetting.as_view(), name='goal_setting'),
+
+
+]

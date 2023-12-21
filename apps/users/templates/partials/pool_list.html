@@ -1,0 +1,6 @@
+<select class="form-control select2" id ="pool" required name="pool" style="width: 100%;">
+    <option selected="selected" value="">Select</option>
+    {% for pool in all_pool %}
+        <option value="{{pool.id}}" {% if pool.id == selected_pool.pk %} selected {% endif %} >{{pool.name}}</option>
+    {% endfor %}
+</select>

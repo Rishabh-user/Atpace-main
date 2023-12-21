@@ -1,0 +1,1096 @@
+{% extends 'base.html' %} {% load static %} 
+{% block title %} Communication {% endblock %} 
+{% load tags %}
+{% block css %} 
+<link
+          rel="stylesheet"
+          href="{% static 'css/program_manager/program_manager.css' %}"
+  />
+  <style>
+    .capitalize {
+      text-transform: capitalize;
+    }
+    .mention-list{
+      background-color:#e1dede;
+    }
+    .mention-list:hover{
+      background-color:#dedada;
+    }
+    .mention-div-box{
+      height:20vh; 
+      overflow:scroll; 
+      box-shadow: 0 0 20px #eee; 
+      border-top:1px solid rgb(234 229 229);
+    }
+    .mention-member-img img {
+      width: 35px;
+      height: 35px;
+      margin-left: 12px;
+    }
+    .pdf-div{
+      background-color: #efeeee;
+      border-radius: 10px;
+      margin-right: 10px;
+      text-align: center;
+    }
+    .pdf-name{
+      border-bottom: 1px solid gray;
+      padding: 20px;
+    }
+    .open-btn{
+      padding: 13px; 
+      border-right: 1px solid;
+    }
+    .download-btn{
+      padding: 13px;
+    }
+  </style>
+{% endblock css %} {% block content %}
+<div class="content-wrapper" id="vue-app">
+  <div :class="'alert alert-dismissible '+[[alert_class]]" v-if="alert_msg" style="margin:10px;">
+    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+    <h4 style="margin-top:10px;"><i class="icon fa fa-warning"></i> Alert!</h4>
+    <a href="/manager/billing">[[alert_msg]]</a>
+  </div>
+  <section class="content-header">
+    <h1>Communication</h1>
+  </section>
+  <section class="content">
+    <div class="row">
+      <div class="col-md-2">
+        <div class="small-box box-tab" style="border-top: 5px solid #1B74E4;" @click="showLiveStream()" id="live-stream">
+          <div class="inner">
+            <h4>Live Stream</h4>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <div class="small-box box-tab" @click="showGroupCalls()" id="group-calls">
+          <div class="inner">
+            <h4>Group Calls</h4>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <div class="small-box box-tab" @click="showBroadcast()" id="broadcast">
+          <div class="inner">
+            <h4>Broadcast</h4>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <div class="small-box box-tab" @click="showGroupChat()" id="group-chat">
+          <div class="inner">
+            <h4>Group Chat</h4>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <div class="small-box box-tab" @click="showEvent()" id="event">
+          <div class="inner">
+            <h4>Event</h4>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <div class="small-box box-tab" @click="showForum()" id="forum">
+          <div class="inner">
+            <h4>Forum</h4>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div v-if="displayLiveStream">
+    {% include 'communication/livestream.html' %}
+    </div>
+    <div v-if="displayGroupCalls">
+    {% include 'communication/group_meet.html' %}
+    </div>
+    <div v-if="displayBroadcast">
+    {% include 'communication/broadcast.html' %}
+    </div>
+    <div v-if="displayGroupChat">
+    {% include 'chat-page.html' %}
+    </div>
+    <div v-if="displayEvent">
+    {% include 'communication/event.html' %}
+    </div>
+    <div v-if="displayForum">
+    {% include 'communication/forum.html' %}
+    </div>
+  </section>
+  {{ request.user.id|json_script:"user_id" }}
+  {{request.session.token|json_script:"token"}}
+  {{request.session.company_id|json_script:"company_id"}}
+  {{request.session.company_name|json_script:"company_name"}}
+  {{request.session.timezone|json_script:"timezone"}}
+  {{request.session.user_type|json_script:"user_type"}}
+</div>
+{% endblock content %} {% block js %} 
+<script src="{% static 'bower_components/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
+<script type="text/javascript">
+  
+  const app = new Vue({
+    el: "#vue-app",
+    delimiters: ['[[', ']]'],
+    data() {
+      return {
+        message:"Hello",
+        displayLiveStream: true,
+        displayGroupCalls: false,
+        displayBroadcast: false,
+        displayGroupChat: false,
+        displayEvent: false,
+        displayForum: false,
+        token:JSON.parse(document.getElementById('token').textContent),
+        auth:"",
+        user_id: JSON.parse(document.getElementById('user_id').textContent),
+        liveStream_list:"",
+        groupCall_list:"",
+        company_list:"",
+        users_list:"",
+        journey_list:"",
+        mentor:"",
+        mentees:"",
+        programTeam:"",
+        everyone:"",
+        title:"",
+        description:"",
+        event_list:"",
+        chat_list:"",
+        post_list:"",
+        base_url:window.location.origin,
+        chat_msg:"",
+        msg:"",
+        connection:"",
+        chat_room_name:"",
+        user_list:"",
+        program_announcement_list:"",
+        start_date:"",
+        end_date:"",
+        url:"",
+        space_list:"",
+        space_members_list:"",
+        livestream:"",
+        displayUrl:"",
+        select_attendees:[],
+        error:false,
+        event_location :"",
+        event_space :"",
+        event_attendees :[],
+        displayLivestream:false,
+        event_id:"",
+        alert_msg:"",
+        alert_class:"",
+        user_company_name: JSON.parse(document.getElementById('company_name').textContent),
+        user_company_id: JSON.parse(document.getElementById('company_id').textContent),
+        timezone: JSON.parse(document.getElementById('timezone').textContent),
+        user_type: JSON.parse(document.getElementById('user_type').textContent),
+        attachment:"",
+        group_members_list: "",
+        group_chat_data: "",
+        mention_member_list: [],
+        mention_group_id:"",
+        mentees_list:""
+      };
+    },
+    mounted(){
+      this.showLiveStream();
+      this.showAlert();
+    },
+    methods: {
+
+      axiosGetRequest: function(url){
+        this.auth = "Token "+this.token;
+        var config = {
+          method: "get",
+          url: url,
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': this.auth,
+          },
+        };
+        return axios(config)
+      },
+      axiosPostRequest: function(url, data){
+        this.auth = "Token "+this.token;
+        var config = {
+          method: "post",
+          url: url,
+          headers: {
+            "Content-Type": "multipart/form-data",
+            "Accept": "application/json",
+            'Authorization': this.auth,
+          },
+          data:data
+        };
+
+        return axios(config)
+      },
+      axiosPutRequest: function(url, data){
+        this.auth = "Token "+this.token;
+        var config = {
+          method: "put",
+          url: url,
+          headers: {
+            "Content-Type": "multipart/form-data",
+            "Accept": "application/json",
+            'Authorization': this.auth,
+          },
+          data:data
+        };
+
+        return axios(config)
+      },
+      async showAlert(){
+        var url = this.base_url+"/manager/check-for-subscription/"+this.user_id+"/";
+        response = await this.axiosGetRequest(url);
+        console.log("Alert response", response.data)
+        if(response.data.message != "No alert available"){
+          this.alert_msg = response.data.message
+          this.alert_class = response.data.css_class
+        }
+      },
+      async destroyDataTable(id){
+        if($(id).DataTable()){
+          console.log("destroying", id);
+          $(id).DataTable().clear();
+          $(id).DataTable().destroy();
+        }
+      },
+      async initializeDataTable(id){
+        console.log("initializing");
+        await this.sleep(2000);
+        $(id).DataTable({
+          "dom": '<"table-pull-left"f><"table-pull-right"l>tip',
+          'destroy': true,
+          'paging'      : true,
+          'lengthChange': true,
+          'searching'   : true,
+          'ordering'    : true,
+          'info'        : true,
+         'autoWidth'   : false,
+         'retrieve':true,
+         'scrollX': true,
+        })
+      },
+      sleep: function(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+      },
+      attachmentUpload(event){
+        console.log("attachment", event.target.files[0]);
+        this.attachment = event.target.files[0]
+      },
+      onProgramAnnouncement() {
+        this.destroyDataTable('#program-announcement-table')
+        console.log("form submitted", this.attachment);
+        this.auth = "Token "+this.token;
+        console.log("data",this.mentor, this.mentees, this.programTeam, this.everyone, this.title, this.description, this.$refs.journey.value)
+        var data = new FormData();
+        if(this.mentor){
+          data.append("mentors", this.mentor);
+        }
+        else{
+          data.append("mentors", false);
+        }
+        if(this.mentees){
+          data.append("mentees", this.mentees);
+        }
+        else{
+          data.append("mentees", false);
+        }
+        if(this.programTeam){
+          data.append("program_team", this.programTeam);
+        }
+        else{
+          data.append("program_team", false);
+        }
+        if(this.everyone){
+          data.append("everyone", this.everyone);
+        }
+        else{
+          data.append("everyone", false);
+        }
+        
+        data.append("topic", this.title);
+        data.append("summary", this.description);
+        //data.append("company", this.$refs.company.value);
+        data.append("company", this.user_company_id);
+        data.append("journey", this.$refs.journey.value);
+        if(this.attachment){
+          data.append("attachment", this.attachment)
+        }
+
+        var config = {
+          method: "post",
+          url: this.base_url+"/manager/program-announcement/"+this.user_id+"/",
+          headers: {
+            "Content-Type": "multipart/form-data",
+            "Accept": "application/json",
+            'Authorization': this.auth,
+          },
+          data:data
+        };
+        axios(config)
+          .then((response) => {
+            console.log("Broadcast submit Response", response.data);
+            bootbox.alert(response.data.message)
+          })
+          .catch((error) => {
+            console.log("error", error, error.response.data.message);
+            bootbox.alert(error.response.data.message)
+        });
+        
+        this.showBroadcast();
+      },
+      async showUrl(){
+        console.log("show url", this.$refs.location.value)
+        if(this.$refs.location.value == 'URl (Zoom, YouTube Live)'){
+          this.displayUrl = true;
+          this.displayLivestream = true;
+        }
+        else{
+          this.displayUrl = false;
+          this.displayLivestream = false;
+        }
+
+      },
+    addZero(i) {
+      if (i < 10) {i = "0" + i}
+      return i;
+    },
+    populateEndTime(){
+        if(this.start_date){
+
+          console.log("success", this.start_date);
+          let start_obj = new Date(this.start_date)
+          let end_obj = new Date(this.start_date)
+          end_obj.setMinutes ( start_obj.getMinutes() + 30 );
+          console.log("success", start_obj, end_obj);
+          this.end_date = end_obj.getFullYear()+"-"+this.addZero(parseInt(end_obj.getMonth()+1))+"-"+this.addZero(end_obj.getDate())+"T"+this.addZero(end_obj.getHours())+":"+this.addZero(end_obj.getMinutes())
+          console.log("time", this.end_date)
+        }
+    },
+      async onCreateEvent(){
+        console.log("create event", this.title, this.description, this.start_date, this.end_date, this.$refs.location.value, this.$refs.space.value, this.bg_image)
+        for (let option of document.getElementById('attendees').options)
+        {
+            if (option.selected) {
+                this.select_attendees.push(option.value);
+            }
+        }
+        console.log("select_attendees", this.select_attendees)
+        if(this.title == ''){
+            bootbox.alert("Title is required!");
+            this.error = true
+        }
+        else if(this.description == ''){
+              bootbox.alert("Description is required!");
+              this.error = true
+        }
+        else if(this.start_date == ''){
+              bootbox.alert("Start time is required!");
+              this.error = true
+        }
+      
+        else if (new Date(this.start_date) < new Date()){
+              bootbox.alert("You're not allowed to create past date events!");
+              this.error = true
+        }
+        else if(this.end_date == ''){
+              bootbox.alert("End time is required!");
+              this.error = true
+        }
+        else if(this.end_date <= this.start_date){
+              bootbox.alert("End time must be greater than start time");
+              this.error = true
+        }
+        else if(this.$refs.location.value == "Select"){
+            bootbox.alert("Location is required!");
+            this.error = true
+        }
+        else if(this.url == '' && !this.livestream){
+          if(this.$refs.location.value == "URl (Zoom, YouTube Live)"){
+            bootbox.alert("Add to livestream is required!");
+            this.error = true
+          }
+        }
+        else if(this.$refs.space.value == "Select"){
+          bootbox.alert("Space is required!");
+          this.error = true
+        }
+        else if(this.select_attendees == ''){
+              bootbox.alert("Attendees is required!");
+              this.error = true
+        }
+        else{
+          this.error = false
+        }
+        if(this.error == false)
+        {
+          var data = new FormData();
+          data.append("title", this.title);
+          data.append("speaker", this.user_id)
+          data.append("start_time", this.start_date)
+          data.append("end_time", this.end_date)
+          data.append("location", this.$refs.location.value)
+          data.append("event_url",this.url)
+          data.append("is_comments_enabled", "True");
+          data.append("is_liking_enabled", "True");
+          data.append("space_id", this.$refs.space.value);
+          data.append("notify_space_members", "False");
+          data.append("post_type", "Event");
+          data.append("attendees", this.select_attendees)
+          data.append("Body",this.description)
+          data.append("frequency","Does Not Repeat")
+          data.append("timezone", this.timezone)
+          data.append('bg_image', this.bg_image)
+
+          if(this.livestream){
+            data.append("livestream", true);
+          }
+          console.log("data",data)
+          var url =  this.base_url+"/atpace-community/create-event-post/" + this.user_id + "/"
+          try{
+            response = await this.axiosPostRequest(url, data);
+            console.log("Create Event Response", response.data);
+            $('#exampleModalCenter').remove()
+            $('.modal-backdrop').remove()
+            bootbox.alert("Event created successfully!");
+            this.showEvent();
+
+          }
+          catch(err){
+            console.log("error", err);
+            bootbox.alert(err.response.data.message);
+          } 
+        }
+
+      },
+      async showEventData(){
+        this.space_list = ""
+        console.log("event data")
+        this.title = ""
+        this.description = ""
+        this.start_date = ""
+        this.end_date = ""
+        this.event_location = ""
+        this.url = ""
+        this.event_space = ""
+        this.event_attendees =  []
+        var url = this.base_url+"/atpace-community/event-space/"+this.user_id+"/";
+        response = await this.axiosGetRequest(url);
+        console.log("Event Space Response", response.data.data);
+        this.space_list = response.data.data.spaces;
+      },
+      async editEventData(id){
+        this.event_id = id
+        var url = this.base_url+"/atpace-community/event-space/"+this.user_id+"/";
+        response = await this.axiosGetRequest(url);
+        console.log("Event Space Response", response.data.data);
+        this.space_list = response.data.data.spaces;
+
+        console.log("edit event data", id)
+        var url = this.base_url+"/atpace-community/user-post/"+id+"/?user_id="+this.user_id+"&timezone="+this.timezone;
+        response = await this.axiosGetRequest(url);
+        console.log("Event Detail Response", response.data.data);
+        this.title = response.data.data.user_post[0].title;
+        this.description = response.data.data.user_post[0].description;
+        let sdate = response.data.data.user_post[0].event.complete_start_time.split("T")
+        this.start_date = sdate[0]+"T"+response.data.data.user_post[0].event.start_time
+        this.start_date = this.start_date.split(" ")[0]
+        //console.log("start_date", this.start_date.split(" ")[0])
+        let edate = response.data.data.user_post[0].event.complete_end_time.split("T")
+        this.end_date = edate[0]+"T"+response.data.data.user_post[0].event.end_time
+        this.end_date = this.end_date.split(" ")[0]
+        //console.log("this.ed_tine", this.end_date)
+        this.url = response.data.data.user_post[0].event.event_url
+        if(response.data.data.user_post[0].event.location == 'URl (Zoom, YouTube Live)'){
+          this.displayUrl = true
+        }
+        else{
+          this.displayUrl = false
+        }
+        this.event_location = response.data.data.user_post[0].event.location;
+        this.event_space = response.data.data.user_post[0].space_id;
+
+        var url = this.base_url+"/atpace-community/event-space-member/"+this.event_space;
+        mem_response = await this.axiosGetRequest(url);
+        console.log("Event Space Members Response", mem_response.data.data);
+        this.space_members_list = mem_response.data.data.all_group_members;
+
+        for (let i=0; i < response.data.data.user_post[0].event.attendees.length; i++){
+            this.event_attendees.push(response.data.data.user_post[0].event.attendees[i].id)
+        }
+        
+      },
+      async onEditEvent(){
+        console.log("create event", this.title, this.description, this.start_date, this.end_date, this.event_location, this.$refs.space.value)
+        for (let option of document.getElementById('attendees').options)
+        {
+            if (option.selected) {
+                this.select_attendees.push(option.value);
+            }
+        }
+        console.log("select_attendees", this.select_attendees)
+        if(this.title == ''){
+            bootbox.alert("Title is required!");
+            this.error = true
+        }
+        else if(this.description == ''){
+              bootbox.alert("Description is required!");
+              this.error = true
+        }
+        else if(this.start_date == ''){
+              bootbox.alert("Start time is required!");
+              this.error = true
+        }
+      
+        else if (new Date(this.start_date) < new Date()){
+              bootbox.alert("You're not allowed to create past date events!");
+              this.error = true
+        }
+        else if(this.end_date == ''){
+              bootbox.alert("End time is required!");
+              this.error = true
+        }
+        else if(this.end_date <= this.start_date){
+              bootbox.alert("End time must be greater than start time");
+              this.error = true
+        }
+        else if(this.url == ''){
+          if(this.event_location == "URl (Zoom, YouTube Live)"){
+            bootbox.alert("Url is required!");
+            this.error = true
+          }
+        }
+        else if(this.$refs.space.value == "Select"){
+          bootbox.alert("Space is required!");
+          this.error = true
+        }
+        else if(this.select_attendees == ''){
+              bootbox.alert("Attendees is required!");
+              this.error = true
+        }
+        else{
+          this.error = false
+        }
+        if(this.error == false)
+        {
+          var data = new FormData();
+          data.append("title", this.title);
+          data.append("speaker", this.user_id)
+          data.append("start_time", this.start_date)
+          data.append("end_time", this.end_date)
+          data.append("location", this.event_location)
+          data.append("event_url",this.url)
+          data.append("is_comments_enabled", "True");
+          data.append("is_liking_enabled", "True");
+          data.append("space_id", this.$refs.space.value);
+          data.append("notify_space_members", "False");
+          data.append("post_type", "Event");
+          data.append("attendees", this.select_attendees)
+          data.append("Body",this.description)
+          data.append("frequency","Does Not Repeat")
+          data.append("timezone", this.timezone)
+
+          if(this.livestream){
+            data.append("livestream", true);
+          }
+          console.log("data",data)
+          var url =  this.base_url+"/atpace-community/update-event-post/" + this.user_id + "/" + this.event_id + "/"
+          try{
+            response = await this.axiosPutRequest(url, data);
+            console.log("Edit Event Response", response.data);
+            bootbox.alert("Event edited successfully!");
+            this.showEvent();
+
+          }
+          catch(err){
+            console.log("error", err);
+            bootbox.alert(err.response.data.message);
+          } 
+        }
+
+      },
+      async showAttendees(){
+        this.space_members_list = ""
+        console.log("show attendees", this.$refs.space.value)
+        var url = this.base_url+"/atpace-community/event-space-member/"+this.$refs.space.value;
+        response = await this.axiosGetRequest(url);
+        console.log("Event Space Members Response", response.data.data);
+        this.space_members_list = response.data.data.all_group_members;
+      },
+      async removeLiveStream(){
+        ele = document.getElementById('live-stream')
+        this.displayLiveStream = false;
+        ele.style.borderTop = "none";
+        await this.destroyDataTable('#live-stream-table')
+      },
+      async removeGroupCalls(){
+        ele = document.getElementById('group-calls')
+        this.displayGroupCalls = false;
+        ele.style.borderTop = "none";
+        await this.destroyDataTable('#group-call-table')
+      },
+      removeBroadcast: function(){
+        ele = document.getElementById('broadcast')
+        this.displayBroadcast = false;
+        ele.style.borderTop = "none";
+
+        this.destroyDataTable('#program-announcement-table')
+      },
+      removeGroupChat: function(){
+        ele = document.getElementById('group-chat')
+        this.displayGroupChat = false;
+        ele.style.borderTop = "none";
+      },
+      async removeEvent(){
+        ele = document.getElementById('event')
+        this.displayEvent = false;
+        ele.style.borderTop = "none";
+        await this.destroyDataTable('#event-table')
+      },
+      async removeForum(){
+        ele = document.getElementById('forum')
+        this.displayForum = false;
+        ele.style.borderTop = "none";
+        await this.destroyDataTable('#forum-table')
+      },
+      async showLiveStream(){
+        this.liveStream_list = ""
+        ele = document.getElementById('live-stream')
+        this.displayLiveStream = true;
+        ele.style.borderTop = "5px solid #1B74E4";
+        
+        this.removeGroupCalls();
+        this.removeBroadcast();
+        this.removeGroupChat();
+        this.removeEvent();
+        this.removeForum();
+
+        var url = this.base_url+"/manager/stream-list/"+this.user_id+"/?call_type=LiveStreaming&timezone="+this.timezone;
+        let response = await this.axiosGetRequest(url);
+        console.log("Livestream Response", response.data);
+        this.liveStream_list = response.data.data
+        await this.initializeDataTable('#live-stream-table')
+
+      },
+      async showGroupCalls(){
+        this.groupCall_list = ""
+        ele = document.getElementById('group-calls')
+        this.displayGroupCalls = true;
+        ele.style.borderTop = "5px solid #1B74E4";
+        
+        this.removeLiveStream();
+        this.removeBroadcast();
+        this.removeGroupChat();
+        this.removeEvent();
+        this.removeForum();
+
+        var url = this.base_url+"/manager/stream-list/"+this.user_id+"/?call_type=GroupStreaming&timezone="+this.timezone;
+        let response = await this.axiosGetRequest(url);
+        console.log("Group call Response", response.data);
+        this.groupCall_list = response.data.data
+        await this.initializeDataTable('#group-call-table')
+      },
+      async showBroadcast(){
+        this.program_announcement_list = ""
+        ele = document.getElementById('broadcast')
+        this.displayBroadcast = true;
+        ele.style.borderTop = "5px solid #1B74E4";
+        
+        this.removeLiveStream();
+        this.removeGroupCalls();
+        this.removeGroupChat();
+        this.removeEvent();
+        this.removeForum();
+
+        var url =  this.base_url+"/manager/journey-list/"+this.user_id+"/?company_id="+this.user_company_id;
+        response = await this.axiosGetRequest(url);
+        console.log("Journey list Response", response.data);
+        this.journey_list = response.data.data
+        
+        url = this.base_url+"/manager/program-announcement/"+this.user_id+"/",
+        response = await this.axiosGetRequest(url);
+        console.log("Program Announcement List Response", response.data);
+        this.program_announcement_list = response.data.data
+        await this.initializeDataTable('#program-announcement-table')
+        
+      },
+      sendMessage: function () {
+       console.log(this.connection);
+       console.log("msg", this.msg);
+        if (this.msg != "") {
+          //this.connection.send(this.msg);
+          const data = {
+            'message': this.msg,
+            'msg_type': "TEXT"
+          };
+          this.connection.send(JSON.stringify(data));
+          this.msg = "";
+          if(this.mention_member_list != []){
+            var formdata = new FormData();
+            formdata.append("group_id", this.mention_group_id);
+            formdata.append("member_id_list", this.mention_member_list);
+            var url =  this.base_url+"/manager/send-notification-to-mention-user/" + this.user_id + "/"
+            try{
+              response = this.axiosPostRequest(url, formdata);
+              this.mention_member_list = []
+              //console.log("Send Notification To Mention User Response", response.data);
+            }
+            catch(err){
+              console.log("error", err);
+            }
+          }
+        }
+      },
+      connectSocket: function () {
+        console.log(
+          "Starting connection to WebSocket Server",
+          window.location.host
+        );
+        var protocol = window.location.protocol;
+        if (protocol == "http:") {
+          this.socket_server = "ws";
+        } else {
+          this.socket_server = "wss";
+        }
+
+        let socketUrl =
+          this.socket_server +
+          "://" +
+          window.location.host +
+          "/ws/chat/" +
+          this.user_id+
+          "/" +
+          this.chat_room_name +
+          "/";
+
+        console.log("socketURL", socketUrl, this.socket_server, this.base_url, window.location.host);
+        this.connection = new WebSocket(socketUrl);
+
+        this.connection.onmessage = function (event) {
+          var currentdate = new Date().toLocaleString();
+          console.log("on message", event);
+          const chat = document.querySelector('#chat-box');
+          const parsedMessage = JSON.parse(event.data);
+          console.log("parsedMessage", parsedMessage)
+
+          let chatUrl = event.target.url;
+          chatUrl = chatUrl.split("/");
+          let logged_user = chatUrl[5];
+
+          const chat_box = document.getElementById("chat-box");
+          const right_div = document.createElement('div');
+          right_div.classList.add('direct-chat-msg');
+          const chat_div = document.createElement('div');
+          chat_div.classList.add('direct-chat-info', 'clearfix');
+          const chat_span = document.createElement('span');
+          const time_span = document.createElement('span');
+          var float = "left"
+
+          if (logged_user != parsedMessage.sender_user_id) {
+            console.log("left")
+            chat_span.classList.add('direct-chat-name', 'pull-left');
+            chat_span.textContent = parsedMessage.sender_user;
+            time_span.classList.add('direct-chat-timestamp', 'pull-right');
+          }
+          if (logged_user == parsedMessage.sender_user_id) {
+            console.log("right")
+            right_div.classList.add('right');
+            chat_span.classList.add('direct-chat-name', 'pull-right');
+            chat_span.textContent = parsedMessage.sender_user;
+            time_span.classList.add('direct-chat-timestamp', 'pull-left');
+            float = "right"
+          }
+
+          time_span.textContent = currentdate;
+          chat_div.append(chat_span);
+          chat_div.append(time_span);
+          const msg_div = document.createElement('div');
+          console.log("parsedMessage.msg_type", parsedMessage.msg_type)
+
+          if(parsedMessage.msg_type ==  'TEXT'){
+            msg_div.classList.add('direct-chat-text');
+            msg_div.innerHTML = parsedMessage.message;
+          }
+          else if(parsedMessage.msg_type == 'IMAGE'){
+            msg_div.style.float = float;
+            const imageElement = document.createElement('img');
+            imageElement.src = parsedMessage.file_url;
+            imageElement.width= "300"
+            imageElement.height = "300"
+            console.log("parsedMessage.file_url", parsedMessage.file_url)
+            msg_div.appendChild(imageElement);
+          }
+          else if(parsedMessage.msg_type == 'PDF'){
+            console.log("inside pdf")
+            msg_div.style.float = float;
+            msg_div.classList.add('row', 'pdf-div')
+            const pdfElement = document.createElement('div');
+            pdfElement.classList.add('col-md-12', 'col-12')
+            pdfElement.textContent = parsedMessage.file_name;
+            pdfElement.fontSize = "19px";
+            pdfElement.classList.add('pdf-name')
+            const fileOpenElement = document.createElement('div');
+            fileOpenElement.classList.add('col-md-6', 'col-12', 'open-btn')
+            var fileOpenText = document.createElement('a');
+            fileOpenText.setAttribute('href', parsedMessage.file_url);
+            fileOpenText.innerText = "Open";
+            //const fileOpenText = document.createTextNode('Open');
+
+            const fileDownloadElement = document.createElement('div');
+            fileDownloadElement.classList.add('col-md-6', 'col-12', 'download-btn')
+            var fileDownloadText = document.createElement('a');
+            fileDownloadText.setAttribute('href', parsedMessage.file_url);
+            fileDownloadText.innerText = "Download";
+            //const fileDownloadText = document.createTextNode('Download');
+            fileDownloadElement.appendChild(fileDownloadText);
+
+            fileOpenElement.appendChild(fileOpenText);
+            msg_div.appendChild(pdfElement);
+            msg_div.appendChild(fileOpenElement);
+            msg_div.appendChild(fileDownloadElement);
+          }
+          else if(parsedMessage.msg_type == 'VIDEO'){
+            msg_div.style.float = float;
+            const videoElement = document.createElement('video');
+            //videoElement.controls = true;
+            videoElement.width = '200';
+            videoElement.height = '200';
+            const sourceElement = document.createElement('source');
+            sourceElement.src = parsedMessage.file_url;
+            sourceElement.type = 'video/mp4';
+            videoElement.appendChild(sourceElement);
+            const fileNameElement = document.createElement('div');
+            const fileNameText = document.createTextNode(parsedMessage.file_name);
+            fileNameElement.appendChild(fileNameText);
+            msg_div.appendChild(fileNameElement);
+            msg_div.appendChild(videoElement);
+          }
+          
+          right_div.append(chat_div)
+          right_div.append(msg_div)
+          chat_box.append(right_div)
+          let chat_msg_box = document.getElementById("chat-msg-box");
+          function scrollBottom(element) {
+            element.scroll({ top: element.scrollHeight, behavior: "smooth" });
+          }
+          scrollBottom(chat_msg_box);
+        };
+
+        this.connection.onopen = function (event) {
+          // console.log(event);
+          console.log(
+            "Successfully connected to the echo websocket server...",
+            event
+          );
+        };
+      },
+      async getUserList(){
+        var url = this.base_url+"/manager/program-data-list/"+this.user_id+"/";
+        response = await this.axiosGetRequest(url);
+        console.log("User list Response", response.data);
+        this.user_list = response.data.user_list
+      },
+      async getHostList(){
+        this.user_list = ""
+        var url = this.base_url+"/atpace-community/host-list/"+this.user_id+"/";
+        response = await this.axiosGetRequest(url);
+        console.log("User list Response", response.data);
+        this.user_list = response.data.host_list
+      },
+      async showGroupChat(){
+        this.chat_list = ""
+        ele = document.getElementById('group-chat')
+        this.displayGroupChat = true;
+        ele.style.borderTop = "5px solid #1B74E4";
+        this.removeLiveStream();
+        this.removeBroadcast();
+        this.removeGroupCalls();
+        this.removeEvent();
+        this.removeForum();
+
+        var url =  this.base_url+"/manager/chat-list/"+this.user_id+"/?user_type=ProgramManager";
+        response = await this.axiosGetRequest(url);
+        console.log("Chat list Response", response.data);
+        this.chat_list = response.data.data
+      },
+      async showChatMsg(room_name){
+        this.chat_room_name = room_name
+        this.chat_msg = ""
+        console.log("line 451", room_name)
+        var url =  this.base_url+"/manager/chat-msg/"+this.user_id+"/"+room_name+"/?user_type=ProgramManager&timezone="+this.timezone;
+        response = await this.axiosGetRequest(url);
+        console.log("Chat Msg Response", response.data);
+        this.chat_msg = response.data
+        
+        if (this.connection) {
+          console.log("this.connention",this.connection)
+          this.connection.close();
+          this.msg = ""
+          document
+            .querySelectorAll(".direct-chat-msg")
+            .forEach((el) => el.remove());
+        }
+        await this.sleep(2000);
+        let chat_msg_box = document.getElementById("chat-msg-box");
+        console.log("line 456", chat_msg_box);
+        if(chat_msg_box){
+          chat_msg_box.scrollTop = chat_msg_box.scrollHeight;
+        }
+        this.connectSocket();
+      },
+      async showEvent(){
+        this.event_list = ""
+        await this.destroyDataTable('#event-table')
+        ele = document.getElementById('event')
+        this.displayEvent = true;
+        ele.style.borderTop = "5px solid #1B74E4";
+        
+        this.removeLiveStream();
+        this.removeBroadcast();
+        this.removeGroupChat();
+        this.removeGroupCalls();
+        this.removeForum();
+        var url =  this.base_url+"/manager/forum-event/"+this.user_id+"/?timezone="+this.timezone;
+        response = await this.axiosGetRequest(url);
+        console.log("Event list Response", response.data);
+        this.event_list = response.data.data
+        await this.initializeDataTable('#event-table')
+      },
+      async showForum(){
+        this.post_list = ""
+        ele = document.getElementById('forum')
+        this.displayForum = true;
+        ele.style.borderTop = "5px solid #1B74E4";
+        this.removeLiveStream();
+        this.removeBroadcast();
+        this.removeGroupChat();
+        this.removeEvent();
+        this.removeGroupCalls();
+        var url = this.base_url+"/atpace-community/user-posts/"+this.user_id+"/?timezone="+this.timezone;
+        response = await this.axiosGetRequest(url);
+        console.log("Forum Response", response.data);
+        this.post_list = response.data.data.All_Posts;
+        await this.initializeDataTable('#forum-table')
+      },
+      async AddMemberList(){
+        document.getElementById("add_group_members").style.display = "block";
+        document.getElementById("addMemberButton").style.display = "none";
+        var url = this.base_url+"/manager/program-data-list/"+this.user_id+"/";
+        response = await this.axiosGetRequest(url);
+        console.log("User list Response", response.data);
+        this.user_list = response.data.user_list
+      },
+      async getGroupMembers(group_id){
+        console.log("calling", group_id)
+        var url = this.base_url+"/manager/groupchat-members-list/"+group_id+"/?user_id="+this.user_id;
+        response = await this.axiosGetRequest(url);
+        console.log("Group Member Response", response.data);
+        this.group_members_list = response.data.data.member_list;
+        this.group_chat_data = response.data.data;
+      },
+      async removeMember(group_id, member_id){
+        console.log(group_id, member_id)
+        var data = new FormData();
+        data.append("group_id", group_id);
+        data.append("member_id", member_id)
+        var url =  this.base_url+"/manager/remove-groupchat-member/" + this.user_id + "/"
+        try{
+          response = await this.axiosPostRequest(url, data);
+          console.log("Remove Group Chat Response", response.data);
+          bootbox.alert("Group Member Removed successfully!");
+          await this.getGroupMembers(group_id)
+        }
+        catch(err){
+          console.log("error", err);
+          bootbox.alert(err.response.data.message);
+        } 
+      },
+      async AddGroupMember(group_id){
+        member_list = []
+        for(i=0; i<this.$refs.add_members.length; i++){
+          if(this.$refs.add_members[i].selected){
+            member_list.push(this.$refs.add_members[i].value)
+          }
+        }
+        var data = new FormData();
+        data.append("group_id", group_id);
+        data.append("member_id_list", member_list)
+        var url =  this.base_url+"/manager/add-groupchat-member/" + this.user_id + "/"
+        try{
+          response = await this.axiosPostRequest(url, data);
+          console.log("Add Group Chat Member Response", response.data);
+          bootbox.alert("Group Member Added successfully!");
+          await this.getGroupMembers(group_id)
+          document.getElementById("add_group_members").style.display = "none";
+          document.getElementById("addMemberButton").style.display = "block";
+        }
+        catch(err){
+          console.log("error", err);
+          bootbox.alert(err.response.data.message);
+        } 
+      },
+      async checkForMention(group_id, room_type){
+        if(room_type == 'OneToMany'){
+          console.log("this.msg", this.msg)
+          if(this.msg.includes(" @") || (this.msg == '@')){
+            console.log("includes.....")
+            await this.getGroupMembers(group_id);
+            document.getElementById("mention-div-box").style.display = "block";
+          }
+          else{
+            document.getElementById("mention-div-box").style.display = "none";
+          }
+        }
+      },
+      async addMentionMember(group_id, member_id, member_name){
+        console.log("mention memebr", group_id, member_id, member_name)
+        this.msg = this.msg+member_name;
+        this.mention_group_id = group_id
+        document.getElementById("mention-div-box").style.display = "none";
+        // this.mention_member_list.push({
+        //   "id":member_id,
+        //   "name":member_name
+        // })
+        this.mention_member_list.push(member_id)
+      },
+      uploadFile(event){
+        console.log("file",this.$refs.chat_file.files[0])
+        console.log("json file",JSON.stringify(this.$refs.chat_file.files[0]))
+        socket = this.connection
+        const file = event.target.files[0];
+        var file_type = 'Text'
+        if(file.type.includes('image')){
+          file_type = 'IMAGE'
+        }
+        else if(file.type.includes('application')){
+          file_type = 'PDF'
+        }
+        else if(file.type.includes('video')){
+          file_type = 'VIDEO'
+        }
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            const fileContent = event.target.result;
+            const base64Data = btoa(fileContent);
+            const data = {
+              'file_content': base64Data,
+              'file_name': file.name,
+              'msg_type': file_type,
+              'file_type':  file.type
+            };
+            socket.send(JSON.stringify(data));
+        };
+        reader.readAsBinaryString(file);
+      }
+    }
+  });
+
+  
+</script>
+
+{% endblock js %}

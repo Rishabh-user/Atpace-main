@@ -1,0 +1,128 @@
+{% extends 'base.html' %} {% load static %}
+{% load tags %}
+<!-- DataTables -->
+{% block css %}
+<link rel="stylesheet" href="{% static 'bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css' %}">
+{% endblock css %}
+
+{% block content %}
+
+<div class="content-wrapper">
+  <section class="content-header">
+    <h1>
+        Meeting Details
+    </h1>
+    <ol class="breadcrumb">
+      <li><a href="#"><i class="fa fa-dashboard"></i> User Settings</a></li>
+      <li><a href="#">User</a></li>
+      <li class="active">List</li>
+    </ol>
+  </section>  
+  <section class="content">
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="box">
+          <div class="box-header">
+            <h3 class="box-title">Meeting Detail</h3>
+              </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+              <table id="example2" class="table table-bordered table-hover">
+                 <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Start Time</th>
+                    <th>Duration(HH:MM:SS)</th>
+                </tr>
+                 </thead>
+                 <tbody>
+                     {% for data in data %}
+                    <tr>
+                      
+                      <td>{{data.title|slice:":-5"}}</td>
+                      <td>{{data.start_time}}</td>
+                      <td>{{data.duration}}</td>
+                    </tr>
+                    {% endfor %}
+                 </tfoot>
+               </table>
+             </div>
+             <!-- /.box-body -->
+           </div>
+           <!-- /.box -->
+ 
+          
+         </div>
+       <!-- /.col -->
+    </div>
+    <!-- /.row -->
+    <div class="row">
+        <div class="col-xs-12">
+          <div class="box">
+            <div class="box-header">
+                <h3 class="box-title">Joined User List</h3>
+                </div>
+              <!-- /.box-header -->
+              <div class="box-body">
+                <table id="metting_details" class="table table-bordered table-hover">
+                   <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Join Time</th>
+                      <th>Duration(HH:MM:SS)</th>
+                  </tr>
+                   </thead>
+                   <tbody>
+                       {% for user in users %}
+                      <tr>
+                        
+                        <td>{{user.user_name}}</td>
+                        <td>{{user.join_time}}</td>
+                        <td>{{user.duration}}</td>
+                    </tr>
+                    {% endfor %}
+                   </tfoot>
+                 </table>
+               </div>
+               <!-- /.box-body -->
+             </div>
+             <!-- /.box -->
+   
+            
+           </div>
+         <!-- /.col -->
+      </div>
+      <!-- /.row -->
+   </section>
+ 
+</div>
+{% endblock content %} 
+{% block js %}
+<script src="{% static 'bower_components/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
+<script>
+
+$(function () {
+ 
+  $('#example2').DataTable({
+    "dom": '<"table-pull-left"f><"table-pull-right"l>tip',
+    'paging'      : true,
+    'lengthChange': true,
+    'searching'   : true,
+    'ordering'    : true,
+    'info'        : true,
+    'autoWidth'   : true,
+    'scrollX'     : true
+  })
+  $('#metting_details').DataTable({
+    "dom": '<"table-pull-left"f><"table-pull-right"l>tip',
+    'paging'      : true,
+    'lengthChange': true,
+    'searching'   : true,
+    'ordering'    : true,
+    'info'        : true,
+    'autoWidth'   : true
+  })
+})
+</script>
+{% endblock js %}

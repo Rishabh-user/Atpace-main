@@ -1,0 +1,69 @@
+<div class="box">
+          <div class="box-header with-border">
+            <h3 class="box-title">Allot User to Journey</h3>
+    
+            <div class="box-tools pull-right">
+              <button type="button" class="btn btn-box-tool" data-widget="collapse" data-toggle="tooltip"
+                      title="Collapse">
+                <i class="fa fa-minus"></i></button>
+              <button type="button" class="btn btn-box-tool" data-widget="remove" data-toggle="tooltip" title="Remove">
+                <i class="fa fa-times"></i></button>
+            </div>
+          </div>
+          <div class="box-body">
+            <form @submit.prevent="onAllotUsetoJourney">
+                <div class="row">
+                    <div class="col-md-12">
+                      <div class="form-group">
+                        <label>Journey</label>
+                        <select class="form-control" name="channel" style="width: 100%;" required ref="journey">
+                          <option selected="selected" value="">Select Journey</option>
+                          <option
+                            v-bind:value="journey.id"
+                            v-for="journey in journey_list"
+                            :key="journey.id"
+                          >
+                            [[journey.name]] 
+                          </option>
+                        </select>
+                      </div>
+                      <!-- /.form-group -->
+
+                      <!-- /.form-group -->
+                    </div>
+                    <!-- /.col -->
+                    <div class="col-md-12">
+                      <div class="form-group">
+                        <label>Users</label>
+                        <select class="form-control" name="user" multiple="multiple" data-placeholder="Select User"
+                                style="width: 100%;" required id="users">
+                                <option
+                                  v-bind:value="user.id"
+                                  v-for="user in users_list"
+                                  :key="user.id"
+                                >
+                                  [[user.company]] - [[user.name]] [[(user.user_type)]] - [[user.email]]
+                                </option>
+                                {% comment %} {% for user in request|get_all_user %} {% endcomment %}
+                                {% comment %} <option value="{{user.pk}}"> {% if user.company.all != None %} {{user.company.all|join:', '}}  -  {% endif %} {{user.first_name}} {{user.last_name}} ({% for type in user.userType.all %}  {{type.type}}, {% endfor %}) {{user.email}}</option> {% endcomment %}
+                                {% comment %} {% endfor %}  {% endcomment %}
+                        </select>
+                      </div>
+                      <div class="form-group">
+                        <input type="checkbox" v-model="is_wp_enable" name="is_wp_enable" value="true" id="is_wp_enable"/>
+                        <label for="is_wp_enable">Is whatsapp Enable</label>
+
+                      </div>
+                      <!-- /.form-group -->
+                      <button type="submit" id="sumbitContent" class="btn btn-primary">Save changes</button>
+
+                    </div>
+                    <!-- /.col -->
+                  </div>
+                  <!-- /.row -->
+            </form>
+            
+          </div>
+          
+        </div>
+        <!-- /.box -->

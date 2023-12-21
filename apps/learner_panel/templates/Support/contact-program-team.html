@@ -1,0 +1,57 @@
+<div class="box">
+    <div class="box-header with-border">
+        <h3 class="box-title">Contact Program Team</h3>
+    </div>
+    <div class="box-body">
+    <form @submit.prevent="onContactProgramTeam" id="contact_program_form">
+        <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                    <label>Subject*</label>
+                    <input
+                        name="subject"
+                        type="text"
+                        id="subject"
+                        v-model="subject"
+                        class="form-control"
+                        required
+                    />
+                    </div>
+                    <!-- /.form-group -->
+                    <div class="form-group">
+                    <label>Issue*</label>
+                     <textarea
+                    name="issue"
+                    class="form-control"
+                    required
+                    v-model="issue"
+                    rows="10"
+                    cols="25"
+                    ></textarea>
+                    </div>
+                    <!-- /.form-group -->
+                    <div class="form-group">
+                    <label>Image</label>
+                    <input
+                        name="image"
+                        type="file"
+                        id="image"
+                        @change="uploadImage"
+                        class="form-control"
+                        accept="image/*"
+                    />
+                    </div>
+                </div>
+                <!-- /.col -->
+            {% if request.session.MentorDashboardView %}
+                <button disabled type="submit" class="btn btn-primary">Submit</button>
+            {% else %}
+                <button type="submit" class="btn btn-primary">Submit</button>
+            {% endif %}
+
+                </div>
+                <!-- /.row -->
+    </form>
+    </div>
+</div>
+<!-- /.box -->

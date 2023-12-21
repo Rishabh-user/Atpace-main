@@ -1,0 +1,193 @@
+{% extends 'base.html' %}
+{% load static %} {% load tags %}
+{% block css %} 
+  
+
+ 
+   {% endblock %}
+{% block sidebar %}
+<aside
+class="main-sidebar"
+style="
+  box-shadow: 0px 12px 7px #2329314d;
+  background-color: white;
+  border-radius: none;
+  backdrop-filter: blur(1.5px);
+  -webkit-backdrop-filter: blur(1.5px);
+  border-right: 1px solid #ababab;
+"
+>
+<!-- sidebar: style can be found in sidebar.less -->
+<section class="sidebar" style="background-color: #fff">
+    <ul class="sidebar-menu" data-widget="tree">
+      {% for data in content_data %}
+  
+      {% endfor %}
+    </ul>
+  </section>
+  </aside>
+  {% endblock sidebar %}
+  {% block content %}
+        <!-- Content Wrapper. Contains page content -->
+        
+<div class="content-wrapper">
+    <section class="content">
+            
+        <!-- Default box -->
+            
+            <div class="box box-widget">
+                
+  
+                <h4 style="padding: 10px;">{{learning_journal.name}}
+                {% if learning_journal.user_id == user_id %}
+                {% if learning_journal.is_weekly_journal %}
+                {% if learning_journal.is_draft %}
+                <a href="{% url 'community:edit_weekly_journals' id=learning_journal.pk %}"><button class="btn btn-primary pull-right">Edit</button></a>
+                {% endif %}
+                {% else %}
+                <a href="{% url 'community:edit_journal' user_id=request.user.id pk=learning_journal.pk %}"><button class="btn btn-primary pull-right">Edit</button></a>
+                {% endif %}
+                {% endif %}
+                </h4>
+                <div class="box-header with-border">
+                  <div class="user-block">
+                    <img 
+                    class="img-circle" 
+                    src="{{MEDIA_URL}}{{request.user.avatar}}" 
+                    onerror="this.onerror=null; this.src='{{MEDIA_URL}}{{request.user.avatar}}'"
+                    alt="User Image">
+                    <span class="username"><a href="#" style="color: black;">{{learning_journal.user_name}}</a></span>
+                    <span class="description"> 
+                     
+                      {{ learning_journal.created_at|convert_in_timezone:request.session.timezone }}
+                     
+                  </div>
+                  <!-- /.user-block -->
+                  
+                  <!-- /.box-tools -->
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body">
+                  <!-- post text -->
+                  {% autoescape off %}
+                    {{learning_journal.learning_journal}}
+                    {% endautoescape %}
+                    {% for attachment in attachments %}
+                    {% if attachment.image_upload %}
+                    <img src="{{MEDIA_URL}}{{attachment.image_upload}}" width="300"> 
+                    {% elif attachment.file_upload %}
+                    <a href="{{MEDIA_URL}}{{attachment.file_upload}}" download="download">
+                    <div class="box_icon">
+                      <span class="icon_i" style="display: inline" ><span icon_align="left">
+                        <i class="fa-solid fa-file"></i>
+                        </span></span>
+                      <div class="box_text">
+                          <h3>{{ attachment.file_upload.file}}</h3>
+                      </div>
+                      {% endif %}
+                    {% endfor %}
+                  <!-- Social sharing buttons -->
+                  <hr>
+                  <!-- <button type="button" class="btn btn-default btn-xs"><i class="fa fa-share"></i> Share</button> -->
+                  <!-- <button type="button" class="btn btn-default btn-xs"><i class="fa fa-thumbs-o-up"></i> Like</button>
+                  <span class="pull-right text-muted">{% if data.likes_count != 0 %} {{data.likes_count}} {% endif %} likes -  comments({{data.comments_count}})</span> -->
+                </div>
+                <!-- /.box-body -->
+                <div class="box-footer box-comments">
+                  
+                  {% for comment in comment %}
+                  <div class="box-comment" id="comment_{{forloop.counter}}">
+                    <!-- User image -->
+                    <img 
+                    class="img-circle img-sm" 
+                    src="{{MEDIA_URL}}{{request.user.avatar}}" 
+                    onerror="this.onerror=null; this.src='{{request.user.avatar}}'"
+                    alt="User Image">
+        
+                    <div class="comment-text">
+                          <span class="username">
+                            {{comment.user_name}}
+                            <span class="text-muted pull-right">
+                                {% if comment.user_id == user_id %}
+                                <span onclick="editComment('{{forloop.counter}}', '{{comment.id}}')"><i class="fa fa-edit option-icon"></i> Edit</span>
+                                <br>
+                                {% endif %}
+                              {% if channel.is_community_required %}
+                              {{comment.body.created_at|get_type}}
+                              {% else %}
+                              {{comment.created_at|convert_in_timezone:request.session.timezone}}
+                              {% endif %}
+                                            </span>
+                                        </span><!-- /.username -->
+                                        <div id="text_{{forloop.counter}}">
+                                        {% autoescape off %}
+                                        {% if channel.is_community_required %}
+                                        {{comment.body.body}}
+                                        {% else %}
+                                        {{comment.body}}
+                                        {% endif %}
+                                        {% endautoescape %}
+                                        </div>
+                    </div>
+                    <!-- /.comment-text -->
+                  </div>
+                  {% endfor %}
+                  <!-- /.box-comment -->
+                </div>
+                <!-- /.box-footer -->
+               
+                <div class="box-footer">
+                  <form action="{% url 'user:journal_comment'%}" method="post">
+                    {% csrf_token %}
+                    <img 
+                    class="img-responsive img-circle img-sm" 
+                    src="{{MEDIA_URL}}{{request.user.avatar}}" 
+                    onerror="this.onerror=null; this.src='{{request.user.avatar}}'"
+                    alt="Alt Text">
+                    <!-- .img-push is used to add margin to elements next to floating images -->
+                    <div class="img-push">
+                      <input type="hidden" name="answer_id" value="" id="answer_id"/>
+                      <input type="hidden" value="{{learning_journal.pk}}" name="learningjournal_id"/>
+                      <textarea class="form-control input-sm" name="answer" id="answer" placeholder="Write your comment here..."></textarea>
+                    </div>
+                    <button class="btn btn-info" id="post_comment" disabled>POST</button>
+                  </form>
+                </div>
+                <!-- /.box-footer -->
+               
+              </div>
+                  </div>
+          
+          
+    
+      </section>
+  </div>
+{% endblock content %} 
+{% block js %}
+<script>
+function editComment(id, comment_id){
+  console.log("id",id, comment_id)
+  comment_box = document.getElementById("comment_"+id).style.display = 'none'
+  form_text = document.getElementById("answer")
+  comment_text = document.getElementById("text_"+id).innerText
+  comment_text = comment_text.replace(/  /g,'')
+  console.log("comment", comment_text)
+  form_text.innerText = comment_text
+  comment_id = document.getElementById("answer_id").value = comment_id
+
+}
+answer.oninput = function(){
+  console.log(document.getElementById("answer").value)
+  if(! document.getElementById("answer").value){
+    document.getElementById("post_comment").disabled = true
+  }
+  else{
+    document.getElementById("post_comment").disabled = false
+  }
+
+}
+
+</script>
+{% endblock %}
+</body>
+</html>

@@ -1,0 +1,209 @@
+{% extends 'base.html' %} {% load static %}
+{% block title %} {% if request.path == '/content/all-content/' %}All Content {% else %} My Content{% endif %} {% endblock %}
+<!-- DataTables -->
+{% block css %}
+<link rel="stylesheet" href="{% static 'bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css' %}">
+{% endblock css %} 
+{% block content %}
+
+
+<div class="content-wrapper">
+  <section class="content-header">
+    <h1>
+      {% if request.path == '/content/all-content/' %}
+        All Content
+      {% else %}
+        My Content
+      {% endif %}
+    </h1>
+    <ol class="breadcrumb">
+      <li><a href="#"><i class="fa fa-dashboard"></i>Content</a></li>
+      <li class="active">{% if request.path == '/content/all-content/' %}All Content {% else %} My Content{% endif %}</li>
+    </ol>
+  </section>
+
+  <section class="content">
+    <div class="row">
+       <div class="col-xs-12">
+           <div class="box">
+             <div class="box-header">
+               <h3 class="box-title">{% if request.path == '/content/all-content/' %}All Content {% else %} My Content{% endif %}</h3>
+               <a href="{% url 'content:create_content' %}"><button class="btn btn-primary pull-right">Create Content</button></a>
+             </div>
+             <!-- /.box-header -->
+             <div class="box-body">
+               <table id="example2" class="table table-bordered table-hover">
+                 <thead>
+                 <tr>
+                  <tr>
+                    <th>Mircoskill</th>
+                    <th>Icon</th>
+                    <th>Status</th>
+                    
+                    <th>User</th>
+                    <th>Last Update</th>
+                    <th>Action</th>
+                  </tr>
+                   
+                 </tr>
+                 </thead>
+                 <tbody>
+                   {% for content in content %}
+                   <tr id={{content.pk}}>
+                    <td>{{content.title}}</td>
+                    <td><img src="{{MEDIA_URL}}{{content.image}}" width="100px" height="90px"></td>
+                    <td>{{content.status}}</td>
+                    
+                    <td>{{content.user}}</td>
+                    <td>{{content.updated_at}}</td>
+                    <td>
+                      <div class="dropdown">
+                        <button class="btn bg-purple dropdown-toggle btn-select-option" type="button" data-toggle="dropdown" aria-expanded="true">Select an option                                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu options-dropdown">
+                            <li>
+                                <a href="{% url 'content:edit_content' pk=content.pk %}"><i class="fa fa-edit option-icon"></i>Edit Draft</a>
+                            </li>
+                            <li>
+                              <a onclick="CopyContent('{{content.pk}}')"><i class="fa fa-copy option-icon"></i>Copy Content</a>
+                          </li>
+                          <li>
+                            <a href="javascript:void(0)" data-toggle="modal" data-target="#modal-default" class="upload_banner"><i class="fa fa-upload option-icon"></i>Upload Banner</a>
+                        </li>
+                        
+                            <li>
+                                <a href="{% url 'content:admin_read_content' pk=content.pk %}"><i class="fa fa-eye option-icon"></i>View</a>
+                            </li>
+                            
+                            <li >
+                                <a href="javascript:void(0)"  class="delete_course" ><i class="fa fa-trash option-icon"></i>Delete</a>
+                            </li>
+                        </ul>
+                    </div>
+                    </td>
+                   </tr>
+                   {% endfor %}
+                 </tfoot>
+               </table>
+             </div>
+             <!-- /.box-body -->
+           </div>
+           <!-- /.box -->
+ 
+          
+         </div>
+       <!-- /.col -->
+    </div>
+    <!-- /.row -->
+ </section>
+ <div class="modal fade " id="modal-default" style="display: none; padding-right: 17px;">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form action="{% url 'content:upload_banner' %}" method="POST" enctype="multipart/form-data">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">×</span></button>
+        <h4 class="modal-title">Upload Banner</h4>
+      </div>
+      <div class="modal-body">
+        {% csrf_token %}
+        <input type="hidden" name="id" required id="content_id"> 
+        <div class="form-group">
+          <label >Select Banner</label>
+          <input name="file" type="file" required class="form-control"placeholder="upload File">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-primary">Save changes</button>
+      </div>
+    </form>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div>
+ 
+</div>
+{% endblock content %} 
+{% block js %}
+<script src="{% static 'bower_components/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
+<script>
+  function CopyContent(id) {
+
+var form_data = new FormData();
+var csrfmiddlewaretoken = "{{csrf_token}}"; 
+form_data.append("id", id);
+form_data.append("csrfmiddlewaretoken", csrfmiddlewaretoken);
+
+$.ajax({
+  type: "POST",
+  url: "{% url 'content:copy_content' %}",
+  data: form_data,
+  contentType: false,
+          cache: false,
+          processData: false,
+  success: function(data){	
+    location.reload()		
+  }
+
+});
+  }
+
+$(document).on("click", ".upload_banner", function(){
+  var id = $(this).parents("tr").attr("id");
+  $("#content_id").val(id);
+})
+$(function () {
+  $(".delete_course").click(function(){
+    var id = $(this).parents("tr").attr("id");
+    bootbox.confirm({
+    message: "Are you sure to remove this record ?",
+    buttons: {
+        confirm: {
+            label: 'Yes',
+            className: 'btn-success'
+        },
+        cancel: {
+            label: 'No',
+            className: 'btn-danger'
+        }
+    },
+    callback: function (result) {
+        if(result == true){
+          $.ajax({
+               url:  "{% url 'content:delete_course' %}",
+               type: 'post',
+               data: {pk: id, csrfmiddlewaretoken : "{{csrf_token}}" },
+               error: function() {
+                bootbox.alert('Something is wrong');
+               },
+               success: function(data) {
+                    $("#"+id).remove();
+                    bootbox.alert("Record removed successfully");  
+               }
+            });
+        }
+    }
+});
+});
+});
+
+$(function () {
+  
+ 
+  $('#example2').DataTable({
+    "dom": '<"table-pull-left"f><"table-pull-right"l>tip',
+    'paging'      : true,
+    'lengthChange': true,
+    'searching'   : true,
+    'ordering'    : true,
+    'info'        : true,
+    'autoWidth'   : true,
+    'scrollX'     : true
+    
+  })
+})
+</script>
+{% endblock js %}

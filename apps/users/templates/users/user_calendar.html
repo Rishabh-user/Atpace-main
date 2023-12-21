@@ -1,0 +1,246 @@
+{% extends 'base.html' %} {% load static %} {% block content %}
+<link
+  rel="stylesheet"
+  href="{% static 'bower_components/fullcalendar/dist/fullcalendar.min.css' %}"
+/>
+<link
+  rel="stylesheet"
+  href="{% static 'bower_components/fullcalendar/dist/fullcalendar.print.min.css' %}"
+  media="print"
+/>
+<div class="content-wrapper">
+  <!-- Content Header (Page header) -->
+  <section class="content-header">
+    <h1>
+      Calendar
+      <small>Control panel</small>
+    </h1>
+    <ol class="breadcrumb">
+      <li>
+        <a href="#"><i class="fa fa-dashboard"></i> Home</a>
+      </li>
+      <li class="active">Calendar</li>
+    </ol>
+  </section>
+  <!-- Main content -->
+  <section class="content">
+    <div class="row">
+      
+      <!-- /.col -->
+      <div class="col-md-12">
+        <div class="box box-primary">
+          <div class="box-body no-padding">
+            <!-- THE CALENDAR -->
+            <div id="calendar"></div>
+          </div>
+          <!-- /.box-body -->
+        </div>
+        <!-- /. box -->
+      </div>
+      <!-- /.col -->
+    </div>
+    <!-- /.row -->
+  </section>
+  <!-- /.content -->
+</div>
+{% endblock %} 
+{% block js %}
+<script src="{% static 'bower_components/moment/moment.js' %}"></script>
+<script src="{% static 'bower_components/fullcalendar/dist/fullcalendar.min.js' %}"></script>
+<script>
+  $(function () {
+
+    /* initialize the external events
+     -----------------------------------------------------------------*/
+    function init_events(ele) {
+      ele.each(function () {
+
+        // create an Event Object (http://arshaw.com/fullcalendar/docs/event_data/Event_Object/)
+        // it doesn't need to have a start or end
+        var eventObject = {
+          title: $.trim($(this).text()) // use the element's text as the event title
+        }
+
+        // store the Event Object in the DOM element so we can get to it later
+        $(this).data('eventObject', eventObject)
+
+        // make the event draggable using jQuery UI
+        $(this).draggable({
+          zIndex        : 1070,
+          revert        : true, // will cause the event to go back to its
+          revertDuration: 0  //  original position after the drag
+        })
+
+      })
+    }
+
+    init_events($('#external-events div.external-event'))
+
+    /* initialize the calendar
+     -----------------------------------------------------------------*/
+    //Date for the calendar events (dummy data)
+    var date = new Date()
+    var d    = date.getDate(),
+        m    = date.getMonth(),
+        y    = date.getFullYear()
+      var calendar = $('#calendar').fullCalendar({
+      header    : {
+        left  : 'prev,next today',
+        center: 'title',
+        right : 'month,agendaWeek,agendaDay'
+      },
+      defaultView: 'agendaWeek',
+      buttonText: {
+        today: 'today',
+        month: 'month',
+        week : 'week',
+        day  : 'day'
+      },
+      slotDuration: '00:05:00',
+      events    : [
+      {% for calendar_data in calendar_data %}
+        {
+          id:"{{calendar_data.id}}",
+          title          :  "{{calendar_data.title}}",
+          start          : '{{calendar_data.start}}',
+          end            : '{{calendar_data.end}}',
+          meeting_type   : '{{calendar_data.type}}',
+          session_type   : '{{calendar_data.session_type}}',
+          url            : "{{calendar_data.url}}",
+          allDay         : false,
+          backgroundColor: '{{calendar_data.backgroundColor}}', //Primary (light-blue)
+          borderColor    : '{{calendar_data.borderColor}}' //Primary (light-blue)
+        },
+        {% endfor %}
+      ],
+      eventRender: function(event, element, view) {
+        if (event.allDay === 'true') {
+        event.allDay = true;
+        } else {
+        event.allDay = false;
+        }
+      },
+      selectable: false,
+      selectHelper: true,
+ 
+      editable  : false,
+     
+
+      droppable : true, // this allows things to be dropped onto the calendar !!!
+  
+      eventClick: function(event) {
+         var dialog = bootbox.dialog({
+          
+          title: event.session_type,
+          message: "<p>"+event.title+"</p><br><strong>Start Time</strong>:-"+$.fullCalendar.formatDate(event.start, "Y-MM-DD HH:mm:ss")+"<br><strong>End Time</strong>:-"+$.fullCalendar.formatDate(event.end, "Y-MM-DD HH:mm:ss")+"<br><br><a href = "+event.url+" target='_blank' id='meeting_url_"+event.id+"'><button class='btn btn-info' > Start Call</button></a>",
+          size: 'large',
+          buttons: {
+              cancel: {
+                  label: "Delete Slot",
+                  className: 'btn-danger',
+                  callback: function(){
+                        bootbox.alert("You Don't have permission to delete this call");
+                  }
+                }
+            
+          }
+      });
+      if(event.url){
+        return false
+      } else {
+        $("#meeting_url_"+event.id).hide()
+      }
+    },
+     
+    })
+
+    /* ADDING EVENTS */
+    var currColor = '#33FF4F' //Red by default
+    //Color chooser button
+    var colorChooser = $('#color-chooser-btn')
+    $('#color-chooser > li > a').click(function (e) {
+      e.preventDefault()
+      //Save color
+      currColor = $(this).css('color')
+      //Add color effect to button
+      $('#add-new-event').css({ 'background-color': currColor, 'border-color': currColor })
+    })
+    $('#add-new-event').click(function (e) {
+      e.preventDefault()
+      //Get value and make sure it is not null
+      var val = $('#new-event').val()
+      if (val.length == 0) {
+        return
+      }
+
+      //Create events
+      var event = $('<div />')
+      event.css({
+        'background-color': currColor,
+        'border-color'    : currColor,
+        'color'           : '#fff'
+      }).addClass('external-event')
+      event.html(val)
+      $('#external-events').prepend(event)
+
+      //Add draggable funtionality
+      init_events(event)
+
+      //Remove event from text input
+      $('#new-event').val('')
+    })
+  })
+
+   function CancelSlot(id){
+    bootbox.confirm({
+      message: "Do you want to Cancel this slot?",
+      buttons: {
+          confirm: {
+              label: 'Yes',
+              className: 'btn-success'
+          },
+          cancel: {
+              label: 'No',
+              className: 'btn-danger'
+          }
+      },
+      callback: function (result) {
+        
+          if(result == true){
+              $.ajax({
+                url:"{% url 'user:cancel_mentor_slot' %}",
+                type:"POST",
+                data:{pk:id, csrfmiddlewaretoken : "{{csrf_token}}" },
+                error: function(data){
+                  console.log(data)
+                  bootbox.alert('something is wrong');
+                },
+                beforeSend: function() {
+                  var dialog = bootbox.dialog({
+                      message: '<p class="text-center mb-0"><i class="fa fa-spin fa-cog"></i> working on your changes - please wait… </p>',
+                      closeButton: false
+                  });
+
+                  setTimeout(function(){
+                      dialog.modal('hide');
+                  }, 4000);
+              
+
+                },
+
+                success: function(data) {
+                  
+                  bootbox.alert("Your Appointment is Cancelled!", function(){ 
+                      location.reload()
+                  });
+                  
+                },
+              });
+            }
+          }
+      });
+    }
+  
+  
+</script>
+{% endblock %}

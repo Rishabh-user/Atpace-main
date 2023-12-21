@@ -1,0 +1,60 @@
+<div class="box">
+      <div class="box-header with-border">
+        <h3 class="box-title">Goal Approval</h3>
+      </div>
+      <div class="box-body">
+        <form @submit.prevent="onGoalApproval">
+          <label for="company" class="col-md-12 control-label">Company</label>
+          <input type="text" class="form-control" value="" v-model="user_company_name" name="sidebarCompany" readOnly/>
+          {% comment %} <select class="form-control select2" name="company" multiple="multiple" data-placeholder="Select Company"
+                                style="width: 100%;" required id="companys">
+          <option
+            v-bind:value="company.company_id"
+            v-for="company in company_list"
+            :key="company.id"
+          >
+          [[company.company_name]]
+          </option>
+          </select> {% endcomment %}
+          <br>
+          <div class="material-switch" style="margin:10px;">
+            <input
+              name="is_true"
+              type="checkbox"
+              value="True"
+              id="togBtn_required"
+              v-model="is_auto_approve"
+            />
+            <label for="togBtn_required" class="">Auto Approve</label>
+          </div>
+          <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+      </div>
+    </div>
+    <div class="box">
+      <div class="box-header">
+        <h3 class="box-title">Company List</h3>        
+      </div>
+      <!-- </div> -->
+      <!-- /.box-header -->
+      <div class="box-body">
+        <table id="goal-table" class="table table-bordered table-hover">
+          <thead>
+          <tr>
+            <th>Id</th>
+            <th>Company Name</th>
+            <th>Is Auto Approve</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr v-for="(company, index) in company_list" :key="company.id">
+            <td>[[index+1 ]]</td>
+            <td>[[company.company_name]]</td>
+            <td class="capitalize">[[company.is_approve]]</td>
+          </tr>
+          </tfoot>
+        </table>
+      </div>
+      <!-- /.box-body -->
+    </div>
+    <!-- /.box -->

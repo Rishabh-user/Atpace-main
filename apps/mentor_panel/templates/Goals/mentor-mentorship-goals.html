@@ -1,0 +1,141 @@
+<div class="box">
+    <div class="box-header with-border bg-grey">
+        <h3 class="box-title">Mentorship Goals</h3>
+        {% if request.session.MentorDashboardView %}
+            <button disabled class="btn btn-info pull-right" data-toggle="modal" data-target="#goal-modal">
+                Create Goal
+            </button>
+        {% else %}
+            <button class="btn btn-info pull-right" data-toggle="modal" data-target="#goal-modal">
+                Create Goal
+            </button>
+    {% endif %}
+
+    </div>
+    <div class="box-body no-padding">
+        <table class="table table-striped">
+        <tr>
+        <th>Heading</th>
+        <th>Description</th>
+        <th>Due Date</th>
+        <th>Action</th>
+        </tr>
+        <tr v-for="goal in all_mentorship_goals" :key="goal.id">
+            <td>[[goal.heading]]</td>
+            <td>[[goal.description]]</td>
+            <td>
+            <span v-if="goal.is_expired" class="label label-danger">Expired</span>
+            <span v-else>[[goal.due_date]]</span>
+            </td>
+            <td>
+                <button class="btn btn-info" @click="getEditGoalData(goal.goal_id)" style="margin: 0px" data-toggle="modal">
+                Edit</button>
+
+                <button
+                  @click="deleteGoal(goal.goal_id, base_url, user_id, token)"
+                  class="btn btn-danger"
+                  style="margin: 0px"
+                >
+                  Delete
+                </button>
+                <a :href="'/leaderboard/view-comment/'+goal.goal_id">
+                <button
+                  class="btn btn-info"
+                  style="margin: 0px;"
+                >
+                  View Request
+                </button>
+                </a>
+            </td>
+            
+        </tr>
+        </table>
+    </div>
+    <!-- /.box-body -->
+</div>
+<div class="modal fade" id="goal-modal" style="display: none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+        <form id="Content_form" @submit.prevent="onCreateEditGoal">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span></button>
+            <h4 class="modal-title"><span v-if="goal_id_val">Edit</span><span v-else>Create</span> Goal</h4>
+        </div>
+        <div class="modal-body">
+            <input v-model="goal_id_val" type="hidden"/>
+            <div class="form-group">
+            <label for="heading" class="col-sm-2 control-label">Heading</label>
+                <input type="text" class="form-control" id="heading" list="heading_list" name="heading" v-model="heading" placeholder="Heading" required/>
+                {% comment %} <datalist id="heading_list">
+                <option value=''>Select</option>
+                    {% if request.session.dashbordId %}
+                        {% for data in request.session.dashbordId|get_suggestion_goals %}
+                            <option value="{{ data.heading }}">{{ data.heading }}</option>
+                        {% endfor %}
+                    {% else %}
+                          {% for data in request.user.id|get_suggestion_goals %}
+                            <option value="{{ data.heading }}">{{ data.heading }}</option>
+                        {% endfor %}
+                    {% endif %}
+
+                </datalist> {% endcomment %}
+            </div>
+            <div class="form-group">
+            <label for="category" class="col-sm-2 control-label">Category</label>
+            <select class="form-control select2" name="category" id='category' ref="category" style="width: 100%;">
+                <option selected="selected" value="Gain Clarity" :selected="category_val == 'Gain Clarity'">Gain Clarity</option>
+                <option value="Health" :selected="category_val == 'Health'">Health</option>
+                <option value="Learn" :selected="category_val == 'Learn'">Learn</option>
+                <option value="Follow Through" :selected="category_val == 'Follow Through'">Follow Through</option>
+            </select>
+            </div>
+            <div class="form-group">
+                <label for="learners" class="col-sm-2 control-label">Learners</label>
+                <select class="form-control select2" name="learners" required id='learners' style="width: 100%;" ref="learners" multiple>
+                    <option v-for="(mentee, index) in mentor_learners" :key="index" :value="mentee.mentee_id" :selected="goal_learners_id.includes(mentee.mentee_id)">[[mentee.mentee_name]]</option>
+                </select>
+            </div>
+            <div class="form-group">
+            <label for="description" class="col-sm-2 control-label">Description</label>
+                <input type="text" class="form-control" id="description" name="description" v-model="description" placeholder="Description" required/>
+            </div>
+            <div class="form-group">
+            <label for="duration" class="col-md-12 control-label">Duration</label>
+                <div class="row">
+                <div class="col-md-6">
+                    <input type="number" class="form-control" id="duration_number" name="duration_number" v-model="duration_number" min="1" max="100" required/>
+                </div>
+                <div class="col-md-6">
+                    <select class="form-control select2" name="duration_time" id='duration_time' ref="duration_time" style="width: 100%;">
+                    <option selected="selected" value="Mins" :selected="duration_time_val == 'Mins'">Mins</option>
+                    <option value="Times" :selected="duration_time_val == 'Times'">Times</option>
+                    </select>
+                </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="complete_by" class="col-sm-2 control-label">Due Date</label>
+                <input type="date" id="complete_by" name="complete_by" class="form-control" v-model="complete_by" required>
+            </div>
+            <div class="form-group">
+            <label for="priority" class="col-sm-2 control-label">Priority</label>
+            <select class="form-control select2" name="priority" id='priority' ref="priority" style="width: 100%;">
+                <option value="High" :selected="priority_val == 'High'">High</option>
+                <option value="Medium" :selected="priority_val == 'Medium'">Medium</option>
+                <option value="Low" :selected="priority_val == 'Low'">Low</option>
+            </select>
+            </div>
+                
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+            <button type="submit" id="submitButton" class="btn btn-primary">Save changes</button>
+
+        </div>
+        </form>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>

@@ -1,0 +1,47 @@
+{% extends 'base.html' %} {% load static %}
+{% block title %} URL Shortner {% endblock %}
+<!-- DataTables -->
+{% block css %}
+<link rel="stylesheet" href="{% static 'bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css' %}">
+{% endblock css %} 
+{% block content %}
+
+
+<div class="content-wrapper">
+  <section class="content-header">
+    <h1>
+     URL Shortner
+    </h1>
+  </section>
+
+  <section class="content">
+    <div class="row" style="width:80%; margin:auto;">
+        <div class="col-md-12">
+        <br>
+        <br>
+            <form action="{% url 'utils:url_shortner' %}" method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label class="col-md-12 control-label">Long URL</label>
+                    <input class="form-control" type="text" name="long_url" placeholder="Long URL" />
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary pull-right">Submit</button>
+                </div>
+            </form>
+
+        <br>
+        <br>
+        {% if short_url %}
+            <b>Short Url: </b><a target="_blank" href="{{short_url}}">{{short_url}}</a>
+        {% endif %}
+        </div>
+       <!-- /.col -->
+    </div>
+    <!-- /.row -->
+ </section>
+ 
+</div>
+{% endblock content %} 
+{% block js %}
+{% endblock js %}

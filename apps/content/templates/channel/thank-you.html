@@ -1,0 +1,302 @@
+{% extends 'base_with_empty_sidebar.html' %}
+{% load static %} {% load tags %}
+{% block css %} 
+  
+
+    <style>
+     
+      /* Blue */
+      .c_info {
+        border-color: #2196f3;
+        color: dodgerblue;
+      }
+
+      .c_info:hover {
+        background: #2196f3;
+        color: white;
+      }
+
+      .wrong_answer {
+        border-color: #e8453c !important;
+        background-color: #e7acac !important;
+      }
+
+      .right_answer {
+        border-color: #6ceb96 !important;
+        background-color: #96f1bc !important;
+      }
+      .quiz_result {
+        background-color: #f2f0f0;
+        padding: 15px;
+        display: none;
+      }
+      .content {
+        min-height: auto;
+      }
+    </style>
+  
+    <style>
+     
+  .section {
+   padding: 15px;
+  }
+
+ 
+  /* section.content{
+min-height: calc(100vh - 33px);
+justify-content: center;
+align-items: center;
+margin: 0 auto;
+display: block;
+margin-top: 1%;
+width: 100%;
+max-width: 750px;
+
+} */
+
+  .c_poll_btn {
+    border: 1px solid black;
+    background-color: white;
+    color: black;
+    font-size: 16px;
+    cursor: pointer;
+    width: 100%;
+    margin-bottom: 10px;
+  }
+  .c_btn {
+    border: 1px solid black;
+    background-color: white;
+    color: black;
+    padding: 9px 28px;
+    font-size: 16px;
+    cursor: pointer;
+    width: 100%;
+    margin-bottom: 10px;
+  }
+  /* //Nick Css */
+  .section {
+    justify-content: center !important;
+    align-items: center !important;
+    display: flex !important;
+  }
+
+
+  .padding-x-48 {
+    padding: 0 48px;
+  }
+  .box-header {
+    padding: 10px 0;
+  }
+  @media only screen and (max-width: 600px) {
+    .content_card {
+      padding: 12px;
+      width: 100%;
+      max-width: 750px;
+      min-width: unset;
+    }
+    iframe.content_card {
+      width: 100%;
+      min-width: 100%;
+    }
+    .content {
+      width: 100%;
+    }
+    .row {
+      padding: 0px;
+      margin-left: -2px;
+      margin-right: 0px;
+    }
+    .card_image {
+      width: 100% !important;
+    }
+  }
+  @media (max-width: 1200px) {
+    .padding-x-48 {
+      padding: 0;
+    }
+    .content_card {
+      /* max-width: 400px; */
+      max-width: unset;
+      width: 100%;
+      /* min-width: 630px; */
+      min-width: unset;
+      
+    }
+    .card_image {
+      width: 60%;
+    }
+    .row {
+      width: 100%;
+      min-width: 100%;
+      margin-left: -3px;
+      margin-right: -5px;
+    }
+    
+  }
+  .pdf-content svg {
+    width: 100%;
+    max-width: 80px;
+  }
+  .pdf-content > div {
+    padding: 0;
+  }
+  .img-cover {
+    height: 400px;
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+  }
+  .img-cover img {
+    position: absolute;
+    left: -1000%;
+    right: -1000%;
+    top: -1000%;
+    bottom: -1000%;
+    margin: auto;
+    /* min-height: 100%; */
+    min-width: 100%;
+  }
+  
+    </style>
+   
+
+    <style>
+      .read_content_link{
+        padding: 5px !important;
+        font-family: 'Nunito', sans-serif;
+        font-size-adjust: 0.58;
+      }
+    </style>
+   {% endblock %}
+{% block sidebar %}
+<aside
+class="main-sidebar"
+style="
+  box-shadow: 0px 12px 7px #2329314d;
+  background-color: white;
+  border-radius: none;
+  backdrop-filter: blur(1.5px);
+  -webkit-backdrop-filter: blur(1.5px);
+  border-right: 1px solid #ababab;
+"
+>
+<!-- sidebar: style can be found in sidebar.less -->
+<section class="sidebar" style="background-color: #fff">
+  <ul class="sidebar-menu" data-widget="tree">
+    {% for data in content_data %}
+    <li class="read_content_link" style="border-bottom: 1px solid gray; ">
+      <a
+        href="{% url 'content:read_content' pk=content.pk group=group.pk %}?page={{data.display_order}}"
+       style="padding: 0px 5px 5px 0px;">
+        {% if data.type == "Text" %}
+        <img src="{% static '/images/icon/text.png' %}" width="30" />
+        <span style="color: #000; font-size: 1vw; white-space: initial; ">
+          {{data.title}} (3:00)</span
+        >
+        {% elif data.type == "Image" %}
+        <img src="{% static '/images/icon/image.png' %}" width="30" />
+        <span style="color: #000; font-size: 1vw; white-space: initial; "
+          >{{data.title}} (1:00)</span
+        >
+        {% elif data.type == "Video" %}
+        <img src="{% static '/images/icon/video.png' %}" width="30" />
+        <span style="color: #000; font-size: 1vw; white-space: initial; "
+          >{{data.title}} (5:00)</span
+        >
+        {% elif data.type == "YtVideo" %}
+        <img src="{% static '/images/icon/link.png' %}" width="30" />
+        <span style="color: #000; font-size: 1vw; white-space: initial; "
+          >{{data.title}} (5:00)</span
+        >
+        {% elif data.type == "Link" %}
+        <img src="{% static '/images/icon/link.png' %}" width="30" style="border-radius: 30%;" />
+        <span style="color: #000; white-space: initial; "
+          >{{data.title}} (1:00)</span
+        >
+        {% elif data.type == "Quiz" %}
+        <img src="{% static '/images/icon/quiz.png' %}" width="30" />
+        <span style="color: #000; font-size: 1vw; white-space: initial; "
+          >{{data.title}} (2:00)</span
+        >
+        {% elif data.type == "Poll" %}
+        <img src="{% static '/images/icon/poll.png' %}" width="30" />
+        <span style="color: #000; font-size: 1vw; white-space: initial; "
+          >{{data.title}} (1:00)</span
+        >
+        {% elif data.type == "Pdf" %}
+        <img src="{% static '/images/icon/pdf.png' %}" width="30" />
+        <span style="color: #000; font-size: 1vw; white-space: initial; "
+          >{{data.title}} (5:00)</span
+        >
+        {% endif %}
+      </a>
+    </li>
+
+    {% endfor %}
+  </ul>
+</section>
+</aside>
+{% endblock sidebar %}
+{% block content %}
+      <!-- Content Wrapper. Contains page content -->
+      <div class="content-wrapper">
+        <section class="content-header">
+          <h1>Hurray ! you have completed the microskill - Select action below</h1>
+          <p></p>
+        </section>
+
+        <section class="content">
+          
+          <div class="row content_data" data-id="{{data.id}}">
+            <!-- <div class="col-md-12"> -->
+
+                <section class="section">
+                    <!-- <div> -->
+                        <img
+                        class="lazy card_image"
+                        src="{{image}}"
+                        loading="lazy"
+                        width="20%"
+                        style="min-width: 30%; min-height: 30%"
+                      />
+                    <!-- </div> -->
+                  </section>
+            <!-- User image -->
+            <section class="content section">
+                <!-- <div> -->
+                  <div class="row">
+                    <div class="col-md-12 ">
+                     
+                      <div class="content_card" style="height: 130px; min-height: 100px;">
+                        <h4 class="text-muted " style="justify-content: center; display: flex;">
+                         <a href="{% url 'content:complete_skill' group=group.pk content=content.pk %}"><button type="button" class="btn btn-primary">Mark As Complete</button></a>&nbsp;
+                         
+                         
+                       </h4>
+                      <div class="row" style="display: flex;
+                      justify-content: space-between; ">
+                         <a href="{% url 'content:Channel_content' Channel=channel.pk %}"> <button class="btn btn-primary" > Go Back</button></a>
+                         <a href="{% url 'content:revice_mode' pk=content.pk group=group.pk %}"> <button class="btn btn-primary"> Revise Mode</button></a>
+                         {% if go_next != "None" %}
+                            <a href="{{go_next}}"> <button class="btn btn-primary" >Next Microskill</button></a>
+                            {% endif %}
+                        </div>
+                     </div>
+                 </div>
+               </div>
+               <!-- </div> -->
+             </section>
+            <!-- </div> -->
+          </div>
+
+          
+       
+        </section>
+        {% include 'microskill_card/floting_button.html' %}
+        {% include 'component/community-ask-question.html' %}
+      </div>
+ 
+{% endblock content %} 
+
+  </body>
+</html>

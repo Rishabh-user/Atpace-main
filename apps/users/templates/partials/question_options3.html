@@ -1,0 +1,6 @@
+<select  class="form-control" id ="ques_opt3" required name="ques_opt3" style="width: 100%;">
+    <option>select</option>
+    {% for opt in ques.options %}
+        <option value="{{opt}}" {% if question_3.dependent_option == opt %}selected{% endif %}> {{opt}}</option>
+    {% endfor %}
+</select>

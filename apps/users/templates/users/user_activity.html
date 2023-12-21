@@ -1,0 +1,25 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+  
+<head>
+    <title>
+        Idle time
+    </title>
+</head>
+  
+<body>
+    
+    <p class="timertext" 
+        style="font-size: 1.5rem;">
+        You are idle for
+        <span class="secs"></span> seconds.
+    </p>
+  
+</body>
+
+<!-- User Inactivity Duration -->
+<script src="{% static 'dist/js/custom/user-activity.js' %}"></script>
+
+</html>

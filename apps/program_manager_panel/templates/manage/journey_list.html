@@ -1,0 +1,52 @@
+<div class="box">
+    <div class="box-header">
+    <h3 class="box-title">My Journey List</h3>
+    {% comment %} <a href="{%url 'content:create-channel' %}"><button class="btn btn-primary pull-right">Create Journey</button></a> {% endcomment %}
+    <a href="{%url 'content:config_course_list' %}"><button class="btn btn-primary pull-right">Journey Pathway List</button></a>
+    </div>
+    <!-- /.box-header -->
+    <div class="box-body">
+            <table id="journey-table" class="table table-bordered table-hover">
+                <thead>
+                <tr>
+
+                <th>Journey Title</th>
+                <th>Category</th>
+                <th>Company</th>
+                <th>Type</th>
+                <th>Description</th>
+                <th>Action</th>
+            </tr>
+                </thead>
+                <tbody>
+                <tr v-for="journey in my_journey_list" :key="journey.id">
+                    <td>[[journey.name]]</td>
+                    <td>[[journey.category]]</td>
+                    <td>[[journey.company]]</td>
+                    <td>[[journey.channel_type]]</td>
+                    <td>[[journey.short_description]]</td>
+                    <td>
+                        <div class="dropdown">
+                            <button class="btn bg-purple dropdown-toggle btn-select-option" type="button" data-toggle="dropdown" aria-expanded="true">Select an option<span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu options-dropdown">
+                                <li>
+                                    <a :href="'/content/journey/v2/'+journey.journey_id"><i class="fa fa-eye option-icon"></i>View</a>
+                                </li>
+                                {% comment %} <li>
+                                    <a :href="'/content/edit/'+journey.journey_id"><i class="fa fa-edit option-icon"></i>Edit</a>
+                                </li> {% endcomment %}
+                                <li v-if="journey.channel_type == 'MentoringJourney'">
+                                    <a :href="'/content/setup-journey-content/'+journey.journey_id"  ><i class="fa fa-cog option-icon"></i>Setup Journey</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </td>
+                
+                </tr>
+                </tfoot>
+            </table>
+    </div>
+    <!-- /.box-body -->
+</div>
+<!-- /.box -->

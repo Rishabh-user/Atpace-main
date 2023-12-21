@@ -1,0 +1,315 @@
+{% extends 'base.html' %} {% load static %} 
+{% block title %} Security {% endblock %} 
+{% load tags %}
+{% block css %} 
+<link
+          rel="stylesheet"
+          href="{% static 'css/program_manager/program_manager.css' %}"
+  />
+  <style>
+    .capitalize {
+      text-transform: capitalize;
+    }
+  </style>
+{% endblock css %} {% block content %}
+<div class="content-wrapper" id="vue-app">
+  <div :class="'alert alert-dismissible '+[[alert_class]]" v-if="alert_msg" style="margin:10px;">
+    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+    <h4 style="margin-top:10px;"><i class="icon fa fa-warning"></i> Alert!</h4>
+    <a href="/manager/billing">[[alert_msg]]</a>
+  </div>
+  <section class="content-header">
+    <h1>Security</h1>
+  </section>
+  <section class="content">
+    <div class="row">
+      <div class="col-md-2">
+        <div class="small-box box-tab" @click="showUploadUsers()" id="upload-user">
+          <div class="inner">
+            <h4>Upload Bulk Users</h4>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <div class="small-box box-tab" @click="showAllotUser()" id="allot-user">
+          <div class="inner">
+            <h4>Allot User to Journey</h4>
+          </div>
+        </div>
+      </div>
+      {% comment %} <div class="col-md-2">
+        <div class="small-box box-tab" @click="showSetPassword()" id="set-password">
+          <div class="inner">
+            <h4>Set Password</h4>
+          </div>
+        </div>
+      </div> {% endcomment %}
+      <div class="col-md-2">
+        <div class="small-box box-tab" @click="showArchiveUser()" id="archive-user">
+          <div class="inner">
+            <h4>Archive User</h4>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div v-if="displayAllotUser">
+    {% include 'security/allot_user_to_journey.html' %}
+    </div>
+    <div v-if="displaySetPassword">
+    {% include 'security/set_password.html' %}
+    </div>
+    <div v-if="displayArchiveUser">
+    {% include 'security/archive_user.html' %}
+    </div>
+    <div v-if="displayUploadUsers">
+    {% include 'security/upload_bulk_users.html' %}
+    </div>
+  </section>
+  {{ request.user.id|json_script:"user_id" }}
+  {{request.session.token|json_script:"token"}}
+  {{request.session.company_id|json_script:"company_id"}}
+  {{request.session.company_name|json_script:"company_name"}}
+  
+</div>
+{% endblock content %} {% block js %} 
+<script src="{% static 'bower_components/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
+<script type="text/javascript">
+  
+  const app = new Vue({
+    el: "#vue-app",
+    delimiters: ['[[', ']]'],
+    data() {
+      return {
+        displayAllotUser: false,
+        displaySetPassword: false,
+        displayArchiveUser: false,
+        displayUploadUsers: true,
+        token:JSON.parse(document.getElementById('token').textContent),
+        auth:"",
+        user_id: JSON.parse(document.getElementById('user_id').textContent),
+        users_list:"",
+        archive_users_list:"",
+        journey_list:"",
+        is_wp_enable:"",
+        selected_users:[],
+        base_url:window.location.origin,
+        company_list:"",
+        alert_msg:"",
+        alert_class:"",
+        user_company_name: JSON.parse(document.getElementById('company_name').textContent),
+        user_company_id: JSON.parse(document.getElementById('company_id').textContent),
+
+      };
+    },
+    mounted(){
+      this.showUploadUsers();
+      this.showAlert();
+    },
+    methods: {
+      axiosGetRequest: function(url){
+        this.auth = "Token "+this.token;
+        var config = {
+          method: "get",
+          url: url,
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': this.auth,
+          },
+        };
+        return axios(config)
+      },
+      axiosPostRequest: function(url, data){
+        this.auth = "Token "+this.token;
+        var config = {
+          method: "post",
+          url: url,
+          headers: {
+            "Content-Type": "multipart/form-data",
+            "Accept": "application/json",
+            'Authorization': this.auth,
+          },
+          data:data
+        };
+
+        return axios(config)
+      },
+      async showAlert(){
+        var url = this.base_url+"/manager/check-for-subscription/"+this.user_id+"/";
+        response = await this.axiosGetRequest(url);
+        console.log("Alert response", response.data)
+        if(response.data.message != "No alert available"){
+          this.alert_msg = response.data.message
+          this.alert_class = response.data.css_class
+        }
+      },
+      async destroyDataTable(id){
+        if($(id).DataTable()){
+          console.log("destroying", id);
+          $(id).DataTable().clear();
+          $(id).DataTable().destroy();
+        }
+      },
+      async initializeDataTable(id){
+        console.log("initializing");
+        await this.sleep(2000);
+        $(id).DataTable({
+          "dom": '<"table-pull-left"f><"table-pull-right"l>tip',
+          'destroy': true,
+          'paging'      : true,
+          'lengthChange': true,
+          'searching'   : true,
+          'ordering'    : true,
+          'info'        : true,
+         'autoWidth'   : false,
+         'retrieve':true,
+         'scrollX': true,
+        })
+      },
+      sleep: function(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+      },
+      removeAllotUser: function(){
+        ele = document.getElementById('allot-user')
+        this.displayAllotUser = false;
+        ele.style.borderTop = "none";
+      },
+      /*removeSetPassword: function(){
+        ele = document.getElementById('set-password')
+        this.displaySetPassword = false;
+        ele.style.borderTop = "none";
+      },*/
+      async removeArchiveUser(){
+        ele = document.getElementById('archive-user')
+        this.displayArchiveUser = false;
+        ele.style.borderTop = "none";
+        await this.destroyDataTable('#archive-table')
+      },
+      removeUploadUsers: function(){
+        ele = document.getElementById('upload-user')
+        this.displayUploadUsers = false;
+        ele.style.borderTop = "none";
+      },
+      async showAllotUser(){
+        ele = document.getElementById('allot-user')
+        this.displayAllotUser = true;
+        ele.style.borderTop = "5px solid #1B74E4";
+        
+        //this.removeSetPassword();
+        this.removeArchiveUser();
+        this.removeUploadUsers();
+
+        var url =  this.base_url+"/manager/journey-list/"+this.user_id+"/?company_id="+this.user_company_id;
+        response = await this.axiosGetRequest(url);
+        console.log("Journey list Response", response.data);
+        this.journey_list = response.data.data
+
+        var url =  this.base_url+"/manager/program-data-list/"+this.user_id+"/";
+        response = await this.axiosGetRequest(url);
+        console.log("Users list Response", response.data);
+        this.users_list = response.data.user_list
+
+      },
+      async onAllotUsetoJourney(){
+        for (let option of document.getElementById('users').options)
+          {
+            if (option.selected) {
+                console.log("user value",option.value)
+                this.selected_users.push(option.value);
+            }
+          }
+        console.log("186",this.selected_users, Array.isArray(this.selected_users));
+        console.log("data",this.is_wp_enable, this.$refs.journey.value)
+        var data = new FormData();
+        data.append("user_list", this.selected_users);
+        data.append("journey", this.$refs.journey.value);
+        if(this.is_wp_enable){
+          data.append("is_wp_enable", this.is_wp_enable);
+        }
+        else{
+          data.append("is_wp_enable", false);
+        }
+        
+        
+        var url =  this.base_url+"/manager/allot-journey-to-user/"+this.user_id+"/";
+        try{
+          response = await this.axiosPostRequest(url, data);
+          console.log("Users list Response", response.data);
+          bootbox.alert(response.data.message)
+        }
+        catch(err){
+          console.log("error", err)
+          bootbox.alert(err.response.data.message)
+        }
+        
+      },
+      async onBulkUserUpload(){
+        for (let option of document.getElementById('users').options)
+          {
+            if (option.selected) {
+                console.log("user value",option.value)
+                this.selected_users.push(option.value);
+            }
+          }
+        console.log("186",this.selected_users, Array.isArray(this.selected_users));
+        console.log("data",this.is_wp_enable, this.$refs.journey.value)
+        var data = new FormData();
+        data.append("user_list", this.selected_users);
+        data.append("journey", this.$refs.journey.value);
+        if(this.is_wp_enable){
+          data.append("is_wp_enable", this.is_wp_enable);
+        }
+        else{
+          data.append("is_wp_enable", false);
+        }
+        
+        
+        var url =  this.base_url+"/manager/allot-journey-to-user/"+this.user_id+"/";
+        response = await this.axiosPostRequest(url, data);
+        console.log("Users list Response", response.data);
+      },
+      /*showSetPassword: function(){
+        ele = document.getElementById('set-password')
+        this.displaySetPassword = true;
+        ele.style.borderTop = "5px solid #1B74E4";
+        this.removeAllotUser();
+        this.removeArchiveUser();
+        this.removeUploadUsers();
+      },*/
+      async showArchiveUser(){
+        this.archive_users_list = ""
+        ele = document.getElementById('archive-user')
+        this.displayArchiveUser = true;
+        ele.style.borderTop = "5px solid #1B74E4";
+        
+        this.removeAllotUser();
+        //this.removeSetPassword();
+        this.removeUploadUsers();
+
+        var url =  this.base_url+"/manager/archive-user/"+this.user_id+"/";
+        response = await this.axiosGetRequest(url);
+        console.log("Archive Users list Response", response.data);
+        this.archive_users_list = response.data.data
+        await this.initializeDataTable('#archive-table')
+
+      },
+      async showUploadUsers(){
+        ele = document.getElementById('upload-user')
+        this.displayUploadUsers = true;
+        ele.style.borderTop = "5px solid #1B74E4";
+        this.removeAllotUser();
+        this.removeArchiveUser();
+        //this.removeSetPassword();
+
+        var url = this.base_url+"/manager/program-data-list/"+this.user_id+"/";
+        response = await this.axiosGetRequest(url);
+        console.log("Company list Response", response.data);
+        this.company_list = response.data.company_list
+      },
+    }
+  });
+
+  
+</script>
+
+{% endblock js %}

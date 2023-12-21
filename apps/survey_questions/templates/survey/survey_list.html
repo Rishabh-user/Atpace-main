@@ -1,0 +1,232 @@
+{% extends 'base.html' %} {% load static %}
+{% block title %} Survey List {% endblock %}
+{% load tags %}
+<!-- DataTables -->
+{% block css %}
+<link rel="stylesheet" href="{% static 'bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css' %}">
+{% endblock css %} 
+{% block content %}
+
+
+<div class="content-wrapper">
+  <section class="content-header">
+    <h1>
+      Survey  {% include 'messages.html' %}
+    </h1> 
+    
+    <ol class="breadcrumb">
+      <li><a href="#"><i class="fa fa-dashboard"></i> Survey</a></li>
+      <li><a href="#">List</a></li>
+    </ol>
+  </section>
+
+  <section class="content">
+    <div class="row">
+       <div class="col-xs-12">
+           <div class="box">
+             <div class="box-header">
+               <h3 class="box-title">Survey List</h3>
+               <a href="{%url 'survey:create-survey' %}"><button class="btn btn-primary pull-right">Create Survey</button></a>
+               
+             </div>
+            
+              
+              <!-- </div> -->
+             <!-- /.box-header -->
+             <div class="box-body">
+               <table id="example2" class="table table-bordered table-hover">
+                 <thead>
+                  <tr>
+                    <th>Id</th>
+                    <th>Survey Name</th>
+                    <th>Is Active</th>
+                    <th>Add Question</th>
+                    <th>Add To Journey</th>
+                    <th>Action</th>
+                  </tr>
+                 </thead>
+                 <tbody>
+                  {% for survey in survey %}
+                  <tr>
+                    <td>{{forloop.counter }}</td>
+                    <td>{{survey.name}}</td>
+                    <td>
+                        {% if user.is_active %}
+                          <kbd>Active</kbd>
+                        {% else %}
+                          <kbd>InActive</kbd>
+                        {% endif %}
+                        </td>
+                    <td><a href="{% url 'survey:add_survey_questions' survey=survey.pk %}"> <button class="btn btn-primary"> Add Questions</button></a></td>
+                    <td> <button class="btn btn-primary" data-toggle="modal" data-target="#modal-add-journey" onclick="AddToChannel('{{survey.pk}}')"> Add To Journey</button></td>
+                    <td>
+                    <div class="dropdown">
+                          <button class="btn bg-purple dropdown-toggle btn-select-option" type="button" data-toggle="dropdown" aria-expanded="true">Select an option                                            <span class="caret"></span>
+                          </button>
+                          <ul class="dropdown-menu options-dropdown">
+                          
+                              <li>
+                                  <a href="{% url 'survey:survey-edit' pk=survey.id %}"><i class="fa fa-edit option-icon"></i>Edit</a>
+                              </li>
+                              
+                              <li>
+                                <a data-target="#modal-default" data-toggle="modal" onclick="getId('{{survey.id}}')"><i class="fa fa-save option-icon"></i>Save as</a>
+                              </li>
+                              <li>
+                                  <a href="{% url 'survey:survey-delete' pk=survey.id %}"><i class="fa fa-trash option-icon"></i>Delete</a>
+                              </li>
+                          </ul>
+                      </div></td>
+                  </tr>
+                  {% endfor %}
+                 </tfoot>
+               </table>
+             </div>
+             <!-- /.box-body -->
+           </div>
+           <!-- /.box -->
+ 
+          
+         </div>
+       <!-- /.col -->
+    </div>
+    <!-- /.row -->
+ </section>
+ <div class="modal fade" id="modal-add-journey" style="display: none;">
+  <div class="modal-dialog">
+    <form action="{% url 'survey:addsurvey_to_channel' %}" method="POST">
+      {% csrf_token %}
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">×</span></button>
+        <h4 class="modal-title">Add Journey To Survey</h4>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" value="" name="survey_id" required id="survey_id">
+        <div class="form-group">
+          <label>Select Journey </label>
+          <select class="form-control select2" id="channel"  name="channel" required style="width: 100%;">
+
+            <option selected="selected">Select Journey</option>
+            {% for channel in request.user|get_user_channel %}
+              <option value="{{channel.pk}}">{{channel.title}}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-primary pull-right">Save changes</button>
+      </div>
+    </div>
+  </form>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div>
+ 
+</div>
+
+<div class="modal fade" id="modal-default" style="display: none;">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form id="journey_form">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">×</span></button>
+        <h4 class="modal-title">Save As</h4>
+      </div>
+      <div class="modal-body">
+          <input name="id" id="survey_id" type="hidden" value=""/>
+          <div class="form-group">
+            <label>Survey Name</label>
+            <input type="text" class="form-control"  name="survey" id="survey" required>
+          </div>
+          {% comment %} <div class="form-group">
+            <input type="checkbox" class="form-check-input"  name="is_lite_signup_enable" id="is_lite_signup_enable" value="">
+            <label for="is_lite_signup_enable">Is lite signup enable</label>
+          </div> {% endcomment %}
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+        <button type="submit" id="sumbitSurvey" class="btn btn-primary">Save changes</button>
+      </div>
+    </form>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div> 
+</div>
+{% endblock content %} 
+{% block js %}
+<script src="{% static 'bower_components/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
+<script>
+
+function AddToChannel(id){
+  document.getElementById("survey_id").value = id;
+
+}
+
+$(function () {
+ 
+  $('#example2').DataTable({
+    "dom": '<"table-pull-left"f><"table-pull-right"l>tip',
+    'paging'      : true,
+    'lengthChange': true,
+    'searching'   : true,
+    'ordering'    : true,
+    'info'        : true,
+    'autoWidth'   : true,
+    'scrollX'     : true
+  })
+});
+
+function getId(id){
+  console.log(id)
+  document.getElementById("survey_id").value = id
+}
+
+$(function () {
+  $("#sumbitSurvey").on('click', function (event) {
+    var id = document.getElementById('survey_id').value;
+    console.log("id ", id);
+    survey = $('#survey').val();
+    console.log("survey ", survey);
+    var data = {
+      survey_id: document.getElementById('survey_id').value,
+      survey: $('#survey').val(),
+      csrfmiddlewaretoken : "{{csrf_token}}"
+    }
+    console.log("Data", data)
+    if (survey){
+      $.ajax({
+        url:  "{% url 'survey:copy_survey' %}",
+        type: 'post',
+        data: data,
+        error: function() {
+          bootbox.alert('Something is wrong');
+        },
+        success: function(data) {
+          if (data.success){
+          bootbox.alert(data.message);
+          window.location.reload();
+          }
+          else {
+            bootbox.alert(data.message);
+            window.location.reload();
+          }  
+        }
+      });
+    }
+    else {
+      bootbox.alert("Please specify new journey name");
+    }
+    event.preventDefault();
+  });
+});
+
+</script>
+{% endblock js %}

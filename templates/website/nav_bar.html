@@ -1,0 +1,36 @@
+
+<nav id="mobile-menu">
+    <ul>
+
+        {#            <li>#}
+        {#                <span id="google_translate_element" class="google-translate-div"></span>#}
+        {#            </li>#}
+
+        <li>
+            <a href="{% url 'user:index' %}">Home</a>
+        </li>
+
+        <li>
+            <a href="{% url 'user:program' %}">Programs</a>
+        </li>
+        <li>
+            <a href="{% url 'user:transition_to_success' %}">Transition to success</a>
+        </li>
+        <li>
+            <a href="{% url 'user:pricing' %}">Offering</a>
+        </li>
+        <li>
+            <a href="{% url 'user:resources' %}">Resources</a>
+        </li>
+
+        <li>
+            <a href="https://forum.growatpace.com/" target="_blank">Community</a>
+        </li>
+
+        <li>
+            <a href="{% url 'user:about_us' %}">About Us</a>
+        </li>
+        <li><a href="{% url 'user:contact_us' %}">Contact</a></li>
+    </ul>
+
+</nav>

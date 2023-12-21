@@ -1,0 +1,35 @@
+<div class="box">
+    <div class="box-header">
+    <h3 class="box-title">Review Content List</h3>
+    </div>
+    <!-- /.box-header -->
+    <div class="box-body">
+            <table id="review-content-table" class="table table-bordered table-hover">
+                <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Post Title</th>
+                    <th>Posted By</th>
+                    <th>Post Type</th>
+                    <th>Space</th>
+                    <th>Is Reviewed</th>
+                    <th>Reviewed By</th>
+                    <th>Review</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr v-for="content in review_content_list" :key="content.id">                   
+                <td>[[content.title]] </td>
+                <td>[[content.post_title]]</td>
+                <td>[[content.post_by_name]]</td>
+                <td>[[content.posted_on]]</td>
+                <td>[[content.space_title]]</td>
+                <td>[[content.is_reviewed]]</td>
+                <td>[[content.reviewed_by]]</td>
+                <td><button><i class="fa fa-view" aria-hidden="true"><a :href="'/atpace-community/review-content/'+content.id">View</a></button></td>
+                </tr>
+            </table>
+    </div>
+    <!-- /.box-body -->
+</div>
+<!-- /.box -->

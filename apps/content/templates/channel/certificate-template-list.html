@@ -1,0 +1,84 @@
+{% extends 'base.html' %} {% load static %}
+{% block title %} Certificate Data List {% endblock %} 
+<!-- DataTables -->
+{% block css %}
+<link rel="stylesheet" href="{% static 'bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css' %}">
+{% endblock css %} 
+{% block content %}
+
+
+<div class="content-wrapper">
+  <section class="content-header">
+    <h1>
+        Certificate Data 
+    </h1>
+    <ol class="breadcrumb">
+      <li><a href="#"><i class="fa fa-dashboard"></i>Certificate Data</a></li>
+      <li class="active">List</li>
+    </ol>
+  </section>
+
+  <section class="content">
+    <div class="row">
+       <div class="col-xs-12">
+           <div class="box">
+             <div class="box-header">
+               <h3 class="box-title">Certificate Data List</h3>
+               
+             </div>
+             <!-- /.box-header -->
+             <div class="box-body">
+                <table id="example2" class="table table-bordered table-hover">
+                    <thead>
+                     <tr>
+                       <th>Journey</th>
+                       <th>Title</th>
+                       <th>Certificate_for</th>
+                       <th>Certificate File</th>
+                       {% comment %} <th>Action</th> {% endcomment %}
+                       <!-- <th>Action</th> -->
+                   </tr>
+                    </thead>
+                    <tbody>
+                       
+                     {% for certificate in certificate_templates %}
+                     
+                       <tr>
+                         
+                         <td>{{certificate.journey.title}}</td>
+                         <td>{{certificate.title}}</td>
+                         <td>{{certificate.Certificate_for}}</td>
+                         <td><img src="{{MEDIA_URL}}{{certificate.file}}" width="100px"></td>
+                         <td>
+                            {% comment %} <div class="dropdown">
+                                <button class="btn bg-purple dropdown-toggle btn-select-option" type="button" data-toggle="dropdown" aria-expanded="true">Select an option<span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu options-dropdown">
+                                    <li>
+                                        <a href="{% url 'content:update_certificate' certificate_id=certificate.pk %}"><i class="fa fa-edit option-icon"></i>Edit</a>
+                                    </li>
+                                    <li>
+                                        <a href="javascript:void(0)"  class="delete_skill_config"><i class="fa fa-trash option-icon"></i>Delete</a>
+                                    </li>
+                                </ul>
+                            </div> {% endcomment %}
+                         </td>
+                         
+                       </tr>
+                       {% endfor %}
+                    </tfoot>
+                  </table>
+             </div>
+             <!-- /.box-body -->
+           </div>
+           <!-- /.box -->
+ 
+          
+         </div>
+       <!-- /.col -->
+    </div>
+    <!-- /.row -->
+ </section>
+ 
+</div>
+{% endblock content %} 

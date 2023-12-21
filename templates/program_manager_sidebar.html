@@ -1,0 +1,152 @@
+{% load static %} {% load tags %}
+{% block css %}
+    <link
+      rel="stylesheet"
+      href="{% static 'css/common/user_mentor_side_bar.css' %}"
+    />
+{% endblock %}
+<aside class="main-sidebar " style="box-shadow: 0px 12px 7px #2329314d; background-color: white; border-radius: none;     background: rgba(187, 176, 176, 0.137);
+backdrop-filter: blur( 1.5px );
+-webkit-backdrop-filter: blur( 1.5px ); border-right: 1px solid #ababab;">
+    <!-- sidebar: style can be found in sidebar.less -->
+    <section class="sidebar">
+        <!-- Sidebar user panel -->
+        <div class="user-panel">
+            <div class="pull-left image">
+                <img
+                        src="{{MEDIA_URL}}{{request.user.avatar}}"
+                        onerror="this.onerror=null; this.src='{{request.user.avatar}}'"
+                        class="img-circle"
+                        alt="User Image"
+                />
+            </div>
+            <div class="pull-left info">
+                <p>{{ request.user.first_name }} {{ request.user.last_name }}</p>
+                <a href="#"><i class="fa fa-circle text-success"></i> Online</a>
+            </div>
+        </div>
+        <!-- sidebar menu: : style can be found in sidebar.less -->
+        <div style="margin:10px;">
+            <span><b>Organization - </b>{{request.session.company_name}}</span>
+            {% if 'manager/' in request.path %}
+                <div class="form-group">
+                    <label>Change</label>
+                    <select class="form-control select2" name="sidebar_company" style="width:100%;" id="sidebar_company" onchange="saveCompany()">
+                    {% comment %} <option value="" disabled>----------</option> {% endcomment %}
+                    {% for company in request.user.company.all %}
+                    <option value="{{company.pk}}" {% if company.pk|stringformat:"s" == request.session.company_id %} selected {% endif %}>{{company.name}}</option>
+                    {% endfor %}
+                    </select>
+                </div>
+            {% endif %}
+        </div>
+        <ul class="sidebar-menu" data-widget="tree">
+            {% if request.user|user_profile_assessment == 0 and request.user.profile_assest_enable %}
+
+            <li class="header our_background_color">All Joined Journey</li>
+
+            {% for channel in request.user.pk|user_channel:request.session.company_id %}
+            {% if channel.Channel.channel_type == "MentoringJourney" %}
+            <li class="joined_channel">
+                <a
+                        href="{% url 'content:Channel_content_v2' Channel=channel.Channel.pk  %}"
+                        style="font-size: 12px;">
+                    <i class="fa fa-circle-o"></i> <span>{{channel.Channel}} </span>
+                </a>
+                
+            </li>
+            {% endif %}
+            {% endfor %}
+
+            {% else %}
+            <li class="header our_background_color">MAIN NAVIGATION</li>
+
+
+            {% comment %} <li class="{% active 'program_manager:analytics' %}">
+                <a href="{% url 'program_manager:analytics'%}">
+                    <img class="sidebar-icon-img" src="{% static 'images/icon/analysis.png' %}"><span><strong>Analytics</strong></span>
+                </a>
+            </li> {% endcomment %}
+            <li class="{% active 'program_manager:manage' %}">
+                <a href="{% url 'program_manager:manage'%}">
+                     <img class="sidebar-icon-img" src="{% static 'images/icon/manage.png' %}">
+                     <span><strong>Manage</strong></span>
+                </a>
+            </li>
+            <li class="{% active 'program_manager:communication' %}">
+                <a href="{% url 'program_manager:communication'%}">
+                    <img class="sidebar-icon-img" src="{% static 'images/icon/communication.png' %}">
+                    <span><strong>Communication</strong></span>
+                </a>
+            </li>
+            <li class="{% active 'program_manager:matching' %}">
+                <a href="{% url 'program_manager:matching'%}">
+
+                    <img class="sidebar-icon-img" src="{% static 'images/icon/matching.png' %}">
+                    <span><strong>Matching</strong></span>
+                </a>
+            </li>
+            <li class="{% active 'program_manager:content' %}">
+                <a href="{% url 'program_manager:content' %}"> 
+                    <img class="sidebar-icon-img" src="{% static 'images/icon/content.png' %}">
+                    <span><strong>Content</strong></span> 
+                </a>
+            </li>
+            <li class="{% active 'program_manager:calendar' %}">
+                <a href="{% url 'program_manager:calendar' %}"> 
+                    <img class="sidebar-icon-img" src="{% static 'images/icon/calendar.png' %}">
+                    <span><strong>Shared Calendar</strong></span> 
+                </a>
+            </li>
+            <li class="{% active 'program_manager:activity' %}">
+                <a href="{% url 'program_manager:activity' %}"> 
+                    <img class="sidebar-icon-img" src="{% static 'images/icon/activity.png' %}">
+                    <span><strong>Activity</strong></span> 
+                </a>
+            </li>
+            <li class="{% active 'program_manager:security' %}">
+                <a href="{% url 'program_manager:security' %}"> 
+                    <img class="sidebar-icon-img" src="{% static 'images/icon/security.png' %}">
+                     <span><strong>Security</strong></span> </a>
+            </li>
+            <li class="{% active 'program_manager:setup' %}">
+                <a href="{% url 'program_manager:setup' %}">
+                    <img class="sidebar-icon-img" src="{% static 'images/icon/setup.png' %}">
+                <span><strong>Setup</strong></span>
+                </a>
+            </li>
+            <li class="{% active 'program_manager:billing' %}">
+                <a href="{% url 'program_manager:billing' %}">
+                    <img class="sidebar-icon-img" src="{% static 'images/icon/billing.png' %}">
+                    <span><strong>Billing</strong></span>
+                </a>
+            </li>
+            <li class="{% active 'program_manager:proxy' %}">
+                <a href="{% url 'program_manager:proxy' %}">
+                    <img class="sidebar-icon-img" src="{% static 'images/icon/proxy.png' %}">
+                    <span><strong>Proxy</strong></span>
+                </a>
+            </li>
+            <li class="{% active 'program_manager:risk_pairs' %}">
+                <a href="{% url 'program_manager:risk_pairs' %}"> 
+                    <img class="sidebar-icon-img" src="{% static 'images/icon/risk.png' %}">
+                    <span><strong>At Risk Pairs</strong></span> 
+                </a>
+            </li>
+            <li class="{% active 'program_manager:generate_certificate' %}">
+                <a href="{% url 'program_manager:generate_certificate' %}">
+                    <img class="sidebar-icon-img" src="{% static 'images/icon/certificate.png' %}">
+                    <span><strong>Generate Certificate</strong></span>
+                </a>
+            </li>
+            <li class="{% active 'program_manager:marketplace' %}">
+                <a href="{% url 'program_manager:marketplace' %}">
+                    <img class="sidebar-icon-img" src="{% static 'images/icon/marketplace.png' %}">
+                    <span><strong>Marketplace</strong></span>
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </section>
+    <!-- /.sidebar -->
+</aside>

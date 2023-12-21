@@ -1,0 +1,604 @@
+{% extends 'base.html' %} {% load static %} 
+{% block title %} Manage {% endblock %} 
+{% load tags %}
+{% block css %} 
+  <link
+          rel="stylesheet"
+          href="{% static 'css/program_manager/program_manager.css' %}"
+  />
+  <style>
+    .capitalize {
+      text-transform: capitalize;
+    }
+  </style>
+{% endblock css %} {% block content %}
+<div class="content-wrapper" id="vue-app">
+  <div :class="'alert alert-dismissible '+[[alert_class]]" v-if="alert_msg" style="margin:10px;">
+    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+    <h4 style="margin-top:10px;"><i class="icon fa fa-warning"></i> Alert!</h4>
+    <a href="/manager/billing">[[alert_msg]]</a>
+  </div>
+  <section class="content-header">
+    <h1>Manage</h1>
+  </section>
+  <section class="content">
+    <div class="row">
+      <div class="col-md-2">
+        <div class="small-box box-tab" style="border-top: 5px solid #1B74E4;" @click="showRegisList()" id="regis-list">
+          <div class="inner">
+            <h4>Registration List</h4>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <div class="small-box box-tab" @click="showJourney()" id="journey">
+          <div class="inner">
+            <h4>Journey</h4>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <div class="small-box box-tab" @click="showIssueRaised()" id="issue-raised">
+          <div class="inner">
+            <h4>Issues Raised</h4>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <div class="small-box box-tab" @click="showAttenReport()" id="atten-report">
+          <div class="inner">
+            <h4>Attendance Report</h4>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <div class="small-box box-tab" @click="showAssessmentReport()" id="assess-report">
+          <div class="inner">
+            <h4>Assessment Report</h4>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <div class="small-box box-tab" @click="showGoalApproval()" id="goal-approval">
+          <div class="inner">
+            <h4>Goal Approval</h4>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <div class="small-box box-tab" @click="showCourseApproval()" id="course-approval">
+          <div class="inner">
+            <h4>Course Approval</h4>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <div class="small-box box-tab" @click="showFeedbackResponse()" id="feedback-response">
+          <div class="inner">
+            <h4>Feedback Response</h4>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <div class="small-box box-tab" @click="showReviewContent()" id="review-content">
+          <div class="inner">
+            <h4>Review Content</h4>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div v-if="displayRegisList">
+    {% include 'manage/registration_list.html' %}
+    </div>
+    <div v-if="displayJourney">
+    {% include 'manage/journey_list.html' %}
+    </div>
+    <div v-if="displayIssueRaised">
+    {% include 'manage/issue_raised.html' %}
+    </div>
+    <div v-if="displayAttenReport">
+    {% include 'manage/attendance_report.html' %}
+    </div>
+    <div v-if="displayAssessmentReport">
+    {% include 'manage/assessment_report.html' %}
+    </div>
+    <div v-if="displayGoalApproval">
+    {% include 'manage/goal_approval.html' %}
+    </div>
+    <div v-if="displayCourseApproval">
+    {% include 'manage/course_approval.html' %}
+    </div>
+    <div v-if="displayFeedbackResponse">
+    {% include 'manage/feedback_response.html' %}
+    </div>
+    <div v-if="displayReviewContent">
+    {% include 'manage/review_content.html' %}
+    </div>
+  </section>
+  {{ request.user.id|json_script:"user_id" }}
+  {{request.session.token|json_script:"token"}}
+  {{request.session.company_id|json_script:"company_id"}}
+  {{request.session.company_name|json_script:"company_name"}}
+  {{request.session.timezone|json_script:"timezone"}}
+
+  
+</div>
+{% endblock content %} {% block js %} 
+<script src="{% static 'bower_components/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
+<script type="text/javascript">
+  const app = new Vue({
+    el: "#vue-app",
+    delimiters: ['[[', ']]'],
+    data() {
+      return {
+        message:"Hello",
+        displayRegisList: true,
+        displayJourney: false,
+        displayIssueRaised: false,
+        displayAttenReport: false,
+        displayAssessmentReport: false,
+        displayGoalApproval: false,
+        displayCourseApproval: false,
+        displayFeedbackResponse:false,
+        displayReviewContent:false,
+        issues_raised: "",
+        registration_list: "",
+        token:JSON.parse(document.getElementById('token').textContent),
+        user_id: JSON.parse(document.getElementById('user_id').textContent),
+        journey_list:"",
+        my_journey_list:"",
+        auth:"",
+        course_approval: "",
+        company_list:"",
+        company:"",
+        title:"",
+        user_name:"",
+        selected_companys:[],
+        is_auto_approve:"",
+        table:"",
+        check_mentor:"",
+        pool_list:"",
+        mentor_id:"",
+        base_url:window.location.origin,
+        alert_msg:"",
+        alert_class:"",
+        user_company_name: JSON.parse(document.getElementById('company_name').textContent),
+        user_company_id: JSON.parse(document.getElementById('company_id').textContent),
+        timezone: JSON.parse(document.getElementById('timezone').textContent),
+        feedback_response_list:"",
+        review_content_list:""
+      };
+    },
+    mounted(){
+      this.showRegisList();
+      this.showAlert();
+    },
+    methods: {
+      
+      axiosGetRequest: function(url){
+        this.auth = "Token "+this.token;
+        var config = {
+          method: "get",
+          url: url,
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': this.auth,
+          },
+        };
+        return axios(config)
+      },
+      axiosPostRequest: function(url, data){
+        this.auth = "Token "+this.token;
+        var config = {
+          method: "post",
+          url: url,
+          headers: {
+            "Content-Type": "multipart/form-data",
+            "Accept": "application/json",
+            'Authorization': this.auth,
+          },
+          data:data
+        };
+
+        return axios(config)
+      },
+      async destroyDataTable(id){
+        if($(id).DataTable()){
+          console.log("destroying", id);
+          $(id).DataTable().clear();
+          $(id).DataTable().destroy();
+        }
+      },
+      async initializeDataTable(id){
+        console.log("initializing");
+        await this.sleep(2000);
+        $(id).DataTable({
+          "dom": '<"table-pull-left"f><"table-pull-right"l>tip',
+          'destroy': true,
+          'paging'      : true,
+          'lengthChange': true,
+          'searching'   : true,
+          'ordering'    : true,
+          'info'        : true,
+         'autoWidth'   : false,
+         'retrieve':true,
+         'scrollX': true,
+        })
+      },
+      sleep: function(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+      },
+      async showAlert(){
+        var url = this.base_url+"/manager/check-for-subscription/"+this.user_id+"/";
+        response = await this.axiosGetRequest(url);
+        console.log("Alert response", response.data)
+        if(response.data.message != "No alert available"){
+          this.alert_msg = response.data.message
+          this.alert_class = response.data.css_class
+        }
+      },
+      async approveRejectCourse(id, status){
+        console.log("data",id, status)
+        var data = new FormData();
+        data.append("channel_group_content_id", id);
+        data.append("status", status);
+        data.append("user_id", this.user_id);
+        var url =  this.base_url+"/manager/content-approve-reject/";
+        response = await this.axiosPostRequest(url, data);
+        console.log("Course approve reject Response", response.data);
+        bootbox.alert(response.data.message)
+        this.showCourseApproval()
+      },
+      async getMentor(id){
+        this.mentor_id = id;
+        var url = this.base_url+"/manager/pool-setup/"+this.user_id+"/";
+        response = await this.axiosGetRequest(url);
+        console.log("Pool list response", response.data)
+        this.pool_list = response.data.data
+      },
+      async onAddMentorToPool(){
+        console.log("data", this.$refs.mentor_pool.value, this.mentor_id)
+        var data = new FormData();
+        data.append("pool_id", this.$refs.mentor_pool.value);
+        data.append("mentor_id", this.mentor_id);
+        
+        var url =  this.base_url+"/manager/add-mentor-pool/"+this.user_id+"/";
+        response = await this.axiosPostRequest(url, data);
+        console.log("Add Mentor Pool Response", response.data);
+        bootbox.alert(response.data.message)
+        $("#modal-default").hide()
+        $(".modal-backdrop").hide()
+        this.showRegisList();
+      },
+      async onGoalApproval(){
+        /*for (let option of document.getElementById('companys').options)
+          {
+            if (option.selected) {
+                console.log("company value",option.value)
+                this.selected_companys.push(option.value);
+            }
+          }*/
+        var data = new FormData();
+        //data.append("company_id", this.selected_companys);
+        data.append("company_id", this.user_company_id);
+        if(this.is_auto_approve){
+          data.append("auto_approve", this.is_auto_approve);
+        }
+        else{
+          data.append("auto_approve", false);
+        }
+        
+        var url =  this.base_url+"/manager/goal-setting/"+this.user_id+"/";
+        response = await this.axiosPostRequest(url, data);
+        console.log("Goal Approval Response", response.data);
+        bootbox.alert("Company goal auto approve updated!")
+        this.showGoalApproval()
+      },
+      async removeRegisList(){
+        ele = document.getElementById('regis-list')
+        this.displayRegisList = false;
+        ele.style.borderTop = "none";
+        await this.destroyDataTable('#registration-table')
+      },
+      async removeJourney(){
+        ele = document.getElementById('journey')
+        this.displayJourney = false;
+        ele.style.borderTop = "none";
+        await this.destroyDataTable('#journey-table')
+      },
+      async removeIssueRaised(){
+        ele = document.getElementById('issue-raised')
+        this.displayIssueRaised = false;
+        ele.style.borderTop = "none";
+        await this.destroyDataTable('#issue-table')
+      },
+      removeAttenReport(){
+        ele = document.getElementById('atten-report')
+        this.displayAttenReport = false;
+        ele.style.borderTop = "none";
+      },
+      removeAssessReport(){
+        ele = document.getElementById('assess-report')
+        this.displayAssessmentReport = false;
+        ele.style.borderTop = "none";
+      },
+      async removeGoalApproval(){
+        ele = document.getElementById('goal-approval')
+        this.displayGoalApproval = false;
+        ele.style.borderTop = "none";
+        await this.destroyDataTable('#goal-table')
+      },
+      async removeFeedbackResponse(){
+        ele = document.getElementById('feedback-response')
+        this.displayFeedbackResponse = false;
+        ele.style.borderTop = "none";
+        await this.destroyDataTable('#feedback-response-table')
+      },
+      async removeReviewContent(){
+        ele = document.getElementById('review-content')
+        this.displayReviewContent = false;
+        ele.style.borderTop = "none";
+        await this.destroyDataTable('#review-content-table')
+      },
+      async removeCourseApproval(){
+        ele = document.getElementById('course-approval')
+        this.displayCourseApproval = false;
+        ele.style.borderTop = "none";
+        await this.destroyDataTable('#course-table')
+      },
+      async archiveUser(id){
+        console.log("id", id)
+        var data = new FormData();
+        data.append("user_id", id);
+        
+        var url =  this.base_url+"/manager/archive-user/"+this.user_id+"/";
+        response = await this.axiosPostRequest(url, data);
+        console.log("User Archive Response", response.data);
+        bootbox.alert("User Archived Successfully!")
+      },
+      async onFilterRegistration(){
+        this.registration_list = ""
+        console.log("satd", this.user_name, this.$refs.journey.value, this.$refs.assessment.value)
+        var url = this.base_url+"/manager/registration-list/"+this.user_id+"/?user_name="+this.user_name+"&journey_id="+this.$refs.journey.value+"&assessment="+this.$refs.assessment.value+"&timezone="+this.timezone;
+        let response = await this.axiosGetRequest(url);
+        console.log("Filter Registration list response", response.data.registration_list)
+        this.registration_list = response.data.registration_list
+        await this.initializeDataTable('#registration-table')
+      },
+      async showRegisList(){
+        await this.destroyDataTable('#registration-table')
+        this.journey_list = ""
+        this.registration_list = ""
+        this.check_mentor = ""
+        ele = document.getElementById('regis-list')
+        this.displayRegisList = true;
+        ele.style.borderTop = "5px solid #1B74E4";
+        console.log("134 regis list", window.location.origin)
+
+        this.removeJourney();
+        this.removeFeedbackResponse();
+        this.removeIssueRaised();
+        this.removeAttenReport();
+        this.removeAssessReport();
+        this.removeGoalApproval();
+        this.removeCourseApproval();
+        this.removeReviewContent();
+        var usr_name = "";
+        var journey_val = "";
+        var ass_val = "";
+        if(this.user_name){
+          usr_name = this.user_name
+        }
+        if(this.$refs.journey){
+          journey_val = this.$refs.journey.value
+        }
+        if(this.$refs.assessment){
+          ass_val = this.$refs.assessment.value
+        }
+
+
+        //var url = this.base_url+"/manager/registration-list/"+this.user_id+"/";
+        var url = this.base_url+"/manager/registration-list/"+this.user_id+"/?user_name="+usr_name+"&journey_id="+journey_val+"&assessment="+ass_val+"&timezone="+this.timezone;
+        let response = await this.axiosGetRequest(url);
+        console.log("Registration list response", response.data)
+        this.registration_list = response.data.registration_list
+        this.check_mentor = response.data.check_mentor
+
+        var url =  this.base_url+"/manager/journey-list/"+this.user_id+"/?company_id="+this.user_company_id;
+        response = await this.axiosGetRequest(url);
+        console.log("Journey list Response", response.data);
+        this.journey_list = response.data.data
+
+        await this.initializeDataTable('#registration-table')
+        
+      },
+      async showJourney(){
+        this.my_journey_list = ""
+        ele = document.getElementById('journey')
+        this.displayJourney = true;
+        ele.style.borderTop = "5px solid #1B74E4";
+        
+        this.removeRegisList();
+        this.removeIssueRaised();
+        this.removeAttenReport();
+        this.removeAssessReport();
+        this.removeGoalApproval();
+        this.removeFeedbackResponse();
+        this.removeReviewContent();
+        var url = this.base_url+"/manager/my-journey-list/"+this.user_id+"/";
+        let response = await this.axiosGetRequest(url);
+        console.log("Journey list Response", response.data);
+        this.my_journey_list = response.data.data
+        await this.initializeDataTable('#journey-table')
+      },
+      async showIssueRaised(){
+        this.issues_raised = ""
+        ele = document.getElementById('issue-raised')
+        this.displayIssueRaised = true;
+        ele.style.borderTop = "5px solid #1B74E4";
+       
+        this.removeRegisList();
+        this.removeJourney();
+        this.removeFeedbackResponse();
+        this.removeReviewContent();
+        this.removeAttenReport();
+        this.removeAssessReport();
+        this.removeGoalApproval();
+        this.removeCourseApproval();
+
+        var url = this.base_url+"/manager/issues-raised/"+this.user_id+"/?company_id="+this.user_company_id;
+        let response = await this.axiosGetRequest(url);
+        console.log("Issues Raised Response", response.data);
+        this.issues_raised = response.data.data.issues_raised
+        await this.initializeDataTable('#issue-table')
+       
+        
+      },
+      async showAttenReport(){
+        this.journey_list = ""
+        ele = document.getElementById('atten-report')
+        this.displayAttenReport = true;
+        ele.style.borderTop = "5px solid #1B74E4";
+        this.removeRegisList();
+        this.removeIssueRaised();
+        this.removeJourney();
+        this.removeFeedbackResponse();
+        this.removeGoalApproval();
+        this.removeCourseApproval();
+        this.removeReviewContent();
+        this.removeAssessReport();    
+
+        var url =  this.base_url+"/manager/journey-list/"+this.user_id+"/?company_id="+this.user_company_id;
+        response = await this.axiosGetRequest(url);
+        console.log("Journey list Response", response.data);
+        this.journey_list = response.data.data
+      },
+      async showAssessmentReport(){
+        this.journey_list = ""
+        ele = document.getElementById('assess-report')
+        this.displayAssessmentReport = true;
+        ele.style.borderTop = "5px solid #1B74E4";
+        this.removeRegisList();
+        this.removeIssueRaised();
+        this.removeJourney();
+        this.removeFeedbackResponse();
+        this.removeGoalApproval();
+        this.removeCourseApproval();
+        this.removeReviewContent();
+        this.removeAttenReport();
+
+        var url =  this.base_url+"/manager/journey-list/"+this.user_id+"/?company_id="+this.user_company_id;
+        response = await this.axiosGetRequest(url);
+        console.log("Journey list Response", response.data);
+        this.journey_list = response.data.data
+      },
+      async showAssessmentReport(){
+        this.journey_list = ""
+        ele = document.getElementById('assess-report')
+        this.displayAssessmentReport = true;
+        ele.style.borderTop = "5px solid #1B74E4";
+        this.removeRegisList();
+        this.removeIssueRaised();
+        this.removeJourney();
+        this.removeFeedbackResponse();
+        this.removeGoalApproval();
+        this.removeCourseApproval();
+        this.removeReviewContent();
+        this.removeAttenReport();
+
+        var url =  this.base_url+"/manager/journey-list/"+this.user_id+"/?company_id="+this.user_company_id;
+        response = await this.axiosGetRequest(url);
+        console.log("Journey list Response", response.data);
+        this.journey_list = response.data.data
+      },
+      async showGoalApproval(){
+        this.company_list = ""
+        ele = document.getElementById('goal-approval')
+        this.displayGoalApproval = true;
+        ele.style.borderTop = "5px solid #1B74E4";
+        
+        this.removeRegisList();
+        this.removeIssueRaised();
+        this.removeAttenReport();
+        this.removeAssessReport();
+        this.removeJourney();
+        this.removeFeedbackResponse();
+        this.removeReviewContent();
+        this.removeCourseApproval();
+
+        var url = this.base_url+"/manager/goal-setting/"+this.user_id+"/";
+        let response = await this.axiosGetRequest(url);
+        console.log("Goal approval Response", response.data);
+        this.company_list = response.data.company_list
+        await this.initializeDataTable('#goal-table')
+        
+      },
+      async showCourseApproval(){
+        this.course_approval = ""
+        ele = document.getElementById('course-approval')
+        this.displayCourseApproval = true;
+        ele.style.borderTop = "5px solid #1B74E4";
+        
+        this.removeRegisList();
+        this.removeIssueRaised();
+        this.removeAttenReport();
+        this.removeAssessReport();
+        this.removeGoalApproval();
+        this.removeJourney();
+        this.removeFeedbackResponse();
+        this.removeReviewContent();
+
+        var url = this.base_url+"/manager/pending-content/"+this.user_id+"/";
+        let response = await this.axiosGetRequest(url);
+        console.log("Course approval Response", response.data);
+        this.course_approval = response.data.data
+        await this.initializeDataTable('#course-table');
+      },
+      async showFeedbackResponse(){
+        this.feedback_response_list = ""
+        ele = document.getElementById('feedback-response')
+        this.displayFeedbackResponse = true;
+        ele.style.borderTop = "5px solid #1B74E4";
+        
+        this.removeRegisList();
+        this.removeIssueRaised();
+        this.removeAttenReport();
+        this.removeAssessReport();
+        this.removeGoalApproval();
+        this.removeJourney();
+        this.removeCourseApproval();
+        this.removeReviewContent();
+
+        var url = this.base_url+"/api/user-response-list/"+this.user_id+"/?company_id="+this.user_company_id+"&user_type=ProgramManager";
+        let response = await this.axiosGetRequest(url);
+        console.log("Feedback Response Data", response.data);
+        this.feedback_response_list = response.data.data
+        await this.initializeDataTable('#feedback-response-table');
+      },
+      async showReviewContent(){
+        ele = document.getElementById('review-content')
+        this.displayReviewContent = true;
+        ele.style.borderTop = "5px solid #1B74E4";
+        
+        this.removeRegisList();
+        this.removeIssueRaised();
+        this.removeAttenReport();
+        this.removeAssessReport();
+        this.removeGoalApproval();
+        this.removeJourney();
+        this.removeCourseApproval();
+        this.removeFeedbackResponse();
+
+        var url = this.base_url+"/atpace-community/review-content-api/"+this.user_id+"?user_type=ProgramManager";
+        let response = await this.axiosGetRequest(url);
+        console.log("Review Content Data", response.data);
+        this.review_content_list = response.data.data.review_data
+        await this.initializeDataTable('#review-content-table');
+      },
+    }
+  });
+  
+</script>
+
+{% endblock js %}

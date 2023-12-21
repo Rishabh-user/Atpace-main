@@ -1,0 +1,107 @@
+{% extends 'base_with_empty_sidebar.html' %}
+{% load static %} {% load tags %}
+{% block css %} 
+  <link
+      rel="stylesheet"
+      href="{% static 'css/test_questions/test_form.css' %}"
+    />
+{% endblock %}
+{% block content %}
+      <!-- Content Wrapper. Contains page content -->
+      <div class="content-wrapper">
+        <section class="content-header">
+          <h1 class="feedback-header">Feedback </h1>
+          <div class="ques-progress-bar">
+            <span>{{next_ques}}</span>/
+            <span>{{ques_count}}</span>
+          </div>
+        </section>
+
+        <section class="content" style="margin:0px; max-width:1500px;">
+        <div class="row">
+          <div class="col-md-6 col-12 col-sm-12">
+            <div class="ques-img">
+            {% if question.image %}
+              <img src="{{question.image}}"/>
+            {% else %}
+              <img src="{{image}}"/>
+            {% endif %}
+            </div>
+          </div>
+          {% comment %} <center> {% endcomment %}
+          <div class="col-md-6 col-12 col-sm-12 question-box">
+            <div class="" style="margin:auto">
+              <form method="post">
+                {% csrf_token %}
+                <input type="hidden" value="{{next_ques}}" name="page" id="page"/>
+                <input type="hidden" value="{{has_next}}" name="next" id="next"/>
+                <div class="row content_data" data-id="{{question.id}}">
+                    {% if question.type == "ShortAnswer" %} 
+                      {% include 'feedback_card/short_ans.html' %} 
+                    {% elif question.type == "DropDown" %} 
+                      {% include 'feedback_card/dropdown.html' %} 
+                    {% elif question.type == "MultiChoice" %} 
+                      {% include 'feedback_card/multiChoice.html' %} 
+                    {% elif question.type == "Checkbox" %} 
+                      {% include 'feedback_card/checkbox.html' %} 
+                    {% elif question.type == "LinearScale" %} 
+                      {% include 'feedback_card/rating.html' %} 
+                    {% endif %}
+                </div >
+                  {% if has_next  %}
+                    <button class="btn test-btn" type="submit">Next</button>
+                  {% else %}
+                  <hr class="feedback-hr">
+                  <div class="form-check">
+                    <input
+                        class="form-check-input"
+                        type="checkbox"
+                        value="is_private"
+                        name = "is_private"
+                        id="defaultCheck3"
+                    />
+                      <label class="form-check-label" for="defaultCheck3">
+                        Feedback should not be shared {% if request.session.user_type == 'Learner' %}with Mentor {% endif %} {% if request.session.user_type == 'Mentor' %}with Mentee {% endif %} 
+                      </label>
+                    </div>
+                      <div class="form-check" id="is_name_private_div">
+                      <input
+                          class="form-check-input"
+                          type="checkbox"
+                          value="is_name_private"
+                          name = "is_name_private"
+                          id="defaultCheck2"
+                      />
+                        <label class="form-check-label" for="defaultCheck2">
+                          Your identity should be shared {% if request.session.user_type == 'Learner' %}with Mentor {% endif %} {% if request.session.user_type == 'Mentor' %}with Mentee {% endif %} 
+                        </label>
+                      </div>
+                      <button class="btn test-btn" type="submit">Submit</button>
+                  {% endif %}
+                </form>
+              </div>
+            </div>
+            {% comment %} </center> {% endcomment %}
+          </div>
+        </section>
+      </div>
+    {% endblock content %} 
+
+    {% block js %}
+    <script>
+      /*function showHideName(){
+        value = document.getElementById("defaultCheck3").checked
+        console.log("changing", value)
+        if(! value){
+          document.getElementById("is_name_private_div").style.display = "none"
+        }
+        else{
+          document.getElementById("is_name_private_div").style.display = "block"
+        }
+
+      }*/
+    </script>
+
+    {% endblock js %}
+  </body>
+</html>

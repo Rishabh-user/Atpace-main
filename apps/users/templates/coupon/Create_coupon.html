@@ -1,0 +1,49 @@
+{% extends 'base.html' %} 
+{% block title %}Create Coupon {% endblock %}
+{% load crispy_forms_tags %}
+{% block content %}
+<div class="content-wrapper">
+  <!-- Content Header (Page header) -->
+  <section class="content-header">
+    <h1>
+      Create Coupon
+    </h1>
+    {% comment %} <ol class="breadcrumb">
+      <li><a href="#"><i class="fa fa-dashboard"></i> User Settings</a></li>
+      <li><a href="#">User</a></li>
+      <li class="active">Upload Bluk User</li>
+    </ol> {% endcomment %}
+  </section>
+
+  <!-- Main content -->
+  <section class="content">
+
+    <!-- Default box -->
+    <div class="box">
+      {% include 'component/error_message.html' %}
+      <div class="box-header with-border">
+        <h3 class="box-title">Create Coupon</h3>
+      </div>
+      <div class="box-body">
+        
+        {% crispy form %}
+
+      </div>
+      <!-- /.box-footer-->
+    </div>
+    <!-- /.box -->
+
+  </section>
+  <!-- /.content -->
+  <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+  <script>
+    $('#id_type').on('change', function() {
+      if ($(this).val() === 'Discount') {   
+          $("#div_id_journey").hide();
+      } else {
+          $("#div_id_journey").show();
+      }
+  });
+  </script>
+</div>
+{% endblock content %}

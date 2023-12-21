@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div class="content-wrapper">
+<!-- Main content -->
+<section class="content">
+  
+         <div class="box glassmorphism" style="margin: 7% auto; width: 90%;">
+          <div class="box-header with-border">
+              <h3 class="box-title" style="padding-left:15px;"><strong> Badges </strong></h3>
+              
+              </div>
+            <!-- /.box-header -->  
+            <div class="box-body" style="height: 61vh; overflow: auto;">
+            <div class="row">
+                {% for slot in data.badges %}
+                
+                <div class="col-sm-4 col-md-4">
+                
+                  <div class="card" style="width: 18rem; padding-left:10px;">
+                    <h4 class="card-title">{{slot.current_badge.name}}</h4>
+                    <img class="card-img-top" src="{{MEDIA_URL}}{{slot.current_badge.image}}" style="max-width:100px; max-height:100px;" >
+                    <div class="card-body">
+                      <p class="card-text">{{slot.current_badge.label.name}}</p>
+                    </div>
+                  </div>
+                  </div>
+                
+                  {% endfor %}    
+            </div>
+                  </div>
+
+            <!-- /.box-body -->    
+         </div>
+         <!-- /.box -->      
+     
+      <div class="box glassmorphism" style="margin: 7% auto; width: 90%;">
+          <div class="box-header with-border">
+            <h3 class="box-title"><strong> Streaks </strong></h3>
+          </div>
+          <div class="box-body">
+            <h5><strong>Total Streaks: </strong>{{data.streak_count}} Days</h5>
+            <h5><strong>Completions: </strong>{{data.streakActivity.total_completion}}</h5>
+          </div>
+      </div>
+
+        <div class="box glassmorphism" style="margin: 7% auto; width: 90%;">
+            <div class="box-header with-border">
+             <h3 class="box-title" style="padding-left:10px;"><strong> Total Points: </strong>{{data.total_points}}</h3>
+             
+            </div>
+           <!-- /.box-header -->
+           <div class="box-body" style="height: 61vh; overflow: auto;">
+            
+             <table id="example2" class="table table-hover">
+               <thead>
+                <tr>
+                <th>Reason For Points</th>
+                <th>Points</th>
+                  
+              </tr>
+               </thead>
+               <tbody>
+                {% for slot in data.points %}
+                  <tr>
+                      <td>{{slot.label.name}}</td>
+                      <td>{{slot.point}}</td>
+                      
+                  </tr>
+                  {% endfor %}
+                  
+               </tfoot>
+             </table>
+           </div>
+           <!-- /.box-body -->
+        </div>
+
+  <!-- /.row -->
+</section>
+</div>
+    <!-- /.row -->
+
+  <!-- /.content -->
+{% endblock content %}
+{% block js %}
+<script src="{% static 'bower_components/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
+
+{% endblock js %}

@@ -1,0 +1,7 @@
+<select  class="form-control" id ="mentor" required name="mentor" style="width: 100%;">
+    {% comment %} <option>Choose Mentor</option> {% endcomment %}
+    
+    {% for user in mentors %}
+        <option value="{{user.pk}}"> {% if user.company.all != None %} {{user.company.all|join:', '}}  -  {% endif %} {{user.first_name}} {{user.last_name}}, {{user.email}} </option>
+    {% endfor %}
+</select>

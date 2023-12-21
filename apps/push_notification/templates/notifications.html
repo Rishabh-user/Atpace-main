@@ -1,0 +1,89 @@
+{% extends 'base.html' %} {% load static %} {% block css %}
+<style>
+  #notifications li {
+    list-style:none;
+  }
+</style>
+{% endblock css %} {% block content %} 
+ <div class="content-wrapper">
+    <section class="content">
+      <div class="row">  
+        <div class="col-md-12">
+          <div class="box" style="min-height: 20vh; width:93%; margin:30px;">
+            <div class="box-header with-border">
+              <h3 class="box-title">Notifications</h3>
+            </div>
+            <div class="box-body">
+                <ul id="notifications">
+                    {% for notification in notification__list %}
+                        <li>{{notification.description}} <p>{{notification.timestamp}}</p></li>
+                    {% endfor %}
+                </ul>
+                <button class="btn btn-primary" style="width:100%; display:none;" id="load_less"> Previous </button>
+                <button class="btn btn-primary" style="width:100%;" id="load_more"> Next</button>
+            </div>
+          </div>
+        </div>
+    </section>
+  </div>
+{% endblock content %}
+{% block js %}
+<script>
+    $(function () {
+      page_no = 1
+      $("body").on("click","#load_more",function(){
+
+        page_no = page_no + 1
+        $.ajax({
+              url: "{% url 'push_notification:show_notification' %}",
+              type: 'POST',
+              data: {page_no: page_no, csrfmiddlewaretoken : "{{csrf_token}}" },
+              error: function(err) {
+                console.log("error", err)
+              },
+              success: function(response){
+                $('#notifications').html('')
+                $.each(response.results, function(i, val) {
+                //append to page
+                $('#notifications').append('<li>' + val.description + '<p>' + val.timestamp + '</p>' + '</li>')
+                });
+                if(response.is_next == false){
+                  document.getElementById('load_more').style.display = 'none';
+                }
+                if(response.is_previous == true){
+                  document.getElementById('load_less').style.display = 'block';
+                }
+              },
+          });
+          
+    });
+    $("body").on("click","#load_less",function(){
+
+        page_no = page_no - 1
+        $.ajax({
+              url: "{% url 'push_notification:show_notification' %}",
+              type: 'POST',
+              data: {page_no: page_no, csrfmiddlewaretoken : "{{csrf_token}}" },
+              error: function(err) {
+                console.log("error", err)
+              },
+              success: function(response){
+                $('#notifications').html('')
+                $.each(response.results, function(i, val) {
+                //append to page
+                $('#notifications').append('<li>' + val.description + '<p>' + val.timestamp + '</p>' + '</li>')
+                });
+                if(response.is_previous == false){
+                  document.getElementById('load_less').style.display = 'none';
+                }
+                if(response.is_next == true){
+                  document.getElementById('load_more').style.display = 'block';
+                }
+              },
+          });
+          
+    });
+  });
+   
+</script>
+{% endblock js %}

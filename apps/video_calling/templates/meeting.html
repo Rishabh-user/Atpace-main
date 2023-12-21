@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script crossorigin src="https://unpkg.com/@daily-co/daily-js"></script>
+  <title>room</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Nunito&display=swap');
+
+    html {
+      font-family: 'Nunito', sans-serif;
+    }
+
+    h1 {
+      color: #444;
+    }
+
+    .btn {
+        padding: 1em 2.1em 1.1em;
+        border-radius: 3px;
+        margin: 8px 8px 8px 8px;
+        color: #fbdedb;
+        background-color: #fbdedb;
+        display: inline-block;
+        background: #e74c3c;
+        -webkit-transition: 0.3s;
+        -moz-transition: 0.3s;
+        -o-transition: 0.3s;
+        transition: 0.3s;
+        font-family: 'Nunito', sans-serif;
+        font-weight: 800;
+        font-size: .85em;
+        text-transform: uppercase;
+        text-align: center;
+        text-decoration: none;
+        -webkit-box-shadow: 0em -0.3rem 0em rgba(0, 0, 0, 0.1) inset;
+        -moz-box-shadow: 0em -0.3rem 0em rgba(0, 0, 0, 0.1) inset;
+        box-shadow: 0em -0.3rem 0em rgba(0, 0, 0, 0.1) inset;
+        position: relative;
+    }
+    .btn:hover, .btn:focus {
+        opacity: 0.8;
+    }
+    .btn:active {
+        -webkit-transform: scale(0.80);
+        -moz-transform: scale(0.80);
+        -ms-transform: scale(0.80);
+        -o-transform: scale(0.80);
+        transform: scale(0.80);
+    }
+  </style>
+</head>
+<body>
+  <div>
+    <h1 style="text-align: center;">{{request.user.username}}</h1>
+    <hr>
+  </div>
+    <div style="text-align: center;">
+      <a onclick="joinCall()" class="btn">Start Meeting</a><br>
+      <a href="{% url 'create-room' %}" class="btn">Create New Room</a>
+      <a href="{% url 'roomss' %}" class="btn">All Recent Rooms</a>
+      <a href="{% url 'logout' %}" class="btn">Logout</a>
+    </div>
+    <script>
+        //function myFunction() {
+        //  var url = '{{room_url}}?t={{token}}'
+        //  callFrame = window.DailyIframe.createFrame({
+        //    showLeaveButton: true,
+        //    iframeStyle: {
+        //      position: 'fixed',
+        //      width: '100%',
+        //      height: '90%',
+        //    },
+        //  });
+        //  return callFrame.join({ url:  url });
+        //}
+        async function joinCall() {
+          const roomURL = '{{room_url}}';
+          callFrame = window.DailyIframe.createFrame({
+            showLeaveButton: true,
+            iframeStyle: {
+              height: '100%',
+              width: '100%',
+              aspectRatio: 16 / 9,
+              minwidth: '400px',
+              maxWidth: '920px',
+              border: '0',
+              borderRadius: '12px',
+            },
+          });
+        
+          // To use live streaming, add a meeting token. `is_owner` must be set to true for the token
+          const token = '{{token}}';
+          await callFrame.join({
+            url: roomURL,
+            showLeaveButton: true,
+            token,
+          });
+        }
+    </script>
+</body>
+</html>

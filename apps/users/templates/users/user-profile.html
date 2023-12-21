@@ -1,0 +1,749 @@
+{% extends 'base.html' %} {% load static %} {% block title %} Profile {% endblock %}{% block css %}
+    <link
+            rel="stylesheet"
+            href="{% static 'css/users_app/users/user_profile.css' %}"
+    />
+{% endblock css %} {% block content %} {% comment %}
+<div
+  class="content-wrapper"
+  style="
+    background: transparent;
+    height: calc(100vh - 100px);
+    min-height: 620px;
+  "
+>
+  {% endcomment %}
+
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <h1>
+        User Profile {% if user.pk == request.user.pk %}<a
+          href="{% url 'user:edit_profile' pk=user.pk %}"
+          ><button class="btn btn-primary">Edit Profile</button></a
+        >
+          {% if request.session.user_type == 'Mentor' %}
+          <a href="{% url 'user:advance_profile' pk=user.pk %}"><button class="btn btn-primary">Marketplace Profile</button></a>
+          {% endif %}
+        {% endif %}
+      </h1>
+
+      <ol class="breadcrumb">
+        <li>
+          <a href="#"><i class="fa fa-dashboard"></i> User Settings</a>
+        </li>
+        <li class="active">User profile</li>
+      </ol>
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+    {% if request.user.profile_assest_enable %}
+      {% include 'component/profile_alert.html' %}
+    {% endif %}
+      <div class="row">
+        <div class="col-md-3">
+          <!-- Profile Image -->
+          <div class="box box-primary" style="height: 230px;">
+            <div class="box-header with-border">
+              <h3 class="box-title">Profile</h3>
+            </div>
+            <div class="box-body box-profile">
+              <img
+                class="profile-user-img img-responsive img-circle"
+                src="{{MEDIA_URL}}{{user.avatar}}"
+                onerror="this.onerror=null; this.src='{{request.user.avatar}}'"
+                alt="User profile picture"
+                style="height:100px"
+              />
+
+              <h3 class="profile-username text-center">
+                {{user.first_name}} {{user.last_name}}
+              </h3>
+
+              <p class="text-center" style="color: #3c8dbc;" data-toggle="modal" data-target="#modal-avatar">Edit Avatar</p>
+ 
+              {% comment %} <ul class="list-group list-group-unbordered">
+                
+              </ul> {% endcomment %}
+            </div>
+            <!-- /.box-body -->
+          </div>
+          <!-- /.box -->
+
+          <!-- About Me Box -->
+          <div class="box box-primary" style="margin-top: 40px">
+            <div class="box-header with-border">
+              <h3 class="box-title">About Me</h3>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+              <strong><i class="fa fa-envelope margin-r-5"></i> Email</strong>
+              {% if user_id in request.path %}
+                <button class="btn btn-small" style="float: right;" id="email-edit-btn">Edit</button>
+              {% endif %}
+              <p id="s_email" class="text-muted">{{user.email}}</p>
+              <p id="email_success"></p>
+              <form id="change_email" onsubmit="change_email('{{user.pk}}'); return false;">
+                <div class="form-group">
+                  <input class="form-control" type="email" placeholder="New Email" id="email" name="email">
+                </div>
+                <input type="submit" class="btn btn-small" style="float: right;" value="Send OTP">
+                <br>
+              </form>
+              <form id="verify_email" onsubmit="verify_email_otp('{{user.pk}}'); return false;">
+                <div class="form-group">
+                  <input class="form-control" type="text" placeholder="Enter OTP" id="email_otp" name="otp">
+                </div>
+                <input type="submit" class="btn btn-small" style="float: right;" value="Verify OTP">
+                <br>
+              </form>
+              <hr />
+
+              <strong><i class="fa fa-phone margin-r-5"></i> Phone</strong>
+              {% if user_id in request.path %}
+                <button class="btn btn-small-phone" style="float: right;" id="phone-edit-btn">Edit</button>
+              {% endif %}
+              <p id="s_phone" class="text-muted">{{user.phone}}</p>
+              <p id="phone_success"></p>
+              <form id="change_phone" onsubmit="change_phone('{{user.pk}}'); return false;">
+                <div class="form-group">
+                  <input class="form-control" type="phone" placeholder="New Phone" id="phone" name="phone">
+                </div>
+                <input type="submit" class="btn btn-small-phone" style="float: right;" value="Send OTP">
+                <br>
+              </form>
+              <form id="verify_phone" onsubmit="verify_phone_otp('{{user.pk}}'); return false;">
+                <div class="form-group">
+                  <input class="form-control" type="text" placeholder="Enter OTP" id="phone_otp" name="otp">
+                </div>
+                <input type="submit" class="btn btn-small-phone" style="float: right;" value="Verify OTP">
+                <br>
+              </form>
+              <hr /><strong><i class="fa fa-id-badge margin-r-5"></i> Current Status </strong>
+
+              <p>{{user.current_status}}</p>
+              <hr />
+
+              <strong><i class="fa fa-building margin-r-5"></i> Organization</strong>
+                {% for company in company %}
+                <p class="text-muted">{{company.name}}</p>
+                {% endfor %}
+              <hr>
+              <strong><i class="fa fa-industry margin-r-5"></i> Industry</strong>
+
+              <p class="text-muted">
+                {% for industry in user.industry.all %}
+                <kbd>{{industry.name}}</kbd>
+                {% endfor %}
+              </p>
+              <hr />
+
+              <strong
+                ><i class="fa fa-map-marker margin-r-5"></i> Location</strong
+              >
+
+              <p class="text-muted">{{user.address}}, {{user.city}}, {{user.state}}</p>
+
+              <hr />
+
+              <strong><i class="fa fa-graduation-cap"></i> Expertize</strong>
+
+              <p>
+                {% for tags in user.expertize.all %}
+                <kbd>{{tags.name}}</kbd>
+                {% endfor %}
+              </p>
+              <hr />
+              <strong><i class="fa fa-user margin-r-5"></i> Gender </strong>
+
+              <p>{{user.gender}}</p>
+              <hr />
+              <strong><i class="fa fa-id-badge margin-r-5"></i> About </strong>
+
+              <p>{{user.about_us}}</p>
+
+              <hr />
+              {% comment %}
+              <strong
+                ><i class="bi bi-cash-coin margin-r-5"></i> Total Points
+              </strong>
+
+              <p>{{total_points}}</p>
+              <a href="/user/points-history/{{user.id}}">Show history</a>
+              <hr />
+              {% endcomment %}
+            </div>
+            <!-- /.box-body -->
+          </div>
+          <!-- /.box -->
+        </div>
+        <!-- /.col -->
+        <div class="col-md-3">
+          {% comment %}
+          <div class="box" style="min-height: 50vh">
+            <div class="box-header with-border">
+              <h3 class="box-title">Profile Assessment</h3>
+              {% if user_profile_assest|length > 0 %}
+              <a href="{% url 'user:edit_assessment' pk=request.user.id %}"
+                ><button class="btn btn-primary pull-right">
+                  Edit Profile Assessment
+                </button></a
+              >
+              {% endif %}
+            </div>
+            <div class="box-body">
+              {% for user_profile_assest in user_profile_assest%}
+              <h5>
+                Q{{forloop.counter}}.
+                {{user_profile_assest.assest_question.question}}
+              </h5>
+
+              Ans. {{user_profile_assest.response}}
+              <br />
+              {% endfor %}
+            </div>
+          </div>
+          {% endcomment %} {% comment %}
+          <div class="nav-tabs-custom">
+            <ul class="nav nav-tabs">
+              <li>
+                <a class="active" href="#timeline" data-toggle="tab"
+                  >Profile Assessment</a
+                >
+              </li>
+              {% if user_profile_assest|length > 0 %}
+              <a href="{% url 'user:edit_assessment' pk=request.user.id %}"
+                ><button class="btn btn-primary pull-right">
+                  Edit Profile Assessment
+                </button></a
+              >
+              {% endif %}
+            </ul>
+            <div class="tab-content">
+              <!-- /.tab-pane -->
+              <div class="active tab-pane" id="timeline">
+                <!-- The timeline -->
+                {% for user_profile_assest in user_profile_assest%}
+                <h5>
+                  Q{{forloop.counter}}.
+                  {{user_profile_assest.assest_question.question}}
+                </h5>
+
+                Ans. {{user_profile_assest.response}}
+                <br />
+                {% endfor %}
+              </div>
+              <!-- /.tab-pane -->
+
+              <!-- /.tab-pane -->
+            </div>
+            <!-- /.tab-content -->
+          </div>
+          {% endcomment %}
+
+          <!-- /.nav-tabs-custom -->
+
+          <div class="box" style="height: 230px; padding-left: 0px">
+            <div class="box-header with-border">
+              <h3 class="box-title">Last Badge</h3>
+            </div>
+            <div class="box-body" style="">
+              {% comment %} {% for slot in badges %} {% endcomment %}
+              <div class="card text-center" style="width: 18rem">
+                <h4 class="card-title">{{badges.current_badge.name}}</h4>
+                <div class="text-center">
+                  <img
+                    class="card-img-top"
+                    src="{{MEDIA_URL}}{{badges.current_badge.image}}"
+                    style="max-width: 80px; max-height: 80px"
+                  />
+                </div>
+              </div>
+              <a href="/user/rewards/{{user.id}}" class="pull-right"
+                >View All
+                <i class="fa fa-angle-double-right" aria-hidden="true"></i
+              ></a>
+              {% comment %} {% endfor %} {% endcomment %}
+            </div>
+          </div>
+        </div>
+        <!-- /.col -->
+        <!-- col-md-3 -->
+        <div class="col-md-3">
+          <div class="box" style="height: 230px;">
+            <div class="box-header with-border">
+              <h3 class="box-title">Points</h3>
+            </div>
+            <div class="box-body">
+              <h5><strong>Total Points: </strong>{{total_points}}</h5>
+              {% comment %} {% if percentage != 100 %} {% endcomment %}
+                <h5><strong>For next badge: </strong>{{next_badge_points}}</h5>
+              {% comment %} {% endif %} {% endcomment %}
+              <div class="circular-progress">
+                <div class="value-container">0</div>
+              </div>
+              <a href="/user/rewards/{{user.id}}" class="pull-right"
+                >View All
+                <i class="fa fa-angle-double-right" aria-hidden="true"></i
+              ></a>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="box" style="height: 230px;">
+            <div class="box-header with-border">
+              <h3 class="box-title">Streaks</h3>
+            </div>
+            <div class="box-body">
+              <h5><strong>Total Streaks: </strong>{{streak_count}} Days</h5>
+              <h5><strong>For {{points_for_streak}} more points: </strong>{{days_for_points}} days</h5>
+              <div class="circular-progress-streaks">
+                <div class="value-container-streaks">0</div>
+              </div>
+              <a href="/user/rewards/{{user.id}}" class="pull-right"
+                >View All
+                <i class="fa fa-angle-double-right" aria-hidden="true"></i
+              ></a>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-md-9" style="margin-top: 20px">
+          <div class="box">
+            <div class="box-header with-border">
+              <h3 class="box-title">Profile Assessment</h3>
+              {% if user.id == request.user.id %}
+                {% if user_profile_assest|length > 0 %}
+                <a href="{% url 'user:edit_assessment' pk=request.user.id %}"
+                  ><button class="btn btn-primary pull-right">
+                    Edit Profile Assessment
+                  </button></a
+                >
+                {% endif %}
+              {% endif %}
+            </div>
+            <div class="box-body" style="height:400px; overflow: auto; padding: 10px;">
+            {% if user_type_list|length < 2 %}
+              
+              {% for user_profile_assest in user_profile_assest%}
+              <h5>
+                Q{{forloop.counter}}.
+                {{user_profile_assest.assest_question.question}}
+              </h5>
+
+              Ans. {{user_profile_assest.response}}
+              <br />
+              {% endfor %}
+              {% else %}
+              <div class="nav-tabs-custom">
+                <ul class="nav nav-tabs">
+                  {% for user_type in user_type_list %}
+                    {% if user_type == 'Learner' %}
+                      <li class="active"><a href="#tab_1" data-toggle="tab">Learner</a></li>
+                    {% elif user_type == 'Admin' %}
+                      <li><a href="#tab_2" data-toggle="tab">Admin</a></li>
+                    {% elif user_type == 'Mentor' %}
+                      <li><a href="#tab_3" data-toggle="tab">Mentor</a></li>
+                    {% elif user_type == 'ProgramManager' %}
+                      <li><a href="#tab_4" data-toggle="tab">Program Manager</a></li>
+                    {% endif %}
+                  {% endfor %}
+
+                </ul>
+                <div class="tab-content">
+                  <div class="tab-pane active" id="tab_1">
+                    {% for user_profile_assest in user_profile_assest%}
+                  {{user_profile_assest.assest_question.question_for}}
+                      {% if user_profile_assest.assest_question.question_for == 'Learner' %}
+                      <h5>
+                        Q.
+                        {{user_profile_assest.assest_question.question}}
+                      </h5>
+
+                      Ans. {{user_profile_assest.response}}
+                      <br />
+                      {% endif %}
+                    {% endfor %}
+                  </div>
+                  <!-- /.tab-pane -->
+                  <div class="tab-pane" id="tab_2">
+                    {% for user_profile_assest in user_profile_assest%}
+                      {% if user_profile_assest.assest_question.question_for == 'Admin' %}
+                      <h5>
+                        Q.
+                        {{user_profile_assest.assest_question.question}}
+                      </h5>
+
+                      Ans. {{user_profile_assest.response}}
+                      <br />
+                      {% endif %}
+                    {% endfor %}
+                  </div>
+                  <!-- /.tab-pane -->
+                  <div class="tab-pane" id="tab_3">
+                    {% for user_profile_assest in user_profile_assest%}
+                      {% if user_profile_assest.assest_question.question_for == 'Mentor' %}
+                      <h5>
+                        Q.
+                        {{user_profile_assest.assest_question.question}}
+                      </h5>
+
+                      Ans. {{user_profile_assest.response}}
+                      <br />
+                      {% endif %}
+                    {% endfor %}
+                  </div>
+                  <!-- /.tab-pane -->
+                  <div class="tab-pane" id="tab_4">
+                    {% for user_profile_assest in user_profile_assest%}
+                      {% if user_profile_assest.assest_question.question_for == 'Program Manager' %}
+                      <h5>
+                        Q.
+                        {{user_profile_assest.assest_question.question}}
+                      </h5>
+
+                      Ans. {{user_profile_assest.response}}
+                      <br />
+                      {% endif %}
+                    {% endfor %}
+                  </div>
+                </div>
+                <!-- /.tab-content -->
+              </div>
+              {% endif %}
+              <div class="box-footer">
+              </div>
+            </div>
+          </div>
+        </div>
+        {{ percentage|json_script:"percentage" }}
+        {{streakPercent|json_script:"streakPercent" }}
+        {{streakActivity|json_script:"streakActivity" }}
+        <div class="col-md-9" style="margin-top: 20px">
+          <!-- LINE CHART -->
+          <div class="box box-info">
+            <div class="box-header with-border">
+              <h3 class="box-title">Activity</h3>
+
+              <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                </button>
+              </div>
+            </div>
+            <div class="box-body chart-responsive">
+              <div class="chart" id="line-chart" style="height: 300px;"></div>
+            </div>
+            <!-- /.box-body -->
+          </div>
+          <!-- /.box -->
+          </div>
+        <!-- /.col-md-3 -->
+      </div>
+      <!-- /.row -->
+    </section>
+    <!-- /.content -->
+  </div>
+  <div class="modal fade" id="modal-avatar" style="display: none;">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <form id="avatar_form">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">×</span></button>
+              <h4 class="modal-title">Update Avatar</h4>
+            </div>
+            <div class="modal-body">
+              <div class="form-group">
+                <label for="avatar" class="col-sm-2 control-label">Avatar</label>
+                  <input type="file" class="form-control" id="avatar" name="avatar" required/>
+              </div>
+            
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+              <button type="button" id="submitButton" onclick="updateAvatar('{{user.id}}', '{{request.session.token}}')" class="btn btn-primary">Update</button>
+            </div>
+          </form>
+          </div>
+          <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+  </div>
+  {% endblock content %}
+</div>
+{% block js %}
+<script>
+  function updateAvatar(id,token){
+    avatar = document.getElementById("avatar").files[0]
+    console.log("avatar", avatar)
+    if(avatar){
+      var data = new FormData()
+      data.append("user_id", id)
+      data.append("avatar", avatar)
+      $.ajax({
+          url: "/api/avatar-update/",
+          type: 'POST',
+          data: data,
+          processData: false,
+          contentType: false,
+          headers: {
+            'Authorization': "Token "+token,
+          },
+          error: function(error) {
+            console.log("error", error)
+            bootbox.alert('Something is wrong');
+          },
+          success: function(data) {
+            console.log("response", data)
+            bootbox.alert("Avatar updated successfully!")
+            $("#modal-avatar").modal('hide')
+            window.location.reload()
+          }
+        });
+    }
+    else{
+      bootbox.alert("Please select avatar.")
+    }
+  }
+  let progressBar = document.querySelector(".circular-progress");
+  let valueContainer = document.querySelector(".value-container");
+  const percentage = JSON.parse(
+    document.getElementById("percentage").textContent
+  );
+  console.log("percentage", percentage)
+  let progressValue = 0;
+  let progressEndValue = percentage;
+  let speed = 25;
+
+  let progress = setInterval(() => {
+    if(percentage != 0){
+      progressValue++;
+    }
+    valueContainer.textContent = `${progressValue}%`;
+    progressBar.style.background = `conic-gradient(
+      #fc6600 ${progressValue * 3.6}deg,
+      #f5cdba ${progressValue * 3.6}deg
+  )`;
+    if (progressValue == progressEndValue) {
+      clearInterval(progress);
+    }
+  }, speed);
+
+  let progressBarStreak = document.querySelector(".circular-progress-streaks");
+  let valueContainerStreak = document.querySelector(".value-container-streaks");
+  const streakPercent = JSON.parse(document.getElementById("streakPercent").textContent);
+  console.log("streakPercent", streakPercent)
+  let progressValueStreak = 0;
+  let progressEndValueStreak = streakPercent;
+  let speedStreak = 25;
+
+  let progressStreak = setInterval(() => {
+    if(progressEndValueStreak != 0){
+      progressValueStreak++;
+    }
+    valueContainerStreak.textContent = `${progressValueStreak}%`;
+    progressBarStreak.style.background = `conic-gradient(
+      #fc6600 ${progressValueStreak * 3.6}deg,
+      #f5cdba ${progressValueStreak * 3.6}deg
+  )`;
+    if (progressValueStreak == progressEndValueStreak) {
+      clearInterval(progressStreak);
+    }
+  }, speedStreak);
+
+
+  $(function () {
+    "use strict";  
+
+    const streakActivity = JSON.parse(document.getElementById("streakActivity").textContent);
+    console.log("streakActivity",streakActivity)
+
+    // LINE CHART
+    var line = new Morris.Line({
+      element: 'line-chart',
+      resize: true,
+      data: streakActivity,
+      xkey: 'date',
+      ykeys: ['quest', 'learning_journal', 'weekly_learning_journal', 'test', 'post', 'survey'],
+      labels: ['Quest', 'Learning Journal', 'Weekly Journal', 'Assessment', 'Post', 'Survey'],
+      lineColors: ['#3c8dbc','#fc6600', '#52fc03', '#bd2452', '#5a2eab', '#c76f18'],
+      hideHover: 'auto'
+    });
+
+   
+  });
+
+  document.getElementById('change_email').style.display = "none";
+  document.getElementById('verify_email').style.display = "none";
+
+  document.querySelector('.btn-small').onclick = function(e) {
+    document.getElementById('change_email').style.display = "block";
+    document.getElementById('s_email').style.display = "none";
+    document.getElementById('email-edit-btn').style.display = "none";
+  }
+
+  
+  function change_email(id){
+    email = document.getElementById('email').value
+    if (email == ''){
+      document.getElementById("email_success").innerText = "Please fill this field";
+    }
+    else{
+      $.ajax({
+        url:  "{% url 'user:update_email' %}",
+        type: 'POST',
+        data: {id: id, email: email, csrfmiddlewaretoken : "{{csrf_token}}" },
+        error: function(error) {
+          console.log("error", error)
+          bootbox.alert('Something is wrong');
+        },
+        success: function(data) {
+          console.log("response", data)
+          if (!data.success) {
+            document.getElementById("email_success").innerText = data.message;
+          } else {
+            document.getElementById("email_success").innerText = data.message;
+            document.getElementById('change_email').style.display = "none";
+            document.getElementById('verify_email').style.display = "block";
+          }
+        }
+      });
+    }
+  }
+
+  function verify_email_otp(id){
+    otp = document.getElementById('email_otp').value
+    console.log("otp", otp)
+    $.ajax({
+      url:  "{% url 'user:verify_email_otp' %}",
+      type: 'POST',
+      data: {id: id, otp: otp, csrfmiddlewaretoken : "{{csrf_token}}" },
+      error: function(error) {
+        console.log("error", error)
+        bootbox.alert('Something is wrong');
+      },
+      success: function(data) {
+        console.log("data", data)
+        if (!data.success){
+          document.getElementById("email_success").innerText = data.message;
+        } else {
+          document.getElementById('change_email').style.display = "none";
+          document.getElementById('verify_email').style.display = "none";
+          bootbox.alert(data.message)
+          window.location.reload()
+        }
+    }
+   });
+  }
+
+  document.getElementById('change_phone').style.display = "none";
+  document.getElementById('verify_phone').style.display = "none";
+
+  document.querySelector('.btn-small-phone').onclick = function(e) {
+    document.getElementById('change_phone').style.display = "block";
+    document.getElementById('s_phone').style.display = "none";
+    document.getElementById('phone-edit-btn').style.display = "none";
+  }
+
+  function verify_phone_otp(id){
+    otp = document.getElementById('phone_otp').value
+    console.log("otp", otp)
+    $.ajax({
+      url:  "{% url 'user:verify_phone_otp' %}",
+      type: 'POST',
+      data: {id: id, otp: otp, csrfmiddlewaretoken : "{{csrf_token}}" },
+      error: function(error) {
+        console.log("error", error)
+        bootbox.alert('Something is wrong');
+      },
+      success: function(data) {
+        console.log("data", data)
+        if (!data.success){
+          document.getElementById("phone_success").innerText = data.message;
+        } else {
+          document.getElementById('change_phone').style.display = "none";
+          document.getElementById('verify_phone').style.display = "none";
+          bootbox.alert(data.message)
+          window.location.reload()
+        }
+    }
+   });
+  }
+
+  document.getElementById('change_phone').style.display = "none";
+  document.getElementById('verify_phone').style.display = "none";
+
+  document.querySelector('.btn-small-phone').onclick = function(e) {
+    document.getElementById('change_phone').style.display = "block";
+    document.getElementById('s_phone').style.display = "none";
+    document.getElementById('phone-edit-btn').style.display = "none";
+  }
+
+  
+  document.getElementById('change_phone').style.display = "none";
+  document.getElementById('verify_phone').style.display = "none";
+
+  document.querySelector('.btn-small-phone').onclick = function(e) {
+    document.getElementById('change_phone').style.display = "block";
+    document.getElementById('s_phone').style.display = "none";
+    document.getElementById('phone-edit-btn').style.display = "none";
+  }
+
+
+  function change_phone(id){
+    phone = document.getElementById('phone').value
+    if(phone == '')
+    {
+      document.getElementById("phone_success").innerText = "Please fill this field";
+    }
+    else{
+      $.ajax({
+        url:  "{% url 'user:update_phone' %}",
+        type: 'POST',
+        data: {id: id, phone: phone, csrfmiddlewaretoken : "{{csrf_token}}" },
+        error: function(error) {
+          console.log("error", error)
+          bootbox.alert('Something is wrong');
+        },
+        success: function(data) {
+          console.log("response", data)
+          if (!data.success) {
+            document.getElementById("phone_success").innerText = data.message;
+          } else {
+            document.getElementById("phone_success").innerText = data.message;
+            document.getElementById('change_phone').style.display = "none";
+            document.getElementById('verify_phone').style.display = "block";
+          }
+        }
+    });
+    }
+  }
+
+  function verify_phone_otp(id){
+    otp = document.getElementById('phone_otp').value
+    console.log("otp", otp)
+    $.ajax({
+      url:  "{% url 'user:verify_phone_otp' %}",
+      type: 'POST',
+      data: {id: id, otp: otp, csrfmiddlewaretoken : "{{csrf_token}}" },
+      error: function(error) {
+        console.log("error", error)
+        bootbox.alert('Something is wrong');
+      },
+      success: function(data) {
+        console.log("data", data)
+        if (!data.success){
+          document.getElementById("phone_success").innerText = data.message;
+        } else {
+          document.getElementById('change_phone').style.display = "none";
+          document.getElementById('verify_phone').style.display = "none";
+          bootbox.alert(data.message)
+          window.location.reload()
+        }
+      }
+    })
+  }
+
+</script>
+{% endblock %}

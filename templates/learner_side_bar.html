@@ -1,0 +1,97 @@
+{% load static %} {% load tags %}
+{% block css %}
+    <link
+      rel="stylesheet"
+      href="{% static 'css/common/user_mentor_side_bar.css' %}"
+    />
+{% endblock %}
+<aside class="main-sidebar " style="box-shadow: 0px 12px 7px #2329314d; background-color: white; border-radius: none;     background: rgba(187, 176, 176, 0.137);
+backdrop-filter: blur( 1.5px );
+-webkit-backdrop-filter: blur( 1.5px ); border-right: 1px solid #ababab;">
+    <!-- sidebar: style can be found in sidebar.less -->
+    <section class="sidebar">
+        <!-- Sidebar user panel -->
+        <div class="user-panel">
+            <div class="pull-left image">
+                <img
+                        src="{{MEDIA_URL}}{{request.user.avatar}}"
+                        onerror="this.onerror=null; this.src='{{request.user.avatar}}'"
+                        class="img-circle"
+                        alt="User Image"
+                />
+            </div>
+            <div class="pull-left info">
+                <p>{{ request.user.first_name }} {{ request.user.last_name }}</p>
+                <a href="#"><i class="fa fa-circle text-success"></i> Online</a>
+            </div>
+        </div>
+        <!-- sidebar menu: : style can be found in sidebar.less -->
+        <div style="margin:10px;">
+            <span><b>Organization - </b>{{request.session.company_name}}</span>
+            {% if 'learner/' in request.path or '/content/journeys/' == request.path or '/user-dashboard/' == request.path %}
+                <div class="form-group">
+                    <label>Change</label>
+                    <select class="form-control select2" name="sidebar_company" style="width:100%;" id="sidebar_company" onchange="saveCompany()">
+                    {% comment %} <option value="" disabled>----------</option> {% endcomment %}
+                    {% for company in request.user.company.all %}
+                    <option value="{{company.pk}}" {% if company.pk|stringformat:"s" == request.session.company_id %} selected {% endif %}>{{company.name}}</option>
+                    {% endfor %}
+                    </select>
+                </div>
+            {% endif %}
+        </div>
+        <ul class="sidebar-menu" data-widget="tree">
+            <li class="header our_background_color">MAIN NAVIGATION</li>
+
+            <li class="{% active 'user:userdashboard' %}">
+                <a href="{% url 'user:userdashboard'%}">
+                     <img class="sidebar-icon-img" src="{% static 'images/icon/Dashboard.png' %}">
+                     <span><strong>Dashboard</strong></span>
+                </a>
+            </li>
+            <li class="{% active 'learner:learner_learn' %}">
+                <a href="{% url 'learner:learner_learn'%}">
+                    <img class="sidebar-icon-img" src="{% static 'images/icon/learn.png' %}">
+                    <span><strong>Learn</strong></span>
+                </a>
+            </li>
+            <li class="{% active 'learner:learner_goals' %}">
+                <a href="{% url 'learner:learner_goals'%}">
+                    <img class="sidebar-icon-img" src="{% static 'images/icon/goals.png' %}">
+                    <span><strong>Goals</strong></span>
+                </a>
+            </li>
+            <li class="{% active 'learner:learner_activity' %}">
+                <a href="{% url 'learner:learner_activity'%}">
+
+                    <img class="sidebar-icon-img" src="{% static 'images/icon/activity.png' %}">
+                    <span><strong>Activity</strong></span>
+                </a>
+            </li>
+            <li class="{% active 'learner:learner_mentor' %}">
+                <a href="{% url 'learner:learner_mentor' %}"> 
+                    <img class="sidebar-icon-img" src="{% static 'images/icon/Mentor.png' %}">
+                    <span><strong>Mentor</strong></span> 
+                </a>
+            </li>
+            <li class="{% active 'learner:learner_community' %}">
+                <a href="{% url 'learner:learner_community' %}"> 
+                    <img class="sidebar-icon-img" src="{% static 'images/icon/community.png' %}">
+                     <span><strong>Community</strong></span> </a>
+            </li>
+            <li class="{% active 'content:browse_channel' %}">
+                <a href="{% url 'content:browse_channel' %}">
+                    <img class="sidebar-icon-img" src="{% static 'images/icon/Browse_Journey.png' %}">
+                    <span><strong>Browse Journey</strong></span>
+                </a>
+            </li>
+            <li class="{% active 'learner:learner_support' %}">
+                <a href="{% url 'learner:learner_support' %}">
+                    <img class="sidebar-icon-img" src="{% static 'images/icon/Contact_program_team.png' %}">
+                    <span><strong>Support</strong></span>
+                </a>
+            </li>
+        </ul>
+    </section>
+    <!-- /.sidebar -->
+</aside>

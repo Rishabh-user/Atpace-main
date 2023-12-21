@@ -1,0 +1,195 @@
+{% load static %}
+ <style>
+   * {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  font-family: 'Nunito', sans-serif;
+}
+
+.wrapper {
+  background-color: #ffffff;
+  position: absolute;
+  width: 80vw;
+  max-width: 41em;
+  min-height: 25em;
+  border-radius: 0.6em;
+  transform: translate(-50%, -50%);
+  left: 50%;
+  top: 50%;
+  box-shadow: 0 1.8em 3em rgba(1, 17, 39, 0.15);
+  display: flex;
+}
+.testimonial-container {
+  width: 85%;
+  height: 60%;
+  position: relative;
+  margin: auto;
+  padding: 1.8em 1.2em;
+}
+.wrapper button {
+  font-size: 1.8em;
+  height: 2.2em;
+  width: 2.2em;
+  background-color: #ffffff;
+  position: absolute;
+  margin: auto;
+  top: 0;
+  bottom: 0;
+  border: none;
+  color: #0a69ed;
+  box-shadow: 0 0 1em rgba(1, 17, 39, 0.25);
+  cursor: pointer;
+  border-radius: 50%;
+}
+button#next {
+  right: -1.1em;
+}
+button#prev {
+  left: -1.1em;
+}
+.testimonial-container p {
+  color: #8c8c90;
+  text-align: center;
+  font-size: 0.9em;
+  line-height: 2em;
+  letter-spacing: 0.05em;
+}
+.testimonial-container img {
+  display: block;
+  margin: 1.8em auto 1.25em auto;
+  border-radius: 50%;
+  width: 4.4em;
+}
+.testimonial-container h3 {
+  color: #2d3d67;
+  font-size: 1em;
+  text-align: center;
+}
+.testimonial-container h6 {
+  color: #bcc4da;
+  font-size: 0.9em;
+  letter-spacing: 0.03em;
+  font-weight: 400;
+  text-align: center;
+}
+@media screen and (max-width: 650px) {
+  .wrapper {
+    font-size: 14px;
+  }
+}
+.fade-out {
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+
+  .fade-in {
+    opacity: 1;
+    transition: opacity 0.5s ease;
+  }
+  .circle-icon {
+  border-radius: 50%;
+  width: 4.4em;
+  height: 4.4em;
+}
+ </style>
+
+ <div class="wrapper">
+   <div class="testimonial-container blur fade-in" id="testimonial-container"></div>
+   <button id="prev">&lt;</button>
+   <button id="next">&gt;</button>
+ </div>
+
+<script>
+   //Testimonial Data
+const testimonials = [
+  {
+    name: "Katey Topaz",
+    job: "Developer, TechCrew",
+    image: "{% static 'website/testimonials/testi3.jpg' %}",
+    testimonial:
+      "I left each session with clarity on the way forward and specific steps I needed to take, and a clear and calm mind to be able to tackle what needed to be done.",
+  },
+  {
+    name: "Jae Robin",
+    job: "UI Designer, Affinity Agency",
+    image: "{% static 'website/testimonials/testi1.jpg' %}",
+    testimonial:
+      "Awesome way of teaching and organized sessions and assesments made my learning easy.",
+  },
+  {
+    name: "Naman Jain",
+    job: "CXO Healthcare",
+    image: "{% static 'website/testimonials/testi2.jpg' %}",
+    testimonial:
+      "Got a clear picutre of the learnings and tasks, got a boost in my professional career.",
+  },
+];
+
+//Current Slide
+let i = 0;
+//Total Slides
+let j = testimonials.length;
+
+let testimonialContainer = document.getElementById("testimonial-container");
+let nextBtn = document.getElementById("next");
+let prevBtn = document.getElementById("prev");
+
+nextBtn.addEventListener("click", () => {
+    // i = (j + i + 1) % j;
+    i = (i + 1) % j;
+    displayTestimonial();
+  });
+  prevBtn.addEventListener("click", () => {
+    i = (i-1+j) % j;
+    // i = (j + i - 1) % j;
+    displayTestimonial();
+  });
+
+let displayTestimonial = () => {
+    fadeOut();
+
+    setTimeout(() => {
+      testimonialContainer.innerHTML = `
+        <p>${testimonials[i].testimonial}</p>
+        <img src=${testimonials[i].image} class=".circle-icon" alt="company icon"></img>
+        <h3>${testimonials[i].name}</h3>
+        <h6>${testimonials[i].job}</h6>
+      `;
+
+      fadeIn();
+    }, 500); // Wait for fade-out transition to complete before fading in the new testimonial
+  };
+
+
+let rotateTestimonial = () => {
+    fadeOut();
+
+    setTimeout(() => {
+      i = (j + i + 1) % j;
+      displayTestimonial();
+    }, 500); // Wait for fade-out transition to complete before displaying the next testimonial
+  };
+
+// setInterval(rotateTestimonial, 4000);
+setInterval(() => {
+  i = (i + 1) % j;
+  displayTestimonial();
+}, 4000);
+
+window.onload = displayTestimonial;
+let fadeOut = () => {
+    testimonialContainer.classList.remove("fade-in");
+    testimonialContainer.classList.add("fade-out");
+  };
+
+  let fadeIn = () => {
+    testimonialContainer.classList.remove("fade-out");
+    testimonialContainer.classList.add("fade-in");
+  };
+
+  setInterval(rotateTestimonial, 4000);
+
+  window.onload = displayTestimonial;
+</script>
+

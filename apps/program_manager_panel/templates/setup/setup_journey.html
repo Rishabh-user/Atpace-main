@@ -1,0 +1,75 @@
+{% comment %} <div class="row" style="margin-top: 30px;">
+    <div class="col-md-2">
+    <div class="card side-tab" >
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item" @click="showMentoringJourney" id="mentoring-journey">Mentoring Journey</li>
+            <li class="list-group-item" @click="showPoolAllocation" id="pool-allocation">Journey Pathway</li>
+        </ul>
+    </div>
+    </div>
+    <div class="col-md-10">
+      <div v-if="displayMentoringJourney">
+        {% include 'setup/mentoring_journey.html' %}
+      </div>
+      <div v-if="displayPoolAllocation">
+        {% include 'setup/pool_allocation.html' %}
+      </div>
+    </div>
+</div> {% endcomment %}
+<div class="box">
+    <div class="box-header">
+    <h3 class="box-title">Journey List</h3>
+    {% comment %} <a href="{%url 'content:config_course_list' %}"><button class="btn btn-primary pull-right">Journey Pathway List</button></a> {% endcomment %}
+    <a href="{%url 'content:create-channel' %}"><button class="btn btn-primary pull-right">Create Journey</button></a>
+    </div>
+    <!-- /.box-header -->
+    <div class="box-body">
+            <table id="setup-journey-table" class="table table-bordered table-hover">
+                <thead>
+                <tr>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Company</th>
+                <th>Category</th>
+                <th>Type</th>
+                <th>Action</th>
+            </tr>
+                </thead>
+                <tbody>
+                <tr v-for="journey in setup_journey_list" :key="journey.id">
+                    <td>[[journey.name]]</td>
+                    <td>[[journey.short_description]]</td>
+                    <td>[[journey.company]]</td>
+                    <td>[[journey.category]]</td>
+                    <td>[[journey.channel_type]]</td>
+                    <td>
+                        <div class="dropdown">
+                            <button class="btn bg-purple dropdown-toggle btn-select-option" type="button" data-toggle="dropdown" aria-expanded="true">Select an option<span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu options-dropdown">
+                                <li>
+                                    <a :href="'/content/journey/v2/'+journey.journey_id"><i class="fa fa-eye option-icon"></i>View</a>
+                                </li>
+                                <li>
+                                    <a :href="'/content/edit/'+journey.journey_id"><i class="fa fa-edit option-icon"></i>Edit</a>
+                                </li>
+                                <li v-if="journey.channel_type == 'MentoringJourney'">
+                                    <a data-target="#modal-default" data-toggle="modal" @click="getId(journey.journey_id, journey.channel_type)"><i class="fa fa-save option-icon"></i>Save as</a>
+                                </li>
+                                <li v-if="journey.channel_type == 'SkillDevelopment'">
+                                    <a data-target="#modal-skill-journey" data-toggle="modal" @click="getId(journey.journey_id, journey.channel_type)"><i class="fa fa-save option-icon"></i>Save as</a>
+                                </li>
+                                {% comment %} <li v-if="journey.channel_type == 'MentoringJourney'">
+                                    <a :href="'/content/setup-journey-content/'+journey.journey_id"  ><i class="fa fa-cog option-icon"></i>Setup Journey</a>
+                                </li> {% endcomment %}
+                            </ul>
+                        </div>
+                    </td>
+                
+                </tr>
+                </tfoot>
+            </table>
+    </div>
+    <!-- /.box-body -->
+</div>
+<!-- /.box -->

@@ -1,0 +1,11 @@
+<div class="form-group">
+    <label class="question_label">[[question.title]] <span v-if="question.is_required">*</span> </label>
+    <textarea
+        class="form-control"
+        row=6
+        type="text"
+        :name="'answer'+[[question.id]]"
+        id="ans"
+        placeholder="Type your answer here..."
+      ></textarea>
+</div>

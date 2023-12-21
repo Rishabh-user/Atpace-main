@@ -1,0 +1,14 @@
+<div class="form-group">
+    <label class="question_label">[[question.title]] <span v-if="question.is_required">*</span> </label><br>
+    <span class="rating-start-scale" style="font-size: 15px;">[[question.rating_scale.start_rating_scale]]</span>
+    <span class="rating-end-scale" style="float:right; font-size: 15px;">[[question.rating_scale.end_rating_scale]]</span>
+    <input
+        type="range"
+        :min="question.start_rating_scale"
+        :max="question.end_rating_scale"
+        :name="'answer'+[[question.id]]"
+        id="ans"
+      />
+      <span class="rating-start-name" style="font-size: 15px;">[[question.rating_scale.start_rating_name]]</span>
+      <span class="rating-end-name" style="float:right; font-size: 15px;">[[question.rating_scale.end_rating_name]]</span>
+</div>

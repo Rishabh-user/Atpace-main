@@ -1,0 +1,370 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load tags %}
+{% block title %} Assessment List {% endblock %}
+<!-- DataTables -->
+{% block css %}
+<link rel="stylesheet" href="{% static 'bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css' %}">
+{% endblock css %}
+{% block content %}
+
+
+<div class="content-wrapper">
+  <section class="content-header">
+    <h1>
+      Assessment
+
+    </h1>
+    <ol class="breadcrumb">
+      <li><a href="{% url 'test_series:test-list' %}"><i class="fa fa-dashboard"></i> Assessment </a></li>
+      <li><a href="#">List</a></li>
+    </ol>
+  </section>
+
+  <section class="content">
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="box">
+          <div class="box-header">
+            <h3 class="box-title">Assessment List</h3>
+            <a href="{%url 'test_series:create-test' %}"><button class="btn btn-primary pull-right">Create
+                Assessment</button></a>
+          </div>
+          <!-- /.box-header -->
+          <div class="box-body">
+            <table id="example2" class="table table-bordered table-hover">
+              <thead>
+                <tr>
+                  <th>Id</th>
+                  <th>Assessment Name</th>
+                  <th>Is Active</th>
+                  {% comment %} <th>Pre Assessment</th> {% endcomment %}
+                  {% comment %} <th>post Assessment</th> {% endcomment %}
+                  <th>Add Question</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for survey in survey %}
+                <tr>
+                  <td>{{forloop.counter }}</td>
+                  <td>{{survey.name}}</td>
+                  <td>
+                    {% if user.is_active %}
+                    <kbd>Active</kbd>
+                    {% else %}
+                    <kbd>InActive</kbd>
+                    {% endif %}
+                  </td>
+                  {% comment %} <td> <button class="btn btn-primary" data-toggle="modal" data-target="#modal-default"
+                      onclick="AddToChannel('{{survey.pk}}', 'pre')"> Add To Journey</button></td> {% endcomment %}
+                  {% comment %} <td> <button class="btn btn-primary" data-toggle="modal"
+                      data-target="#modal-post-assessment" onclick="AddToChannel('{{survey.pk}}', 'post')"> Add Post
+                      Assessment</button></td> {% endcomment %}
+                  <td><a href="{% url 'test_series:add_questions' survey=survey.pk %}"> <button class="btn btn-primary">
+                        Add Questions</button></a></td>
+                  <td>
+                    <div class="dropdown">
+                      <button class="btn bg-purple dropdown-toggle btn-select-option" type="button"
+                        data-toggle="dropdown" aria-expanded="true">Select an option <span class="caret"></span>
+                      </button>
+                      <ul class="dropdown-menu options-dropdown">
+
+                        <li>
+                          <a href="{% url 'test_series:assessment-edit' pk=survey.id %}"><i
+                              class="fa fa-edit option-icon"></i>Edit</a>
+                        </li>
+                        <li>
+                          <a href="{% url 'test_series:assessment_channel' pk=survey.id %}"><i
+                              class="fa fa-eye option-icon"></i>Journey</a>
+                        </li>
+                        <li>
+                          <a data-target="#modal-default1" data-toggle="modal" onclick="getId('{{survey.id}}')"><i
+                              class="fa fa-save option-icon"></i>Save as</a>
+                        </li>
+
+                        <li>
+                          <a href=""><i class="fa fa-trash option-icon"></i>Delete</a>
+                        </li>
+                      </ul>
+                    </div>
+                  </td>
+                </tr>
+                {% endfor %}
+                </tfoot>
+            </table>
+          </div>
+          <!-- /.box-body -->
+        </div>
+        <!-- /.box -->
+
+
+      </div>
+      <!-- /.col -->
+    </div>
+    <!-- /.row -->
+  </section>
+  <div class="modal fade" id="modal-default" style="display: none;">
+    <div class="modal-dialog">
+      <form action="{% url 'test_series:addtest_to_channel' %}" method="POST">
+        {% csrf_token %}
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">×</span></button>
+            <h4 class="modal-title">Add Pre Assessment</h4>
+          </div>
+          <div class="modal-body">
+            <input type="hidden" value="" required name="survey_id" id="survey_id">
+            <input type="hidden" value="pre" required name="assessment_type" id="assessment_type">
+            <div class="form-group">
+              <label>Select Journey/Skill</label>
+              <select class="form-control select2" name="channel" required style="width: 100%;">
+
+                <option selected="selected">Select Journey/Skill</option>
+                <optgroup label="Journey">
+                  {% for channel in request.user|get_user_channel_skill %}
+                  {% if channel.parent_id == None %}
+                  <option value="{{channel.pk}}">{{channel.title}}</option>
+                  {% endif %}
+                  {% endfor %}
+                </optgroup>
+                <optgroup label="Skill">
+                  {% for channel in request.user|get_user_channel_skill %}
+                  {% if channel.parent_id != None %}
+                  <option value="{{channel.pk}}">{{channel.title}}</option>
+                  {% endif %}
+                  {% endfor %}
+                </optgroup>
+              </select>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary">Save changes</button>
+          </div>
+        </div>
+      </form>
+      <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+  </div>
+  <div class="modal fade" id="modal-post-assessment" style="display: none;">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form action="{% url 'test_series:addtest_to_channel' %}" method="POST">
+          {% csrf_token %}
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">×</span></button>
+            <h4 class="modal-title">Add Post Assessment</h4>
+          </div>
+          <div class="modal-body">
+            <input type="hidden" value="" required name="survey_id" id="assessment_id">
+            <input type="hidden" value="post" required name="assessment_type" id="assessment_type">
+            <div class="form-group">
+              <label>Select Journey</label>
+              <select class="form-control select2" id="channel" name="channel" required style="width: 100%;">
+
+                <option selected="selected">Select Journey</option>
+                {% for channel in request.session.user_type|all_skill_channel %}
+                <option value="{{channel.pk}}">{{channel.title}}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div id="sub_channel_div"></div>
+            <div class="form-group">
+              <label>Select Proficiency Level</label>
+              <select class="form-control select2" id="group" name="group" required style="width: 100%;">
+
+                <option selected="selected">Select proficiency Level</option>
+
+              </select>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+            <button type="submit" id="sumbitContent" class="btn btn-primary">Save changes</button>
+          </div>
+        </form>
+      </div>
+      <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+  </div>
+</div>
+
+<div class="modal fade" id="modal-default1" style="display: none;">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form id="assessment_form">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span></button>
+          <h4 class="modal-title">Save As</h4>
+        </div>
+        <div class="modal-body">
+          <input name="assessment_id" id="test_id" type="hidden" value="" />
+          <div class="form-group">
+            <label>Assessment Name</label>
+            <input type="text" class="form-control" name="assessment" id="assessment" required>
+          </div>
+          {% comment %} <div class="form-group">
+            <input type="checkbox" class="form-check-input" name="is_lite_signup_enable" id="is_lite_signup_enable"
+              value="">
+            <label for="is_lite_signup_enable">Is lite signup enable</label>
+          </div> {% endcomment %}
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+          <button type="submit" id="sumbitAssessment" class="btn btn-primary">Save changes</button>
+        </div>
+      </form>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div>
+</div>
+{% endblock content %}
+{% block js %}
+<script src="{% static 'bower_components/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
+<script>
+
+  function getId(id) {
+    document.getElementById("test_id").value = id
+  }
+
+  function AddToChannel(id, type) {
+    if (type == "pre") {
+      document.getElementById("survey_id").value = id;
+    } else {
+      document.getElementById("assessment_id").value = id;
+    }
+  }
+
+
+  $(document).on('change', '#sub_channel', function (e) {
+    var formData = {
+      channel: $("#sub_channel").val(),
+      csrfmiddlewaretoken: "{{csrf_token}}"
+    };
+    selectChannelGroup(formData);
+  });
+
+
+  function selectChannelGroup(formData) {
+    $.ajax({
+      type: "POST",
+      url: '{% url "content:select_channel_group" %}',
+      data: formData,
+      encode: true,
+    }).done(function (data) {
+      // var obj = JSON.parse(data);
+      console.log(data);
+      data = data['data'];
+      $("#group").empty();
+      $.each(data, function (key, value) {
+        $("#group").append('<option value=' + value['id'] + '>' + value['title'] + '</option>');
+      });
+    });
+  }
+
+  $(document).ready(function () {
+
+    $("#channel").change(function () {
+      var formData = {
+        channel: $("#channel").val(),
+        csrfmiddlewaretoken: "{{csrf_token}}"
+      };
+      $.ajax({
+        type: "POST",
+        url: '{% url "content:check_sub_channel" %}',
+        data: formData,
+        encode: true,
+      }).done(function (data) {
+        // var obj = JSON.parse(data);
+        // console.log(data.length);
+        // $("#group").empty();
+        // $.each(data,function(key, value)
+        //           { 
+        //               $("#group").html('<option value=' + value['id'] + '>' + value['title'] + '</option>');
+        //           });
+
+        $("#sub_channel_div").empty();
+        if (data.SkillDevelopment) {
+
+          $("#sub_channel_div").html(' <div class="form-group"><label>Select  Skill</label><select class="form-control select2" id="sub_channel" required style="width: 100%;"><option selected="selected" value="">Select Skill</option></select></div>')
+
+          $.each(data.data, function (key, value) {
+            $("#sub_channel").append('<option value=' + value['id'] + '>' + value['title'] + '</option>');
+          });
+        } else {
+          selectChannelGroup(formData);
+        }
+      });
+
+
+      event.preventDefault();
+    });
+  });
+
+
+  $(function () {
+
+    $('#example2').DataTable({
+      "dom": '<"table-pull-left"f><"table-pull-right"l>tip',
+      'paging': true,
+      'lengthChange': true,
+      'searching': true,
+      'ordering': true,
+      'info': true,
+      'autoWidth': false,
+      'responsive': true,
+      'scrollX': true
+      //"scrollX": true
+    })
+  });
+
+
+  $(function () {
+    $("#sumbitAssessment").on('click', function (event) {
+      var id = document.getElementById('test_id').value;
+      console.log("id ", id);
+      assessment = $('#assessment').val();
+      console.log("assessment ", assessment);
+      var data = {
+        assessment_id: document.getElementById('test_id').value,
+        assessment: $('#assessment').val(),
+        csrfmiddlewaretoken: "{{csrf_token}}"
+      }
+      console.log("Data", data)
+      if (assessment) {
+        $.ajax({
+          url: "{% url 'test_series:copy_assessment' %}",
+          type: 'post',
+          data: data,
+          error: function () {
+            bootbox.alert('Something is wrong');
+          },
+          success: function (data) {
+            if (data.success) {
+              bootbox.alert(data.message);
+              window.location.reload();
+            }
+            else {
+              bootbox.alert(data.message);
+              window.location.reload();
+            }
+          }
+        });
+      }
+      else {
+        bootbox.alert("Please specify new assessment name");
+      }
+      event.preventDefault();
+    });
+  });
+</script>
+{% endblock js %}

@@ -1,0 +1,117 @@
+<div class="box">
+        <div class="box-header with-border">
+          <h3 class="box-title">Create Badge</h3>
+        </div>
+        <div class="box-body">
+                    <form @submit.prevent="onCreateBadge">
+            <div class="row">
+                    <div class="col-md-12">
+                      <div class="form-group">
+                        <label>Name</label>
+                        <input
+                          name="name"
+                          type="text"
+                          id="name"
+                          v-model="title"
+                          class="form-control"
+                          required
+                        />
+                      </div>
+                      <!-- /.form-group -->
+                      <div class="form-group">
+                        <label>Points required</label>
+                        <input
+                          name="points"
+                          type="number"
+                          id="points"
+                          v-model="points"
+                          class="form-control"
+                          required
+                        />
+                      </div>
+                      <!-- /.form-group -->
+                      <div class="form-group">
+                        <label>Badge for</label>
+                        <select class="form-control select2" name="badge_for" required style="width: 100%;" ref="badge_for">
+                          <option value="Mentor">Mentor</option>
+                          <option value="Learner">Learner</option>
+                        </select>
+                      </div>  
+                      <div class="form-group">
+                        <label>Icon</label>
+                        <input
+                        name="image"
+                        type="file"
+                        id="image"
+                        accept="image/*"
+                        @change="addImage"
+                      />
+                      </div>
+                      <!-- /.form-group -->
+                      <div class="form-group">
+                        <label>Comment</label>
+                        <textarea
+                          name="description"
+                          id="description"
+                          v-model="description"
+                          class="form-control"
+                          rows="10"
+                          cols="25"
+                          required
+                        ></textarea>
+                      </div>
+                      <!-- /.form-group -->
+                      
+                    </div>
+                    <!-- /.col -->
+                    <button type="submit" class="btn btn-primary">Create</button>
+                  </div>
+                  <!-- /.row -->
+        </form>
+        </div>
+      </div>
+      <!-- /.box -->
+<div class="box">
+        <div class="box-header">
+          <h3 class="box-title">Badge List</h3>
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body">
+          <table id="badges-table" class="table table-bordered table-hover">
+            <thead>
+             <tr>
+               <th>SNo.</th>
+               <th>Name</th>
+               <th>Badge</th>
+               <th>Points required</th>
+               <th>Description</th>
+               <th>Status</th>
+               <th>Action</th>
+             </tr>
+            </thead>
+            <tbody>
+             <tr v-for="(badge, index) in badge_list">
+               <td>[[index+1]]</td>
+               <td>[[badge.name]]</td>
+               <td><img :src="badge.image" width="100px;"/></td>
+               <td>[[badge.points_required]]</td>
+               <td>[[badge.description]]</td>
+               <td class="capitalize">[[badge.is_active]]</td>
+               <td>
+                    <div class="dropdown">
+                        <button class="btn bg-purple dropdown-toggle btn-select-option" type="button" data-toggle="dropdown" aria-expanded="true">Select an option                                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu options-dropdown">
+                            <li>
+                                <a :href="'/edit-badge/'+badge.id"><i class="fa fa-pencil option-icon"></i>Edit</a>
+                            </li>
+                        </ul>
+                    </div>
+                </td>
+             </tr>
+            </tfoot>
+          </table>
+        </div>
+        <!-- /.box-body -->
+      </div>
+  

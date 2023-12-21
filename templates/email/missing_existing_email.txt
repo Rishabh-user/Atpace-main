@@ -1,0 +1,22 @@
+{% autoescape off %}
+Hello {{user_name}},
+
+All the users from the CSV file are uploaded except some that are listed below.
+
+Users with this email already exist. 
+{{existing_email}}
+
+Users have improper data format.
+{{missign_email}}
+
+Reasons why the data row is not getting uploaded
+Incorrect country code
+Incorrect phone number or phone number already exist
+Username contains special character, capital letters or username already exist 
+
+Please correct the CSV file data rows and reupload it.
+
+Sincerely,
+The Growatpace Team
+
+{% endautoescape %}

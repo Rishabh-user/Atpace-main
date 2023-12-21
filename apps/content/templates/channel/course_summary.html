@@ -1,0 +1,240 @@
+{% extends 'base_with_empty_sidebar.html' %}
+{% load static %} 
+{% load tags %}
+
+{% block css %} 
+<style>
+
+  .glassmorphism {
+    background: rgba(255, 255, 255, 0.45);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    backdrop-filter: blur(10.5px);
+    -webkit-backdrop-filter: blur(10.5px);
+    border-radius: 30px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+  }
+
+  .table-pull-left {
+    float: left !important;
+  }
+  .table-pull-right {
+    float: right !important;
+  }
+
+  .btn-primary {
+    background-image: linear-gradient(
+      to right,
+      #1a2980 0%,
+      #26d0ce 51%,
+      #1a2980 100%
+    );
+  }
+  .btn-primary {
+    margin: 5px;
+    padding: 5px 30px;
+    text-align: center;
+    text-transform: uppercase;
+    transition: 0.5s;
+    background-size: 200% auto;
+    color: white;
+    box-shadow: 0 0 20px #eee;
+    border-radius: 10px;
+    /* display: block; */
+  }
+
+  .btn-primary:hover {
+    background-position: right center; /* change the direction of the change here */
+    color: #fff;
+    text-decoration: none;
+  }
+
+  .btn-warning {
+    background-image: linear-gradient(
+      to right,
+      #ff512f 0%,
+      #f09819 51%,
+      #ff512f 100%
+    );
+  }
+  .btn-warning {
+    margin: 5px;
+    padding: 5px 30px;
+    text-align: center;
+    text-transform: uppercase;
+    transition: 0.5s;
+    background-size: 200% auto;
+    color: white;
+    box-shadow: 0 0 20px #eee;
+    border-radius: 10px;
+    display: block;
+  }
+
+  .btn-warning:hover {
+    background-position: right center; /* change the direction of the change here */
+    color: #fff;
+    text-decoration: none;
+  }
+ 
+  @media screen and (min-width:650px) { /*hide mobile menu for desktop*/
+           .sidebar-toggle{
+    display: none;
+  }
+        }    
+        
+  .summary_content_title{
+    color: #444; 
+    font-size: 16px;
+  }
+</style>
+{% endblock %}
+{% block content %}
+  <!-- Left side column. contains the logo and sidebar -->
+  <aside class="main-sidebar " style="box-shadow: 0px 12px 7px #2329314d; background-color: white; border-radius: none;;
+  backdrop-filter: blur( 1.5px );
+  -webkit-backdrop-filter: blur( 1.5px ); border-right: 1px solid #ababab;">
+    <!-- sidebar: style can be found in sidebar.less -->
+    <section class="sidebar">
+        <img src="{{MEDIA_URL}}{{content.image}}" width="100%">
+    
+        <div style="padding: 5px;">
+        <h5>{{content}}</h5>
+       
+          <!-- <p class="justify-center">75% Complete</p> -->
+        </div>
+        <hr>
+        <ul class="sidebar-menu" data-widget="tree">
+            <li >
+                <a href="#">
+                  <i class="fa fa-file-text-o"></i> <span title="Coming Soon">Course Curriculum</span>
+                </a>
+              </li>
+            <li class="">
+    <a href="#">
+      <i class="fa fa-user"></i> <span title="Coming Soon" style="white-space: initial;">{{channel.title}}</span>
+    </a>
+  </li>
+        </ul>
+    </section>
+    </aside>
+
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <section class="content-header">
+    <a href="{% url 'user:user-dashboard' %}"><button class="btn btn-primary pull-right">Go to dashboard</button></a>
+      <h1>
+        {{content}} - Summary of Content 
+      </h1> 
+      <p></p>
+      
+      <!-- <span style="background-color: rgb(235, 230, 230); border: 1px solid black ; padding: 5px; border-radius: 10px;">Approx time needed ({{total_time}}:00)</span> -->
+      
+      
+    </section>
+    
+    <section class="content">
+        
+        <div class=" ">
+              
+                <a href="{% url 'content:read_content' pk=content.pk group=group.pk %}?page=1"><span class="btn btn-primary">Learn Mode</span></a>
+                {% if not channel.channel_type == "MentoringJourney" %}
+                <a href="{% url 'content:revice_mode' pk=content.pk group=group.pk %}"><span class="btn btn-primary" title="comingsoon"> Revise Mode</span></a>
+                {% endif %}
+                {% comment %}
+                {% if progress == 100 %}
+                  
+                  <a href="{% url 'content:revice_mode' pk=content.pk group=group.pk %}"><span class="btn btn-primary" title="comingsoon"> Revise Mode</span></a>
+                {% else %}
+                
+                  <a href=""><span class="btn btn-primary" title="First Complete Course"> Revise Mode</span></a>
+                {% endif %}
+              {% endcomment %}
+              {% if parent_check.is_community_required %}
+              <a href="{{community_url}}/space-link/{{space_id}}" target="__blank">
+                <span class="btn btn-primary "> <i class="fa fa-comment-o"></i>  Open Community </span>
+              </a>
+              {% endif %}
+            
+              <a href="{% url 'community:learning_journal' channel=parent_check.channel_id %}" >
+                <span class="btn btn-primary "> <i class="fa fa-comment-o"></i>  Learning Journal  </span>
+              </a>
+        </div>
+        <div class="row">
+          <div class="col-md-2">
+            <p>Progress Bar :- <p><p class="justify-center">{{progress}}% Complete</p>
+          </div>
+          <div class="col-md-6">
+            <div class="progress">
+              <div class="progress-bar progress-bar-striped progress-bar-animated"  role="progressbar" aria-valuenow="{{progress}}]" aria-valuemin="0" aria-valuemax="100" style="width: {{progress}}%; background-color: green;"></div>
+            </div>
+          </div>
+        </div>
+        
+        
+        <ul class="timeline timeline-inverse">
+    
+            <li class="time-label">
+                  <span class="bg-red">
+                    Time needed :-  ({{total_time}}:00 Minutes)
+                  </span>
+            </li>
+         
+            <!-- timeline item -->
+            
+            {% for data in content_data %}
+            
+            <li >
+              {% if data.status == "Complete" %}
+                <i class="fa fa-circle"></i>
+              {% elif data.status == "InProgress" %}
+                <i class="fa fa-dot-circle-o"></i>
+              {% else %}
+                <i class="fa fa-circle-o"></i>
+              {% endif %}
+
+              <div class="timeline-item" style="border-bottom: 1px solid #f3f3f3 ;" >
+                <a href="{% url 'content:read_content' pk=content.pk group=group.pk %}?page={{data.display_order}}">                   
+                   <div class="timeline-body"  style="padding-bottom: 5px;">
+                
+                    {% if data.type == "Text" %}
+                        <img src = "{% static 'images/icon/text.png' %}" width="40" style="border-radius: 30%;">
+                        <span class="summary_content_title">{{data.title}} (3:00)</span>
+                    {% elif data.type == "Image" %}
+                    <img src = "{% static 'images/icon/image.png' %}" width="40" style="border-radius: 30%;">
+                    <span class="summary_content_title">{{data.title}} (1:00)</span>
+                    {% elif data.type == "Video"  %}
+                    <img src = "{% static 'images/icon/video.png' %}" width="40" style="border-radius: 30%;">
+                    <span class="summary_content_title">{{data.title}} (5:00)</span>
+                    {% elif data.type == "YtVideo" %}
+                    <img src = "{% static 'images/icon/link.png' %}" width="40" style="border-radius: 30%;">
+                    <span class="summary_content_title">{{data.title}} (5:00)</span>
+                    {% elif data.type == "Link" %}
+                    <img src = "{% static 'images/icon/link.png' %}" width="40" style="border-radius: 30%;">
+                    <span class="summary_content_title">{{data.title}} (1:00)</span>
+                    {% elif data.type == "Quiz" %}
+                    <img src = "{% static 'images/icon/quiz.png' %}" width="40" style="border-radius: 30%;">
+                    <span class="summary_content_title">{{data.title}} (2:00)</span>
+                    {% elif data.type == "Poll" %}
+                    <img src = "{% static 'images/icon/poll.png' %}" width="40" style="border-radius: 30%;">
+                    <span class="summary_content_title">{{data.title}} (1:00)</span>
+                    {% elif data.type == "Pdf" %}
+                    <img src = "{% static 'images/icon/pdf.png' %}" width="40" style="border-radius: 30%;">
+                    <span class="summary_content_title">{{data.title}} (5:00)</span>
+                    {% elif data.type == "Activity" %}
+                    <img src = "{% static 'images/icon/pdf.png' %}" width="40" style="border-radius: 30%;">
+                    <span class="summary_content_title">{{data.title}} (10:00)</span>
+                    {% endif %}
+                   
+                </div>
+              </a>
+              </div>
+            
+            </li>
+          
+            {% endfor %}
+          
+        </ul>
+      
+    </section>
+  </div>
+
+{% endblock content %} 

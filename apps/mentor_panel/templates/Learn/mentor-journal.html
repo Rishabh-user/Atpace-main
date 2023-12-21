@@ -1,0 +1,164 @@
+<div class="nav-tabs-custom">
+<ul class="nav nav-tabs">
+    <li class="active"><a href="#tab_1" data-toggle="tab"><b>Mentee Learning Journal</b></a></li>
+    {% comment %} <li><a href="#tab_2" data-toggle="tab">Mentoring Journal</a></li> {% endcomment %}
+    <li><a href="#tab_3" data-toggle="tab"><b>Private Journal</b></a></li>
+    <li class="pull-right"><a href="/community/post-journal/"><button class="btn btn-primary">Post Journal</button></a></li>
+</ul>
+<div class="tab-content">
+    <div class="tab-pane active" id="tab_1">
+        <div v-if="learning_journal.length != 0 && loading == false">
+        <div class="box box-widget" v-for="journal in learning_journal" :key="journal.id">
+        <h4 style="padding: 10px;"><a :href="'/learning-journal-post/'+user_id+'/'+journal.id+'/'">[[journal.name]]</a>
+        </h4>
+        <div class="box-header with-border">
+            <div class="user-block">
+            <img class="img-circle" src="{{MEDIA_URL}}{{request.user.avatar}}" alt="User Image" onerror="this.onerror=null; this.src='{{request.user.avatar}}'">
+            <span class="username"><a href="#" style="color: black;">[[journal.user_name]]</a></span>
+            <span class="description">  
+                [[ journal.created_at ]]
+            </span>   
+            </div>
+            <!-- /.user-block -->
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body">
+            <!-- post text -->
+            <span v-html="journal.learning_journal">
+            [[journal.learning_journal]]
+            </span>
+
+            <!-- Social sharing buttons -->
+        <hr>
+        </div>
+        <!-- /.box-body -->
+        <div class="box-footer box-comments" v-if="journal.comment">
+
+            <div class="box-comment" v-for="(comment, index) in journal.comment" :key="comment.index" v-if="index < 2">
+            <!-- User image -->
+            <img class="img-circle img-sm" src="{{MEDIA_URL}}{{request.user.avatar}}" alt="" onerror="this.onerror=null; this.src='{{request.user.avatar}}'">
+
+            <div class="comment-text">
+                <span class="username">
+                    [[comment.user_name]]
+                    <span class="text-muted pull-right">
+                    [[comment.created_at]]
+                    </span>
+                </span><!-- /.username -->
+                <span v-html="comment.body">
+                [[comment.body]]
+                </span>
+            </div>
+            <!-- /.comment-text -->
+            </div>
+            <!-- /.box-comment -->
+        </div>
+        <!-- /.box-footer -->
+        
+        <div class="box-footer">
+            <form action="{% url 'user:journal_comment'%}" method="post">
+            {% csrf_token %}
+            <img class="img-responsive img-circle img-sm" src="{{MEDIA_URL}}{{request.user.avatar}}" alt="" onerror="this.onerror=null; this.src='{{request.user.avatar}}'">
+            <!-- .img-push is used to add margin to elements next to floating images -->
+            <div class="img-push">
+                <input type="hidden" :value="[[journal.id]]" name="learningjournal_id"/>
+                <textarea class="form-control input-sm" name="answer" placeholder="Write your comment here..."></textarea>
+            </div>
+                {% if request.session.user_type == "Admin" or request.session.user_type == "ProgramManager" %}
+                    <button disabled class="btn btn-info mgt-10">POST</button>
+                {% elif request.session.user_type == "Learner" or request.session.user_type == "Mentor" %}
+                    <button class="btn btn-info mgt-10">POST</button>
+                {% endif %}
+            </form>
+        </div>
+        <!-- /.box-footer -->
+        </div>
+        </div>
+        <div v-else-if="loading">
+        <center><b></b></center>
+        </div>
+        <div v-else>
+        <center><b>No Learning Journal</b></center>
+        </div>
+    </div>
+    <!-- /.tab-pane -->      
+    <div class="tab-pane" id="tab_3">
+    <div v-if="private_journal.length != 0 && loading == false">
+        <div class="box box-widget" v-for="journal in private_journal" :key="journal.id">
+        <a :href="'/community/edit-journal/'+user_id+'/'+journal.id+'/'" v-if="user_id == journal.user_id"><button class="btn btn-primary pull-right">Edit</button></a>
+        <h4 style="padding: 10px;"><a :href="'/learning-journal-post/'+user_id+'/'+journal.id+'/'">[[journal.name]]</a></h4>
+        <div class="box-header with-border">
+            <div class="user-block">
+            <img class="img-circle" src="{{MEDIA_URL}}{{request.user.avatar}}" alt="User Image" onerror="this.onerror=null; this.src='{{request.user.avatar}}'">
+            <span class="username"><a href="#" style="color: black;">[[journal.user_name]]</a></span>
+            <span class="description">  
+                [[ journal.created_at ]]
+            </span>   
+            </div>
+            <!-- /.user-block -->
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body">
+            <!-- post text -->
+            <span v-html="journal.learning_journal">
+                [[journal.learning_journal
+            </span>
+            <hr>
+        </div>
+        <!-- /.box-body -->
+        <div class="box-footer box-comments">
+
+            <div class="box-comment" v-for="(comment, index) in journal.comment" :key="index" v-if="index < 2">
+            <!-- User image -->
+            <img class="img-circle img-sm" src="{{MEDIA_URL}}{{request.user.avatar}}" alt="" onerror="this.onerror=null; this.src='{{request.user.avatar}}'">
+
+            <div class="comment-text">
+                <span class="username">
+                    [[comment.user_name]]
+                    <span class="text-muted pull-right">
+                    [[comment.created_at]]
+                    </span>
+                </span><!-- /.username -->
+                <span v-html="comment.body">
+                [[comment.body]]
+                </span>
+            </div>
+            <!-- /.comment-text -->
+            </div>
+            <!-- /.box-comment -->
+        </div>
+        <!-- /.box-footer -->
+        
+        <div class="box-footer">
+            <form action="{% url 'user:journal_comment'%}" method="post">
+            {% csrf_token %}
+            <img class="img-responsive img-circle img-sm" src="{{MEDIA_URL}}{{request.user.avatar}}" alt="" onerror="this.onerror=null; this.src='{{request.user.avatar}}'">
+            <!-- .img-push is used to add margin to elements next to floating images -->
+            <div class="img-push">
+                <input type="hidden" :value="journal.id" name="learningjournal_id"/>
+                <textarea class="form-control input-sm" name="answer" placeholder="Press enter to post answer"></textarea>
+            </div>
+                {% if request.session.user_type == "Admin" or request.session.user_type == "ProgramManager" %}
+                    <button disabled class="btn btn-info mgt-10">POST</button>
+                {% elif request.session.user_type == "Learner" or request.session.user_type == "Mentor" %}
+                    <button class="btn btn-info mgt-10">POST</button>
+                {% endif %}
+
+            </form>
+        </div>
+        <!-- /.box-footer -->
+        </div>
+        </div>
+        <div v-else-if="loading">
+        <center><b></b></center>
+        </div>
+        <div v-else>
+        <center><b>No Private Journal</b></center>
+        </div>
+    </div>
+
+</div>
+<!-- /.tab-content -->
+</div>
+
+

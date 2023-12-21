@@ -1,0 +1,247 @@
+{% extends 'base.html' %} {% load static %} {% block css %} {% endblock css %}
+{% block content %}
+<div class="content-wrapper">
+  <section class="content">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="box box-solid" style="border-left: 0px solid">
+          <div class="box-header with-border bg-blue">
+            <h3 class="box-title">{{goal.heading}}</h3>
+          </div>
+          <!-- /.box-header -->
+          <div class="box-body">
+            <div class="row">
+              <div class="col-md-3">
+                <dl class="dl">
+                  <dt>Category</dt>
+                  <dd>{{goal.category}}</dd>
+                </dl>
+              </div>
+              <div class="col-md-3">
+                <dl class="dl">
+                  <dt>Priority</dt>
+                  <dd>{{goal.priority_level}}</dd>
+                </dl>
+              </div>
+              <div class="col-md-3">
+                <dl class="dl">
+                  <dt>Duration</dt>
+                  <dd>{{goal.duration_number}} {{goal.duration_time}}</dd>
+                </dl>
+              </div>
+              <div class="col-md-3">
+                <dl class="dl">
+                  <dt>Due Date</dt>
+                  <dd>{{goal.complete_till.date}}</dd>
+                </dl>
+              </div>
+              <div class="col-md-6">
+                <dl class="dl">
+                  <dt>Description</dt>
+                  <dd>{{goal.description}}</dd>
+                </dl>
+              </div>
+            </div>
+          </div>
+          <!-- /.box-body -->
+        </div>
+        <!-- /.box -->
+      </div>
+      <!-- ./col -->
+      <div class="col-md-12">
+        <div class="box">
+          <div class="box-header">
+            <h3 class="box-title">Approve Request</h3>
+            <!-- /.box-header -->
+            <div class="box-body table-responsive no-padding">
+              {% if request_list %}
+              <table class="table table-hover">
+                <tr>
+                  <th>Mentee</th>
+                  <th>Action</th>
+                </tr>
+                {% for request in request_list %}
+                <tr>
+                  <td>{{request.learner}}</td>
+                  <td>
+                    <button
+                      type="button"
+                      onclick="ApproveGoal('{{request.goal_id}}','{{request.user_id}}','ApprovedByMentor')"
+                      class="btn btn-success"
+                    >
+                      Approve
+                    </button>
+                    <button
+                      type="button"
+                      onclick="ApproveGoal('{{request.goal_id}}','{{request.user_id}}','RejectedByMentor')"
+                      class="btn btn-danger"
+                    >
+                      Reject
+                    </button>
+                    {% comment %}
+                    <div class="dropdown">
+                      <button
+                        class="btn bg-purple dropdown-toggle btn-select-option"
+                        type="button"
+                        data-toggle="dropdown"
+                        aria-expanded="true"
+                      >
+                        Select an option <span class="caret"></span>
+                      </button>
+                      <ul class="dropdown-menu options-dropdown">
+                        <li>
+                          <a
+                            href=""
+                            onclick="ApproveGoal('{{learner.goal_id}}','{{learner.user_id}}','ApprovedByMentor')"
+                            ><i class="fa fa-edit option-icon"></i>Approve</a
+                          >
+                        </li>
+                        <li>
+                          <a
+                            href=""
+                            onclick="ApproveGoal('{{learner.goal_id}}','{{learner.user_id}}','RejectedByMentor')"
+                            ><i class="fa fa-edit option-icon"></i>Reject</a
+                          >
+                        </li>
+                      </ul>
+                    </div>
+                    {% endcomment %}
+                  </td>
+                </tr>
+                {% endfor %}
+              </table>
+              {% else %}
+              <center><h4>No Request</h4></center>
+              {% endif %}
+            </div>
+            <!-- /.box-body -->
+          </div>
+        </div>
+        <div class="box box-widget">
+          <h4 style="padding: 10px">Comments</h4>
+
+          <div class="box-footer box-comments">
+            {% for comment in comment %}
+            <div class="box-comment">
+              <!-- User image -->
+              <img
+                class="img-circle img-sm"
+                src="{{MEDIA_URL}}{{comment.created_by.avatar}}"
+                onerror="this.onerror=null; this.src='{{comment.created_by.avatar}}'"
+                alt="User Image"
+              />
+
+              <div class="comment-text">
+                <span class="username">
+                  {{comment.created_by.first_name}}
+                  {{comment.created_by.last_name}}
+                  <span class="text-muted pull-right">
+                    {{comment.created_at}}
+                  </span> </span
+                ><!-- /.username -->
+                {% autoescape off %} {{comment.comment}} {% endautoescape %}
+              </div>
+              <!-- /.comment-text -->
+            </div>
+            {% endfor %}
+            <!-- /.box-comment -->
+          </div>
+          <!-- /.box-body -->
+
+          <div class="box-footer">
+            <form
+              action='{% url "leaderboard:mentorship_goal_comment" %}'
+              method="post"
+            >
+              {% csrf_token %}
+              <img
+                class="img-responsive img-circle img-sm"
+                src="{{MEDIA_URL}}{{request.user.avatar}}"
+                onerror="this.onerror=null; this.src='{{request.user.avatar}}'"
+                alt="Alt Text"
+              />
+              <!-- .img-push is used to add margin to elements next to floating images -->
+              <div class="img-push">
+                <input type="hidden" value="{{goal.pk}}" name="goal_id" />
+                <input
+                  type="text"
+                  class="form-control"
+                  name="comment"
+                  placeholder="Type Comment ..."
+                  style=""
+                />
+                <button class="btn btn-info">POST</button>
+              </div>
+            </form>
+          </div>
+          <!-- /.box-footer -->
+        </div>
+        {{user_progress_chart|json_script:"user_progress_chart" }}
+
+        <div class="box box-success">
+          <div class="box-header with-border">
+            <h3 class="box-title">Learner Goal Progress</h3>
+
+            <div class="box-tools pull-right">
+              <button
+                type="button"
+                class="btn btn-box-tool"
+                data-widget="collapse"
+              >
+                <i class="fa fa-minus"></i>
+              </button>
+            </div>
+          </div>
+          <div class="box-body chart-responsive">
+            <div class="chart" id="bar-chart" style="height: 300px"></div>
+          </div>
+          <!-- /.box-body -->
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+{% endblock content %} {% block js %}
+<script>
+  $(function () {
+    const user_progress_chart = JSON.parse(
+      document.getElementById("user_progress_chart").textContent
+    );
+
+    console.log("user_progress_chart", user_progress_chart);
+    ("use strict");
+    //BAR CHART
+    var bar = new Morris.Bar({
+      element: "bar-chart",
+      resize: true,
+      data: user_progress_chart,
+      barColors: ["#0073b7"],
+      xkey: "learner",
+      ykeys: ["progress"],
+      labels: ["Progress"],
+      hideHover: "auto",
+    });
+  });
+  function ApproveGoal(goal_id, user_id, status) {
+    console.log(goal_id, user_id, status);
+    $.ajax({
+      url: "{% url 'leaderboard:approve_learner_goal' %}",
+      type: "post",
+      data: {
+        goal_id: goal_id,
+        user_id: user_id,
+        status: status,
+        csrfmiddlewaretoken: "{{csrf_token}}",
+      },
+      error: function () {
+        console.log("error");
+        // bootbox.alert("Something is wrong");
+      },
+      success: function (data) {
+        console.log("data", data);
+        location.reload();
+      },
+    });
+  }
+</script>
+{% endblock js %}

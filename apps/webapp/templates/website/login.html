@@ -1,0 +1,206 @@
+{% extends 'website/web_base.html' %} {% load static %}{% load crispy_forms_tags %}
+{% block content %}
+<main>
+
+   <!-- sign up area start -->
+   <section class="signup__area po-rel-z1 pt-100 pb-145">
+      <div class="sign__shape">
+         <img class="man-1" src="assets/img/icon/sign/man-1.png" alt="">
+         <img class="man-2" src="assets/img/icon/sign/man-2.png" alt="">
+         <img class="circle" src="assets/img/icon/sign/circle.png" alt="">
+         <img class="zigzag" src="assets/img/icon/sign/zigzag.png" alt="">
+         <img class="dot" src="assets/img/icon/sign/dot.png" alt="">
+         <img class="bg" src="assets/img/icon/sign/sign-up.png" alt="">
+      </div>
+      <div class="container">
+         <div class="row">
+            <div class="col-xxl-8 offset-xxl-2 col-xl-8 offset-xl-2">
+               <div class="section__title-wrapper text-center mb-55">
+                  <h2 class="section__title">Sign in to <br> Mentor Circle | AtPace .</h2>
+                  <p style="text-align: center;">If you don't have an account you can <a
+                        href="{% url 'user:register' %}">Register here!</a></p>
+               </div>
+            </div>
+         </div>
+         <div class="row">
+            <div class="col-xxl-6 offset-xxl-3 col-xl-6 offset-xl-3 col-lg-8 offset-lg-2">
+               <div class="sign__wrapper white-bg">
+
+                  {% include 'component/error_message.html' %}
+
+                  <div class="sign__form">
+                     <form id="singup" method="post">
+                        {% csrf_token %} {{ form|crispy }}
+                        <div class="form-group" id="div_id_company" style="display:none;">
+                           <label>Organization*</label>
+                           <select class="form-control" name="company" style="width:100%;" id="company">
+                              <option value="">---------</option>
+                           </select>
+                        </div>
+                        <br>
+                        <button class="e-btn w-100"> <span></span>Sign In</button>
+                        <div class="sign__new text-center mt-20">
+                           <a href="{% url 'user:login_otp' %}"> Login With OTP </a><br>
+                           <a href="{% url 'user:password_reset' %}"> Forgot Password </a>
+                           <p>Don't have an account? <a href="{% url 'user:register' %}" class="pull-right"> Create
+                                 Account </a></p>
+                        </div>
+                     </form>
+                  </div>
+                  <a class="btn w-100 google-signin" style="background-color:brown; color:white;"
+                     href="{% url 'user:google_login' %}"> Login with Google </a><br><br>
+                  {% comment %} <a class="btn w-100 apple-signin"
+                     style="background-color:white; color:black; border: 1px solid black;"
+                     href="{% url 'user:apple_login' %}"> Signin with Apple </a><br><br> {% endcomment %}
+                  {% comment %} <div class="social">
+                     <ul>
+                        <li class="facebook">
+                           <a class="btn w-100" style="background-color:blue; color:white;"
+                              href="{% provider_login_url 'facebook' method='js_sdk' %}">Login with Facebook</a>
+                        </li>
+                     </ul>
+                  </div> {% endcomment %}
+                  {% comment %} <div id="spinner" style="
+                           border-radius: 5px;
+                           color: white;
+                           height: 20px;
+                           text-align: center;
+                           width: 250px;">
+                     Loading
+                     <div class="fb-login-button" data-max-rows="2" data-size="large" data-button-type="continue_with"
+                        data-use-continue-as="true"></div>
+                  </div> {% endcomment %}
+               </div>
+            </div>
+         </div>
+      </div>
+      </div>
+   </section>
+   <!-- sign up area end -->
+
+</main>
+{% endblock content %}
+
+{% block js %}
+{% comment %}
+<script>
+   $(document).on('load', function () {
+      var finished_rendering = function () {
+         console.log("finished rendering plugins");
+         var spinner = document.getElementById("spinner");
+         spinner.removeAttribute("style");
+         spinner.removeChild(spinner.childNodes[0]);
+      }
+      FB.Event.subscribe('xfbml.render', finished_rendering);
+   });
+</script> {% endcomment %}
+<script>
+   $(document).ready(function () {
+      var text = "Learner"
+      $("#id_type option").filter(function () {
+         return this.text == text;
+      }).text('Learner/Mentee');
+   });
+
+   document.getElementById("id_username").onblur = function () { getCompany() };
+
+   function getCompany() {
+      var email = document.getElementById("id_username").value
+      console.log("Get Company", email);
+      $.ajax({
+         url: "{% url 'user:get_user_company' %}",
+         type: "post",
+         data: {
+            email: email,
+            csrfmiddlewaretoken: "{{csrf_token}}"
+         },
+         success: function (data) {
+            console.log(data, data.data.company.length)
+            if (data.data.success) {
+               console.log("success")
+               if (data.data.company.length >= 1) {
+                  document.getElementById("div_id_company").style.display = "block"
+               }
+               var select = document.getElementById("company");
+               var length = select.options.length;
+               for (i = length - 1; i >= 0; i--) {
+                  select.options[i] = null;
+               }
+               for (var i = 0; i < data.data.company.length; i++) {
+                  var option = document.createElement("option");
+                  option.text = data.data.company[i].name;
+                  option.value = data.data.company[i].id;
+                  select.appendChild(option);
+               }
+            }
+         },
+         error: function (error) {
+            console.log(error)
+         }
+      })
+
+   }
+</script>
+{% comment %}
+<script>
+   window.fbAsyncInit = function () {
+      FB.init({
+         appId: '423600063206280',
+         cookie: true,
+         xfbml: true,
+         version: 'v15.0'
+      });
+
+      FB.AppEvents.logPageView();
+
+   };
+
+   (function (d, s, id) {
+      var js, fjs = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) { return; }
+      js = d.createElement(s); js.id = id;
+      js.src = "https://connect.facebook.net/en_US/sdk.js";
+      fjs.parentNode.insertBefore(js, fjs);
+   }(document, 'script', 'facebook-jssdk'));
+
+   $(document).on('load', function () {
+      FB.getLoginStatus(function (response) {
+         statusChangeCallback(response);
+         console.log('statusChangeCallback');
+         console.log(response);
+         if (response.status === 'connected') {
+            testAPI();
+         } else {
+            document.getElementById('status').innerHTML = 'Please log ' +
+               'into this webpage.';
+         }
+      });
+   });
+
+   function checkLoginState() {
+      FB.getLoginStatus(function (response) {
+         statusChangeCallback(response);
+      });
+   }
+
+   function testAPI() {
+      console.log('Welcome!  Fetching your information.... ');
+      FB.api('/me', function (response) {
+         console.log('Successful login for: ' + response.name);
+         document.getElementById('status').innerHTML =
+            'Thanks for logging in, ' + response.name + '!';
+      });
+   }
+</script>
+<script>
+   const form = document.getElementById('singup');
+   console.log("SINGUP FORM", form)
+   form.addEventListener('keypress', function (e) {
+      if (e.keyCode == 13) {
+         e.preventDefault();
+         console.log("EVENT listner added")
+      }
+   })
+</script>
+{% endcomment %}
+{% endblock %}

@@ -1,0 +1,53 @@
+<div class="box">
+    <div class="box-header">
+    <h3 class="box-title">All Content</h3>
+    <a href="{% url 'content:create_content' %}"><button class="btn btn-primary pull-right">Create Content</button></a>
+    </div>
+    <!-- /.box-header -->
+    <div class="box-body">
+            <table id="microskill-table" class="table table-bordered table-hover">
+                <thead>
+                <tr>
+                <th>SNo.</th>
+                <th>Mircoskill</th>
+                <th>Icon</th>
+                <th>Status</th>
+                <th>User</th>
+                <th>Last Update</th>
+                <th>Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr v-for="(content, index) in microskill_list" :key="content.id" id={{content.pk}}>
+                <td>[[index+1]]</td>
+                <td>[[content.name]]</td>
+                <td><img :src="content.icon" width="100px"/></td>
+                <td>[[content.status]]</td>
+                <td>[[content.content_admin]]</td>
+                <td>[[content.updated_at]]</td>
+                <td>
+                    <div class="dropdown">
+                    <button class="btn bg-purple dropdown-toggle btn-select-option" type="button" data-toggle="dropdown" aria-expanded="true">Select an option                                            <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu options-dropdown">
+                        <li>
+                            <a :href="'/content/content/edit/'+content.id"><i class="fa fa-edit option-icon"></i>Edit Draft</a>
+                        </li>
+                        {% comment %} <li>
+                            <a onclick="CopyContent('{{content.pk}}')"><i class="fa fa-copy option-icon"></i>Copy Content</a>
+                        </li> {% endcomment %}
+                        {% comment %} <li>
+                        <a href="javascript:void(0)" data-toggle="modal" data-target="#modal-default" class="upload_banner"><i class="fa fa-eye option-icon"></i>Upload Banner</a>
+                    </li>
+                    {% endcomment %}
+                        <li>
+                            <a :href="'/content/'+content.id"><i class="fa fa-eye option-icon"></i>View</a>
+                        </li>
+                    </ul>
+                </div>
+                </td>
+                </tr>
+            </table>
+    </div>
+<!-- /.box-body -->
+</div>

@@ -1,0 +1,163 @@
+<div class="box">
+        <div class="box-header with-border">
+          <h3 class="box-title">Create Space</h3>
+
+        </div>
+        <div class="box-body">
+          <form @submit.prevent="onCreateSpace">
+            <div class="row">
+                    <div class="col-md-12">
+                      <div class="form-group">
+                        <label>Title</label>
+                        <input
+                          name="title"
+                          type="text"
+                          id="title"
+                          v-model="title"
+                          class="form-control"
+                          required
+                        />
+                      </div>
+                      <!-- /.form-group -->
+                      <div class="form-group">
+                        <label>Description</label>
+                        <textarea
+                          name="description"
+                          id="description"
+                          v-model="description"
+                          class="form-control"
+                          rows = "6"
+                          cols="40"
+                          required
+                        ></textarea>
+                      </div>
+                      <!-- /.form-group -->
+                      <div class="form-group">
+                        <label>Space group</label>
+                        <select class="form-control select2" name="space_group" required style="width: 100%;" ref="space_group">
+                          <option
+                            v-bind:value="space.id"
+                            v-for="space in space_group_list"
+                            :key="space.id"
+                          >
+                            [[space.name]] 
+                          </option>
+                        </select>
+                      </div>     
+                      <div class="form-group">
+                        <label>Space type</label>
+                        <select class="form-control select2" name="space_type" required style="width: 100%;" ref="space_type">
+                          <option value="Post">Post</option>
+                          <option value="Event">Event</option>
+                        </select>
+                      </div> 
+                      <div class="form-group">
+                        <label>Privacy</label>
+                        <select class="form-control select2" name="privacy" required style="width: 100%;" ref="privacy">
+                          <option value="Public">Public</option>
+                          <option value="Private">Private</option>
+                        </select>
+                      </div> 
+                      <div class="form-group">
+                        <label>Icon</label>
+                        <input
+                        name="image"
+                        type="file"
+                        id="image"
+                        accept="image/*"
+                        @change="addImage"
+                      />
+                      </div>
+                      <!-- /.form-group -->
+                       
+                      <div class="form-group">
+                        <input
+                        name="is_hidden"
+                        type="checkbox"
+                        value="true"
+                        v-model="is_hidden"
+                        checked
+                        id="is_hidden"
+                        />
+                        <label for="is_hidden" class="">Is hidden</label>
+                      </div>
+                      <!-- /.form-group -->
+                      <div class="form-group">
+                        <input
+                        name="non_members_hidden"
+                        type="checkbox"
+                        value="true"
+                        v-model="non_members_hidden"
+                        checked
+                        id="non_members_hidden"
+                      />
+                      <label for="non_members_hidden" class="">Hidden from non members</label>
+                      </div>
+                      <!-- /.form-group -->
+                      <div class="form-group">
+                        <input
+                        name="is_active"
+                        type="checkbox"
+                        value="true"
+                        v-model="is_active"
+                        checked
+                        id="is_active"
+                      />
+                      <label for="is_active" class="">Is active</label>
+                      </div>
+                      <!-- /.form-group -->
+                    </div>
+                    <!-- /.col -->
+                    <button type="submit" class="btn btn-primary">Create</button>
+                  </div>
+                  <!-- /.row -->
+        </form>
+  
+        </div>
+      </div>
+      <!-- /.box -->
+      <div class="box">
+        <div class="box-header">
+          <h3 class="box-title">Space List</h3>
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body">
+          <table id="space-table" class="table table-bordered table-hover">
+            <thead>
+             <tr>
+               <th>SNo.</th>
+               <th>Name</th>
+               <th>Description</th>
+               <th>Cover Image</th>
+               <th>Privacy</th>
+               {% comment %} <th>Active Status</th> {% endcomment %}
+               <th>Action</th>
+               
+             </tr>
+            </thead>
+            <tbody>
+             <tr v-for="(space, index) in space_list" :key="space.id">
+               <td>[[index+1]]</td>
+               <td>[[space.name]]</td>
+               <td>[[space.description]]</td>
+               <td><img :src="space.cover_image" width="100px"/></td>
+               <td>[[space.privacy]]</td>
+               {% comment %} <td class="capitalize">[[space.is_active]]</td> {% endcomment %}
+               <td>
+                <div class="dropdown">
+                    <button class="btn bg-purple dropdown-toggle btn-select-option" type="button" data-toggle="dropdown" aria-expanded="true">Select an option                                            <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu options-dropdown">
+                        <li>
+                            <a :href="'/atpace-community/edit-space/'+space.id"><i class="fa fa-edit option-icon"></i>Edit</a>
+                        </li>
+                    </ul>
+                </div>
+                </td>
+             </tr>
+            </tfoot>
+          </table>
+        </div>
+        <!-- /.box-body -->
+      </div>
+  

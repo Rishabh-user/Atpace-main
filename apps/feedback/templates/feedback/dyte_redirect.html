@@ -1,0 +1,56 @@
+{% load static %} {% load tags %}
+<!-- <script>
+    // Function to handle the redirection after meeting ends
+    function redirectToURLAfterMeetingEnd() {
+        // Replace 'meeting_id' with the actual meeting ID you receive from the backend
+        // var meetingId = 'meeting_id';
+        
+        // Construct the URL based on the meeting ID
+        var redirectURL = 'https://www.instagram.com/';
+
+        // Redirect the user to the specified URL
+        window.location.href = redirectURL;
+    }
+    // Example fetch request to your Django API endpoint handling the webhook
+    fetch("{% url 'api:dyte_webhook' %}", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        // Include the webhook payload as JSON
+        body: JSON.stringify(webhookPayload),
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log("DATA", data)
+        // Check the response from the Django API
+        if (data.status === 'success') {
+            // Call the redirection function
+            redirectToURLAfterMeetingEnd();
+        }
+    })
+    .catch(error => {
+        console.error('An error occurred:', error);
+    });
+</script> -->
+
+<script>
+    <iframe
+  src="https://growatpace.dyte.live/v2/meeting?id=bbba76e0-7636-4cfc-aff0-4ecf81292c86&authToken=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJvcmdJZCI6IjFlYTQzMGI1LTMzZjEtNGJhNS1hZjBmLTYyYTQzMzhjM2U0OSIsIm1lZXRpbmdJZCI6ImJiYmE3NmUwLTc2MzYtNGNmYy1hZmYwLTRlY2Y4MTI5MmM4NiIsInBhcnRpY2lwYW50SWQiOiJhYWFmZTkyNi0xNWZhLTRmZmEtOTkxOC0xNzdkNjI0NjA4M2YiLCJwcmVzZXRJZCI6ImFiZjg4YjE5LThjMDUtNDQwYi05YWQ1LTBkYmRhOTYyNjk4MyIsImlhdCI6MTY5MzE5ODAwMywiZXhwIjoxNzAxODM4MDAzfQ.TC8CJNCMZwKeublBsYSgYId0qTRG1D9TqR5XrlmdX6nKcxrWsqwpOsGsfsanINuvXVkHSUPegGvxje7zDOWbUBkSyeb9Q9KCh-iiQ1mJQQuzO00tPooxr69bx16ztnr_5tfcXuSrxyr5ammBmj9aV8x-mq0Tzhsq2DZrg6Sm-XvWnT10P3wky8HscHugoH7TP6wj-hHmraEl9XBzUZPBCg4ycxeTYHmPoJvb9pT-kzoqgcfX4O37js6NSQd_4ScPdeFQOLhFtJfuYfDdh115q73qGcy6rCieU0ifX1mUvgEhbJ0Ru0bsZhgdsm08Xx7KJUY5ic7pT7BVmsOXwkacHQ&showSetupScreen=true&disableVideoBackground=true&orgId=1ea430b5-33f1-4ba5-af0f-62a4338c3e49"
+  allow="camera;microphone;fullscreen;display-capture;picture-in-picture;clipboard-write;"/>
+
+  window.location.href = 'https://www.facebook.com/';
+//   // Polling function to check if the meeting has ended
+//     function checkMeetingStatus() {
+//         fetch("{% url 'api:dyte_webhook' %}")
+//         .then(response => response.json())
+//         .then(data => {
+//             if (data) {
+//                 window.location.href = 'https://www.facebook.com/';
+//             } else {
+//                 setTimeout(checkMeetingStatus, 5000);  // Check every 5 seconds
+//             }
+//         });
+//     }
+//     checkMeetingStatus();  // Start checking
+</script>

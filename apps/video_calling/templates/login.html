@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Log In</title>
+</head>
+<body>
+	<div id="container">
+	<h1 id="heading"></h1>
+
+		<form method="post" action="{% url 'login' %}">
+			{% csrf_token %}
+			{# A more "HTML" way of creating the login form#}
+			<label for="username">Username:</label>
+			<input type="text" name="username" placeholder="Username">
+		<label for="password">Password:</label>
+				<input type="password" name="password" placeholder="Password">
+		<input type="submit" name="" value="Login">
+		<p> Don't have an account <a href="{% url 'signup' %}">SignUp</a> here.</p> 
+		</form>
+	</div>
+
+	<script type="text/javascript">
+		document.getElementById('heading').innerHTML = "Enter Login Details";
+	</script>
+</body>
+</html>

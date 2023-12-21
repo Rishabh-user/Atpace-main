@@ -1,0 +1,10 @@
+
+    <input type="hidden" name="ques" id="ques" value="{{question.id}}"/>
+    <div class="form-group">
+        <label class="question_label ">{{ question.title }} {% if question.is_required is True %} * {% endif %}</label>
+        <select class="" name="ans" id="ans" style="width:500px;"  {% if question.is_required %} required {% endif %}>
+        {% for value in question.option_list %}
+        <option>{{value}}</option>
+        {% endfor %}
+        </select>
+    </div>

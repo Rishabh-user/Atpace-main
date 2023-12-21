@@ -1,0 +1,94 @@
+{% extends 'base.html' %} {% load static %}
+{% block title %} Feedback Response {% endblock %}
+{% load tags %}
+<!-- DataTables -->
+{% block css %}
+<link rel="stylesheet" href="{% static 'bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css' %}">
+{% endblock css %} 
+{% block content %}
+
+
+<div class="content-wrapper">
+  <section class="content-header">
+    <h1>
+        Feedback Response  {% include 'messages.html' %}
+    </h1> 
+    
+    <ol class="breadcrumb">
+      <li><a href="#"><i class="fa fa-dashboard"></i> Feedback Response</a></li>
+      <li><a href="#">List</a></li>
+    </ol>
+  </section>
+
+  <section class="content">
+    <div class="row">
+       <div class="col-xs-12">
+           <div class="box">
+             <div class="box-header">
+               <h3 class="box-title">Feedback Response</h3>
+             </div>
+             <!-- /.box-header -->
+             <div class="box-body">
+               <table id="example2" class="table table-bordered table-hover">
+                 <thead>
+                  <tr>
+                    <th>Id</th>
+                    <th>Template</th>
+                    <th>Template For</th>
+                    <th>Company</th>
+                    <th>Journey</th>
+                    <th>User</th>
+                    <th>Is Private</th>
+                    <th>Is name private</th>
+                    <th>View</th>
+                  </tr>
+                 </thead>
+                 <tbody>
+                  {% for response in feedback_response %}
+                  <tr>
+                    <td>{{forloop.counter }}</td>
+                    <td>{{response.feedback_template.name}}</td>
+                    <td>{{response.feedback_template.template_for}}</td>
+                    <td>{{response.feedback_template.company}}</td>
+                    <td>{{response.feedback_template.journey}}</td>
+                    <td>{{response.user.first_name}} {{response.user.last_name}}</td>
+                    <td>{{response.is_private}}</td>
+                    <td>{{response.is_name_private}}</td>
+                    <td><a href="{% url 'feedback:feedback_response_detail' template_id=response.feedback_template.id %}">View</a></td>
+                  </tr>
+                  {% endfor %}
+                 </tfoot>
+               </table>
+             </div>
+             <!-- /.box-body -->
+           </div>
+           <!-- /.box -->
+ 
+          
+         </div>
+       <!-- /.col -->
+    </div>
+    <!-- /.row -->
+ </section>
+ 
+</div>
+{% endblock content %} 
+{% block js %}
+<script src="{% static 'bower_components/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
+<script>  
+$(function () {
+ 
+  $('#example2').DataTable({
+    "dom": '<"table-pull-left"f><"table-pull-right"l>tip',
+    'paging'      : true,
+    'lengthChange': true,
+    'searching'   : true,
+    'ordering'    : true,
+    'info'        : true,
+    'autoWidth'   : true,
+    'scrollX'     : true
+  })
+})
+</script>
+{% endblock js %}

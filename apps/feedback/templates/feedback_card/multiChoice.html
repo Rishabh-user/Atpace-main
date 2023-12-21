@@ -1,0 +1,23 @@
+
+  <input type="hidden" name="ques" id="ques" value="{{question.id}}"/>
+  <div class="form-group">
+    <label class="question_label">{{ question.title }} {% if question.is_required is True %} * {% endif %}</label>
+    {% for value in question.option_list %}
+    <div class="form-check">
+      <input
+        class="form-check-input"
+        type="radio"
+        name="ans"
+        id="exampleRadios{{value}}"
+        value="{{value}}"
+        {% if question.is_required %}
+          required
+        {% endif %}
+      />
+      <label class="form-check-label" for="exampleRadios{{value}}">
+        {{value}}
+      </label>
+    </div>
+    {% endfor %}
+  </div>
+

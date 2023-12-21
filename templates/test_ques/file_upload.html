@@ -1,0 +1,11 @@
+<div class="form-group">
+    <label class="question_label">[[question.title]] <span v-if="question.is_required">*</span> </label>
+    <input
+        class="form-control"
+        type="file"
+        :name="'answer'+[[question.id]]"
+        id="file_ans"
+        ref="answerFile"
+        @change="uploadFile"
+      />
+</div>

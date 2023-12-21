@@ -1,0 +1,84 @@
+{% extends 'base.html' %} {% load static %} 
+{% block title %} Match Question {% endblock %} 
+{% block css %} 
+{% endblock css %} {% block content %}
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <h1> Match Question </h1>
+      <ol class="breadcrumb">
+        <li>
+          <a href="#"><i class="fa fa-dashboard"></i> Match</a>
+        </li>
+        <li><a href="#">Question</a></li>
+      </ol>
+    </section>
+    <section class="content">
+        <div class="box">
+          <div class="box-header with-border">
+            <h3 class="box-title">Match Question</h3>
+          </div>
+          <div class="box-body">
+              <div class="row">
+                  <div class="col-md-6 control-label">
+                    <h4><strong>Company</strong></h4>
+                    <p>{{match_config.company.name}}</p>
+                </div>
+                <div class="col-md-6 control-label">
+                    <h4><strong>Journey</strong></h4>
+                    <p>{{match_config.journey.title}}</p>
+                </div>
+            </div>
+            <hr><br>
+            {% for question in match_questions %}
+            <div class="row">
+                <div class="col-md-6 control-label">
+                    <h4><strong>Mentor Question</strong></h4>
+                    <p>{{question.mentor_ques.question}}</p>
+                </div>
+            </div><br>
+            <div class="row">
+                <div class="col-md-6 control-label">
+                    <h4><strong>Learner Question</strong></h4>
+                    <p>{{question.learner_ques.question}}</p>
+                </div>
+            </div><br>
+            <div class="row">
+                <div class="col-md-3 control-label">
+                    <h4><strong>Question Type</strong></h4>
+                    <p>{{question.question_type}}</p>
+                </div>
+                <div class="col-md-3 control-label">
+                    <h4><strong>Is Dependent</strong></h4>
+                    <p>{{question.is_dependent}}</p>
+                </div>
+            {% if question.is_dependent %}
+                <div class="col-md-3 control-label">
+                    <h4><strong>Option for Dependent Question</strong></h4>
+                    <p>{{question.dependent_option}}</p>
+                </div>                
+            {% endif %}
+            </div><br>
+            {% if question.is_dependent %}
+            <div class="row">
+                <div class="col-md-6 control-label">
+                    <h4><strong>Dependent Learner Question</strong></h4>
+                    <p>{{question.dependent_learner.question}}</p>
+                </div>
+            </div><br>
+            <div class="row">
+                <div class="col-md-6 control-label">
+                    <h4><strong>Dependent Mentor Question</strong></h4>
+                    <p>{{question.dependent_mentor.question}}</p>
+                </div>
+            </div>
+            {% endif %}
+            <hr>
+            <br>
+            <br>
+            {% endfor %}
+          </div>
+        </div>
+    </section>
+</div>
+{% endblock content %} 

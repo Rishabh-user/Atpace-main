@@ -1,0 +1,56 @@
+{% extends 'base.html' %} 
+{% block title %}Create Points{% endblock %}
+{% load crispy_forms_tags %}
+{% block content %}
+<div class="content-wrapper">
+  <!-- Content Header (Page header) -->
+  <section class="content-header">
+    <h1>
+        Create Points
+    </h1>
+    {% comment %} <ol class="breadcrumb">
+      <li><a href="#"><i class="fa fa-dashboard"></i> User Settings</a></li>
+      <li><a href="#">User</a></li>
+      <li class="active">Upload Bluk User</li>
+    </ol> {% endcomment %}
+  </section>
+
+  <!-- Main content -->
+  <section class="content">
+
+    <!-- Default box -->
+    <div class="box">
+      <div class="box-header with-border">
+        <h3 class="box-title">Create Points</h3>
+
+        <div class="box-tools pull-right">
+          <button type="button" class="btn btn-box-tool" data-widget="collapse" data-toggle="tooltip"
+                  title="Collapse">
+            <i class="fa fa-minus"></i></button>
+          <button type="button" class="btn btn-box-tool" data-widget="remove" data-toggle="tooltip" title="Remove">
+            <i class="fa fa-times"></i></button>
+        </div>
+      </div>
+      <div class="box-body">
+        
+        {% crispy form %}
+
+      </div>
+      <!-- /.box-footer-->
+    </div>
+    <!-- /.box -->
+
+  </section>
+  <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+  <script type="text/javascript" language="javascript">
+    $(document).ready(function(){
+      $('#id_label').each(function() {
+        if ($(this).val().length>0) {
+          $(this).attr('readonly','readonly');
+        }
+      });
+    });
+  </script>
+  <!-- /.content -->
+</div>
+{% endblock content %}

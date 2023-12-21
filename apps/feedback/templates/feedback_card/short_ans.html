@@ -1,0 +1,15 @@
+
+    <input type="hidden" name="ques" id="ques" value="{{question.id}}"/>
+    <div class="form-group">
+        <label class="question_label">{{question.title}} {% if question.is_required is True %} * {% endif %}</label>
+        <input
+            name="ans"
+            id="ans"
+            class="form-control"
+            {% if question.is_required %}
+            required
+            {% endif %}
+            placeholder="Type your answer here..."
+        />
+    </div>
+    <!-- /.form-group -->            

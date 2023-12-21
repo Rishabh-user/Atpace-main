@@ -1,0 +1,156 @@
+<div class="box">
+          <div class="box-header">
+            <h3 class="box-title">Event List</h3> 
+            <button data-toggle="modal" data-target="#exampleModalCenter" class="btn btn-primary pull-right" @click="showEventData()">Create Event</button>                 
+          </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+              {% include 'component/error_message.html' %}
+              <table id="event-table" class="table table-bordered table-hover">
+                 <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>URL Link</th>
+                    <th>Host</th>
+                    <th>Start time</th>                  
+                    <th>End time</th>
+                    <th>Action</th>
+                </tr>
+                 </thead>
+                 <tbody>
+                    <tr v-for="meet in event_list">
+                      <td>[[meet.title]]</td>
+                      <td>[[meet.body]]</td>
+                      <td><a :href="meet.event.event_url" target="_blank">click to enter</a></td>
+                      <td v-if="meet.event.host">[[meet.event.host.name]]</td>
+                      <td v-else></td>
+                      <td>[[meet.event.start_date]] [[meet.event.start_month]], [[meet.event.start_time]]</td>
+                      <td>[[meet.event.end_time]]</td>
+                      <td><button data-toggle="modal" data-target="#exampleModalCenter" class="btn btn-primary" @click="editEventData(meet.id)">Edit</button></td>
+                    </tr>
+                 </tfoot>
+               </table>
+             </div>
+             <!-- /.box-body -->
+           </div>
+           <!-- /.box -->
+ <!-- Modal -->
+<div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 v-if="event_location" class="md-col-11 modal-title" id="exampleModalLongTitle">Edit Event</h3>
+        <h3 v-else class="md-col-11 modal-title" id="exampleModalLongTitle">Create Event</h3>
+      </div>
+      <div class="modal-body">
+        <form>  
+          <div class="col-sm-12">
+            <div class="form-group">
+              <label>Title</label>
+              <input
+              name="title"
+              type="text"
+              required
+              class="form-control"
+              v-model="title"
+            />
+            </div>
+            <div class="form-group">
+              <label>Description</label>
+              <input
+              name="description"
+              type="text"
+              required
+              class="form-control"
+              v-model="description"
+            />
+            </div>
+            <div class="form-group">
+              <label>Start date and time</label>
+              <input
+              name="start_date"
+              type="datetime-local"
+              required
+              class="form-control"
+              v-model="start_date"
+              @blur="populateEndTime()"
+            />
+            </div>
+            <div class="form-group">
+              <label>End date and time</label>
+              <input
+              name="end_date"
+              type="datetime-local"
+              required
+              class="form-control"
+              v-model="end_date"
+            />
+            </div>
+            <div class="form-group" v-if="event_location">
+              <label>Location</label>
+              <input type="text" class="form-control" id="location" v-model="event_location" readonly>
+            </div>
+            <div class="form-group" v-else>
+              <label>Location</label>
+              <select style="width:100%;" ref="location" @change="showUrl()" class="form-control select2">
+                  <option value="Select">Select</option>
+                  <option value="URl (Zoom, YouTube Live)">URl (Zoom, YouTube Live)</option>
+                  <option value="In person">In Person</option>
+              </select>
+            </div>
+            <div class="form-group" v-if="displayUrl" id="showUrl">
+              <label>Custom URL (external links are excluded from analytics and reporting metrics)</label>
+              <input type="text" class="form-control" v-model="url" id="url">
+            </div>
+            <div class="form-group">
+              <label for="image">Background Image</label>
+              <input
+                type="file"
+                name="bg_image"
+                accept="image/*"
+                class="form-control-file"
+              />
+            </div>
+            <div class="form-group">
+              <label>Space</label>
+              <select style="width:100%;" ref="space" class="form-control select2" @change="showAttendees">
+                  <option selected="selected">Select</option>
+                  <option
+                    v-bind:value="space.id"
+                    v-for="space in space_list"
+                    :key="space.id"
+                    :selected="space.id == event_space"
+                  >
+                    [[space.title]]
+                  </option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Attendees</label>
+              <select style="width:100%;" multiple id="attendees" class="form-control select2" ref="members">
+                  <option
+                    v-bind:value="member.user_id"
+                    v-for="member in space_members_list"
+                    :key="member.id"
+                    :selected="event_attendees.includes(member.user_id)"
+                  >
+                    [[member.name]]
+                  </option>
+              </select>
+            </div>
+            <div class="form-group" v-if="displayLivestream" id="showLive">
+              <input type="checkbox" v-model="livestream" id="livestream" name="livestream">
+              <label for="livestream">Add to LiveStream</label>
+            </div>
+          </div>  
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button v-if="event_location" type="button" class="btn btn-primary" @click="onEditEvent">Save changes</button>
+        <button v-else type="button" class="btn btn-primary" @click="onCreateEvent">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,88 @@
+{% extends 'base.html' %} 
+{% load tags %} {% load static %}
+{% block title %}Review Content{% endblock %} 
+{% block css %}
+  <style>
+    .post-data{
+      margin-left:10px;
+    }
+    img.user_avatar {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        margin-top: 10px;
+    }
+    .post-user {
+      font-size: 20px;
+      margin-top: 30px;
+      margin-left: -60px;
+    }   
+    .post-description {
+      font-size: 18px;
+    }
+  </style>
+{% endblock css %}
+{% block content %}
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <h1>
+        Review Content
+        
+      </h1>
+    </section>
+  
+    <!-- Main content -->
+    <section class="content">
+      {% include 'component/error_message.html' %}
+      <!-- Default box -->
+      <div class="box">
+        <div class="box-header with-border">
+          <h3 class="box-title">{{title}}</h3>
+        </div>
+        <div class="box-body post-data">
+          <h3>{{post_title}}</h3>
+          <div class="post_by row" id="post_by">
+            <div class="col-md-2">
+              <img src="{{user_avatar}}" class="user_avatar">
+            </div>
+            <div class="col-md-10 post-user">
+            <span class="user_name">{{user_name}}</span><br>
+            <span class="post_date">{{post_created_at}}</span>
+            </div>
+          </div>
+          <div class="post-description">
+            <p>{{content|safe}}</p>
+          </div>
+        </div>
+        <div class="box-footer">
+          <h4>Inappropriate Content</h4>
+          <p>{% if inappropriate_content %}{{inappropriate_content}}{% else %} Inappropriate words for this post can not be shown. {% endif %}</p>
+        </div>
+        <!-- /.box-body-->
+      </div>
+      <!-- /.box -->
+      <div class="box">
+        <div class="box-header with-border">
+          <h3 class="box-title">Review Content</h3>
+        </div>
+        <div class="box-body">
+          <form method="post" action="{% url 'atpace_community:review_content' review_content_id=id %}" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="row">
+              <div class="col-md-12">
+                <input type="hidden" class="form-control"  name="user_id" id="user_id" value="{{user_id}}" readOnly>
+                <div class="form-group">
+                    <input class="m-check-input" type="checkbox" class="form-control"  name="post_on_community" id="post_on_community" {% if post_on_community %}checked{% endif %}>
+                    <label for="post_on_community">Post On Community </label>
+                </div>
+              </div>
+              <input type="submit" name="submit" value="Save" class="btn btn-primary" id="btnSubmit" style="margin-left:18px;">
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+    <!-- /.content -->
+  </div>
+  {% endblock content %}

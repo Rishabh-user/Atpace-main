@@ -1,0 +1,21 @@
+{% autoescape off %}
+
+Hello {{mentor_name}},
+
+Welcome to our Mentor MarketPlace Team,
+
+Please login using below credetials and complete profile assessment,
+
+Email: {{email}}
+Password: {{password}}
+
+Here is your Profile Assessment completion link, Please checkout below.
+
+{{ url }}
+
+Ignore this mail if you've already completed your Profile Assessment.
+
+Regards,
+Program Team
+
+{% endautoescape %}

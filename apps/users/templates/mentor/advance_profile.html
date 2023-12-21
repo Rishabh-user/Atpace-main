@@ -1,0 +1,692 @@
+{% extends 'base.html' %} {% load static %}
+{% block content %}
+<div class="content-wrapper" id="vue-app">
+  <!-- Content Header (Page header) -->
+  <section class="content-header">
+    <h1>
+      Marketplace Profile
+      <a :href="'/user/advance-profile-preview/'+this.user_id" v-if="advance_profile_data"><button class="btn btn-primary">Preview</button></a>
+    </h1>
+    <ol class="breadcrumb">
+      <li>
+        <a href="#"><i class="fa fa-dashboard"></i> Profile</a>
+      </li>
+      <li class="active">Marketplace Profile</li>
+    </ol>
+  </section>
+
+  <!-- Main content -->
+  <section class="content">
+    {% include 'component/error_message.html' %}
+    <!-- Default box -->
+    <div class="box">
+      <div class="box-header with-border">
+        <h3 class="box-title">Marketplace Profile (Profile will be reviewed again everytime when updated.)</h3> 
+        <button class="btn btn-info pull-right">[[marketplace_status]]</button>
+      </div>
+      <div class="box-body">
+      <form @submit.prevent="saveAdvanceProfile()"> 
+        <div class="row form-group">
+            <div class="col-md-6 col-12">
+                <label for="mentoring_types" class="control-label">Mentoring Types</label>
+                <select class="form-control select2" id='mentoring_types' style="width: 100%;" multiple>
+                    <option 
+                    v-bind:value="type.id" 
+                    v-for="(type, index) in advance_profile.mentoring_types" 
+                    :key="index"
+                    :selected="mentoring_types_data.includes(type.id)">
+                    [[type.name]]
+                    </option>
+                </select>
+            </div>
+            <div class="col-md-6 col-12">
+                <label for="target_audience" class="control-label">Target Audience</label>
+                <select class="form-control select2" name="target_audience" id='target_audience' style="width: 100%;" multiple>
+                    <option 
+                    v-bind:value="audience.id" 
+                    v-for="(audience, index) in advance_profile.target_audience" 
+                    :key="index"
+                    :selected="target_audience_data.includes(audience.id)">
+                    [[audience.name]]
+                    </option>
+                </select>
+            </div>
+        </div>
+        <div class="row form-group">
+            <div class="col-md-12 col-12">
+                <label for="" class="control-label">Mentoring Style</label>
+                <textarea class="form-control" row="3" col="4" v-model="mentoring_style" id="mentoring_style"></textarea>
+            </div>
+        </div>
+        <div class="row form-group">
+            <div class="col-md-6 col-12">
+                <label for="contact_preferences" class="control-label">Contact Preferences</label>
+                <select class="form-control select2" name="contact_preferences" id='contact_preferences' style="width: 100%;" multiple>
+                    <option 
+                    v-bind:value="preference" 
+                    v-for="(preference, index) in advance_profile.contact_preferences" 
+                    :key="index"
+                    :selected="contact_preferences_data.includes(preference)">
+                    [[preference]]
+                    </option>
+                </select>
+            </div>
+            <div class="col-md-6 col-12">
+                <label for="" class="control-label">Spoken Language</label>
+                <select class="form-control select2" name="languages" id='languages' style="width: 100%;" multiple>
+                    <option 
+                    v-bind:value="language" 
+                    v-for="(language, index) in advance_profile.languages" 
+                    :key="index"
+                    :selected="languages_data.includes(language)">
+                    [[language]]
+                    </option>
+                </select>
+            </div>
+        </div>
+        <div class="row form-group">
+            <div class="col-md-6 col-12">
+                <label for="" class="control-label">Total Experience (In years)</label>
+                <input class="form-control" type="number" id="total_experience" v-model="total_experience" required>
+            </div>
+            <div class="col-md-6 col-12">
+                <label for="" class="control-label">Partner Badge</label>
+                <input class="form-control" type="text" id="partner_badge" v-model="partner_badge">
+            </div>
+        </div>
+        <div class="row form-group">
+            <div class="col-md-6 col-12">
+                <label for="" class="control-label">Linkedln Profile</label>
+                <input class="form-control" type="text" id="linkedln" v-model="linkedln" required>
+            </div>
+            <div class="col-md-6 col-12">
+                <label for="" class="control-label">Twitter Profile</label>
+                <input class="form-control" type="text" id="twitter" v-model="twitter">
+            </div>
+        </div>
+        <div class="row form-group">
+            <div class="col-md-6 col-12">
+                <label for="" class="control-label">Instagram Profile</label>
+                <input class="form-control" type="text" id="instagram" v-model="instagram">
+            </div>
+            <div class="col-md-6 col-12">
+                <label for="" class="control-label">Facebook Profile</label>
+                <input class="form-control" type="text" id="facebook" v-model="facebook">
+            </div>
+        </div>
+        <div class="row form-group">
+            <div class="col-md-6 col-12">
+                <input class="" type="checkbox" id="is_private_contact" v-model="contact_private">
+                <label for="is_private_contact" class="control-label">Keep Contact Details Private</label>
+            </div>
+            <div class="col-md-6 col-12">
+                <input class="" type="checkbox" id="is_profile_private" v-model="profile_private">
+                <label for="is_profile_private" class="control-label">Keep Profile Private</label>
+            </div>
+            <div class="col-md-6 col-12">
+                <input class="" type="checkbox" id="publish_marketplace" v-model="publish_to_marketplace">
+                <label for="publish_marketplace" class="control-label">Publish to MarketPlace</label>
+            </div>
+        </div>
+        <div class="row form-group">
+            <span class="btn" data-toggle="modal" data-target="#modal-work-experience" @click="getExperienceData('id')" v-if="advance_profile_data">Add Work Experience</span>
+            <span class="btn" data-toggle="modal" data-target="#modal-certificate" @click="getCertificationData('id')" v-if="advance_profile_data">Add Certificate</span>
+        </div>
+        <button class="btn btn-info">Save</button>
+        </form>
+      </div>
+      <!-- /.box-footer-->
+    </div>
+    <!-- /.box -->
+    <div class="box">
+      <div class="box-header with-border">
+        <h3 class="box-title">Work Experience</h3> 
+      </div>
+      <div class="box-body">
+        <div class="row" v-for="(experience, index) in advance_profile_data.work_experience" :key="index" style="border-bottom:1px solid #bab8b6; margin:5px" :id="experience.id">
+            <div class="pull-right" style="margin-right:40px;" @click="deleteExperienceData(experience.id)"><i class="fa fa-trash" style="font-size:20px"></i></div>
+            <div class="pull-right" style="margin-right:10px;" data-toggle="modal" data-target="#modal-work-experience" @click="getExperienceData(experience.id)"><i class="fa fa-pencil" style="font-size:20px"></i></div>
+            <div class="col-md-1">
+                <img src="{% static 'images/company1.jpg' %}" width="70px" height="70px" style="margin-top:30px;">
+            </div>
+            <div class="col-md-11">
+                <h4>[[experience.designation]]</h4>
+                <h5>[[experience.company]] - [[experience.employment_type]]</h5>
+                <p>[[experience.location]]</p>
+                <p v-if="experience.currently_working == false">[[experience.start_date]] - [[experience.end_date]]</p>
+                <p v-else>[[experience.start_date]] - present</p>
+                <p>[[experience.description]]</p>
+            </div>
+        </div>
+      </div>
+      <!-- /.box-footer-->
+    </div>
+    <!-- /.box -->
+    <div class="box">
+      <div class="box-header with-border">
+        <h3 class="box-title">Certification</h3> 
+      </div>
+      <div class="box-body">
+        <div class="row" v-for="(certi, index) in advance_profile_data.certificates" :key="index" style="border-bottom:1px solid #bab8b6; margin:5px">
+            <div class="pull-right" style="margin-right:40px;" data-toggle="modal" data-target="#modal-certificate" @click="getCertificationData(certi.id)"><i class="fa fa-pencil" style="font-size:20px"></i></div>
+            <div class="col-md-1">
+                <a :href="certi.certificate" target="_blank"><img :src="certi.certificate" width="70px" height="70px" style="margin-top:30px;"/></a>
+            </div>
+            <div class="col-md-11">
+                <h4>[[certi.title]]</h4>
+                <p>[[certi.certification_level]] level</p>
+                <p v-if="is_expiration_date == true">[[certi.generated_date]] - [[certi.valid_upto]]</p>
+                <p v-else>[[certi.generated_date]]</p>
+                <p>[[certi.description]]</p>
+            </div>
+        </div>
+      </div>
+      <!-- /.box-footer-->
+    </div>
+    <!-- /.box -->
+    <div class="modal fade" id="modal-work-experience" style="display: none;" @click.self="closeWorkExperience">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form @submit.prevent="AddWorkExperience()">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span></button>
+                        <h4 class="modal-title" v-if="experience_id">Edit Work Experience</h4>
+                        <h4 class="modal-title" v-else>Create Work Experience</h4>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" v-model="experience_id" type="text" />
+                        <div class="form-group">
+                            <label>Role/Designation</label> 
+                            <input class="form-control" v-model="role" id="role" type="text" name="role" required placeholder="role"/>
+                        </div> 
+                        <div class="form-group">
+                            <label>Company</label>
+                            <input class="form-control" v-model="company" id="company" type="text" name="company" required placeholder="Company"/>
+                        </div>
+                        <div class="form-group">
+                            <label>Location</label>
+                            <input class="form-control" v-model="location" id="location" type="text" name="location" required placeholder="Location"/>
+                        </div>
+                        <div class="form-group">
+                            <label>Location Type</label>
+                            <select class="form-control select2" ref="location_type" type="text" name="location_type" style="width: 100%;">
+                                <option 
+                                v-bind:value="type" 
+                                v-for="(type, index) in advance_profile.location_types" 
+                                :key="index">
+                                [[type]]
+                                </option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Employment Type</label>
+                            <select class="form-control select2" ref="employment_type" type="text" name="employment_type" style="width: 100%;">
+                                <option 
+                                v-bind:value="type" 
+                                v-for="(type, index) in advance_profile.employment_types" 
+                                :key="index">
+                                [[type]]
+                                </option>
+                            </select>
+                        </div> 
+                        <div class="form-group">
+                            <label>Start Date</label>
+                            <input type="date" class="form-control" v-model="start_date" id="start_date" name="start_date" required/>
+                        </div> 
+                        <div class="form-group">
+                            <input value="true" type="checkbox" name="is_currently_working" id="is_currently_working" @change="triggerEndDate()" checked/>
+                            <label for="is_currently_working">Currently Working</label>
+                        </div> 
+                        <div class="form-group" id="end_date_div" style="display:none">
+                            <label>End Date</label>
+                            <input type="date" class="form-control" v-model="end_date" id="end_date"  name="end_date"/>
+                        </div> 
+                        <div class="form-group">
+                            <label>Description</label>
+                            <textarea class="form-control" v-model="work_description" id="work_description" type="file" name="work_description" required></textarea>
+                        </div> 
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default pull-left" data-dismiss="modal" @close="closeWorkExperience">Close</button>
+                        <button class="btn btn-primary">Save changes</button>
+                    </div>
+                </form>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+    <!-- /.modal-dialog -->
+    </div>
+    <!-- modal certificate -->
+    <div class="modal fade" id="modal-certificate" style="display: none;" @click.self="closeCertificate">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form @submit.prevent="AddCertification()">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span></button>
+                        <h4 class="modal-title" v-if="certificate_id">Edit Certificate</h4>
+                        <h4 class="modal-title" v-else>Create Certificate</h4>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" v-model="certificate_id" type="text" />
+                        <div class="form-group">
+                            <label>Title</label> 
+                            <input class="form-control" v-model="title" id="title" type="text" name="title" required placeholder="Title"/>
+                        </div> 
+                        <div class="form-group">
+                            <label>Certificate</label>
+                            <input class="form-control" id="certificate_img" type="file" @change="uploadImage" name="certificate_img" required/>
+                        </div>
+                        <div class="form-group">
+                            <label>Certification Level</label>
+                            <select class="form-control select2" ref="certification_level" type="text" name="certification_level" style="width: 100%;">
+                                <option 
+                                v-bind:value="type" 
+                                v-for="(type, index) in advance_profile.certification_level" 
+                                :key="index">
+                                [[type]]
+                                </option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Generated Date</label>
+                            <input type="date" class="form-control" v-model="generated_date" id="generated_date" name="generated_date" required/>
+                        </div> 
+                        <div class="form-group">
+                            <input v-model="is_expiration_date" type="checkbox" name="is_expiration_date" id="is_expiration_date"/>
+                            <label for="is_expiration_date">Is Expiration Date</label>
+                        </div> 
+                        <div class="form-group" v-show="is_expiration_date">
+                            <label>Expiration Date</label>
+                            <input type="date" class="form-control" v-model="expiration_date" id="expiration_date"  name="expiration_date"/>
+                        </div> 
+                        <div class="form-group">
+                            <label>Description</label>
+                            <textarea class="form-control" v-model="work_description" id="work_description" type="file" name="work_description" required></textarea>
+                        </div> 
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default pull-left" data-dismiss="modal" @click="closeCertificate">Close</button>
+                        <button class="btn btn-primary">Save changes</button>
+                    </div>
+                </form>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+    <!-- /.modal-dialog -->
+    </div>
+    
+
+  </section>
+  <!-- /.content -->
+  {{ request.user.id|json_script:"user_id" }}
+  {{request.session.token|json_script:"token"}}
+  {{request.session.company_id|json_script:"company_id"}}
+  {{request.session.company_name|json_script:"company_name"}}
+</div>
+{% endblock content %}
+{% block js %} 
+    <script type="text/javascript">
+    let app = new Vue({
+        el: "#vue-app",
+        delimiters: ['[[', ']]'],
+        data() {
+        return {
+            token:JSON.parse(document.getElementById('token').textContent),
+            auth:"",
+            base_url:window.location.origin,
+            user_id: JSON.parse(document.getElementById('user_id').textContent),
+            user_company_name: JSON.parse(document.getElementById('company_name').textContent),
+            user_company_id: JSON.parse(document.getElementById('company_id').textContent),
+            advance_profile: "",
+            mentoring_style:"",
+            lagnuages:"",
+            total_experience:"",
+            partner_badge:"",
+            linkedln:"",
+            twitter:"",
+            instagram:"",
+            facebook:"",
+            mentoring_types_list:[],
+            target_audience_list:[],
+            contact_preferences_list:[],
+            mentoring_types_data:[],
+            target_audience_data:[],
+            contact_preferences_data:[],
+            languages_data:"",
+            contact_private:"",
+            profile_private:"",
+            publish_to_marketplace:"",
+            languages_list:[],
+            role:"",
+            company:"",
+            location:"",
+            start_date:"",
+            end_date:"",
+            work_description:"",
+            generated_date:"",
+            expiration_date:"",
+            title:"",
+            image:"",
+            com_name:"",
+            work_experience_data:"",
+            certificate_data:"",
+            advance_profile_data:"",
+            is_expiration_date:false,
+            experience_id:"",
+            certificate_id:"",
+            "marketplace_status":"Pending"
+        };
+        },
+        mounted(){
+            this.showAdvanceProfile();
+        },
+        methods: {
+            axiosGetRequest: function(url){
+            this.auth = "Token "+this.token;
+            var config = {
+            method: "get",
+            url: url,
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': this.auth,
+            },
+            };
+            return axios(config)
+            },
+            axiosPostRequest: function(url, data){
+                this.auth = "Token "+this.token;
+                var config = {
+                method: "post",
+                url: url,
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                    "Accept": "application/json",
+                    'Authorization': this.auth,
+                },
+                data:data
+                };
+                return axios(config)
+            },
+            uploadImage(event) {
+                if(event.target.files[0]["size"] > 999999){
+                    bootbox.alert("File size too big add upto 1 MB file size only");
+                }
+                else{
+                    this.image = event.target.files[0];
+                }
+            },
+            closeCertificate(){
+                console.log("modal closed")
+                this.title = this.image = this.generated_date = this.is_expiration_date = this.work_description = "" 
+                this.$refs.certification_level.value = null
+            },
+            closeWorkExperience(){
+                console.log("modal closed")
+                this.role = this.company = this.location = this.start_date = this.is_currently_working = this.end_date = this.work_description = "" 
+                this.$refs.location_type.value = null
+                this.$refs.employment_type.value = null
+            },
+            async showAdvanceProfile(){
+                var url =  this.base_url+"/mentor/profile-constant-data/?mentoring_types='mentoring_types'&target_audience='target_audience'&contact_preferences='contact_preferences'&languages='languages'";
+                response1 = await this.axiosGetRequest(url);
+                console.log("Advance profile constants", response1.data)
+                this.advance_profile = response1.data
+                var url2 =  this.base_url+"/mentor/mentor-advance-profile/"+this.user_id;
+                response = await this.axiosGetRequest(url2);
+                console.log("Advance profile data",response.data)
+                if(response.data.data.mentoring_style){
+                    this.advance_profile_data = response.data.data
+                    this.mentoring_style = response.data.data.mentoring_style
+                    this.total_experience = response.data.data.total_experience
+                    this.partner_badge = response.data.data.partner_badge
+                    this.twitter = response.data.data.twitter_profile
+                    this.facebook = response.data.data.facebook_profile
+                    this.instagram = response.data.data.instagram_profile
+                    this.linkedln = response.data.data.linkedin_profile
+                    for(let i=0; i<response.data.data.mentoring_types.length; i++){
+                        this.mentoring_types_data.push(response.data.data.mentoring_types[i].id)
+                    }
+                    for(let i=0; i<response.data.data.target_audience.length; i++){
+                        this.target_audience_data.push(response.data.data.target_audience[i].id)
+                    }
+                    this.languages_data = response.data.data.languages
+                    this.contact_preferences_data = response.data.data.contact_preferences
+                    this.publish_to_marketplace = response.data.data.mentor_publish_on_marketplace
+                    this.profile_private = response.data.data.private_profile
+                    this.contact_private = response.data.data.keep_contact_details_private
+                    this.marketplace_status = response.data.data.marketplace_status
+                }
+            },
+            triggerEndDate(){
+                if (document.getElementById("is_currently_working").checked){
+                    document.getElementById("end_date_div").style.display = "none"
+                }
+                else{
+                    document.getElementById("end_date_div").style.display = "block"
+                }
+            },
+            async saveAdvanceProfile(){
+                for (let option of document.getElementById('mentoring_types').options)
+                {
+                    if (option.selected) {
+                        this.mentoring_types_list.push(option.value);
+                    }
+                }
+                for (let option of document.getElementById('target_audience').options)
+                {
+                    if (option.selected) {
+                        this.target_audience_list.push(option.value);
+                    }
+                }
+                for (let option of document.getElementById('contact_preferences').options)
+                {
+                    if (option.selected) {
+                        this.contact_preferences_list.push(option.value);
+                    }
+                }
+                for (let option of document.getElementById('languages').options)
+                {
+                    if (option.selected) {
+                        this.languages_list.push(option.value);
+                    }
+                }
+                var data = new FormData();
+                console.log("this.mentoring_types_list", this.mentoring_types_list)
+                data.append("mentoring_types", this.mentoring_types_list);
+                data.append("target_audience", this.target_audience_list);
+                data.append("mentoring_style", this.mentoring_style);
+                data.append("contact_preferences", this.contact_preferences_list);
+                data.append("languages", this.languages_list)
+                data.append("total_experience", this.total_experience)
+                data.append("partner_badge", this.user_company_id)
+                data.append("linkedin_profile", this.linkedln)
+                data.append("instagram_profile", this.instagram)
+                data.append("twitter_profile", this.twitter)
+                data.append("facebook_profile", this.facebook)
+                contact_details_private = false
+                if(this.contact_private){
+                    contact_details_private = true
+                }
+                data.append("keep_contact_details_private", contact_details_private)
+                is_private_profile = false
+                if(this.profile_private){
+                    is_private_profile = true
+                }
+                data.append("private_profile", is_private_profile)
+                publish_marketplace = false
+                if(this.publish_to_marketplace){
+                    publish_marketplace = true
+                }
+                data.append("publish_to_marketplace", publish_marketplace)
+                if(this.mentoring_types_list == ""){
+                    bootbox.alert("Please choose mentoring types.")
+                    return false
+                }
+                if(this.target_audience_list == ""){
+                    bootbox.alert("Please choose target audience.")
+                    return false
+                }
+                if(this.mentoring_style == ""){
+                    bootbox.alert("Please enter mentoring style.")
+                    return false
+                }
+                if(this.contact_preferences_list == ""){
+                    bootbox.alert("Please choose contact preferences.")
+                    return false
+                }
+                if(this.languages_list == ""){
+                    bootbox.alert("Please choose spoken language.")
+                    return false
+                }
+                else{
+                    var url =  this.base_url+"/mentor/mentor-advance-profile/" + this.user_id + "/"
+                    response = await this.axiosPostRequest(url, data);
+                    console.log("Create Advance Profile Response", response.data);
+                    bootbox.alert("Marketplace Profile updated successfully!");
+                    this.showAdvanceProfile();
+                }
+            },
+            async AddWorkExperience(){
+                var data = new FormData();
+                data.append("designation", this.role)
+                data.append("company", this.company)
+                data.append("location", this.location)
+                data.append("start_date", this.start_date)
+                if(!document.getElementById("is_currently_working").checked){
+                    if(this.end_date){
+                        data.append("end_date", this.end_date)
+                    }
+                    else{
+                        bootbox.alert("End Date is required!")
+                    }
+                }
+                data.append("description", this.work_description)
+                data.append("currently_working", document.getElementById("is_currently_working").checked)
+                data.append("location_type", this.$refs.location_type.value)
+                data.append("employment_type", this.$refs.employment_type.value)
+
+                var url =  this.base_url+"/mentor/post-mentor-work-experience/" + this.user_id + "/"
+                var message = "Work Experience Created Successfully!" 
+                if(this.experience_id){
+                    url =  this.base_url+"/mentor/get-mentor-work-experience/" + this.user_id + "/" + this.experience_id + "/"
+                    message = "Work Experience Updated Successfully!"
+                }
+                response = await this.axiosPostRequest(url, data);
+                console.log("Create Work Experience Response", response.data);
+                bootbox.alert(message);
+                $('#modal-work-experience').modal('hide');
+                this.showAdvanceProfile();
+            },
+            async getExperienceData(id){
+                this.experience_id = ""
+                var url =  this.base_url+"/mentor/profile-constant-data/?location_types='location_types'&employment_types='employment_types'";
+                response = await this.axiosGetRequest(url);
+                console.log("advance profile constants", response.data)
+                this.advance_profile = response.data
+
+                if(id != 'id'){
+                    var url =  this.base_url+"/mentor/get-mentor-work-experience/"+this.user_id+"/"+id;
+                    response = await this.axiosGetRequest(url);
+                    console.log("Get Work Experience", response.data)
+                    this.experience_id = response.data.data.id
+                    this.role = response.data.data.designation
+                    this.company = response.data.data.company
+                    this.location = response.data.data.location
+                    this.start_date = response.data.data.start_date
+                    this.is_currently_working = response.data.data.currently_working
+                    this.end_date = response.data.data.end_date
+                    this.work_description = response.data.data.description
+                    this.$refs.location_type.value = response.data.data.location_type
+                    this.$refs.employment_type.value = response.data.data.employment_type
+                }
+            },
+            async deleteExperienceData(experience_id){
+                var mentor_id = this.user_id;
+                var token = this.token;
+
+                bootbox.confirm({
+                    message: "Do you want to delete this work experience?",
+                    buttons: {
+                        confirm: {
+                            label: 'Yes',
+                            className: 'btn-success'
+                        },
+                        cancel: {
+                            label: 'No',
+                            className: 'btn-danger'
+                        }
+                    },
+                    callback: function (result) {
+                        if(result == true){
+                            $.ajax({
+                                url: "/mentor/get-mentor-work-experience/" + mentor_id + "/" + experience_id + "/",
+                                type: 'DELETE',
+                                processData: false,
+                                contentType: false,
+                                headers: {
+                                    'Authorization': "Token "+token,
+                                },
+                                error: function(error) {
+                                    console.log("error", error)
+                                    bootbox.alert('Something is wrong');
+                                },
+                                success: function(data) {
+                                    console.log("response", data)
+                                    bootbox.alert("Work experience deleted successfully!")
+                                    document.getElementById(experience_id).remove()
+                                }
+                                });
+                        }
+                    }
+                })
+            },
+            async AddCertification(){
+                var data = new FormData();
+                data.append("title", this.title)
+                data.append("certification_level", this.$refs.certification_level.value)
+                data.append("certificate", this.image)
+                data.append("generated_date", this.generated_date)
+                if(document.getElementById("is_expiration_date").checked){
+                    data.append("valid_upto", this.expiration_date)
+                }
+                data.append("description", this.work_description)
+                data.append("is_expiration_date", document.getElementById("is_expiration_date").checked)
+
+                var url =  this.base_url+"/mentor/post-mentor-certificate/" + this.user_id + "/"
+                var message = "Certificate Created Successfully!"
+                if(this.certificate_id){
+                    url =  this.base_url+"/mentor/get-mentor-certificate/" + this.user_id + "/" + this.certificate_id + "/"
+                    message = "Certficate Updated Successfully!"
+                }
+                response = await this.axiosPostRequest(url, data);
+                console.log("Create Certificate Response", response.data);
+                bootbox.alert(message);
+                $('#modal-certificate').modal('hide');
+                this.showAdvanceProfile();
+            },
+            async getCertificationData(id){
+                this.certificate_id = ""
+                var url =  this.base_url+"/mentor/profile-constant-data/?certification_level='certification_level'";
+                response = await this.axiosGetRequest(url);
+                console.log("advance profile constants", response.data)
+                this.advance_profile = response.data
+
+                if(id != 'id'){
+                    var url =  this.base_url+"/mentor/get-mentor-certificate/"+this.user_id+"/"+id;
+                    response = await this.axiosGetRequest(url);
+                    console.log("Get Certificate", response.data)
+                    this.certificate_id = response.data.data.id
+                    this.title = response.data.data.title
+                    this.generated_date = response.data.data.generated_date
+                    this.is_expiration_date = response.data.data.is_expiration_date
+                    this.expiration_date = response.data.data.valid_upto
+                    this.work_description = response.data.data.description
+                    this.$refs.certification_level.value = response.data.data.certification_level
+                }
+            }
+        }
+    });
+    </script>
+{% endblock js %} 

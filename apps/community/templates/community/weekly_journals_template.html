@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% load static %} {% load tags %} {% load crispy_forms_tags %}
+{% block css %} 
+  
+
+ 
+   {% endblock %}
+{% block sidebar %}
+<aside
+class="main-sidebar"
+style="
+  box-shadow: 0px 12px 7px #2329314d;
+  background-color: white;
+  border-radius: none;
+  backdrop-filter: blur(1.5px);
+  -webkit-backdrop-filter: blur(1.5px);
+  border-right: 1px solid #ababab;
+"
+>
+<!-- sidebar: style can be found in sidebar.less -->
+<section class="sidebar" style="background-color: #fff">
+  <ul class="sidebar-menu" data-widget="tree">
+    {% for data in content_data %}
+
+    {% endfor %}
+  </ul>
+</section>
+</aside>
+{% endblock sidebar %}
+{% block content %}
+      <!-- Content Wrapper. Contains page content -->
+      <div class="content-wrapper">
+        <section class="content-header">
+          <h1>Learning Journal Templates</h1>
+          <p></p>
+        </section>
+
+        <section class="content">
+          
+            <!-- Default box -->
+            <div class="box">
+              
+              <div class="box-header with-border">
+                <h3 class="box-title">Create Templates
+                  
+      
+                </h3>
+                
+               
+              </div>
+              <div class="box-body">
+                
+                {% crispy form %}
+              </div>
+              <!-- /.box-footer-->
+            </div>
+            <!-- /.box -->
+        
+          </section>
+      </div>
+{% endblock content %} 
+{% block js %}
+<script>
+  $(function () {
+    // Replace the <textarea id="editor1"> with a CKEditor
+    //bootstrap WYSIHTML5 - text editor
+    $('.textarea').wysihtml5({
+      toolbar: {
+    "font-styles": true, // Font styling, e.g. h1, h2, etc.
+    "emphasis": true, // Italics, bold, etc.
+    "lists": true, // (Un)ordered lists, e.g. Bullets, Numbers.
+    "html": false, // Button which allows you to edit the generated HTML.
+    "link": false, // Button to insert a link.
+    "image": false, // Button to insert an image.
+    "color": false, // Button to change color of font
+    "blockquote": true, // Blockquote
+
+  }
+    })
+  })
+  </script>
+{% endblock %}
+  </body>
+</html>

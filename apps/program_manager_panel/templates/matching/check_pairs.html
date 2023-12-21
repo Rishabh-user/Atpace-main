@@ -1,0 +1,32 @@
+<div class="row" style="margin-top: 30px">
+  <div class="col-md-2">
+    <div class="card side-tab" style="">
+      <ul class="list-group list-group-flush">
+        <li
+          class="list-group-item"
+          @click="showAllMenteesMentors"
+          id="all-mentees-mentors"
+        >
+          All
+        </li>
+        <li class="list-group-item" @click="showAllMentees" id="all-mentees">
+          Mentees
+        </li>
+        <li class="list-group-item" @click="showAllMentors" id="all-mentors">
+          Mentors
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div class="col-md-10">
+      <div v-if="displayMentee">
+        {% include 'matching/mentee_list.html' %}
+      </div>
+      <div v-if="displayMentor">
+        {% include 'matching/mentor_list.html' %}
+      </div>
+      <div v-if="displayMentorMentee">
+        {% include 'matching/mentor_mentee_list.html' %}
+      </div>
+    </div>
+</div>

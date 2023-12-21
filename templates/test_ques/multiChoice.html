@@ -1,0 +1,15 @@
+<div class="form-group">
+    <label class="question_label">[[question.title]] <span v-if="question.is_required">*</span> </label>
+    <div class="form-check" v-for="option in question.options" :key="option">
+      <input
+        class="form-check-input"
+        type="radio"
+        :name="'answer'+[[question.id]]"
+        :id="'exampleRadios1'+[[option]]"
+        :value="option"
+      />
+      <label class="form-check-label" :for="'exampleRadios1'+[[option]]">
+        [[option]]
+      </label>
+    </div> 
+</div>

@@ -1,0 +1,364 @@
+{% extends 'website/web_base.html' %} 
+{% load static %}
+{% load crispy_forms_tags %}  
+{% load tags %}
+{% block content %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.15/css/intlTelInput.css">
+      <main>
+
+         <!-- sign up area start -->
+         <section class="signup__area po-rel-z1 pt-100 pb-145">
+            <div class="page__title-shape">
+                <img class="page-title-shape-5 d-none d-sm-block"
+                    src="{% static 'website/img/page-title/page-title-shape-1.png' %}" alt="">
+                <img class="page-title-shape-6" src="{% static 'website/img/page-title/page-title-shape-6.png' %}" alt="">
+                <img class="page-title-shape-7" src="{% static 'website/img/page-title/page-title-shape-4.png' %}" alt="">
+            </div>
+            <div class="container">
+                {% for data in ordering %}
+            <div class="row">
+                <div class="col-xxl-12 col-xl-12 col-lg-12">
+                    <div class="course__wrapper">
+                        <div class="page__title-content mb-25">
+
+                            <span class="page__title-pre">Create a free  Account</span>
+                            <h5 class="page__title-3">{{content_setup.journey.title}}</h5>
+                        </div>
+
+                        {% if content_setup.journey.image %}
+                        <div class="course__img w-img mb-30">
+                            <img src="{{MEDIA_URL}}{{content_setup.journey.image}}" alt="">
+                        </div>
+                        {% endif %}
+                        {% if data.type == "video_url" %}
+                        <div style="text-align:center">
+                            <iframe width="520" height="315" allowfullscreen
+                                src="{{data.data}}">
+                            </iframe>
+                        </div>
+                        {% endif %}
+                        {% if data.type == "cta_button_title" %}
+                        <div style="text-align:center">
+                         <a href="{{data.data}}" target="_blank"> <button type="button" class="btn btn-primary" id="" >{{data.cta_button_title}}</button></a>
+                        </div>
+                        {% endif %}
+
+                        
+                    </div>
+                </div>
+                 <div class="course__tab-content mb-95">
+                      <div class="tab-content" id="courseTabContent">
+                         <div class="tab-pane fade show active" id="description" role="tabpanel" aria-labelledby="description-tab">
+                            <div class="course__description">
+                                {% if content_setup.journey.description|length > 0 %}
+                                <h3>{% if data.type == "overview" %} {{ data.data }}{% endif %}</h3>
+                               <p>{{content_setup.journey.description|safe}}</p>
+                               {% endif %}
+
+                               {% if content_setup.journey.tags|length > 0 %}
+                               <div class="course__tag-2 mb-35 mt-35">
+                                  <i class="fal fa-tag"></i>
+                                  {{content_setup.journey.tags}}
+                                  <!-- <a href="#">Big data,</a>
+                                  <a href="#">Data analysis,</a>
+                                  <a href="#">Data modeling</a> -->
+                               </div>
+                               {% endif %}
+                               {% if content_setup.journey.what_we_learn|length > 0 %}
+                               <div class="course__description-list mb-45">
+                                  <h4>{% if data.type == "learn_label" %} {{ data.data }}{% endif %} </h4>
+                                  <ul>
+                                     
+                                  {% with content_setup.journey.what_we_learn|split:"," as what_we_learn_list %}
+                                  
+                                    {% for learn in what_we_learn_list %}
+                                  
+                                    <li>{{learn|safe}}</li>
+                                    {% endfor %}
+                                 {% endwith %}
+                                  </ul>
+                               </div>
+                               {% endif %}
+                               {% if data.type == "pdpa_label" and data.data|length > 0 %}
+                                <div class="course__description-list mb-45">
+                                  <h4>{{data.data}}</h4>
+                                  {% if data.type == "pdpa_description" %}{{data.data|safe}}{% endif %}
+                                </div>
+                                {% endif %}
+                               <div class="col-xxl-8 offset-xxl-2 col-xl-8 offset-xl-2 col-lg-8 offset-lg-2">
+                                    <div class="sign__wrapper white-bg">
+                                        {% include 'component/messages.html' %}
+                                        <div class="sign__form"> {{data.data}}
+                                        <form  id="singup" method="POST" action="{% url 'user:signup-lite' journey_id=content_setup.journey.id  %}">
+                                            {% csrf_token %}
+                                    
+                                            <div class="row">
+                                                <div class="form-group col-12">
+                                            <label>User Type </label>
+                                                <select class="form-control" name="type" hx-get="{% url 'user:assessment_question' journey=content_setup.journey.id  %}" hx-target="#assessment_question"  hx-trigger="change"  required style="width: 100%;">
+                                                <option value="" selected disabled>Select</option>
+                                                    <option value="Learner" {% if data.user_type == "Learner"  %} selected {% endif %}>Learner/Mentee</option>
+                                                    <option value="Mentor" {% if data.user_type == "Mentor"  %} selected {% endif %}>Mentor</option>
+                                                
+                                                </select>
+                                            </div>
+                                            <div class="form-group col-12">
+                                                <div class="row">
+                                                    <div class="form-group col-12">
+                                                        <label>Enter Email *</label>
+                                                        <input type="email"  placeholder="Email" value="{{data.email}}" required class="form-control" {% if "/edit-signup-lite/" in request.path %}readonly{% endif %} name="email" id="email" onblur="check_signup_user('{{content_setup.journey.id}}')">
+                                                    </div>
+                                            </div>
+                                            <div class="row">
+                                                <label>Enter Name *</label>
+                                                
+                                                    <input type="text" placeholder="Name" value="{{data.name}}" required {% if "/edit-signup-lite/" in request.path %}readonly{% endif %} class="form-control" name="name" id="name">
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="form-group col-12">
+                                                <label>Enter Phone Number *</label>
+                                                <br>
+                                                    <input type="text" placeholder="Mobile" style="width: 100%;" value="{{data.mobile}}" required class="form-control" {% if "/edit-signup-lite/" in request.path %}readonly{% endif %} name="mobile" id="phone" onblur="check_phone('{{content_setup.journey.id}}')">
+                                                </div>
+                                            </div>
+                                        <div class="row">
+                                            <div class="form-group col-12">
+                                                <label>Enter Username *</label>
+                                            
+                                                <input type="text" placeholder="Username"  required class="form-control" value="{{data.username}}" {% if "/edit-signup-lite/" in request.path %}readonly{% endif %} name="username" id="username">
+                                                <span class="help-block username-help">The username should only contain all small letters and at least one special character</span>
+                                            </div>
+                                        </div>
+                                        
+                                            
+                                         <div id="assessment_question">
+                                            {% for profile_assest in question_list %}
+                                            <div class="form-group col-12">
+                                                <label>{{profile_assest.question}}</label>
+                                                <input type="hidden" name="question[]" value="{{profile_assest.question_id}}">
+                                            </div>
+                                            <div class="form-group col-12">
+                                                {% if profile_assest.question_type ==  "Options" %}
+                                                <select class="form-control" name="response[]">
+                                                    <option selected hidden value="">Selected</option>
+                                                    {% for options in profile_assest.options %}    
+                                                    {% comment %} <option selected>{{profile_assest.response}}</option> {% endcomment %}
+                                                    <option {% if profile_assest.response == options %}selected{% endif %}>{{options}}</option>
+                                                    {% endfor %}
+                                                </select>
+                                                {% else %}
+                                                <textarea class="form-control" placeholder="Enter Your Answer" name="response[]">{{profile_assest.response}}</textarea>
+                                                {% endif %}
+                                            </div>
+                                            {% endfor %}
+                                                                                {% include 'partials/assessment_question_list.html' %}
+                                        </div>
+                                        <div class="row">
+                               <div class="form-group col-12">
+                                 <label>Enter Coupon Code </label>
+                                   <input type="text" placeholder="Coupon Code" required class="form-control" name="coupon_code" value="{{data.coupon_code}}" id="coupon_code" onblur="check_coupon_code('{{content_setup.journey.id}}')">
+                               </div>
+                           </div>
+                                        <div class="row">
+                                            
+                                            <div class="sign__action d-flex justify-content-between">
+                                                <div class="sign__agree d-flex align-items-center">
+                                                    <input class="m-check-input" type="checkbox" required class="form-control" id="m-agree" name="term_and_conditions">
+                                                    <label class="m-check-label" for="m-agree">I agree to the <a target="_blank" href="{% static 'website/files/Terms_of_Use(EULA)_GROWATPACE.pdf' %}"> Terms &amp; Conditions</a>
+                                                    </label>
+                                                    </div>
+                                                </div>
+                                                <div class="sign__action d-flex justify-content-between">
+                                                    <div class="sign__agree d-flex align-items-center">
+                                                    <input class="m-check-input" type="checkbox" class="form-control" id="m-enable" name="is_whatsapp_enable">
+                                                    <label class="m-check-label" for="m-enable">I have OR will create a WhatsApp account for updates</label>
+                                                        </label>
+                                                    </div>
+                                                    </div>
+                                                     <div class="sign__action d-flex justify-content-between">
+                                                    <div class="sign__agree d-flex align-items-center">
+                                                    <input class="m-check-input" type="checkbox" class="form-control" id="m-pdpa" name="pdpa_statement">
+                                                    <label class="m-check-label" for="m-pdpa">PDPA Statement</label>
+                                                        </label>
+                                                    </div>
+                                                    </div>
+                                        </div></div>
+                                        <br>
+                                            <button type="submit" class="e-btn" id="btnSubmit preview_btn"> <span></span>Preview</button>
+                                            <a href="{% url 'user:signup-lite' journey_id=content_setup.journey.id  %}"> <button type="button" class="e-btn  " > <span></span> Reset</button></a>
+                                            <div class="sign__new text-center mt-20">
+                                                <p>Already have Account ? <a href="{% url 'user:login' %}"> Sign In</a></p>
+                                            </div>
+                                        </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                         </div>
+                         
+                        
+                       </div>
+                   </div>
+
+            </div>
+            {% endfor %}
+        </div>
+        
+         </section>
+         <!-- sign up area end -->
+         
+      </main>
+
+{% endblock content %}
+  
+{% block js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.15/js/intlTelInput.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/htmx/1.7.0/htmx.min.js" integrity="sha512-etqA0KankuxrlSeZDYycQBY/D/KWZn0YZjlsjAo7kCEBTy1gg+DwmR6icxtOpqDBOzm2P00/lSIXEu7K+zvNsg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script>
+// Vanilla Javascript
+var input = document.querySelector("#phone");
+window.intlTelInput(input,({
+  // options here
+}));
+
+$(document).ready(function() {
+    $('.iti__flag-container').click(function() { 
+      var countryCode = $('.iti__selected-flag').attr('title');
+      var countryCode = countryCode.replace(/[^0-9]/g,'')
+      $('#phone').val("");
+      $('#phone').val("+"+countryCode+" "+ $('#phone').val());
+   });
+});
+
+</script>
+<script>
+$(document).ready(function(){
+var text = "Learner"
+$("#id_type option").filter(function() {
+return this.text == text; 
+}).text('Learner/Mentee');
+});
+</script>
+<script>
+//   $(document).ready(function(){
+//      $('#phone').on('change', function(){
+//         if ($(this).length() <7){
+//            alert("Please enter valid mobile number!");
+//         }
+//      })
+//   });
+
+   function check_signup_user(journey_id) {
+    console.log("journey_id ", journey_id)
+    if ($("#email").val() != "") {
+        value = $("#email").val();
+    }
+    $.ajax({
+        url: "{% url 'user:check_user' %}",
+        type: "post",
+        data: {
+            email: value,
+            journey_id: journey_id,
+            csrfmiddlewaretoken: "{{csrf_token}}"
+        },
+        error: function () {
+            console.log("Something is wrong");
+        },
+        success: function (data) {
+            console.log("user details data", data);
+            if (data.success == true){
+                if (data.is_active == true){
+                    name = data.first_name+" "+data.last_name;
+                    document.getElementById("name").value = name;
+                    document.getElementById("email").value = data.email;
+                    if(data.mobile != 'None' && data.mobile.length>7){
+                        document.getElementById("phone").value = data.mobile;
+                        $("#phone").attr('readonly','readonly');
+                    } else {
+                        $("#phone").removeAttr('readonly');
+                    }
+                    if(data.username == '') {
+                        $("#username").removeAttr('readonly');
+                    } else {
+                        document.getElementById("username").value = data.username;          
+                        $("#username").attr('readonly','readonly');
+                        $('.username-help').hide()
+                    }
+                    document.getElementById("coupon_code").value = data.coupon_code;
+                } else {
+                    alert("Your account is Inactive, Please email us on info@growatpace.com to re-activate the account.");
+                    document.getElementById("email").value = '';
+                }
+            } else {
+                document.getElementById("name").value = '';
+                document.getElementById("coupon_code").value = '';
+                document.getElementById("username").value = '';
+                $("#username").removeAttr('readonly');
+                $('.username-help').show()          
+                document.getElementById("phone").value = '';
+                $("#phone").removeAttr('readonly');
+            } 
+        },
+    });
+}
+    function check_coupon_code(journey_id) {
+        if ($("#coupon_code").val() != '') {
+            value = $("#coupon_code").val()
+            console.log(journey_id, value)
+            $.ajax({
+            url: "{% url 'user:check_coupon' %}",
+            type: "post",
+            data: {
+                coupon_code: value,
+                journey_id: journey_id,
+                csrfmiddlewaretoken: "{{csrf_token}}"
+            },
+            error: function () {
+                console.log("Something is wrong");
+            },
+            success: function (data) {
+                if (!data.success) {
+                    alert("The Coupon Code is invalid for this journey!");
+                    document.getElementById("coupon_code").value = '{{data.coupon_code}}'
+                }
+            }
+        })
+    }
+}
+    function check_phone(journey_id) {
+        const element = document.getElementById('phone');
+        value = $('#phone').val()
+        console.log("readOnly ",element.readOnly);    
+        if ($('#phone').val().length<7) {
+            alert("Please enter valid mobile number!");
+            document.getElementById("phone").value = '';
+        }
+        if (element.readOnly) {
+            if ($('#phone').val().length<7) {
+                alert("Please enter valid mobile number!");
+                $("#phone").removeAttr('readonly');
+                document.getElementById("phone").value = '';
+            }
+        }
+        if (!element.readOnly) {
+        $.ajax({
+            url: "{% url 'user:check_phone' %}",
+            type: "post",
+            data: {
+                phone: value,
+                journey_id: journey_id,
+                csrfmiddlewaretoken: "{{csrf_token}}"
+            },
+            success: function(data) {
+                if (data.data.success) {
+                    console.log(data.data.phone)
+                    alert("The Phone Number "+data.data.phone+" is already exist with username "+data.data.username+"!");
+                    document.getElementById("phone").value = '';
+                }
+            }
+        })
+    }
+}
+</script>
+{% endblock %}

@@ -1,0 +1,104 @@
+
+
+<div class="fab-container">
+    <div class="fab fab-icon-holder">
+      <i class="fa fa-plus"></i>
+    </div>
+    <ul class="fab-options">
+      {% if go_next != "None" %}
+      <a href="{{go_next}}">
+      <li>
+       
+        <span class="fab-label">Next Microskill</span>
+        <div class="fab-icon-holder">
+          <i class="fa fa-arrow-right"></i>
+        </div>
+       
+      </li>
+    </a>
+      {% endif %}
+     
+      {% if mode == "Learn" %}
+      {% if not channel.channel_type == "MentoringJourney" %}
+      <a href="{% url 'content:revice_mode' pk=content.pk group=group.pk %}">
+        <li>
+          
+          <span class="fab-label">Revise Mode</span>
+          <div class="fab-icon-holder">
+            <i class="fa fa-edit"></i>
+          </div>
+          
+        </li>
+      </a>
+      {% endif %}
+      
+      {% elif mode == "revise" %}
+      <a href="{% url 'content:read_content' pk=content.pk group=group.pk %}">
+        <li>
+          
+          <span class="fab-label">Learn Mode</span>
+          <div class="fab-icon-holder">
+            <i class="fa fa-edit"></i>
+          </div>
+          
+        </li>
+      </a>
+      {% endif %}
+      {% if go_previous != None %}
+    <a href="{{go_previous}}"> 
+      <li>
+        
+        <span class="fab-label">Previous Microskill</span>
+        <div class="fab-icon-holder">
+          <i class="fa fa-arrow-left"></i>
+        </div>
+        
+      </li>
+    </a>
+    {% endif %}
+   
+    <a href="{% url 'community:learning_journal' channel=parent_check.channel_id  %}">
+      <li>
+        
+        <span class="fab-label">Learning Journal</span>
+        <div class="fab-icon-holder">
+          <i class="fa fa-comment-o"></i>
+        </div>
+        
+      </li>
+    </a>
+    {% if parent_check.is_community_required %}
+    <a href="{% url 'community:journey_post' channel=parent_check.channel_id  %}">
+      <li>
+        
+        <span class="fab-label">Open Community</span>
+        <div class="fab-icon-holder">
+          <i class="fa fa-comment-o"></i>
+        </div>
+        
+      </li>
+    </a>
+    <a >
+      <li data-toggle="modal" data-target="#modal-ask-question" >
+        
+        <span class="fab-label">POST to Community</span>
+        <div class="fab-icon-holder">
+          <i class="fa fa-edit"></i>
+        </div>
+        
+      </li>
+    </a>
+    {% endif %}
+    
+    <a href="{{ request.META.HTTP_REFERER }}"> 
+      <li>
+        
+        <span class="fab-label">Go Back</span>
+        <div class="fab-icon-holder">
+          <i class="fa fa-arrow-left"></i>
+        </div>
+        
+      </li>
+    </a>
+    </ul>
+  </div>

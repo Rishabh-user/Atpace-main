@@ -1,0 +1,47 @@
+ <div class="box">
+      <div class="box-header">
+        <h3 class="box-title">Task List</h3>
+      </div>
+      <!-- /.box-header -->
+      <div class="box-body">
+        <table id="all-task-table" class="table table-bordered table-hover">
+          <thead>
+          <tr>
+            <th>Title</th>
+            <th>Start Time</th>
+            <th>Due Time</th>
+            <th>Assigned to</th>
+            <th>Is Recurring</th>
+            <th>Recurring Time</th>
+            <th>Set Reminder</th>
+            <th>Reminder Before</th>
+            <th>Action</th>
+        </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(task, index) in all_task_list" :key="index">
+              <td class="capitalize">[[task.title]]</td>
+              <td>[[task.start_time]]</td>
+              <td>[[task.end_time]]</td>
+              <td> <li v-for="assignee in task.assign_to" :key="assignee.id" style="list-style:none">[[assignee.name]]</li></td>
+              <td class="capitalize">[[task.is_recurring]]</td>
+              <td>[[task.recurring_time]]</td>
+              <td class="capitalize">[[task.set_remainder]]</td>
+              <td>[[task.reminder_before]]</td>
+              <td>
+                <div class="dropdown">
+                  <button class="btn bg-purple dropdown-toggle btn-select-option" type="button" data-toggle="dropdown" aria-expanded="true">Select an option                                            <span class="caret"></span>
+                  </button>
+                  <ul class="dropdown-menu options-dropdown">
+                    <li class="anchor" data-toggle="modal" data-target="#modal-create-task" @click="getTaskData(task.id)"><i class="fa fa-edit option-icon" style="margin-right:10px"></i>Edit</li>
+                    <li><a :href="'/manager/task-status-template/'+task.id"><i class="fa fa-eye option-icon"></i>View Status</a></li>
+                  </ul>
+                </div>
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+      <!-- /.box-body -->
+    </div>
+    <!-- /.box -->

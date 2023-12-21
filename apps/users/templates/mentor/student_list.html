@@ -1,0 +1,97 @@
+{% extends 'base.html' %} {% load static %}
+{% if request.path == '/user/list/' %} User List {% else %} Admin {% endif %}
+{% load tags %}
+<!-- DataTables -->
+{% block css %}
+<link rel="stylesheet" href="{% static 'bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css' %}">
+{% endblock css %} 
+{% block content %}
+
+
+<div class="content-wrapper">
+  <section class="content-header">
+    <h1>
+      Student
+      <small>List</small>
+    </h1>
+    <ol class="breadcrumb">
+      <li><a href="#"><i class="fa fa-dashboard"></i> Student</a></li>
+      <li class="active">List</li>
+    </ol>
+  </section>
+
+  <section class="content">
+    <div class="row">
+       <div class="col-xs-12">
+           <div class="box">
+             <div class="box-header">
+               <h3 class="box-title">Student List</h3>
+               
+              </div>
+             <!-- /.box-header -->
+             <div class="box-body">
+              
+               <table id="example2" class="table table-bordered table-hover">
+                 <thead>
+                  <tr>
+                    <th>Action</th>
+                    <th>Full Name</th>
+                    <th>username</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Journey Name</th>
+                    <th>View Journey</th>
+                    <th>User Profile</th>
+                </tr>
+                 </thead>
+                 <tbody>
+                  {% for user in mentor_user %}
+                    <tr>
+                      
+                      <td><a href="{% url 'user:mentor_users_details' user_id=user.user.pk journey_id=user.journey.pk %}">Mentee View</a></td>
+                      <td>{{user.user.first_name}} {{user.user.last_name}}</td>
+                      <td>{{user.user.username}}</td>
+                      <td>{{user.user.email}}</td>
+                      <td>{{user.user.phone}}</td>
+                      <td>{{user.journey}}</td>
+                      <td><a href="{% url 'content:Channel_content_v2' Channel=user.journey.pk  %}"><kbd>View Journey</kbd></a></td>
+                      <td><a href="{% url 'user:user-profile' pk=user.user.id %}" target="_blank"><kbd>User Profile</kbd></a> </td>
+                   
+                    </tr>
+                    {% endfor %}
+                 </tfoot>
+               </table>
+             </div>
+             <!-- /.box-body -->
+           </div>
+           <!-- /.box -->
+ 
+          
+         </div>
+       <!-- /.col -->
+    </div>
+    <!-- /.row -->
+ </section>
+ 
+</div>
+{% endblock content %} 
+{% block js %}
+<script src="{% static 'bower_components/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
+<script>
+
+$(function () {
+ 
+  $('#example2').DataTable({
+    "dom": '<"table-pull-left"f><"table-pull-right"l>tip',
+    'paging'      : true,
+    'lengthChange': true,
+    'searching'   : true,
+    'ordering'    : true,
+    'info'        : true,
+    'autoWidth'   : true,
+    'scrollX'     : true
+  })
+})
+</script>
+{% endblock js %}

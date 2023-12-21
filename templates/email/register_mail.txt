@@ -1,0 +1,15 @@
+{% autoescape off %}
+Welcome to the AtPace Academy, {{ user.first_name }}!
+You have taken the first step to going after the dreams with new skills
+
+Along with our platform link and your login credentials
+{{ protocol }}://{{ domain }}
+Username : {{ user.username }}
+password : {{ password }}
+    
+         
+Its awesome to have you onboard to learn and contribute to this community !!!
+
+Time to go after our dreams with all we got...see you there.
+
+{% endautoescape %}

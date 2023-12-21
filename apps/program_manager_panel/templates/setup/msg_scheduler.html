@@ -1,0 +1,219 @@
+<div class="row" style="margin-top: 30px;">
+    <div class="col-md-2">
+    <div class="card side-tab" style="">
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item" @click="showCreateMsgScheduler" id="createMsgScheduler">Create</li>
+            <li class="list-group-item" @click="showListMsgScheduler" id="listMsgScheduler">List</li>
+        </ul>
+    </div>
+    </div>
+    <div class="col-md-10">
+      <div v-if="displayCreateMsgScheduler">
+        <div class="box">
+        <div class="box-header with-border">
+          <h3 class="box-title">Message Scheduler</h3>
+        </div>
+        <div class="box-body">
+          <form @submit.prevent="onCreateMsgScheduler" id="msg-scheduler-form">
+            <div class="row">
+                    <div class="col-md-12">
+                      <div class="form-group" style="">
+                        <label>Title</label>
+                        <input type="text" class="form-control" value="" v-model="scheduler_title" name="scheduler_title" required/>
+                      </div>
+                      <!-- /.form-group -->
+                      <div class="form-group">
+                        <label>Journey</label>
+                        <select class="form-control select2" name="journey" required style="width: 100%;" ref="journey" @change="showJournal()">
+                          <option selected="selected" value="">Select</option>
+                          <option
+                            v-bind:value="journey.id"
+                            v-for="journey in journey_list"
+                            :key="journey.id"
+                          >
+                            [[journey.name]] 
+                          </option>
+                        </select>
+                      </div>
+                      <!-- /.form-group -->
+                      <div class="form-group">
+                        <label>Journal</label>
+                        <select class="form-control select2" name="journal" style="width: 100%;" ref="journal">
+                          <option
+                            v-bind:value="journal.id"
+                            v-for="journal in journal_list"
+                            :key="journal.id"
+                          >
+                            [[journal.name]] 
+                          </option>
+                        </select>
+                      </div>
+                      <!-- /.form-group -->
+                      <div class="row">
+                        <div class="col-md-6 form-group">
+                          <label>Schedule Day</label>
+                          <select class="form-control select2" name="scheduler_day" required style="width: 100%;" ref="scheduler_day">
+                            <option value="Monday">Monday</option>
+                            <option value="Tuesday">Tuesday</option>
+                            <option value="Wednesday">Wednesday</option>
+                            <option value="Thrusday">Thrusday</option>
+                            <option value="Friday" selected="selected">Friday</option>
+                            <option value="Saturday">Saturday</option>
+                            <option value="Sunday">Sunday</option>
+                          </select>
+                        </div>
+                        <!-- /.form-group -->
+                        <div class="form-group col-md-6">
+                          <label>Schedule Time</label>
+                          <input
+                            name="scheduler_time"
+                            type="time"
+                            id="scheduler_time"
+                            v-model="scheduler_time"
+                            class="form-control"
+                            required
+                          />
+                        </div>
+                        <!-- /.form-group -->
+                      </div>
+                      <div class="row">
+                        <div class="form-group col-md-6">
+                          <label>Start Date</label>
+                          <input
+                            name="start_date"
+                            type="date"
+                            id="start_date"
+                            v-model="start_date"
+                            class="form-control"
+                            required
+                          />
+                        </div>
+                        <!-- /.form-group -->
+                        <div class="form-group col-md-6">
+                          <label>End Date</label>
+                          <input
+                            name="end_date"
+                            type="date"
+                            id="end_date"
+                            v-model="end_date"
+                            class="form-control"
+                            required
+                          />
+                        </div>
+                        <!-- /.form-group -->
+                      </div>
+                      <div class="form-group">
+                        <label>Scheduler Type</label>
+                        <select class="form-control select2" name="scheduler_type" required style="width: 100%;" ref="scheduler_type" @change="showReceiver()">
+                          <option value="">Select</option>
+                          <option value="Reminder_to_Journal">Reminder to Journal</option>
+                          <option value="Program_Team_Weekly">Program Team Weekly</option>
+                        </select>
+                      </div>
+                      <!-- /.form-group -->
+                      <div class="form-group">
+                        <label>Receiver</label>
+                        <select class="form-control select2" name="receiver" required style="width: 100%;" ref="receiver">
+                          <option
+                            v-bind:value="receiver.value"
+                            v-for="receiver in receiver_list"
+                            :key="receiver.value"
+                          >
+                            [[receiver.title]] 
+                          </option>
+                          {% comment %} <option value="Mentor">Mentor</option>
+                          <option value="Mentee">Mentee</option>
+                          <option value="Program_Manager">Program Manager</option>
+                          <option value="Both">Mentor and Mentee</option> {% endcomment %}
+                        </select>
+                      </div>
+                      <!-- /.form-group -->
+                      <div class="form-group">
+                        <label>Receiver's Platform</label>
+                        <select class="form-control select2" name="receiver_platform" required style="width: 100%;" ref="receiver_platform">
+                          <option value="WhatsApp">WhatsApp</option>
+                          {% comment %} <option value="Mail">Mail</option> {% endcomment %}
+                          {% comment %} <option value="Chat">Chat</option> {% endcomment %}
+                        </select>
+                      </div>
+                      <!-- /.form-group -->
+                      {% comment %} <div class="form-group">
+                        <label>Message</label>
+                        <textarea
+                          name="message"
+                          type="text"
+                          id="message"
+                          v-model="message"
+                          class="form-control"
+                          required
+                        ></textarea>
+                      </div>
+                      <!-- /.form-group --> {% endcomment %}
+                      
+                    </div>
+                    <!-- /.col -->
+                    <button type="submit" class="btn btn-primary">Create</button>
+                  </div>
+                  <!-- /.row -->
+        </form>
+        </div>
+      </div>
+      <!-- /.box -->
+      </div>
+      <div v-if="displayListMsgScheduler">
+        <div class="box">
+        <div class="box-header">
+          <h3 class="box-title">Message Scheduler List</h3>
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body">
+          <table id="msg-scheduler-table" class="table table-bordered table-hover">
+            <thead>
+             <tr>
+               <th>SNo.</th>
+               <th>Title</th>
+               <th>Type</th>
+               <th>Start Date</th>
+               <th>End Date</th>
+               <th>Day</th>
+               <th>Time</th>
+               <th>Receiver</th>
+               <th>Message</th>
+               {% comment %} <th>Action</th> {% endcomment %}
+             </tr>
+            </thead>
+            <tbody>
+            <tr v-for="(scheduler, index) in msg_scheduler_list">
+               <td>[[index+1]]</td>
+               <td>[[scheduler.title]]</td>
+               <td>[[scheduler.scheduler_type]]</td>
+               <td>[[scheduler.start_date]]</td>
+               <td>[[scheduler.end_date]]</td>
+               <td>[[scheduler.scheduler_day]]</td>
+               <td>[[scheduler.scheduler_time]]</td>
+               <td v-if="scheduler.receiver == 'Both'">Mentor, Mentee</td>
+               <td v-else>[[scheduler.receiver]]</td>
+               <td>[[scheduler.message]]</td>
+               {% comment %} <td>
+                <div class="dropdown">
+                    <button class="btn bg-purple dropdown-toggle btn-select-option" type="button" data-toggle="dropdown" aria-expanded="true">Select an option<span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu options-dropdown">
+                        <li>
+                            <a href="#"><i class="fa fa-edit option-icon"></i>Edit</a>
+                        </li>
+                    </ul>
+                </div>
+            </td> {% endcomment %}
+             </tr>
+            </tfoot>
+          </table>
+        </div>
+        <!-- /.box-body -->
+      </div>
+      </div>
+    </div>
+</div>
+
+
+  

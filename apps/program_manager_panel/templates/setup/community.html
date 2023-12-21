@@ -1,0 +1,18 @@
+<div class="row" style="margin-top: 30px;">
+    <div class="col-md-2">
+    <div class="card side-tab" style="">
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item" @click="showSpaceGroup" id="space-group">Space Group</li>
+            <li class="list-group-item" @click="showSpace" id="space">Space</li>
+        </ul>
+    </div>
+    </div>
+    <div class="col-md-10">
+      <div v-if="displaySpaceGroup">
+        {% include 'setup/space_group.html' %}
+      </div>
+      <div v-if="displaySpace">
+        {% include 'setup/space.html' %}
+      </div>
+    </div>
+</div>

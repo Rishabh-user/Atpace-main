@@ -1,0 +1,90 @@
+{% extends 'base.html' %} {% load static %}
+{% load tags %}
+<!-- DataTables -->
+{% block css %}
+<link rel="stylesheet" href="{% static 'bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css' %}">
+{% endblock css %} 
+{% block content %}
+
+<div class="content-wrapper">
+  <section class="content-header">
+    <h1>
+        Issues Raised
+        <small>Issues Raised</small>
+    </h1>
+    <ol class="breadcrumb">
+      <li><a href="#"><i class="fa fa-dashboard"></i> User Settings</a></li>
+      <li><a href="#">Issues Raised User</a></li>
+      <li class="active">List</li>
+    </ol>
+  </section>  
+  <section class="content">
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="box">
+          <div class="box-header">
+            <h3 class="box-title">Issues Raised List</h3>            
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+              {% include 'component/error_message.html' %}
+              <table id="example2" class="table table-bordered table-hover">
+                 <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Subject</th>
+                    <th>Issue</th>
+                    <th>Company</th>
+                    <th>image</th>
+                </tr>
+                 </thead>
+                 <tbody>
+                  {% for team in ProgramTeam %}
+                    <tr>
+                      
+                      <td>{{team.name}}</td>
+                      <td>{{team.subject}}</td>
+                      <td>{{team.issue}}</td>
+                      <td>{{team.company}}</td>
+                      <td><button><i class="fa fa-download" aria-hidden="true"><a target="_blank" href="{{MEDIA_URL}}{{team.image}}" title="Image"> Download
+                          
+                      </a></i>
+                    </button></td>
+                    </tr>
+                    {% endfor %}
+                 </tfoot>
+               </table>
+             </div>
+             <!-- /.box-body -->
+           </div>
+           <!-- /.box -->
+ 
+          
+         </div>
+       <!-- /.col -->
+    </div>
+    <!-- /.row -->
+ </section>
+ 
+</div>
+{% endblock content %} 
+{% block js %}
+<script src="{% static 'bower_components/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
+<script>
+
+$(function () {
+ 
+  $('#example2').DataTable({
+    "dom": '<"table-pull-left"f><"table-pull-right"l>tip',
+    'paging'      : true,
+    'lengthChange': true,
+    'searching'   : true,
+    'ordering'    : true,
+    'info'        : true,
+    'autoWidth'   : true,
+    'scrollX'     : true
+  })
+})
+</script>
+{% endblock js %}

@@ -1,0 +1,41 @@
+<div class="box">
+          <div class="box-header">
+            <h3 class="box-title">Matching Setup</h3>
+            <a href="/create-match-question/"><button class="btn btn-primary pull-right">Create New Match Configuration</button></a>               
+              </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+              {% include 'component/error_message.html' %}
+              <table id="matching-setup-table" class="table table-bordered table-hover">
+                 <thead>
+                  <tr>
+                    <th>Company</th>
+                    <th>Journey</th>
+                    <th>Action</th>
+                </tr>
+                 </thead>
+                 <tbody>
+                    <tr v-for="config in matching_setup_list">
+                      <td>[[config.company_name]]</td>
+                      <td>[[config.journey_name]]</td>
+                      <td>
+                        <div class="dropdown">
+                          <button class="btn bg-purple dropdown-toggle btn-select-option" type="button" data-toggle="dropdown" aria-expanded="true">Select an option<span class="caret"></span>
+                          </button>
+                          <ul class="dropdown-menu options-dropdown">
+                              <li>
+                                  <a :href="'/match-question-preview/'+config.id"><i class="fa fa-eye option-icon"></i></i>View</a>
+                            </li>
+                            <li>
+                                  <a :href="'/edit-match-question/'+config.id"><i class="fa fa-edit option-icon"></i>Edit</a>
+                            </li>
+                      </ul>
+                      </div>
+                      </td>
+                    </tr>
+                 </tfoot>
+               </table>
+             </div>
+             <!-- /.box-body -->
+           </div>
+           <!-- /.box -->

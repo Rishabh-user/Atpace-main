@@ -1,0 +1,225 @@
+{% extends 'base.html' %} {% load static %}
+{% load tags %}
+{% block title %} {% endblock %}
+{% block content %}
+{% block css %}
+<style>
+    .profile-user-img {
+        width: 100px;
+        height: 100px;
+        overflow: hidden;
+        border-radius: 50%; 
+    }
+    .col-md-4 control-label {
+        justify-content: center;
+    }
+
+</style>
+<link rel="stylesheet" href="{% static 'bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css' %}">
+{% endblock css %}
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+        <h1>
+            Mentor Mentee Match Details
+        </h1>
+    </section>
+
+    <section class="content">
+
+        <!-- Default box -->
+        <div class="box">
+            <div class="box-header with-border">
+                <h3 class="box-title">Mentee Details</h3>
+            </div>
+            <div class="row">
+            <div class="col-md-4 control-label">
+                <div class="box-body box-profile">
+                    <img class="profile-user-img img-responsive img-circle" src="{{MEDIA_URL}}{{user.avatar}}"
+                        onerror="this.onerror=null; this.src='{% static 'dist/img/avatar.png' %}'" alt="User profile picture" />
+
+                    <h3 class="profile-username text-center">
+                        {{user.first_name}} {{user.last_name}}
+                    </h3>
+
+                    <ul class="list-group list-group-unbordered">
+                        <li class="list-group-item">
+                            <b>Email</b> <a class="pull-right">{{user.email}}</a>
+                        </li>
+                        <li class="list-group-item">
+                            <b>Phone</b> <a class="pull-right">{{user.phone}}</a>
+                        </li>
+                        <li class="list-group-item">
+                            <b>Company</b> <a class="pull-right">{{company}}</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        <div class="col-md-8 control-label">
+            {% for question in match_question %}
+                <div>
+                    <h4>Q. {{question.question}}</h4>
+                    <p>Ans. {{question.response}}</p>
+                </div>
+            {% endfor %}
+            </div>                
+        </div>                
+    </div>
+    <div class="row">
+        {% if not criteria_1 %}
+        <div class="col-md-12">
+            <div class="box">
+                {% comment %} <div class="box-header with-border">
+                    <h3 class="box-title">Criteria 1</h3>
+                </div> {% endcomment %}
+                <div class="box-body box-profile">
+                    <h3 class="text-center">There is no match found</h3>
+                </div>                
+            </div>
+        </div>
+        {% else %}
+        {% for mentor in criteria_1 %}
+        <div class="col-md-4">
+            <div class="box">
+                {% comment %} <div class="box-header with-border">
+                    <h3 class="box-title">Criteria 1</h3>
+                </div> {% endcomment %}
+                <div class="box-body box-profile">
+                    <img class="profile-user-img img-responsive img-circle" src="{{mentor.avatar}}"
+                        onerror="this.onerror=null; this.src='{% static 'dist/img/avatar.png' %}'" alt="User profile picture" />
+
+                    <h3 class="profile-username text-center">
+                        {{mentor.mentor.first_name}} {{mentor.mentor.last_name}}
+                    </h3>
+
+                    <ul class="list-group list-group-unbordered">
+                        <li class="list-group-item">
+                            <b>Email</b> <a class="pull-right">{{mentor.mentor.email}}</a>
+                        </li>
+                        <li class="list-group-item">
+                            <b>Phone</b> <a class="pull-right">{{mentor.mentor.phone}}</a>
+                        </li>
+                        <li class="list-group-item">
+                            <b>Company</b> <a class="pull-right">{{company}}</a>
+                        </li>
+                    </ul><br>
+                    {% comment %} <div>
+                        <h4>Q. {{mentor.profile_question.assest_question.question}}</h4>
+                        <p>Ans. {{mentor.profile_question.response}}</p>
+                    </div> {% endcomment %}
+                    <div>
+                        <h4>Match Percentage: {{mentor.match_percentage}}</h4>
+                    </div>
+            </div>
+            </div>
+        </div>
+        {% endfor %}
+        {% endif %}
+    {% comment %} </div>
+        <div class="row">
+            {% if not criteria_2 %}
+            <div class="col-md-12">
+                <div class="box">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Criteria 2</h3>
+                    </div>
+                    <div class="box-body box-profile">
+                        <h3 class="text-center">There is no match found for Criteria 2</h3>
+                    </div>                
+                </div>
+            </div>
+            {% else %}
+            {% for mentor in criteria_2 %}
+            <div class="col-md-4">
+                <div class="box">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Criteria 2</h3>
+                    </div>
+                    <div class="box-body box-profile">
+                        <img class="profile-user-img img-responsive img-circle" src="{{MEDIA_URL}}{{mentor.mentor.avatar}}"
+                            onerror="this.onerror=null; this.src='{{request.user.avatar}}'" alt="User profile picture" />
+    
+                        <h3 class="profile-username text-center">
+                            {{mentor.mentor.first_name}} {{mentor.mentor.last_name}}
+                        </h3>
+    
+                        <ul class="list-group list-group-unbordered">
+                            <li class="list-group-item">
+                                <b>Email</b> <a class="pull-right">{{mentor.mentor.email}}</a>
+                            </li>
+                            <li class="list-group-item">
+                                <b>Phone</b> <a class="pull-right">{{mentor.mentor.phone}}</a>
+                            </li>
+                            <li class="list-group-item">
+                                <b>Company</b> <a class="pull-right">{{company}}</a>
+                            </li>
+                        </ul><br>
+                        <div>
+                            <h4>Q. {{mentor.profile_question.assest_question.question}}</h4>
+                            <p>Ans. {{mentor.profile_question.response}}</p>
+                        </div>
+                        <div>
+                            <h4>Match Percentage: {{mentor.match_percentage}}</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            {% endif %}
+        </div>
+        <div class="row">
+            {% if not criteria_3 %}
+            <div class="col-md-12">
+                <div class="box">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Criteria 3</h3>
+                    </div>
+                    <div class="box-body box-profile">
+                        <h3 class="text-center">There is no match found for Criteria 3</h3>
+                    </div>                
+                </div>
+            </div>
+            {% else %}
+            {% for mentor in criteria_3 %}
+            <div class="col-md-4">
+                <div class="box">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Criteria 3</h3>
+                    </div>
+                    <div class="box-body box-profile">
+                        <img class="profile-user-img img-responsive img-circle" src="{{MEDIA_URL}}{{mentor.mentor.avatar}}"
+                            onerror="this.onerror=null; this.src='{{request.user.avatar}}'" alt="User profile picture" />
+    
+                        <h3 class="profile-username text-center">
+                            {{mentor.mentor.first_name}} {{mentor.mentor.last_name}}
+                        </h3>
+    
+                        <ul class="list-group list-group-unbordered">
+                            <li class="list-group-item">
+                                <b>Email</b> <a class="pull-right">{{mentor.mentor.email}}</a>
+                            </li>
+                            <li class="list-group-item">
+                                <b>Phone</b> <a class="pull-right">{{mentor.mentor.phone}}</a>
+                            </li>
+                            <li class="list-group-item">
+                                <b>Company</b> <a class="pull-right">{{company}}</a>
+                            </li>
+                        </ul><br>
+                        <div>
+                            <h4>Q. {{mentor.profile_question.assest_question.question}}</h4>
+                            <p>Ans. {{mentor.profile_question.response}}</p>
+                        </div>
+                        <div>
+                            <h4>Match Percentage: {{mentor.match_percentage}}</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            {% endif %}
+    </div> {% endcomment %}
+
+            <!-- /.box-body -->
+    </section>
+</div>
+{% endblock %}

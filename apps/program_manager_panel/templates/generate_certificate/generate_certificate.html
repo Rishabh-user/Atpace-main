@@ -1,0 +1,235 @@
+{% extends 'base.html' %} {% load static %}
+{% block title %} Generate Certificate {% endblock %}
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/program_manager/program_manager.css' %}" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+<style>
+    .capitalize {
+        text-transform: capitalize;
+    }
+
+    .bold-captitalized {
+        text-transform: capitalize;
+        font-weight: bold;
+    }
+</style>
+{% endblock css %} {% block content %}
+<div class="content-wrapper" id="vue-app">
+    <div :class="'alert alert-dismissible '+[[alert_class]]" v-if="alert_msg" style="margin:10px;">
+        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+        <h4 style="margin-top:10px;"><i class="icon fa fa-warning"></i> Alert!</h4>
+        <a href="/manager/billing">[[alert_msg]]</a>
+    </div>
+    <section class="content-header">
+        <h1>Generate Certificate</h1>
+    </section>
+    <section class="content">
+        <div class="box">
+            <div class="box-header">
+                <h3 class="box-title">Filter by</h3>
+            </div>
+            <div class="box-body">
+                <form @submit.prevent="getusersfromjourney">
+                    <div class="form-group">
+                        <label class="col-md-12 control-label">Journey</label>
+                        <select class="form-control select2" name="journey" style="width:100%;" ref="journey">
+                            <option value="">Select</option>
+                            <option v-bind:value="journey.id" v-for="journey in journey_list" :key="journey.id">
+                                [[journey.name]]
+                            </option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-12 control-label">User-Type</label>
+                        <select class="form-control select2" name="user_type" style="width:100%;" ref="user_type">
+                            <option value="">Select</option>
+                            <option value="Mentor">Mentor</option>
+                            <option value="Learner">Learner</option>
+                            <option value="ProgramManager">Program Manager</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary pull-right">Filter</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="box">
+            <div class="box-header">
+                <h3 class="box-title">Users List</h3>
+            </div>
+            <div class="box-body">
+                <table id="registration-table" class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th>Full Name</th>
+                            <th>Email</th>
+                            <th>Journey</th>
+                            <th>Journey Completion</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="list in user_list" :key="list.id">
+                            <td class="capitalize">[[list.name]]</td>
+                            <td>[[list.email]]</td>
+                            <td><kbd>[[list.channel]]</kbd></td>
+                            <td class="bold-captitalized"><kbd>[[list.is_completed]]</kbd></td>
+                            <td>
+                                <!-- <button class="btn bg-purple btn-select-option" type="button" aria-expanded="true" id="loading"
+                                    @click="sendemailtouser(list.user_id, list.channel_id, list.user_type)">
+                                    <span v-if="!sendingEmail">Send Email</span>
+                                    <span v-else><i class="fa fa-spinner fa-spin"></i> Sending...</span>
+                                </button> -->
+                                <button class="btn bg-purple btn-select-option" type="button" aria-expanded="true" 
+                                        :disabled="sendingEmail" @click="sendemailtouser(list.user_id, list.channel_id, list.user_type)">
+                                    <span v-if="!sendingEmail">Send Email</span>
+                                    <span v-else><i class="fa fa-spinner fa-spin"></i> Sending...</span>
+                                </button>
+                            </td>
+                        </tr>
+                        </tfoot>
+                </table>
+            </div>
+        </div>
+    </section>
+    {{request.user.id|json_script:"user_id" }}
+    {{request.session.token|json_script:"token"}}
+    {{request.session.company_id|json_script:"company_id"}}
+    {{request.session.company_name|json_script:"company_name"}}
+</div>
+{% endblock content %} {% block js %}
+<script src="{% static 'bower_components/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
+<script type="text/javascript">
+    let app = new Vue({
+        el: "#vue-app",
+        delimiters: ['[[', ']]'],
+        data() {
+            return {
+                token: JSON.parse(document.getElementById('token').textContent),
+                user_id: JSON.parse(document.getElementById('user_id').textContent),
+                auth: "",
+                base_url: window.location.origin,
+                user_list: "",
+                user_name: "",
+                journey_list: "",
+                alert_msg: "",
+                alert_class: "",
+                user_company_name: JSON.parse(document.getElementById('company_name').textContent),
+                user_company_id: JSON.parse(document.getElementById('company_id').textContent),
+                sendingEmail: false,
+            };
+        },
+        mounted() {
+            this.journeyList();
+            this.showAlert();
+        },
+        methods: {
+            axiosGetRequest: function (url) {
+                this.auth = "Token " + this.token;
+                var config = {
+                    method: "get",
+                    url: url,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': this.auth,
+                    },
+                };
+                return axios(config)
+            },
+            axiosPostRequest: function (url, data) {
+                this.auth = "Token " + this.token;
+                var config = {
+                    method: "post",
+                    url: url,
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                        "Accept": "application/json",
+                        'Authorization': this.auth,
+                    },
+                    data: data
+                };
+
+                return axios(config)
+            },
+            async showAlert() {
+                var url = this.base_url + "/manager/check-for-subscription/" + this.user_id + "/";
+                response = await this.axiosGetRequest(url);
+                // console.log("Alert response", response.data)
+                if (response.data.message != "No alert available") {
+                    this.alert_msg = response.data.message
+                    this.alert_class = response.data.css_class
+                }
+            },
+            async destroyDataTable(id) {
+                if ($(id).DataTable()) {
+                    console.log("destroying", id);
+                    $(id).DataTable().clear();
+                    $(id).DataTable().destroy();
+                }
+            },
+            async initializeDataTable(id) {
+                await this.sleep(2000);
+                $(id).DataTable({
+                    "dom": '<"table-pull-left"f><"table-pull-right"l>tip',
+                    'destroy': true,
+                    'paging': true,
+                    'lengthChange': true,
+                    'searching': true,
+                    'ordering': true,
+                    'info': true,
+                    'autoWidth': false,
+                    'retrieve': true,
+                    'scrollX': true,
+                })
+            },
+            sleep: function (ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            },
+            async journeyList() {
+                var url = `${this.base_url}/manager/journey-list/${this.user_id}/?company_id=${this.user_company_id}`
+                response = await this.axiosGetRequest(url);
+                // console.log("Journey list response", response.data)
+                this.journey_list = response.data.data
+            },
+            async getusersfromjourney() {
+                await this.destroyDataTable('#registration-table')
+                var journey = this.$refs.journey.value;
+                var user_type = this.$refs.user_type.value;
+                console.log("USER TYPE", user_type)
+                var url = `${this.base_url}/manager/journey-completed-users/${this.user_id}/?channel_id=${journey}&user_type=${user_type}`;
+                response = await this.axiosGetRequest(url);
+                console.log("Users List response", response.data)
+                this.user_list = response.data.data
+                await this.initializeDataTable('#registration-table')
+            },
+            async sendemailtouser(end_userid, channel_id, user_type) {
+                this.sendingEmail = true;
+                var url = `${this.base_url}/manager/send-generated-cert-email/${this.user_company_id}/`;
+                var data = new FormData();
+                data.append("end_userid", end_userid);
+                data.append("channel_id", channel_id);
+                data.append("user_type", user_type)
+                try {
+                    response = await this.axiosPostRequest(url, data);
+                    
+                    if (response.status === 200) {
+                        // console.log("SEND EMAIL response", response.data);
+                        bootbox.alert("Email sent successfully");
+                    }
+                    else if (response.status == 400) {
+                        bootbox.alert("Failed to send email");
+                    }
+                }
+                catch (err) {
+                    bootbox.alert("Failed to send the email. Certificate template may not exist for this journey.\nPlease contact to info@growatpace.com for more information.")
+                }
+                finally {
+                    this.sendingEmail = false;
+                }
+            }
+        }
+    });
+</script>
+{% endblock js %}

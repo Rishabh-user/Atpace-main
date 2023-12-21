@@ -1,0 +1,146 @@
+<div class="box">
+  <div class="box-header">
+  <h3 class="box-title">Filter by</h3>
+  </div>
+  <div class="box-body">
+    <form @submit.prevent="showRegisList">
+      <div class="form-group">
+        <label class="col-md-12 control-label">User</label>
+        <input class="form-control" type="text" name="user" placeholder="user" v-model="user_name" />
+      </div>
+      <div class="form-group">
+        <label class="col-md-12 control-label">Assessment</label>
+        <select class="form-control select2" name="assessment" style="width:100%;" ref="assessment">
+          <option value="">Select</option>
+          <option value="complete">Complete</option>
+          <option value="pending">Pending</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="col-md-12 control-label">Journey</label>
+        <select class="form-control select2" name="journey" style="width:100%;" ref="journey">
+          <option value="">Select</option>
+            <option
+                  v-bind:value="journey.id"
+                  v-for="journey in journey_list"
+                  :key="journey.id"
+                >
+                  [[journey.name]]
+                </option>
+        </select>
+      </div>
+      <div class="form-group">
+        <button type="submit" class="btn btn-primary pull-right">Filter</button>
+      </div>
+    </form>
+  </div>
+</div>
+  <div class="box">
+    <div class="box-header">
+      <h3 class="box-title">Users List</h3>
+
+    </div>
+    <!-- /.box-header -->
+    <div class="box-body" style="overflow-x: auto;">
+      <div class="table-wrapper" style="width: calc(100% - 0px); overflow-x: auto;">
+        <table id="registration-table" class="table table-bordered table-hover">
+          <thead>
+            <tr>
+              <th>Full Name</th>
+              <th>Username</th>
+              <th>Email</th>
+              <th>Phone</th>
+              <th>Profile Assessment</th>
+              <th>Type</th>
+              <th>Journey</th>
+              <th>Status</th>
+              <th>Join Date</th>
+              <th>Date Modified</th>
+              <th>Lite Signup</th>
+              <th>User Status</th>
+          </tr>
+          </thead>
+          <tbody>
+              <tr v-for="list in registration_list" :key="list.id">
+                
+                <td class="capitalize"><a :href="'/user/profile/'+list.user_id" target="_blank">[[list.fullname]]</a></td>
+                <td>[[list.username]]</td>
+                <td>[[list.email]]</td>
+                <td>[[list.phone]]</td>
+                <td class="capitalize">[[list.profile_assest]]</td>
+                <td>
+                  <div v-for="user_type in list.type" :key="user_type.id">
+                    [[user_type.type]]
+                  </div>
+                </td>
+                <td><kbd>[[list.journey_name]]</kbd></td> 
+                <td>
+                    <kbd v-if="list.is_active">Active</kbd>
+                    <kbd v-else>InActive</kbd>
+                  </td>
+                  <td>[[list.date_joined]]</td>
+                  <td>[[list.date_modified]]</td>
+                  <td class="capitalize"><kbd>[[list.is_lite_signup]]<kbd></td>
+                <td v-if="list.is_archive">
+                  <kbd>Archive</kbd>
+                </td>
+                <td v-else-if="list.in_check_mentor">
+                <kbd>Active</kbd>
+                </td>
+                <td v-else >
+                  <div class="dropdown" >
+                      <button class="btn bg-purple dropdown-toggle btn-select-option" type="button" data-toggle="dropdown" aria-expanded="true">Select an option<span class="caret"></span></button>
+                      <ul class="dropdown-menu options-dropdown">
+                        <li  class="archive_user" data-id="" @click="archiveUser(list.user_id)" style="padding:3px 20px;">
+                          <i class="fa fa-edit option-icon"></i><span style="margin-left:10px;">Archive</span>
+                        </li>
+                        <li class="add_mentor_pool"  v-for="user_type in list.type" :key="user_type.id" v-if="user_type.type == 'Mentor'" @click="getMentor(list.user_id)">
+                            <a href="#" data-toggle="modal" data-target="#modal-default"><i class="fa fa-edit option-icon"></i>Add to Mentor Pool</a>
+                        </li>
+                      </ul>
+                  </div>
+                
+                </td>
+              </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <!-- /.box-body -->
+  </div>
+<!-- /.box -->
+<div class="modal fade" id="modal-default" style="display: none;">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <form @submit.prevent="onAddMentorToPool">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">×</span></button>
+              <h4 class="modal-title">Add to Pool</h4>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="pool_mentor_id" name="pool_mentor_id">
+                <div class="form-group">
+                    <label>Select Pool</label>
+                    <select class="form-control select2" id="pool" required style="width: 100%;" ref="mentor_pool">
+                      <option selected="selected" value="">Select Pool</option>
+                        <option
+                          v-bind:value="pool.id"
+                          v-for="pool in pool_list"
+                          :key="pool.id"
+                        >
+                          [[pool.name]] 
+                        </option>
+                    </select>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+              <button type="submit" id="sumbitpool" class="btn btn-primary">Save changes</button>
+            </div>
+          </form>
+          </div>
+      </div>
+</div>
+
+           

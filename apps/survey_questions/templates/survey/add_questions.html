@@ -1,0 +1,1025 @@
+{% extends 'base.html' %} 
+{% load tags %}
+{% block title %} Add Questions {% endblock %} {% load
+  crispy_forms_tags %} {% block content %}
+  <style>
+    .material-switch > input[type="checkbox"] {
+      display: none;
+    }
+  
+    .material-switch > label {
+      cursor: pointer;
+      height: 0px;
+      position: relative;
+      width: 40px;
+    }
+  
+    .material-switch > label::before {
+      background: rgb(0, 0, 0);
+      box-shadow: inset 0px 0px 10px rgba(0, 0, 0, 0.5);
+      border-radius: 8px;
+      content: "";
+      height: 16px;
+      margin-top: -8px;
+      position: absolute;
+      opacity: 0.3;
+      transition: all 0.4s ease-in-out;
+      width: 40px;
+    }
+    .material-switch > label::after {
+      background: rgb(255, 255, 255);
+      border-radius: 16px;
+      box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.3);
+      content: "";
+      height: 24px;
+      left: -4px;
+      margin-top: -8px;
+      position: absolute;
+      top: -4px;
+      transition: all 0.3s ease-in-out;
+      width: 24px;
+    }
+    .material-switch > input[type="checkbox"]:checked + label::before {
+      background: inherit;
+      opacity: 0.5;
+    }
+    .material-switch > input[type="checkbox"]:checked + label::after {
+      background: inherit;
+      left: 20px;
+    }
+  
+    .q_icon{
+      float: right;
+      margin: 0 10px;
+      color: black;
+  
+    }
+    .img-div{
+      margin-left:5px;
+    }
+    .ques-img{
+      margin-left:5px;
+    }
+
+   
+  </style>
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <h1>{{survey_id.name}}
+      <button class="btn btn-primary" data-toggle="modal" data-target="#modal-default" > Add To Journey</button>
+    </h1>
+      <ol class="breadcrumb">
+        <li>
+          <a href="#"><i class="fa fa-dashboard"></i> Survey</a>
+        </li>
+        <li><a href="#">{{survey_id.name}} </a></li>
+        <li class="active">Add Questions</li>
+      </ol>
+    </section>
+    <!-- Main content -->
+    <section class="content">
+      <div class="row">
+        <!-- left column -->
+        <div class="col-md-3">
+          <!-- general form elements -->
+          <div class="box box-primary">
+            <div class="box-header with-border">
+              <h3 class="box-title">Question Types</h3>
+            </div>
+            <!-- /.box-header -->
+            <nav class="nav-sidebar">
+              <ul class="nav">
+                <li class="form_bal_short_answer" id="add">
+                  <a
+                    href="javascript:;"
+                    data-toggle="modal"
+                    data-target="#modal-shortanswer"
+                    >Short Answer <i class="fa fa-plus-circle pull-right"></i
+                  ></a>
+                </li>
+                <li class="form_bal_textarea">
+                  <a
+                    href="javascript:;"
+                    data-toggle="modal"
+                    data-target="#modal-Paragraph"
+                    >Paragraph <i class="fa fa-plus-circle pull-right"></i
+                  ></a>
+                </li>
+                <li class="form_bal_select">
+                  <a
+                    href="javascript:;"
+                    data-toggle="modal"
+                    data-target="#modal-DropDown"
+                    >DropDown <i class="fa fa-plus-circle pull-right"></i
+                  ></a>
+                </li>
+                <li class="form_bal_radio">
+                  <a
+                    href="javascript:;"
+                    data-toggle="modal"
+                    data-target="#modal-MultiChoice"
+                  >
+                    Multichoice <i class="fa fa-plus-circle pull-right"></i
+                  ></a>
+                </li>
+                <li class="form_bal_checkbox">
+                  <a
+                    href="javascript:;"
+                    data-toggle="modal"
+                    data-target="#modal-Checkbox"
+                    >Checkbox <i class="fa fa-plus-circle pull-right"></i
+                  ></a>
+                </li>
+                <li class="form_bal_date">
+                  <a
+                    href="javascript:;"
+                    data-toggle="modal"
+                    data-target="#modal-date"
+                    >Date <i class="fa fa-plus-circle pull-right"></i
+                  ></a>
+                </li>
+                <li class="form_bal_time">
+                  <a
+                    href="javascript:;"
+                    data-toggle="modal"
+                    data-target="#modal-time"
+                    >Time <i class="fa fa-plus-circle pull-right"></i
+                  ></a>
+                </li>
+                <li class="form_bal_file">
+                  <a
+                    href="javascript:;"
+                    data-toggle="modal"
+                    data-target="#modal-file-field"
+                    >File Field <i class="fa fa-plus-circle pull-right"></i
+                  ></a>
+                </li>
+                <li class="form_bal_grid_checkbox">
+                  <a
+                    href="javascript:;"
+                    data-toggle="modal"
+                    data-target="#modal-time"
+                    >Grid With Checkbox
+                    <i class="fa fa-plus-circle pull-right"></i
+                  ></a>
+                </li>
+                <li class="form_bal_grid_radio">
+                  <a
+                    href="javascript:;"
+                    data-toggle="modal"
+                    data-target="#modal-time"
+                    >Grid With Radio <i class="fa fa-plus-circle pull-right"></i
+                  ></a>
+                </li>
+                <li class="form_bal_rating">
+                  <a
+                    href="javascript:;"
+                    data-toggle="modal"
+                    data-target="#modal-rating"
+                    >Rating<i class="fa fa-plus-circle pull-right"></i
+                  ></a>
+                </li>
+              </ul>
+            </nav>
+          </div>
+          <!-- /.box -->
+        </div>
+        <!-- right column -->
+        <div class="col-md-9 reorder-gallery" >
+          {% for question in questions %}
+          <!-- Short Answer -->
+            {% if question.type == "ShortAnswer" %}
+          <div class="box" id="{{question.id}}">
+            <div class="box-body">
+              <div class="form-group">
+                <label>{{ question.title }} {% if question.is_required is True %} * {% endif %}</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  placeholder="Enter Answer"
+                />
+              </div>
+              {% if question.image %}
+              <div class="form-group img-div">
+                <i class="fa fa-eye" aria-hidden="true"><a target="_blank" href="{{MEDIA_URL}}{{question.image}}" title="Image" class="ques-img">View Image</a></i>
+              </div>
+              {% endif %}
+            </div>
+            <div class="box-footer">
+              <a href="{% url 'survey:delete-question' survey_id=question.survey.pk  pk=question.pk %}">
+                <i class="fa fa-trash fa-2x q_icon"></i>
+              </a>
+              <a onclick="CopyQuestion('{{question.pk}}', '{{question.survey.pk}}')"
+                ><i class="fa fa-copy fa-2x q_icon"></i
+              ></a>
+              <a href="javascript:void(0)" class="edit_question"
+                ><i class="fa fa-edit fa-2x q_icon"></i
+              ></a>
+            </div>
+          </div>
+          <!-- Short Answer end -->
+          {% elif question.type == "Paragraph" %}
+          <!-- Paragraph Field Start -->
+          <div class="box" id="{{question.id}}">
+            <div class="box-body">
+              <div class="form-group">
+                <label >{{ question.title }}{% if question.is_required is True %} * {% endif %} </label>
+                <textarea
+                  class="form-control"
+                  rows="3"
+                  placeholder="Enter Pragraph"
+                ></textarea>
+              </div>
+              {% if question.image %}
+              <div class="form-group img-div">
+                <i class="fa fa-eye" aria-hidden="true"><a target="_blank" href="{{MEDIA_URL}}{{question.image}}" title="Image" class="ques-img">View Image</a></i>
+              </div>
+              {% endif %}
+            </div>
+            <div class="box-footer">
+              <a href="{% url 'survey:delete-question' survey_id=question.survey.pk  pk=question.pk %}">
+                <i class="fa fa-trash fa-2x q_icon" ></i>
+              </a>
+              <a onclick="CopyQuestion('{{question.pk}}', '{{question.survey.pk}}')"
+                ><i class="fa fa-copy fa-2x q_icon"></i
+              ></a>
+              <a href="javascript:void(0)" class="edit_question"
+                ><i class="fa fa-edit fa-2x q_icon"></i
+              ></a>
+            </div>
+          </div>
+          <!-- Paragraph Field end -->
+          {% elif question.type == "DropDown" %}
+          <!-- DropDown Field Start -->
+          <div class="box" id="{{question.id}}">
+            <div class="box-body">
+              <div class="form-group">
+                <label>{{ question.title }} {% if question.is_required is True %} * {% endif %} </label>
+                
+                <select class="form-control select2" style="width: 100%;">
+                  {% for value in question.option_list %}
+                  <option>{{value}}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              {% if question.image %}
+              <div class="form-group img-div">
+                <i class="fa fa-eye" aria-hidden="true"><a target="_blank" href="{{MEDIA_URL}}{{question.image}}" title="Image" class="ques-img">View Image</a></i>
+              </div>
+              {% endif %}
+            </div>
+            <div class="box-footer">
+              <a href="{% url 'survey:delete-question' survey_id=question.survey.pk  pk=question.pk %}">
+                <i class="fa fa-trash fa-2x q_icon" ></i>
+              </a>
+              <a onclick="CopyQuestion('{{question.pk}}', '{{question.survey.pk}}')"
+                ><i class="fa fa-copy fa-2x q_icon"></i
+              ></a>
+              <a href="javascript:void(0)" class="edit_question"
+                ><i class="fa fa-edit fa-2x q_icon"></i
+              ></a>
+            </div>
+          </div>
+          <!-- DropDown Field end -->
+          {% elif question.type == "MultiChoice" %}
+          <!-- MultiChoice Field Start -->
+          <div class="box" id="{{question.id}}">
+            <div class="box-body">
+              <div class="form-group">
+                <label>{{ question.title }}  {% if question.is_required is True %} * {% endif %} </label>
+                {% for value in question.option_list %}
+                <div class="form-check">
+                  <input
+                    class="form-check-input"
+                    type="radio"
+                    name="exampleRadios"
+                    id="exampleRadios1"
+                    value="option1"
+                    checked
+                  />
+                  <label class="form-check-label" for="exampleRadios1">
+                    {{value}}
+                  </label>
+                </div>
+                {% endfor %}
+              </div>
+              {% if question.image %}
+              <div class="form-group img-div">
+                <i class="fa fa-eye" aria-hidden="true"><a target="_blank" href="{{MEDIA_URL}}{{question.image}}" title="Image" class="ques-img">View Image</a></i>
+              </div>
+              {% endif %}
+            </div>
+            <div class="box-footer">
+              <a href="{% url 'survey:delete-question' survey_id=question.survey.pk  pk=question.pk %}">
+                <i class="fa fa-trash fa-2x q_icon" ></i>
+              </a>
+              <a onclick="CopyQuestion('{{question.pk}}', '{{question.survey.pk}}')"
+                ><i class="fa fa-copy fa-2x q_icon"></i
+              ></a>
+              <a href="javascript:void(0)" class="edit_question"
+                ><i class="fa fa-edit fa-2x q_icon"></i
+              ></a>
+            </div>
+          </div>
+          <!-- MultiChoice Field end -->
+          {% elif question.type == "Checkbox" %}
+          <!-- CheckBok Field Start -->
+          <div class="box" id="{{question.id}}">
+            <div class="box-body">
+              <div class="form-group">
+                <label>{{ question.title }} {% if question.is_required is True %} * {% endif %}</label>
+                {% for value in question.option_list %}
+                <div class="form-check">
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    value=""
+                    id="defaultCheck1"
+                  />
+                  <label class="form-check-label" for="defaultCheck1">
+                    {{value}}
+                  </label>
+                </div>
+                {% endfor %}
+              </div>
+              {% if question.image %}
+              <div class="form-group img-div">
+                <i class="fa fa-eye" aria-hidden="true"><a target="_blank" href="{{MEDIA_URL}}{{question.image}}" title="Image" class="ques-img">View Image</a></i>
+              </div>
+              {% endif %}
+            </div>
+            <div class="box-footer">
+              <a href="{% url 'survey:delete-question' survey_id=question.survey.pk  pk=question.pk %}">
+                <i class="fa fa-trash fa-2x q_icon" ></i>
+              </a>
+              <a onclick="CopyQuestion('{{question.pk}}', '{{question.survey.pk}}')"
+                ><i class="fa fa-copy fa-2x q_icon" ></i
+              ></a>
+              <a href="javascript:void(0)" class="edit_question"
+                ><i class="fa fa-edit fa-2x q_icon"></i
+              ></a>
+            </div>
+          </div>
+          <!-- CheckBox Field end -->
+          {% elif question.type == "Date" %}
+          <!-- Date Field Start -->
+          <div class="box" id="{{question.id}}">
+            <div class="box-body">
+              <div class="form-group">
+                <label>{{ question.title }} {% if question.is_required is True %} * {% endif %} </label>
+                <input
+                  type="date"
+                  class="form-control"
+                  id="exampleInputEmail1"
+                  placeholder="Enter Date"
+                />
+              </div>
+              {% if question.image %}
+              <div class="form-group img-div">
+                <i class="fa fa-eye" aria-hidden="true"><a target="_blank" href="{{MEDIA_URL}}{{question.image}}" title="Image" class="ques-img">View Image</a></i>
+              </div>
+              {% endif %}
+            </div>
+            <div class="box-footer">
+              <a href="{% url 'survey:delete-question' survey_id=question.survey.pk  pk=question.pk %}">
+                <i class="fa fa-trash fa-2x q_icon" ></i>
+              </a>
+              <a onclick="CopyQuestion('{{question.pk}}', '{{question.survey.pk}}')"
+                ><i class="fa fa-copy fa-2x q_icon" ></i
+              ></a>
+              <a href="javascript:void(0)" class="edit_question"
+                ><i class="fa fa-edit fa-2x q_icon"></i
+              ></a>
+            </div>
+          </div>
+          <!-- Date Field end -->
+          {% elif question.type == "Time" %}
+          <!-- Time Field Start -->
+          <div class="box" id="{{question.id}}">
+            <div class="box-body">
+              <div class="form-group">
+                <label>{{ question.title }} {% if question.is_required is True %} * {% endif %}</label>
+                <input type="time" class="form-control timepicker" />
+              </div>
+              {% if question.image %}
+              <div class="form-group img-div">
+                <i class="fa fa-eye" aria-hidden="true"><a target="_blank" href="{{MEDIA_URL}}{{question.image}}" title="Image" class="ques-img">View Image</a></i>
+              </div>
+              {% endif %}
+            </div>
+            <div class="box-footer">
+              <a href="{% url 'survey:delete-question' survey_id=question.survey.pk  pk=question.pk %}">
+                <i class="fa fa-trash fa-2x q_icon" ></i>
+              </a>
+              <a onclick="CopyQuestion('{{question.pk}}', '{{question.survey.pk}}')"
+                ><i class="fa fa-copy fa-2x q_icon"></i
+              ></a>
+              <a href="javascript:void(0)" class="edit_question"
+                ><i class="fa fa-edit fa-2x q_icon"></i
+              ></a>
+            </div>
+          </div>
+          <!-- Time Field end -->
+          {% elif question.type == "FileUpload" %}
+          <!-- File Field Start -->
+          <div class="box" id="{{question.id}}">
+            <div class="box-body">
+              <div class="form-group">
+                <label>{{ question.title }} {% if question.is_required is True %} * {% endif %} </label>
+                <input
+                  type="file"
+                  class="form-control"
+                  id="exampleInputEmail1"
+                  placeholder="Enter File"
+                />
+              </div>
+              {% if question.image %}
+              <div class="form-group img-div">
+                <i class="fa fa-eye" aria-hidden="true"><a target="_blank" href="{{MEDIA_URL}}{{question.image}}" title="Image" class="ques-img">View Image</a></i>
+              </div>
+              {% endif %}
+            </div>
+            <div class="box-footer">
+              <a href="{% url 'survey:delete-question' survey_id=question.survey.pk  pk=question.pk %}">
+                <i class="fa fa-trash fa-2x q_icon" ></i>
+              </a>
+              <a onclick="CopyQuestion('{{question.pk}}', '{{question.survey.pk}}')"
+                ><i class="fa fa-copy fa-2x q_icon" ></i
+              ></a>
+              <a href="javascript:void(0)" class="edit_question"
+                ><i class="fa fa-edit fa-2x q_icon"></i
+              ></a>
+            </div>
+          </div>
+          <!-- File Field end -->
+          {% elif question.type == "CheckboxGrid" %}
+          <!-- Grid With Checkbox Start -->
+          <div class="box" id="{{question.id}}">
+            <div class="box-body">
+              <div class="form-group">
+                <label>{{ question.title }} {% if question.is_required is True %} * {% endif %}</label>
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th></th>
+                      {% for coloum in question.grid_coloum %}
+                        <th>{{coloum}}</th>
+                      {% endfor %}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for row in question.grid_row %}
+                    <tr>
+                      <td>{{ row }} </td>
+                      {% for i in question.grid_coloum %}
+                      <td>
+                        <input type="checkbox" class="flat-red" name="row1" />
+                      </td>
+                      {% endfor %}
+                      
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+              {% if question.image %}
+              <div class="form-group img-div">
+                <i class="fa fa-eye" aria-hidden="true"><a target="_blank" href="{{MEDIA_URL}}{{question.image}}" title="Image" class="ques-img">View Image</a></i>
+              </div>
+              {% endif %}
+            </div>
+            <div class="box-footer">
+              <a href="{% url 'survey:delete-question' survey_id=question.survey.pk  pk=question.pk %}">
+                <i class="fa fa-trash fa-2x q_icon" ></i>
+              </a>
+              <a onclick="CopyQuestion('{{question.pk}}', '{{question.survey.pk}}')"
+                ><i class="fa fa-copy fa-2x q_icon"></i
+              ></a>
+              <a href="javascript:void(0)" class="edit_question"
+                ><i class="fa fa-edit fa-2x q_icon"></i
+              ></a>
+            </div>
+          </div>
+          <!-- Grid With Checkbox end -->
+          {% elif question.type == "MultiChoiceGrid" %}
+          <!-- Grid With RadioButton Start -->
+          <div class="box" id="{{question.id}}">
+            <div class="box-body">
+              <div class="form-group">
+                <label> {{ question.title }} {% if question.is_required is True %} * {% endif %} </label>
+                
+                 
+                <table class="table">
+                  <thead>
+  
+                    <tr>
+                      <th></th>
+                      {% for coloum in question.grid_coloum %}
+                        <th>{{coloum}}</th>
+                      {% endfor %}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for row in question.grid_row %}
+                    <tr>
+                      <td>{{ row }} </td>
+                      {% for i in question.grid_coloum %}
+                        <td><input type="radio" class="flat-red" name="row{{forloop.parentloop.counter}}" /></td>
+                      {% endfor %}
+                      
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+              {% if question.image %}
+              <div class="form-group img-div">
+                <i class="fa fa-eye" aria-hidden="true"><a target="_blank" href="{{MEDIA_URL}}{{question.image}}" title="Image" class="ques-img">View Image</a></i>
+              </div>
+              {% endif %}
+            </div>
+            <div class="box-footer">
+              <a href="{% url 'survey:delete-question' survey_id=question.survey.pk  pk=question.pk %}">
+                <i class="fa fa-trash fa-2x q_icon" ></i>
+              </a>
+              <a onclick="CopyQuestion('{{question.pk}}', '{{question.survey.pk}}')"
+                ><i class="fa fa-copy fa-2x q_icon" ></i
+              ></a>
+              <a href="javascript:void(0)" class="edit_question"
+                ><i class="fa fa-edit fa-2x q_icon"></i
+              ></a>
+            </div>
+          </div>
+          <!-- Grid With Radio end -->
+          {% elif question.type == "LinearScale" %}
+          <!-- Rating Start -->
+          <div class="box" id="{{question.id}}">
+            <div class="box-body">
+              <div class="form-group">
+                <label>{{ question.title }} {% if question.is_required is True %} * {% endif %} </label>
+                <div class="row" style="padding-top: 10px;">
+                <div class="col-md-2 col-sm-2">
+                  {{question.start_rating_name}} 
+                </div>
+                <div class="col-md-8 col-sm-8">
+                <input
+                  type="range"
+                  value="{{question.start_rating_scale}}"
+                  min="{{question.start_rating_scale}}"
+                  max="{{question.end_rating_scale}}"
+                  oninput="this.nextElementSibling.value = this.value"
+                />
+                <output>{{question.start_rating_scale}}</output>
+              </div>
+                <div class="col-md-2 col-sm-2">
+                  {{question.end_rating_name}}
+                </div>
+              </div>
+                
+              </div>
+              {% if question.image %}
+              <div class="form-group img-div">
+                <i class="fa fa-eye" aria-hidden="true"><a target="_blank" href="{{MEDIA_URL}}{{question.image}}" title="Image" class="ques-img">View Image</a></i>
+              </div>
+              {% endif %}
+            </div>
+            <div class="box-footer">
+              <a href="{% url 'survey:delete-question' survey_id=question.survey.pk  pk=question.pk %}">
+                <i class="fa fa-trash fa-2x q_icon" ></i>
+              </a>
+              <a onclick="CopyQuestion('{{question.pk}}', '{{question.survey.pk}}')"
+                ><i class="fa fa-copy fa-2x q_icon" ></i
+              ></a>
+              <a href="javascript:void(0)" class="edit_question"
+                ><i class="fa fa-edit fa-2x q_icon"></i
+              ></a>
+            </div>
+          </div>
+            {% endif %}
+          {% endfor %}
+          <!-- Rating end -->
+        </div>
+        <!--/.col (right) -->
+      </div>
+    </section>
+    <!-- /.content -->
+    
+    <div class="modal fade" id="modal-question" style="display: none">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <form action="{% url 'survey:update-question'%}" class="form-horizontal" id="add_question" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="modal-header">
+              
+              <h4 class="modal-title"></h4>
+            </div>
+            <div class="modal-body">
+              <div class="row li_row form_output" data-type="text" data-field="">
+                <div class="col-md-12" >
+                  <div id="question_id"></div>
+                  <input type="hidden" name="type" required id="type" value="" />
+                  <input type="hidden" name="survey_id" required value="{{survey_id.pk}}" />
+                  <div class="form-group">
+                    <div class="col-md-10">Enter Title *</div>
+                    <div class="col-md-12">
+                    <input
+                      type="text"
+                      name="title"
+                      class="form-control form_input_label "
+                      id="form_input_title"
+                      placeholder="Enter Title"
+                      required="required" 
+  
+                    /></div>
+                    <div class="col-md-10" style="margin-top:10px;">Add Image</div>
+                    <div class="col-md-12">
+                    <input
+                      type="file"
+                      name="ques_image"
+                      class="form-control form_input_label"
+                      id="form_input_image"
+                    /></div>
+
+                  </div><div id="form_input_title_error" style="color: red;"></div>
+                </div>
+                <div id="body_fields">
+  
+                </div>
+                
+                <div class="col-md-12">
+                  Required
+                  <div class="material-switch">
+                    <input
+                      
+                      name="is_required"
+                      type="checkbox"
+                      value="False"
+                      id="togBtn_required"
+                      
+                      
+                    />
+                    <label
+                      for="togBtn_required"
+                      class="label-default"
+                    ></label>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-default pull-left"
+  
+                id="formcloseButton"
+              >
+                Close
+              </button>
+              <button type="submit" id="formSubmitButton" class="btn btn-primary pull-right">Save changes</button>
+            </div>
+          </form>
+        </div>
+        <!-- /.modal-content -->
+      </div>
+      <!-- /.modal-dialog -->
+    </div> 
+  </div>
+  <div class="modal fade" id="modal-default" style="display: none;">
+    <div class="modal-dialog">
+      <form action="{% url 'survey:addsurvey_to_channel' %}" method="POST">
+        {% csrf_token %}
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span></button>
+          <h4 class="modal-title">Add Journey</h4>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" value="{{survey_id.id}}" name="survey_id" id="survey_id">
+          <div class="form-group">
+            <label>Select Journey</label>
+            <select class="form-control select2" id="channel" name="channel" required style="width: 100%;">
+  
+              <option selected="selected">Select Journey</option>
+              {% for channel in request.user|get_user_channel %}
+                <option value="{{channel.pk}}">{{channel.title}}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-primary pull-right">Save changes</button>
+        </div>
+      </div>
+    </form>
+      <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+  </div>
+  {% endblock content %} {% block js %}
+  <script>
+    
+    $(document).ready(function () {
+      $("#formcloseButton").click(function() {
+      
+      $("#modal-question").removeClass("in");
+          
+      $("#modal-question").css("display", "none");
+    });
+      $(".form_bal_short_answer").click(function () {
+        $("#type").val("ShortAnswer");
+        $("#modal-question").addClass("in");
+        $(".modal-title").html("ShortAnswer Field");
+        $("#modal-question").css("display", "block");
+        $("#body_fields").empty();
+      });
+  
+      $(".form_bal_textarea").click(function () {
+        $("#body_fields").empty();
+        $("#type").val("Paragraph");
+        $("#modal-question").addClass("in");
+        $(".modal-title").html("Paragraph Field");
+        $("#modal-question").css("display", "block");
+      });
+      $(".form_bal_select").click(function () {
+        $("#body_fields").empty();
+        $("#type").val("DropDown");
+        $("#modal-question").addClass("in");
+        $("#body_fields").html('<div class="col-md-12"><div class="form-group"><label class="col-sm-2 control-label">Option </label>\
+                    <div class="col-sm-8"><input type="text" class="form-control" name="option[]" id="option" required placeholder="Value" /></div></div><div class="add_multichoice_options"></div></div>\
+                <div class="col-md-12">\
+                  <span class="btn btn-default" id="check_add_option" onclick="AddOption()"\
+                    ><i class="fa fa-plus"></i></span></div>');
+        $(".modal-title").html("DropDown Field");
+        $("#modal-question").css("display", "block");
+      });
+      $(".form_bal_radio").click(function () {
+        $("#body_fields").empty();
+        $("#type").val("MultiChoice");
+        $("#modal-question").addClass("in");
+        $("#body_fields").html('<div class="col-md-12"><div class="form-group"><label class="col-sm-2 control-label">Option </label>\
+                    <div class="col-sm-8"><input type="text" class="form-control" name="option[]" id="option" required  placeholder="Value" /></div></div><div class="add_multichoice_options"></div></div>\
+                <div class="col-md-12">\
+                  <span class="btn btn-default" id="check_add_option" onclick="AddOption()"\
+                    ><i class="fa fa-plus"></i></span></div>');
+        $(".modal-title").html("MultiChoice Field");
+        $("#modal-question").css("display", "block");
+      });
+      $(".form_bal_checkbox").click(function () {
+        $("#body_fields").empty();
+        $("#type").val("Checkbox");
+        $("#modal-question").addClass("in");
+        $("#body_fields").html('<div class="col-md-12"><div class="form-group"><label class="col-sm-2 control-label">Option </label>\
+                    <div class="col-sm-8"><input type="text" class="form-control" name="option[]" id="option" required   placeholder="Value" /></div></div><div class="add_multichoice_options"></div></div>\
+                <div class="col-md-12">\
+                  <span class="btn btn-default" id="check_add_option" onclick="AddOption()"\
+                    ><i class="fa fa-plus"></i></span></div>');
+        $(".modal-title").html("Checkbox Field");
+        $("#modal-question").css("display", "block");
+      });
+      $(".form_bal_date").click(function () {
+        $("#body_fields").empty();
+        $("#type").val("Date");
+        $("#modal-question").addClass("in");
+        $(".modal-title").html("Date Field");
+        $("#modal-question").css("display", "block");
+      });
+      $(".form_bal_time").click(function () {
+        $("#body_fields").empty();
+          $("#type").val("Time");
+          $("#modal-question").addClass("in");
+          $(".modal-title").html("Time Field");
+          $("#modal-question").css("display", "block");
+      });
+      $(".form_bal_file").click(function () {
+        $("#body_fields").empty();
+        $("#type").val("FileUpload");
+        $("#modal-question").addClass("in");
+        $(".modal-title").html("File Field");
+        $("#modal-question").css("display", "block");
+      });
+      $(".form_bal_grid_checkbox").click(function () {
+        $("#body_fields").empty();
+        $("#type").val("CheckboxGrid");
+        $("#modal-question").addClass("in");
+        $(".modal-title").html("Grid With Checkbox Field");
+        $("#modal-question").css("display", "block");
+        $("#body_fields").html('<div class="col-md-6"><div class="form-group"><label class="col-sm-3 control-label">Row </label>\
+                    <div class="col-sm-9"><input type="text" class="form-control" name="row[]"  required placeholder="Value" /></div></div><div class="add_multichoice_row"></div><span class="btn btn-primary" onclick="AddRow()"\
+                    ><i class="fa fa-plus"></i></span></div><div class="col-md-6"><div class="form-group"><label class="col-sm-3 control-label">Column </label>\
+                    <div class="col-sm-9"><input type="text" class="form-control" name="coloum[]"  required placeholder="Value" /></div></div><div class="add_multichoice_coloum"></div><span class="btn btn-primary" onclick="AddColoum()"\
+                    ><i class="fa fa-plus"></i></span></div>'
+        );
+      });
+      $(".form_bal_grid_radio").click(function () {
+        $("#body_fields").empty();
+        $("#type").val("MultiChoiceGrid");
+        $("#modal-question").addClass("in");
+        $(".modal-title").html("Grid With Multichoice Field");
+        $("#modal-question").css("display", "block");
+        $("#body_fields").html('<div class="col-md-6"><div class="form-group"><label class="col-sm-3 control-label">Row </label>\
+                    <div class="col-sm-9"><input type="text" class="form-control" name="row[]"  placeholder="Value" /></div></div><div class="add_multichoice_row"></div><span class="btn btn-primary" onclick="AddRow()"\
+                    ><i class="fa fa-plus"></i></span></div><div class="col-md-6"><div class="form-group"><label class="col-sm-3 control-label">Column </label>\
+                    <div class="col-sm-9"><input type="text" class="form-control" name="coloum[]"  placeholder="Value" /></div></div><div class="add_multichoice_coloum"></div><span class="btn btn-primary" onclick="AddColoum()"\
+                    ><i class="fa fa-plus"></i></span></div>'
+        );
+      });
+      $(".form_bal_rating").click(function () {
+        $("#body_fields").empty();
+        $("#type").val("LinearScale");
+        $("#modal-question").addClass("in");
+        $(".modal-title").html("Rating Field");
+  
+        $("#modal-question").css("display", "block");
+        $("#body_fields").html('<div class="col-md-12"> <div class="col-md-6"> <div class="form-group"> <select name="start_rating_scale" class="form-control"> <option>1</option> <option>2</option> </select> </div> </div> <div class="col-md-6"> <div class="form-group"> <select name="end_rating_scale" class="form-control"><option>3</option> <option>4</option> <option>5</option> </select> </div> </div> </div> <div class="col-md-12"> <div class="col-md-6"> <div class="form-group"> <input class="form-control" name="start_rating_name"> </div></div> <div class="col-md-6"> <div class="form-group"> <input class="form-control" name="end_rating_name"> </div> </div> </div>');
+      });
+    });
+    
+    function AddOption() {
+      count = $(".add_multichoice_options input").length;
+      console.log(count);
+      $(".add_multichoice_options").append(
+        '<div class="form-group">\
+            <label class="col-sm-2 control-label">Option </label>\
+              <div class="col-sm-8">\
+              <input type="text" name=option[] required class="form-control" id="option'+count+'" placeholder="Value" >\
+              </div>\
+              <div class="col-sm-2">\
+                <span class="input-group-btn">\
+          <button type="button" id="close_button" class="btn btn-default btn-flat close_button" onClick="$(this).parent().parent().parent().remove();"><i class="fa fa-times"></i></button>\
+        </span>\
+        </div>\
+                </div>\
+                </div>'
+      );
+      document.getElementById("option"+count).focus();
+    }
+  
+    function AddRow(value ="") {
+      $(".add_multichoice_row").append(
+        '<div class="form-group">\
+            <label class="col-sm-3 control-label">Row </label>\
+              <div class="col-sm-9">\
+              <input type="text" name=row[] required class="form-control" placeholder="Value" value='+value+'>\
+              <span class="input-group-btn">\
+          <button type="button" id="close_button" class="btn btn-default btn-flat close_button" onClick="$(this).parent().parent().parent().remove();"><i class="fa fa-times"></i></button>\
+        </span>\
+      </div>\
+        </div>\
+        </div>'
+      );
+    }
+    function AddColoum(value ="") {
+      $(".add_multichoice_coloum").append(
+        '<div class="form-group">\
+            <label class="col-sm-3 control-label">Coloum </label>\
+              <div class="col-sm-9">\
+              <input type="text" name=coloum[] class="form-control" value="'+value+'" placeholder="Value">\
+              <span class="input-group-btn">\
+          <button type="button" id="close_button" class="btn btn-default btn-flat close_button" onClick="$(this).parent().parent().parent().remove();"><i class="fa fa-times"></i></button>\
+        </span>\
+              </div>\
+                </div>\
+                </div>'
+      );
+    }
+  
+    $("#togBtn_required").on('change', function() {
+      if ($(this).is(':checked')) {
+          $(this).attr('value', 'True');
+      }
+      else {
+        $(this).attr('value', 'False');
+      }});
+  
+  function CopyQuestion(id, survey_id) {
+  
+  var form_data = new FormData();
+  var csrfmiddlewaretoken = "{{csrf_token}}"; 
+  form_data.append("id", id);
+  form_data.append("survey_id", survey_id);
+  form_data.append("csrfmiddlewaretoken", csrfmiddlewaretoken);
+  
+  $.ajax({
+    type: "POST",
+    url: "{% url 'survey:copy_question' %}",
+    data: form_data,
+    contentType: false,
+            cache: false,
+            processData: false,
+    success: function(data){	
+      location.reload()		
+    }
+  });
+  }
+  
+ 
+
+  $(document).ready(function(){	
+	$("div.reorder-gallery").sortable({		
+		update: function( event, ui ) {
+			updateQOrder();
+		}
+	});
+  
+});
+function updateQOrder() {	
+	var item_order = new Array();
+	$('div.reorder-gallery div').each(function() {
+		item_order.push($(this).attr("id"));
+	});
+  item_order = item_order.filter(Boolean);
+  var form_data = new FormData();
+  var csrfmiddlewaretoken = "{{csrf_token}}"; 
+  form_data.append("order", item_order);
+  form_data.append('survey', "{{survey_id.pk}}")
+  form_data.append("csrfmiddlewaretoken", csrfmiddlewaretoken);
+ 
+	$.ajax({
+		type: "POST",
+		url: "{% url 'survey:update-q-order' %}",
+		data: form_data,
+	  contentType: false,
+            cache: false,
+            processData: false,
+		success: function(data){	
+      location.reload()		
+		}
+	});
+}
+
+$(document).on('click', '.edit_question', function(){
+  var id = $(this).parent().parent().attr("id");
+  var form_data = new FormData();
+  var csrfmiddlewaretoken = "{{csrf_token}}"; 
+  form_data.append("id", id);
+  form_data.append("csrfmiddlewaretoken", csrfmiddlewaretoken);
+  $.ajax({
+		type: "POST",
+		url: "{% url 'survey:single_question' %}",
+		data: form_data,
+	  contentType: false,
+            cache: false,
+            processData: false,
+		success: function(data){console.log(data.option_list);
+      $("#question_id").empty();
+      $("#body_fields").empty();
+      var list = data.option_list
+      console.log(list);
+      $("#type").val(data.type);
+      $("#modal-question").addClass("in");
+      $(".modal-title").html(data.type);
+      $("#modal-question").css("display", "block");	
+      $("#form_input_title").val(data.title);	
+      $("#question_id").append('<input type="hidden" name="question_id" id="q_id" value="'+data.id+'" />')
+      
+      if(data.is_required == true){
+        $("#togBtn_required").val("True");
+        $('#togBtn_required').prop('checked', true);
+      } else {
+        $("#togBtn_required").val("False");
+        $('#togBtn_required').prop('checked', false);
+      }
+      if(data.type == "MultiChoice" || data.type == "DropDown" || data.type == "Checkbox"){
+        
+        $("#body_fields").html('<div class="col-md-12"><div class="add_multichoice_options"></div></div>\
+              <div class="col-md-12">\
+                <span class="btn btn-default" id="check_add_option" onclick="AddOption()"\
+                  ><i class="fa fa-plus"></i></span></div>');
+                  list.forEach(function(value) {
+        $('.add_multichoice_options').append('<div class="form-group"><label class="col-sm-2 control-label">Option </label>\
+                  <div class="col-sm-8"><input type="text" class="form-control" name="option[]" placeholder="Value" value="'+value+'"/></div><div class="col-sm-2">\
+                <span class="input-group-btn" >\
+          <button type="button" id="close_button" class="btn btn-default btn-flat close_button" onClick="$(this).parent().parent().parent().remove();"><i class="fa fa-times"></i></button>\
+        </span>\
+        </div></div>');
+      });
+      } else if(data.type == "LinearScale"){
+        $("#body_fields").html('<div class="col-md-12"> <div class="col-md-6"> <div class="form-group"> <select name="start_rating_scale" id="start_rating_scale" class="form-control "> <option>1</option> <option>2</option> </select> </div> </div> <div class="col-md-6"> <div class="form-group"> <select name="end_rating_scale" id="end_rating_scale" class="form-control"> <option>3</option> <option>4</option> <option>5</option> </select> </div> </div> </div> <div class="col-md-12"> <div class="col-md-6"> <div class="form-group"> <input class="form-control" value="'+data.start_rating_name+'" name="start_rating_name"> </div></div> <div class="col-md-6"> <div class="form-group"> <input class="form-control" value="'+data.end_rating_name+'" name="end_rating_name"> </div> </div> </div>');
+        $('#start_rating_scale').val(data.start_rating_scale);
+        console.log(data.start_rating_scale);
+        $('#end_rating_scale').val(data.end_rating_scale);
+      } else if(data.type == "CheckboxGrid" || data.type == "MultiChoiceGrid"){
+        $("#body_fields").html('<div class="col-md-6"><div class="add_multichoice_row"></div> <span class="btn btn-primary" onclick="AddRow()"\ ><i class="fa fa-plus"></i></span></div><div class="col-md-6"> <div class="add_multichoice_coloum"></div> <span class="btn btn-primary" onclick="AddColoum()"\ ><i class="fa fa-plus"></i></span></div>'
+
+   
+        );
+        data.grid_row.forEach(function(value) {
+          AddRow(value);
+        });
+        data.grid_coloum.forEach(function(value) {
+          AddColoum(value);
+        });
+      }
+    }
+	});
+
+});
+
+
+
+  </script>
+  {% endblock %}
+  

@@ -1,0 +1,98 @@
+
+{% extends 'website/web_base.html' %} {% load static %}{% load crispy_forms_tags %}
+{% block content %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.15/css/intlTelInput.css">
+         <!-- sign up area start -->
+         <section class="signup__area po-rel-z1 pt-100 pb-145">
+            <div class="sign__shape">
+               <img class="man-1" src="assets/img/icon/sign/man-3.png" alt="">
+               <img class="man-2 man-22" src="assets/img/icon/sign/man-2.png" alt="">
+               <img class="circle" src="assets/img/icon/sign/circle.png" alt="">
+               <img class="zigzag" src="assets/img/icon/sign/zigzag.png" alt="">
+               <img class="dot" src="assets/img/icon/sign/dot.png" alt="">
+               <img class="bg" src="assets/img/icon/sign/sign-up.png" alt="">
+               <img class="flower" src="assets/img/icon/sign/flower.png" alt="">
+            </div>
+            <div class="container">
+               <div class="row">
+                  <div class="col-xxl-8 offset-xxl-2 col-xl-8 offset-xl-2">
+                     <div class="section__title-wrapper text-center mb-55">
+                        <h2 class="section__title">hey {{data.name}}, Please select login type</h2>
+                     </div>
+                  </div>
+               </div>
+               <div class="row">
+                  <div class="col-xxl-6 offset-xxl-3 col-xl-6 offset-xl-3 col-lg-8 offset-lg-2">
+                     <div class="sign__wrapper white-bg">
+                        {% include 'component/messages.html' %}
+                        <div class="sign__form">
+                           <form  id="singup" method="POST" action="{% url 'user:social_login_type' %}">
+                              {% csrf_token %}
+                              <div class="row">
+                                 <div class="form-group col-12">
+                                     <label>Enter Email *</label>
+                                     <input type="email"  placeholder="Email" required class="form-control" name="email" id="" value="{{data.email}}" readOnly>
+                                 </div>
+                              </div>
+                              <div class="row">
+                                 <div class="form-group col-12">
+                                   <label>User Type*</label>
+                                     <select class="form-control" name="type">
+                                       {% for type in type %}
+                                       <option value="{{type.type}}">{{type.type}}</option>
+                                       {% endfor %}                                    
+                                    </select>
+                                 </div>
+                              </div>
+                              <div class="row">
+                                 <div class="form-group col-12">
+                                   <label>Organization*</label>
+                                    <select class="form-control select2" name="company" style="width:100%;" id="company"> 
+                                    {% for company in company %}
+                                    <option value="{{company.pk}}">{{company.name}}</option>
+                                    {% endfor %}
+                                    </select>
+                                 </div>
+                              </div>
+                              <input type="hidden" name="user_data" value="{{data}}">
+                              <br>
+                           <button type="submit" class="e-btn w-100" id="btnSubmit"> <span></span> Login</button>
+                        </form>
+                     </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </section>
+         <!-- sign up area end -->
+         
+      </main>
+{% endblock content %}
+
+{% block js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.15/js/intlTelInput.min.js"></script>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <script type="text/javascript">
+        $(window).on('beforeunload', function () {
+            $("button[type=submit]").prop("disabled", "disabled");
+        });
+    </script>
+<script>
+$(document).ready(function(){
+var text = "Learner"
+$("#id_type option").filter(function() {
+return this.text == text; 
+}).text('Learner/Mentee');
+});
+</script>
+<script>
+   const form = document.getElementById('singup');
+   console.log("SINGUP FORM", form)
+      form.addEventListener('keypress', function(e){
+         if(e.keyCode == 13){
+            e.preventDefault();
+            console.log("EVENT listner added")
+         }
+      })
+</script>
+{% endblock %}

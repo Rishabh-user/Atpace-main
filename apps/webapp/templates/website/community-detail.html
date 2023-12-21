@@ -1,0 +1,223 @@
+
+<?php include('header2.php'); ?><link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<!------ Include the above in your HEAD tag ---------->
+
+<link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN"
+        crossorigin="anonymous">
+        
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+        crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
+        crossorigin="anonymous"></script>
+        <style>
+     
+        .dropdown-toggle::after {
+            content: none;
+            display: none;
+        } 
+        .btn-toolbar{
+            padding-top: 20px;
+        }
+        .card {
+    
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+.pt-120 {
+    padding-top: 130px;
+}
+
+.fa-close{
+    float: right;
+}
+.course__comment-box {
+    background: #f7f7f7;
+}
+.course__comment-box {
+    
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+    padding: 6px 30px 5px 30px;
+    margin-bottom: 10px;
+}
+.comment-click, .view-comments{
+    cursor: pointer;
+}
+        </style>
+<main>
+
+
+    <div class="container-fluid gedf-wrapper course__area pt-120 pb-120">
+        <div class="row">
+            
+            <div class="col-md-3">
+                {% include 'website/web_component/community_side_nav.html'%}
+            </div>
+           
+            <div class="col-md-6 gedf-main">
+
+                <!--- \\\\\\\Post-->
+                <div class="card gedf-card">
+                    <div class="card-header">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="mr-2">
+                                    <img class="rounded-circle" width="45" src="https://picsum.photos/50/50" alt="">
+                                </div>
+                                <div class="ml-2">
+                                    <div class="h5 m-0">@LeeCross</div>
+                                    <div class="h7 text-muted">Miracles Lee Cross</div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="dropdown">
+                                    <button class="btn btn-link dropdown-toggle" type="button" id="gedf-drop1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <i class="fa fa-ellipsis-h"></i>
+                                    </button>
+                                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="gedf-drop1">
+                                        <div class="h6 dropdown-header">Configuration</div>
+                                        <a class="dropdown-item" href="#">Save</a>
+                                        <a class="dropdown-item" href="#">Hide</a>
+                                        <a class="dropdown-item" href="#">Report</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="card-body">
+                        <div class="text-muted h7 mb-2"> <i class="fa fa-clock-o"></i>10 min ago</div>
+                        <a class="card-link" href="#">
+                            <h5 class="card-title">Lorem ipsum dolor sit amet, consectetur adip.</h5>
+                        </a>
+
+                        <p class="card-text">
+                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Quo recusandae nulla rem eos ipsa praesentium esse magnam nemo dolor
+                            sequi fuga quia quaerat cum, obcaecati hic, molestias minima iste voluptates.
+                        </p>
+                    </div>
+                    <div class="card-footer">
+                        <a href="#" class="card-link"><i class="fa fa-gittip"></i> Like</a>
+                        <span class="card-link comment-click" id='1'><i class="fa fa-comment"></i> Comment </span>
+                        <a href="#" class="card-link"><i class="fa fa-mail-forward"></i> Share</a>
+                        <span class="card-link view-comments" id="1"></i> 0 Comments </span>
+                
+                        <!------comment show---------->  
+                        <div class="course__comment mb-75" id='view-comments-1'>
+                        
+                            <br>
+                                       <h3>2 Comments</h3>
+
+                                       <ul>
+                                          <li>
+                                             <div class="course__comment-box ">
+                                                <div class="course__comment-thumb float-start">
+                                                   <img src="assets/img/course/comment/course-comment-1.jpg" alt="">
+                                                </div>
+                                                <div class="course__comment-content">
+                                                   <div class="course__comment-wrapper ml-70 fix">
+                                                      <div class="course__comment-info float-start">
+                                                         <h4>Eleanor Fant</h4>
+                                                         <span>July 14, 2022</span>
+                                                      </div>
+                                             
+                                                   </div>
+                                                   <div class="course__comment-text ml-70">
+                                                      <p>So I said lurgy dropped a clanger Jeffrey bugger cuppa gosh David blatant have it, standard A bit of how's your father my lady absolutely.</p>
+                                                   </div>
+                                                </div>
+                                             </div>
+                                          </li>
+                                          <li>
+                                             <div class="course__comment-box ">
+                                                <div class="course__comment-thumb float-start">
+                                                   <img src="assets/img/course/comment/course-comment-2.jpg" alt="">
+                                                </div>
+                                                <div class="course__comment-content">
+                                                   <div class="course__comment-wrapper ml-70 fix">
+                                                      <div class="course__comment-info float-start">
+                                                         <h4>Shahnewaz Sakil</h4>
+                                                         <span>July 17, 2022</span>
+                                                      </div>
+                                                     
+                                                   </div>
+                                                   <div class="course__comment-text ml-70">
+                                                      <p>David blatant have it, standard A bit of how's your father my lady absolutely.</p>
+                                                   </div>
+                                                </div>
+                                             </div>
+                                          </li>
+                                       </ul>
+                                    </div> 
+                        <!------comment show---------->   
+         <!------comment text box ---------->   
+         <div class="tab-pane fade show active comment-box" id="comment-box-1" role="tabpanel" aria-labelledby="posts-tab" >
+                            
+                                    <div class="form-group">
+                                        <label class="sr-only" for="message">post</label>
+                                        <textarea class="form-control" id="message" rows="3" placeholder="What are you thinking?"></textarea>
+                                    </div>
+                                    <div class="btn-toolbar justify-content-between">
+                                <div class="btn-group">
+                                    <button type="submit" class="btn btn-primary">Comment</button>
+                                </div>
+                                <div class="btn-group">
+                                    <button id="btnGroupDrop1" type="button" class="btn btn-link dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    
+                                    </button>
+                                
+                                </div>
+                            </div>
+                                </div>
+
+                        <!------comment text box end---------->  
+                    </div>
+                </div>
+                <!-- Post /////-->
+
+
+                <!--- \\\\\\\Post-->
+                
+
+                <!--- \\\\\\\Post-->
+                
+
+            </div>
+            {% comment %}
+            <div class="col-md-3">
+                <div class="card gedf-card">
+                    <div class="card-body">
+                        <h5 class="card-title">Card title</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
+                        <p class="card-text">Some quick example text to build on the card title and make up the bulk of the
+                            card's content.</p>
+                        <a href="#" class="card-link">Card link</a>
+                        <a href="#" class="card-link">Another link</a>
+                    </div>
+                </div>
+                <div class="card gedf-card">
+                        <div class="card-body">
+                            <h5 class="card-title">Card title</h5>
+                            <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
+                            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the
+                                card's content.</p>
+                            <a href="#" class="card-link">Card link</a>
+                            <a href="#" class="card-link">Another link</a>
+                        </div>
+                    </div>
+            </div>
+            {% endcomment %}
+        </div>
+    </div>
+
+    </main>
+    <script>
+
+    </script>
+
+      <?php include('footer.php');?>

@@ -1,0 +1,80 @@
+{% extends 'base.html' %} {% load static %}
+{% load tags %}
+<!-- DataTables -->
+{% block css %}
+
+    <link
+            rel="stylesheet"
+            href="{% static 'css/content/channel/new_read_content.css' %}"
+    />
+{% endblock css %} 
+{% block content %}
+{% comment %} {% include 'side_bar.html' %} {% endcomment %}
+<div class="content-wrapper" >
+  <section class="content-header">
+    <h1>
+      {{content}} 
+     
+    </h1>
+    
+  </section>
+
+  <section class="content">
+    <div class="row content_data" style="padding: 8px;" >
+      <div class="col-md-12 col-sm-12 section padding-x-48"  style="width: 100%;">
+          <!-- Widget: user widget style 1 -->
+          <div class="box box-widget widget-user  content_card" style=" box-shadow: 0 8px 32px 0 rgba( 31, 38, 135, 0.37 ); max-height: auto !important;
+            width: 100%;
+            max-width: 750px;">
+            <!-- Add the bg color to the header using any of the bg-* classes -->
+            
+            
+            <div class="widget-user-header bg-black" style="background: url('{{MEDIA_URL}}{{content.image}}') center; background-size: cover; background-repeat: no-repeat; height:45vh;">
+              <!-- <i class="fa fa-times go_back"></i> -->
+            </div>
+          
+            <div class="box-footer" style="background-color: #f3f3f3;" >
+              <h2 id="content_title" >{{content.title}} </h2>
+              <div class="user-block">
+                </div>
+              </div>
+              
+          </div>
+          <!-- /.widget-user -->
+      </div>
+    <!-- /.box -->
+
+  </section>
+  <section class="content">
+    {% for data in data %}
+    <div class="row content_data" data-id="{{data.id}}">
+      <!-- <div class="col-md-12"> -->
+
+      <!-- User image -->
+      {% if data.type == "Text" %} 
+        {% include 'microskill_card/text.html' %} 
+      {% elif data.type == "Video" %} 
+        {% include 'microskill_card/video.html' %} 
+      {% elif data.type == "Image" %} 
+        {% include 'microskill_card/image.html' %} 
+      {% elif data.type == "YtVideo" %} 
+        {% include 'microskill_card/yt_video.html' %} 
+      {% elif data.type == "Link" %} 
+        {% include 'microskill_card/system_link.html' %} 
+      {% elif data.type == "Pdf" %} 
+        {% include 'microskill_card/pdf.html' %} 
+      {% elif data.type == "Quiz" %} 
+        {% include 'microskill_card/quiz.html' %} 
+      {% elif data.type == "Poll" %} 
+        {% include 'microskill_card/poll.html' %} 
+      {% elif data.type == "Activity" %} 
+        {% include 'microskill_card/activity.html' %} 
+      {% endif %}
+      <!-- </div> -->
+    </div>
+
+    {% endfor %}
+  </section>
+ 
+</div>
+{% endblock content %} 

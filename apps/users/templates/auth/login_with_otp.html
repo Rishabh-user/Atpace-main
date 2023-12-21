@@ -1,0 +1,143 @@
+{% extends 'website/web_base.html' %} {% load static %}{% load crispy_forms_tags %}
+{% block content %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.15/css/intlTelInput.css">
+
+<main>
+
+   <!-- sign up area start -->
+   <section class="signup__area po-rel-z1 pt-100 pb-145">
+      <div class="sign__shape">
+         <img class="man-1" src="assets/img/icon/sign/man-1.png" alt="">
+         <img class="man-2" src="assets/img/icon/sign/man-2.png" alt="">
+         <img class="circle" src="assets/img/icon/sign/circle.png" alt="">
+         <img class="zigzag" src="assets/img/icon/sign/zigzag.png" alt="">
+         <img class="dot" src="assets/img/icon/sign/dot.png" alt="">
+         <img class="bg" src="assets/img/icon/sign/sign-up.png" alt="">
+      </div>
+      <div class="container">
+         <div class="row">
+            <div class="col-xxl-8 offset-xxl-2 col-xl-8 offset-xl-2">
+               <div class="section__title-wrapper text-center mb-55">
+                  <h2 class="section__title">Sign in to <br> Mentor Circle | AtPace.</h2>
+                  <p style="text-align: center;">If you don't have an account you can <a href="#">Register here!</a></p>
+               </div>
+            </div>
+         </div>
+         <div class="row">
+            <div class="col-xxl-6 offset-xxl-3 col-xl-6 offset-xl-3 col-lg-8 offset-lg-2">
+               <div class="sign__wrapper white-bg">
+                  {% include 'component/error_message.html' %}
+                  <div class="sign__form">
+                     <form method="post">
+                        {% csrf_token %}
+                        <div class="row">
+                           <div class="form-group col-12">
+                              <label>Enter Phone Number *</label>
+                              <input type="text" placeholder="Mobile" style="width: 150%;" required class="form-control"
+                                 name="mobile" id="phone">
+                           </div>
+                        </div>
+
+                        <div class="row">
+                           <div class="form-group col-12">
+                              <label>User Type </label>
+                              <select class="form-control" name="type" id="type">
+                                 {% for user_type in user_type %}
+                                 <option value="{{user_type.pk}}">{% if user_type.type == "Learner" %}Learner/Mentee {%
+                                    else %} {{user_type.type}} {% endif %}</option>
+                                 {% endfor %}
+                              </select>
+                           </div>
+                        </div>
+                        <div class="row">
+                           <div class="form-group col-12" id="div_id_company" required style="display:none;">
+                              <label>Organization*</label>
+                              <select class="form-control" name="company" style="width:100%;" id="company">
+                                 <option value="">---------</option>
+                              </select>
+                           </div>
+                        </div>
+                        <br>
+                        <button class="e-btn w-100"> <span></span> Login</button>
+                        <div class="row text-center">
+
+                        </div>
+                        <br>
+                        <a href="{% url 'user:login' %}"> Already have Account! </a>
+                        <!-- /.col -->
+                  </div>
+                  </form>
+               </div>
+            </div>
+         </div>
+      </div>
+      </div>
+   </section>
+   <!-- sign up area end -->
+
+</main>
+{% endblock content %}
+{% block js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.15/js/intlTelInput.min.js"></script>
+<script>
+   document.getElementById("phone").onblur = function () { getCompany() };
+
+   function getCompany() {
+      var phone = document.getElementById("phone").value
+      console.log("Get Company", phone);
+      $.ajax({
+         url: "{% url 'user:get_user_company' %}",
+         type: "post",
+         data: {
+            email: phone,
+            csrfmiddlewaretoken: "{{csrf_token}}"
+         },
+         success: function (data) {
+            console.log(data, data.data.company.length)
+            if (data.data.success) {
+               console.log("success")
+               document.getElementById("div_id_company").style.display = "block"
+               var select = document.getElementById("company");
+               var length = select.options.length;
+               for (i = length - 1; i >= 0; i--) {
+                  select.options[i] = null;
+               }
+               for (var i = 0; i < data.data.company.length; i++) {
+                  var option = document.createElement("option");
+                  option.text = data.data.company[i].name;
+                  option.value = data.data.company[i].id;
+                  select.appendChild(option);
+               }
+            }
+         },
+         error: function (error) {
+            console.log(error)
+         }
+      })
+
+   }
+   // Vanilla Javascript
+   var input = document.querySelector("#phone");
+   window.intlTelInput(input, ({
+      // options here
+   }));
+
+   $(document).ready(function () {
+      $('.iti__flag-container').click(function () {
+         var countryCode = $('.iti__selected-flag').attr('title');
+         var countryCode = countryCode.replace(/[^0-9]/g, '')
+         $('#phone').val("");
+         $('#phone').val("+" + countryCode + " " + $('#phone').val());
+      });
+   });
+
+</script>
+<script>
+   $(document).ready(function () {
+      var text = "Learner"
+      $("#id_type option").filter(function () {
+         return this.text == text;
+      }).text('Learner/Mentee');
+   });
+</script>
+{% endblock %}

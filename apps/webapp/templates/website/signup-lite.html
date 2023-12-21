@@ -1,0 +1,518 @@
+{% extends 'website/web_base.html' %} 
+{% load static %}
+{% load crispy_forms_tags %}  
+{% load tags %}
+{% block content %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.15/css/intlTelInput.css">
+      <main>
+
+         <!-- sign up area start -->
+         <section class="signup__area po-rel-z1 pt-100 pb-145">
+            <div class="page__title-shape">
+                <img class="page-title-shape-5 d-none d-sm-block"
+                    src="{% static 'website/img/page-title/page-title-shape-1.png' %}" alt="">
+                <img class="page-title-shape-6" src="{% static 'website/img/page-title/page-title-shape-6.png' %}" alt="">
+                <img class="page-title-shape-7" src="{% static 'website/img/page-title/page-title-shape-4.png' %}" alt="">
+            </div>
+            <div class="container">
+            <div class="row">
+                <div class="col-xxl-12 col-xl-12 col-lg-12">
+                    <div class="course__wrapper">
+                        <div class="page__title-content mb-25">
+
+                            <span class="page__title-pre">Create a free  Account</span>
+                            <h5 class="page__title-3">{{journey.title}}</h5>
+                        </div>
+
+                        {% if journey.image %}
+                        <div class="course__img w-img mb-30">
+                            <img src="{{MEDIA_URL}}{{journey.image}}" alt="">
+                        </div>
+                        {% endif %}
+                        {% if video_url %}
+                        <div style="text-align:center">
+                            {{ video_url|youtube_embed_url|safe }}
+                        </div>
+                        {% endif %}
+                        {% if cta_button_title %}
+                        <div style="text-align:center">
+                            <a href="{{cta_button_action}}" target="_blank"> <button type="button" class="btn btn-primary" id="" >{{cta_button_title}}</button></a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                 <div class="course__tab-content mb-95">
+                      <div class="tab-content" id="courseTabContent">
+                         <div class="tab-pane fade show active" id="description" role="tabpanel" aria-labelledby="description-tab">
+                            <div class="course__description">
+                                {% if journey.description|length > 0 %}
+                            
+                                <h3>{% if overview %} {{ overview }} {% else %} Course Overview {% endif %}</h3>
+                               <p>{{journey.description|safe}}</p>
+                               {% endif %}
+
+                               {% if journey.tags|length > 0 %}
+                               <div class="course__tag-2 mb-35 mt-35">
+                                  <i class="fal fa-tag"></i>
+                                  {{journey.tags}}
+                                  <!-- <a href="#">Big data,</a>
+                                  <a href="#">Data analysis,</a>
+                                  <a href="#">Data modeling</a> -->
+                               </div>
+                               {% endif %}
+                               {% if journey.what_we_learn|length > 0 %}
+                               <div class="course__description-list mb-45">
+                                  <h4>{% if learn_label %} {{ learn_label }} {% else %}What Will you learn {% endif %} </h4>
+                                  <ul>
+                                     
+                                  {% with journey.what_we_learn|split:"," as what_we_learn_list %}
+                                  
+                                    {% for learn in what_we_learn_list %}
+                                  
+                                    <li>{{learn|safe}}</li>
+                                    {% endfor %}
+                                 {% endwith %}
+                                  </ul>
+                               </div>
+                               {% endif %}
+                               {% if pdpa_statement|length > 0 %}
+                                <div class="course__description-list mb-45">
+                                  <h4 >{{pdpa_label}}</h4>
+                                  {{pdpa_statement|safe}}
+                                </div>
+                                {% endif %}
+                               <div class="col-xxl-8 offset-xxl-2 col-xl-8 offset-xl-2 col-lg-8 offset-lg-2">
+                                    <div class="sign__wrapper white-bg">
+                                        {% include 'component/messages.html' %}
+                                        <div class="sign__form"> {{data.data}}
+                                        <form  id="singup" method="POST" action="{% url 'user:signup-lite' journey_id=journey.id  %}">
+                                            {% csrf_token %}
+                                            <input type="hidden" id="journey_idd" value="{{journey.id}}"/>
+                                            <div class="row">
+                                                <div class="form-group col-12">
+                                            <label>User Type </label>
+                                                <select class="form-control" name="type" id="type" hx-get="{% url 'user:assessment_question' journey=journey.id  %}" hx-target="#assessment_question"  hx-trigger="change"  required style="width: 100%;">
+                                                <option value="" selected disabled>Select</option>
+                                                    <option value="Learner" {% if data.user_type == "Learner"  %} selected {% endif %}>Learner/Mentee</option>
+                                                    <option value="Mentor" {% if data.user_type == "Mentor"  %} selected {% endif %}>Mentor</option>
+                                                
+                                                </select>
+                                            </div>
+                                            <div class="form-group col-12">
+                                                <div class="row">
+                                                    <div class="form-group col-12">
+                                                        <label>Enter Email *</label>
+                                                        <input type="email"  placeholder="Email" value="{{data.email}}" required class="form-control" {% if "/edit-signup-lite/" in request.path %}readonly{% endif %} name="email" id="email" >
+                                                    </div>
+                                            </div>
+                                            <div class="row">
+                                            <div class="form-group col-12">
+                                                <label>Enter Name *</label>
+                                                <br>
+                                                    <input type="text" placeholder="Name" style="width: 100%;" value="{{data.name}}" required {% if "/edit-signup-lite/" in request.path %}readonly{% endif %} class="form-control" name="name" id="name">
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="form-group col-12">
+                                                <label>Enter Phone Number *</label>
+                                                <br>
+                                                    <input type="text" placeholder="Mobile" style="width: 100%;" value="{{data.mobile}}" required class="form-control" {% if "/edit-signup-lite/" in request.path %}readonly{% endif %} name="mobile" id="phone" onblur="check_signup_user('{{journey.id}}')">
+                                                </div>
+                                            </div>
+                                        <div class="row">
+                                            <div class="form-group col-12">
+                                                <label>Enter Username *</label>
+                                            
+                                                <input type="text" placeholder="Username"  required class="form-control" value="{{data.username}}" {% if "/edit-signup-lite/" in request.path %}readonly{% endif %} name="username" id="username" onKeyUp="checkInput()">
+                                                <!-- <span class="help-block username-help">The username should only contain all small letters and at least one special character with no space</span> -->
+                                                <span style="color:red" id="message_id"></span>
+                                            </div>
+                                        </div>
+                                        
+                                            
+                                         <div id="assessment_question">
+                                            {% for profile_assest in question_list %}
+                                            <div class="form-group col-12">
+                                                <label>{{profile_assest.question}}</label>
+                                                <input type="hidden" name="question[]" value="{{profile_assest.question_id}}">
+                                            </div>
+                                            <div class="form-group col-12">
+                                                {% if profile_assest.question_type ==  "Options" %}
+                                                <select class="form-control" name="response[]">
+                                                    <option selected hidden value="">Selected</option>
+                                                    {% for options in profile_assest.options %}    
+                                                    {% comment %} <option selected>{{profile_assest.response}}</option> {% endcomment %}
+                                                    <option {% if profile_assest.response == options %}selected{% endif %}>{{options}}</option>
+                                                    {% endfor %}
+                                                </select>
+                                                {% else %}
+                                                <textarea class="form-control" placeholder="Enter Your Answer" name="response[]">{{profile_assest.response}}</textarea>
+                                                {% endif %}
+                                            </div>
+                                            {% endfor %}
+                                                                                {% include 'partials/assessment_question_list.html' %}
+                                        </div>
+                                        <div class="row">
+                               <div class="form-group col-12">
+                                 <label>Enter Coupon Code </label>
+                                   <input type="text" placeholder="Coupon Code" required class="form-control" name="coupon_code" style="text-transform: uppercase;" id="coupon_code" onblur="check_coupon_code('{{journey.id}}')">
+                               </div>
+                           </div>
+                                        <div class="row">
+                                            
+                                            <div class="sign__action d-flex justify-content-between">
+                                                <div class="sign__agree d-flex align-items-center">
+                                                    <input class="m-check-input" type="checkbox" required class="form-control" id="m-agree" name="term_and_conditions" checked>
+                                                    <label class="m-check-label" for="m-agree">I agree to the <a target="_blank" href="{% static 'website/files/Terms_of_Use(EULA)_GROWATPACE.pdf' %}"> Terms &amp; Conditions</a>
+                                                    </label>
+                                                    </div>
+                                                </div>
+                                                <div class="sign__action d-flex justify-content-between">
+                                                    <div class="sign__agree d-flex align-items-center">
+                                                    <input class="m-check-input" type="checkbox" class="form-control" id="m-enable" name="is_whatsapp_enable">
+                                                    <label class="m-check-label" for="m-enable">I have OR will create a WhatsApp account for updates</label>
+                                                        </label>
+                                                    </div>
+                                                    </div>
+                                                     <div class="sign__action d-flex justify-content-between">
+                                                    <div class="sign__agree d-flex align-items-center">
+                                                    <input class="m-check-input" type="checkbox" class="form-control" id="m-pdpa" name="pdpa_statement">
+                                                    <label class="m-check-label" for="m-pdpa">{{pdpa_label}}</label>
+                                                        </label>
+                                                    </div>
+                                                    </div>
+                                        </div></div>
+                                        <br>
+                                            <a style="margin-bottom:10px;"><button type="submit" class="e-btn btn-sm" id="btnSubmit preview_btn">Preview</button></a>
+                                            <a href="{% url 'user:signup-lite' journey_id=journey.id  %}"> <button type="button" class="e-btn btn-small " >Reset</button></a>
+                                            <div class="sign__new text-center mt-20">
+                                                <p>Already have Account ? <a href="{% url 'user:login' %}"> Sign In</a></p>
+                                            </div>
+                                        </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                         </div>
+                         
+                        
+                       </div>
+                   </div>
+
+            </div>
+        </div>
+        
+         </section>
+         <!-- sign up area end -->
+         <!-- Modal -->
+        <div class="modal fade" id="myModal" role="dialog">
+            <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+            {% comment %} <form action="{% url 'user:merge_user_record' %}" method="post"> {% endcomment %}
+                {% comment %} {% csrf_token %} {% endcomment %}
+                <div class="modal-header">
+                    <h4 class="modal-title">User Account</h4>
+                    <button type="button" class="close" onclick="closeModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p>We have found the following account linked to your credentials, please select one to continue.</p>
+                    <div id="account-form">
+                    
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default pull-left" data-dismiss="modal" onclick="closeModal()">No</button>
+                    <button type="button" class="btn btn-default" onclick="appendData()">Yes</button>
+                </div>
+            {% comment %} </form> {% endcomment %}
+            </div>
+            
+            </div>
+        </div>
+         
+      </main>
+
+{% endblock content %}
+  
+{% block js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.15/js/intlTelInput.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/htmx/1.7.0/htmx.min.js" integrity="sha512-etqA0KankuxrlSeZDYycQBY/D/KWZn0YZjlsjAo7kCEBTy1gg+DwmR6icxtOpqDBOzm2P00/lSIXEu7K+zvNsg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/4.4.0/bootbox.min.js"></script>
+<script>
+// Vanilla Javascript
+var input = document.querySelector("#phone");
+window.intlTelInput(input,({
+  // options here
+}));
+
+$(document).ready(function() {
+    $('.iti__flag-container').click(function() { 
+      var countryCode = $('.iti__selected-flag').attr('title');
+      var countryCode = countryCode.replace(/[^0-9]/g,'')
+      $('#phone').val("");
+      $('#phone').val("+"+countryCode+" "+ $('#phone').val());
+   });
+});
+
+</script>
+<script>
+$(document).ready(function(){
+var text = "Learner"
+$("#id_type option").filter(function() {
+return this.text == text; 
+}).text('Learner/Mentee');
+});
+</script>
+<script>
+    (function() {
+        $('form > input').keyup(function() {
+    
+            var empty = false;
+            $('form > input').each(function() {
+                if ($(this).val() == '') {
+                    empty = true;
+                }
+            });
+    
+            if (empty) {
+                $('#btnSubmit preview_btn').attr('disabled', 'disabled'); // updated according to http://stackoverflow.com/questions/7637790/how-to-remove-disabled-attribute-with-jquery-ie
+            } else {
+                $('#btnSubmit preview_btn').removeAttr('disabled'); // updated according to http://stackoverflow.com/questions/7637790/how-to-remove-disabled-attribute-with-jquery-ie
+            }
+        });
+    })()
+   /*$(document).ready(function(){
+      $('#phone').on('blur', function(){
+         if ($(this).length() < 7){
+            bootbox.alert("Please enter valid mobile number!");
+         }
+      })
+   });*/
+
+    function closeModal(){
+        //$('#myModal').modal('hide');
+        bootbox.alert("Please select a account to continue signup!")
+    }
+    function appendData(){
+        console.log("append data", document.querySelector('input[name="account"]:checked'))
+        
+        if(! document.querySelector('input[name="account"]:checked')){
+            bootbox.alert("Please select a account to continue signup!")
+        }
+        else{
+            var selected_value = document.querySelector('input[name="account"]:checked').value   
+            $('#myModal').modal('hide');
+            if(selected_value.split("and")[1] != 'None'){
+                document.getElementById("email").value = selected_value.split("and")[0]
+                document.getElementById("phone").value = selected_value.split("and")[1]
+                document.getElementById("username").value = selected_value.split("and")[2]
+                document.getElementById("name").value = selected_value.split("and")[3]
+                document.getElementById('email').readOnly = true
+                console.log("phone", selected_value.split("and")[1])
+                document.getElementById('phone').readOnly = true
+                document.getElementById('username').readOnly = true
+                document.getElementById('name').readOnly = true
+                is_enroll = checkJourneyEnroll(selected_value.split("and")[0]);
+            }
+            else{
+                bootbox.alert("Please login by using email " + selected_value.split("and")[0] +" and update your phone number.")
+                document.getElementById("email").value = ""
+                document.getElementById("phone").value = ""
+            }
+            
+        }
+
+    }
+
+    function hide_email(email){
+        emailarray = email.split(".")
+        ename_array = emailarray[0].split("@")
+        sub = ename_array[0].substr(2,ename_array[0].length)
+        e_1 = ename_array[0].replace(sub, "*".repeat(sub.length))
+        e_2 = ename_array[1].replace(ename_array[1], "*".repeat(ename_array[1].length))
+        return e_1+"@"+e_2+"."+emailarray[1]
+    }
+
+    function hide_number(phone){
+        sub = phone.substr(0,phone.length-3)
+        console.log("sub1 ",sub)
+        phone = phone.replace(sub, "*".repeat(sub.length))
+        console.log("phone11 ",phone)
+        return phone
+    }
+
+   function check_signup_user(journey_id) {
+    console.log("journey_id ", journey_id)
+    console.log("email ", $("#email").val())
+    if ((document.getElementById('email').value == "") | (document.getElementById('phone') == "")) {
+        console.log("315")
+        bootbox.alert("Email or Phone should not be empty!")
+    }
+    else if (document.getElementById('phone').value.length < 7 | document.getElementById('phone').value.length > 15){
+        console.log("319")
+        bootbox.alert("Please enter valid mobile number!");
+    }
+    else {
+        console.log("323")
+        email = $("#email").val();
+        phone = $('#phone').val();
+
+        console.log("315")
+        $.ajax({
+            url: "{% url 'user:check_user' %}",
+            type: "post",
+            data: {
+                email: email,
+                phone: phone,
+                journey_id: journey_id,
+                csrfmiddlewaretoken: "{{csrf_token}}"
+            },
+            error: function () {
+                console.log("Something is wrong");
+            },
+            success: function (data) {
+                console.log("data", data)
+
+                if (data.success == true){
+                    console.log("Hello modal")
+                    $("#account-form").empty();
+                    for(let i=0; i<data.users.length; i++){
+                        var radiobox = document.createElement('input');
+                        radiobox.type = 'radio';
+                        radiobox.id = 'account_'+i;
+                        radiobox.name = 'account';
+                        radiobox.value = data.users[i].email + "and" + data.users[i].mobile + "and" + data.users[i].username + "and" + data.users[i].first_name+data.users[i].last_name;
+                        var label = document.createElement('label')
+                        label.htmlFor = 'account_'+i;
+                        var description = document.createTextNode(hide_email(data.users[i].email) + " " + hide_number(data.users[i].mobile));
+                        label.appendChild(description);
+                    
+                        var newline = document.createElement('br');
+                    
+                        var container = document.getElementById('account-form');
+                        container.appendChild(radiobox);
+                        container.appendChild(label);
+                        container.appendChild(newline);
+                    }
+                    $('#myModal').modal({backdrop: 'static', keyboard: false}) 
+                    $('#myModal').modal('show');
+                } 
+            },
+        });
+   }
+   }
+function checkJourneyEnroll(email){
+    user_type = document.getElementById('type').value;
+    journey_id = document.getElementById('journey_idd').value;
+    console.log("user_type ",user_type)
+    email = $("#email").val();
+    let result
+    $.ajax({
+        url: "{% url 'user:user_enroll_check' %}",
+        type: "post",
+        data: {
+            email: email,
+            journey_id: journey_id,
+            type: user_type,
+            csrfmiddlewaretoken: "{{csrf_token}}"
+        },
+        success: function (data) {
+            console.log("message ", data);
+            if (data != "success"){
+            if (!data.success){
+                bootbox.alert(data.message)
+
+                var element = document.getElementById('singup');
+                document.getElementById('phone').readOnly = false;
+                document.getElementById('username').readOnly = false;
+                document.getElementById('email').readOnly = false;
+                document.getElementById('name').readOnly = false;
+                element.reset();
+                result = true
+            }
+        }
+        },
+        error: function () {
+            console.log("Something is wrong");
+            result = false
+        }
+    });
+    return result
+}
+    function check_coupon_code(journey_id) {
+        if ($("#coupon_code").val() != '') {
+            value = $("#coupon_code").val()
+            console.log(journey_id, value)
+            $.ajax({
+            url: "{% url 'user:check_coupon' %}",
+            type: "post",
+            data: {
+                coupon_code: value,
+                journey_id: journey_id,
+                csrfmiddlewaretoken: "{{csrf_token}}"
+            },
+            error: function () {
+                console.log("Something is wrong");
+            },
+            success: function (data) {
+                if (!data.success) {
+                    bootbox.alert("The Coupon Code is invalid for this journey!");
+                    document.getElementById("coupon_code").value = ''
+                }
+            }
+        })
+    }
+}
+function checkInput() {
+    document.getElementById('message_id').innerHTML = "";
+    if (!document.getElementById('username').readOnly) {
+        var myTextBox = document.getElementById('username');
+        var value = myTextBox.value;
+        if (!isUserNameValid(value)) {
+            document.getElementById('message_id').innerHTML = "username should contain all small character with no space or special characters";
+        } else {
+            document.getElementById('message_id').innerHTML = "";
+            check_username(value)
+        }
+    }
+}
+
+function isUserNameValid(username) {
+    const regex = /^[a-z]+$/gm;
+    if(username){
+        let res = username.match(regex);
+        var valid = !!res;
+        return valid;
+    }
+  }
+
+function check_username(username) {
+    if(username){
+        $.ajax({
+        url: "{% url 'user:check_user_name' %}",
+        type: "GET",
+        data: {username: username},
+        error: function () {
+            console.log("Something is wrong");
+        },
+        success: function (data) {
+            if (!data.success) {
+                document.getElementById('message_id').innerHTML = "username already exists";        }
+        }
+    })
+    }
+}
+   
+</script>
+<script>
+const form = document.getElementById('singup');
+    console.log("SINGUP FORM", form)
+      form.addEventListener('keypress', function(e){
+        if(e.keyCode == 13){
+            e.preventDefault();
+            console.log("EVENT listner added")
+        }
+    })
+ </script>
+{% endblock %}

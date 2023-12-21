@@ -1,0 +1,36 @@
+{% load static %}
+<div class="box">
+      <div class="box-header with-border">
+        <h3 class="box-title">Upload Mentor</h3>
+      </div>
+      <div class="box-body">
+      {% include 'component/messages.html' %}
+      {% include 'component/error_message.html' %}
+        <form id="upload_mentor" method="post" action="{% url 'user:create-bulk-user' %}?marketplace_user=True" enctype="multipart/form-data">
+          {% csrf_token %}
+            <div class="row">
+                <input type="hidden" name="company_id" :value="user_company_id">
+                <div class="col-md-12">
+                  <div class="form-group">
+                    <label>Upload CSV file</label>
+                    <input
+                      name="file"
+                      type="file"
+                      id="file"
+                      class="form-control"
+                      accept=".csv"
+                      required
+                    />
+                  </div>
+                  <!-- /.form-group -->
+                </div>
+                <!-- /.col -->
+                <input type="submit" name="submit" value="Upload" class="btn btn-primary" id="btnSubmit" @click="showProgressModal()">
+                <a href="{% static 'csv/sample.csv' %}" class="btn btn-primary" download>Download Sample File</a>
+            </div>
+            <!-- /.row -->
+        </form>
+      </div>
+      <!-- /.box-footer-->
+    </div>
+    <!-- /.box -->

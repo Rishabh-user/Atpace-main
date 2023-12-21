@@ -1,0 +1,65 @@
+*,
+*:before,
+*:after {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+body {
+    height: 100vh;
+    background: linear-gradient(#e8f0f7 50%, #fc6600
+    50%);
+}
+
+.circular-progress {
+    position: relative;
+    height: 60px;
+    width: 60px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    margin-left: 60px;
+}
+
+.circular-progress:before {
+    content: "";
+    position: absolute;
+    height: 84%;
+    width: 84%;
+    background-color: #ffffff;
+    border-radius: 50%;
+}
+
+.value-container {
+    position: relative;
+    font-family: 'Nunito', sans-serif;
+    font-size: 20px;
+    color: #231c3d;
+}
+
+.circular-progress-streaks {
+    position: relative;
+    height: 60px;
+    width: 60px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    margin-left: 60px;
+}
+
+.circular-progress-streaks:before {
+    content: "";
+    position: absolute;
+    height: 84%;
+    width: 84%;
+    background-color: #ffffff;
+    border-radius: 50%;
+}
+
+.value-container-streaks {
+    position: relative;
+    font-family: 'Nunito', sans-serif;
+    font-size: 20px;
+    color: #231c3d;
+}

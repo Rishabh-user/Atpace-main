@@ -1,0 +1,504 @@
+{% extends 'base.html' %} {% load static %} 
+{% block title %} Matching Setup {% endblock %} 
+{% block css %} 
+{% endblock css %} {% block content %}
+<div class="content-wrapper">
+  <!-- Content Header (Page header) -->
+  <section class="content-header">
+    <h1> Matching Setup </h1>
+    <ol class="breadcrumb">
+      <li>
+        <a href="#"><i class="fa fa-dashboard"></i> Matching</a>
+      </li>
+      <li><a href="#">Setup</a></li>
+    </ol>
+  </section>
+  <section class="content">
+    <div class="box">
+      <div class="box-header with-border">
+        <h3 class="box-title">Matching Setup</h3>
+      </div>
+      <div class="box-body">
+        <form method="post" action="{% url 'user:create_match_question' %}">
+          {% csrf_token %}
+        <div class="form-group">
+
+          <label for="company" class="col-md-12 control-label">Company</label>
+          <input type="text" class="form-control" value="{{request.session.company_name}}" name="company" id="company" readOnly/>
+          {% comment %} <select
+            class="form-control select2"
+            name="company"
+            required
+            id="company"
+            style="width: 100%"
+          >
+          <option value ="">Select </option>  
+            {% for company in company_list %}
+            <option value="{{company.id}}">{{company}}</option>
+            {% endfor %}
+          </select> {% endcomment %}
+        </div>
+        <div class="form-group">
+          <label for="journey" class="col-md-12 control-label">Journey</label>
+          <select
+            class="form-control select2"
+            name="journey"
+            required
+            id="journey"
+            style="width: 100%"
+            onchange="check_match_question_config()"
+          >
+          <option value ="">Select </option>
+            {% for journey in journey %}
+            <option value="{{journey.id}}">{{journey}}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="row">
+            <div class="col-md-3">
+                <div class="form-group">
+                <label for="mentor1" class="col-md-12 control-label">Mentor Question</label>
+                <select
+                    class="form-control"
+                    name="mentor1"
+                    hx-get="{% url 'user:question_options1' %}" hx-target="#opt1"  hx-trigger="change"
+                    required
+                    id="mentor1"
+                    style="width: 100%"
+                >
+                <option value ="">Select </option>
+                {% for ques in mentor_ques %}
+                <option value="{{ques.id}}">{{ques.question}}</option>
+                {% endfor %}
+                </select>
+                </div>
+            </div>
+            <div class="col-md-1 text-center">
+                <span><b>Match with</b></span>
+            </div>
+             <div class="col-md-3">
+             <div class="form-group">
+                <label for="learner1" class="col-md-12 control-label">Learner Question</label>
+                <select
+                    class="form-control select2"
+                    name="learner1"
+                    required
+                    id="learner1"
+                    style="width: 100%"
+                >
+                <option value ="">Select </option>
+                {% for ques in learner_ques %}
+                <option value="{{ques.id}}">{{ques.question}}</option>
+                {% endfor %}
+                </select>
+            </div>
+            </div>
+            <div class="col-md-1 text-center">
+              <span><b>Set Type</b></span>
+            </div>
+            <div class="col-md-2">
+              <div class="form-group">
+                 <label for="type1" class="col-md-12 control-label">Question Type</label>
+                 <select
+                     class="form-control select2"
+                     name="type1"
+                     required
+                     id="type1"
+                     style="width: 100%"
+                 >
+                 <option value ="">Select </option>
+                 <option value="self">Self Match</option>
+                 <option value="goal">Match By Goal</option>
+                 <option value="industry">Match By Industry</option>
+                 </select>
+             </div>
+             </div> 
+            <div class="col-md-1 text-center">
+              <span><b>Is Dependent</b></span>
+              <input type="checkbox" id="is_dependent1" name="is_dependent1" value="True" onclick="showOptions('1')"/>
+            </div>
+        </div>
+        <div class="row hide" id="row1">
+            <div class="col-md-3">
+                <div class="form-group ">
+                <label for="mentor_ques_opt1" class="col-md-12 control-label">Question</label>
+                <select
+                    class="form-control"
+                    name="mentor_ques_opt1"
+                    required
+                    id="mentor_ques_opt1"
+                    style="width: 100%"
+                >
+                {% for ques in mentor_ques %}
+                <option value="{{ques.id}}">{{ques.question}}</option>
+                {% endfor %}
+                </select>
+                </div>
+            </div>
+            <div class="col-md-1 text-center">
+              <span><b>Match with</b></span>
+            </div>
+            <div class="col-md-3">
+             <div class="form-group">
+                <label for="learner_ques_opt1" class="col-md-12 control-label">Question</label>
+                <select
+                    class="form-control select2"
+                    name="learner_ques_opt1"
+                    required
+                    id="learner_ques_opt1"
+                    style="width: 100%"
+                >
+                {% for ques in learner_ques %}
+                <option value="{{ques.id}}">{{ques.question}}</option>
+                {% endfor %}
+                </select>
+            </div>
+            </div>
+            <div class="col-md-1 text-center">
+              <span><b>On Option</b></span>
+            </div>
+            <div class="col-md-2">
+             <div class="form-group">
+                <label for="ques_opt1" class="col-md-12 control-label">Question Options</label>
+                <div id="opt1">
+                  {% include 'partials/question_options1.html' %}
+                </div>
+             </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3">
+                <div class="form-group">
+                <label for="mentor2" class="col-md-12 control-label">Mentor Question</label>
+                <select
+                    class="form-control"
+                    name="mentor2"
+                    hx-get="{% url 'user:question_options2' %}" hx-target="#opt2"  hx-trigger="change"
+                    required
+                    id="mentor2"
+                    style="width: 100%"
+                >
+                <option value ="">Select </option>
+                {% for ques in mentor_ques %}
+                <option value="{{ques.id}}">{{ques.question}}</option>
+                {% endfor %}
+                </select>
+                </div>
+            </div>
+            <div class="col-md-1 text-center">
+                <span><b>Match with</b></span>
+            </div>
+             <div class="col-md-3">
+                <div class="form-group">
+                <label for="learner2" class="col-md-12 control-label">Learner Question</label>
+                <select
+                    class="form-control select2"
+                    name="learner2"
+                    required
+                    id="learner2"
+                    style="width: 100%"
+                >
+                <option value ="">Select </option>
+                {% for ques in learner_ques %}
+                <option value="{{ques.id}}">{{ques.question}}</option>
+                {% endfor %}
+                </select>
+                </div>
+            </div>
+            <div class="col-md-1 text-center">
+              <span><b>Set Type</b></span>
+            </div>
+            <div class="col-md-2">
+              <div class="form-group">
+                 <label for="type2" class="col-md-12 control-label">Question Type</label>
+                 <select
+                     class="form-control select2"
+                     name="type2"
+                     required
+                     id="type2"
+                     style="width: 100%"
+                 >
+                 <option value ="">Select </option>
+                 <option value="self">Self Match</option>
+                 <option value="goal">Match By Goal</option>
+                 <option value="industry">Match By Industry</option>
+                 </select>
+             </div>
+             </div>
+             <div class="col-md-1 text-center">
+              <span><b>Is Dependent</b></span>
+              <input type="checkbox" id="is_dependent2" name="is_dependent2" value="True" onclick="showOptions('2')"/>
+            </div>
+        </div>
+        <div class="row hide" id="row1">
+          <div class="col-md-3">
+              <div class="form-group ">
+              <label for="mentor_ques_opt2" class="col-md-12 control-label">Question</label>
+              <select
+                  class="form-control"
+                  name="mentor_ques_opt2"
+                  required
+                  id="mentor_ques_opt2"
+                  style="width: 100%"
+              >
+              {% for ques in mentor_ques %}
+              <option value="{{ques.id}}">{{ques.question}}</option>
+              {% endfor %}
+              </select>
+              </div>
+          </div>
+          <div class="col-md-1 text-center">
+            <span><b>Match with</b></span>
+          </div>
+          <div class="col-md-3">
+           <div class="form-group">
+              <label for="learner_ques_opt2" class="col-md-12 control-label">Question</label>
+              <select
+                  class="form-control select2"
+                  name="learner_ques_opt2"
+                  required
+                  id="learner_ques_opt2"
+                  style="width: 100%"
+              >
+              {% for ques in learner_ques %}
+              <option value="{{ques.id}}">{{ques.question}}</option>
+              {% endfor %}
+              </select>
+          </div>
+          </div>
+          <div class="col-md-1 text-center">
+            <span><b>On Option</b></span>
+          </div>
+          <div class="col-md-2">
+           <div class="form-group">
+              <label for="ques_opt2" class="col-md-12 control-label">Question Options</label>
+              <div id="opt1">
+                {% include 'partials/question_options2.html' %}
+              </div>
+           </div>
+          </div>
+      </div>
+      <div class="row hide" id="row2">
+            <div class="col-md-3">
+                <div class="form-group ">
+                <label for="mentor_ques_opt2" class="col-md-12 control-label">Question</label>
+                <select
+                    class="form-control"
+                    name="mentor_ques_opt2"
+                    required
+                    id="mentor_ques_opt2"
+                    style="width: 100%"
+                >
+                {% for ques in mentor_ques %}
+                <option value="{{ques.id}}">{{ques.question}}</option>
+                {% endfor %}
+                </select>
+                </div>
+            </div>
+            <div class="col-md-1 text-center">
+              <span><b>Match with</b></span>
+            </div>
+            <div class="col-md-3">
+             <div class="form-group">
+                <label for="learner_ques_opt2" class="col-md-12 control-label">Question</label>
+                <select
+                    class="form-control select2"
+                    name="learner_ques_opt2"
+                    required
+                    id="learner_ques_opt2"
+                    style="width: 100%"
+                >
+                {% for ques in learner_ques %}
+                <option value="{{ques.id}}">{{ques.question}}</option>
+                {% endfor %}
+                </select>
+            </div>
+            </div>
+            <div class="col-md-1 text-center">
+              <span><b>On Option</b></span>
+            </div>
+            <div class="col-md-2">
+             <div class="form-group">
+                <label for="ques_opt2" class="col-md-12 control-label">Question Options</label>
+                <div id="opt2">
+                  {% include 'partials/question_options2.html' %}
+                </div>
+             </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3">
+                <div class="form-group">
+                <label for="mentor3" class="col-md-12 control-label">Mentor Question</label>
+                <select
+                    class="form-control"
+                    name="mentor3"
+                    hx-get="{% url 'user:question_options3' %}" hx-target="#opt3"  hx-trigger="change"
+                    required
+                    id="mentor3"
+                    style="width: 100%"
+                >
+                <option value ="">Select </option>
+                {% for ques in mentor_ques %}
+                <option value="{{ques.id}}">{{ques.question}}</option>
+                {% endfor %}
+                </select>
+                </div>
+            </div>
+            <div class="col-md-1 text-center">
+                <span><b>Match with</b></span>
+            </div>
+             <div class="col-md-3">
+                <div class="form-group">
+                <label for="learner3" class="col-md-12 control-label">Learner Question</label>
+                <select
+                    class="form-control select2"
+                    name="learner3"
+                    required
+                    id="learner3"
+                    style="width: 100%"
+                >
+                <option value ="">Select </option>
+                {% for ques in learner_ques %}
+                <option value="{{ques.id}}">{{ques.question}}</option>
+                {% endfor %}
+                </select>
+                </div>
+            </div>
+            <div class="col-md-1 text-center">
+              <span><b>Set Type</b></span>
+            </div>
+            <div class="col-md-2">
+              <div class="form-group">
+                 <label for="type3" class="col-md-12 control-label">Question Type</label>
+                 <select
+                     class="form-control select2"
+                     name="type3"
+                     required
+                     id="type3"
+                     style="width: 100%"
+                 >
+                 <option value ="">Select </option>
+                 <option value="self">Self Match</option>
+                 <option value="goal">Match By Goal</option>
+                 <option value="industry">Match By Industry</option>
+                 </select>
+             </div>
+             </div>
+             <div class="col-md-1 text-center">
+              <span><b>Is Dependent</b></span>
+              <input type="checkbox" id="is_dependent3" name="is_dependent3" value="True" onclick="showOptions('3')"/>
+            </div>
+        </div>
+        <div class="row hide" id="row3">
+            <div class="col-md-3">
+                <div class="form-group ">
+                <label for="mentor_ques_opt3" class="col-md-12 control-label">Question</label>
+                <select
+                    class="form-control"
+                    name="mentor_ques_opt3"
+                    required
+                    id="mentor_ques_opt3"
+                    style="width: 100%"
+                >
+                {% for ques in mentor_ques %}
+                <option value="{{ques.id}}">{{ques.question}}</option>
+                {% endfor %}
+                </select>
+                </div>
+            </div>
+            <div class="col-md-1 text-center">
+              <span><b>Match with</b></span>
+            </div>
+            <div class="col-md-3">
+             <div class="form-group">
+                <label for="learner_ques_opt3" class="col-md-12 control-label">Question</label>
+                <select
+                    class="form-control select2"
+                    name="learner_ques_opt3"
+                    required
+                    id="learner_ques_opt3"
+                    style="width: 100%"
+                >
+                {% for ques in learner_ques %}
+                <option value="{{ques.id}}">{{ques.question}}</option>
+                {% endfor %}
+                </select>
+            </div>
+            </div>
+            <div class="col-md-1 text-center">
+              <span><b>On Option</b></span>
+            </div>
+            <div class="col-md-2">
+             <div class="form-group">
+                <label for="ques_opt3" class="col-md-12 control-label">Question Options</label>
+                <div id="opt3">
+                  {% include 'partials/question_options3.html' %}
+                </div>
+             </div>
+            </div>
+        </div>
+          <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+      </div>
+    </div>
+  </section>
+</div>
+{% endblock content %} {% block js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.15/js/intlTelInput.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/htmx/1.7.0/htmx.min.js" integrity="sha512-etqA0KankuxrlSeZDYycQBY/D/KWZn0YZjlsjAo7kCEBTy1gg+DwmR6icxtOpqDBOzm2P00/lSIXEu7K+zvNsg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script>
+function showOptions(row) {
+  // Get the checkbox
+  console.log("row", row)
+  var checkBox = document.getElementById("is_dependent"+row);
+  // Get the output text
+  var options = document.getElementById("row"+row);
+  console.log("row", checkBox, checkBox.checked)
+  console.log("row", options)
+
+  // If the checkbox is checked, display the output text
+  if (checkBox.checked == true){
+    console.log("row", row)
+    options.classList.remove("hide");
+  } else {
+    options.classList.add("hide");
+  }
+}
+
+function check_match_question_config(company_id, journey_id){
+  console.log("company_id ", company_id)
+  console.log("journey_id ", journey_id)
+  if (($("#company").val() != "") && ($("#journey").val() != "")) {
+    journey = $("#journey").val()
+    company = $("#company").val()
+  }
+  else {
+    alert("Please Select Journey and Company both");
+    var y = document.getElementById("journey");
+    y.remove(y.selectedIndex);  
+  }
+  $.ajax({
+    url: "{% url 'user:check_match_ques_config' %}",
+    type: "post",
+    data: {
+        company: company,
+        journey: journey,
+        csrfmiddlewaretoken: "{{csrf_token}}"
+    },
+    error: function () {
+        console.log("Something is wrong");
+    },
+    success: function (data) {
+      if (data.success){
+        alert(data.message)
+        var x = document.getElementById("company");
+        x.remove(x.selectedIndex);  
+        var y = document.getElementById("journey");
+        y.remove(y.selectedIndex);  
+      }
+    } 
+});
+}
+</script>
+{% endblock js %}

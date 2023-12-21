@@ -1,0 +1,22 @@
+{% autoescape off %}
+You have a new session scheduled as per details below
+
+Mentor : {{ mentor_name }}
+
+Mentee/Coachee: {{ mentee_name }}
+
+Date of Session {{datetime}} {{time_zone}}
+
+click here to start Call
+
+{{call_url}} .
+
+if you need to make changes please 
+
+click here to make changes 
+
+{{login_url}} 
+
+Regards team AtPace
+
+{% endautoescape %}

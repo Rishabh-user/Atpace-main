@@ -1,0 +1,817 @@
+{% extends 'base.html' %} {% load static %} 
+{% block title %} Calendar {% endblock %} 
+{% load tags %}
+{% block css %} 
+  <link
+    rel="stylesheet"
+    href="{% static 'css/program_manager/program_manager.css' %}"
+  />
+  <link
+    rel="stylesheet"
+    href="{% static 'bower_components/fullcalendar/dist/fullcalendar.min.css' %}"
+  />
+  <link
+    rel="stylesheet"
+    href="{% static 'bower_components/fullcalendar/dist/fullcalendar.print.min.css' %}"
+    media="print"
+  />
+  <style>
+    .capitalize {
+      text-transform: capitalize;
+    }
+    .mgt-10{
+      margin-top: 10px;
+    }
+    /* Create an active/current tablink class */
+    .tab div div.active {
+      border-top: 5px solid #1B74E4;
+    }
+    /* Style the tab content */
+    .tabcontent {
+      display: none;
+    }
+    .anchor{
+      display: block;
+      padding: 3px 20px;
+      clear: both;
+      font-weight: 400;
+      line-height: 1.42857143;
+      color: #333;
+      white-space: nowrap;
+    }
+    .anchor:hover{
+      background-color:#c2c0c0;
+    }
+  </style>
+{% endblock css %} {% block content %}
+<div class="content-wrapper" id="vue-app">
+  <div :class="'alert alert-dismissible '+[[alert_class]]" v-if="alert_msg" style="margin:10px;">
+    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+    <h4 style="margin-top:10px;"><i class="icon fa fa-warning"></i> Alert!</h4>
+    <a href="/manager/billing">[[alert_msg]]</a>
+  </div>
+  <section class="content-header">
+    <h1>Calendar</h1>
+  </section>
+  <section class="content">
+    <div class="row tab"> 
+      <div class="col-md-2">
+        <div class="small-box box-tab tab-links"  id="calender-tab" @click="showCalender()">
+          <div class="inner">
+            <h4>Calendar/Session</h4>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <div class="small-box box-tab tab-links" @click="showAllTask()" id="all-task-tab">
+          <div class="inner">
+            <h4>All Task</h4>
+          </div>
+        </div>
+      </div>
+      <div class=""><button class="btn btn-info" data-toggle="modal" data-target="#modal-create-task" @click="getAssignUser()">Create task</button></div>
+    </div>
+    <div id="calender-content" class="tabcontent">
+    {% include 'Mentor/mentor-calender-session.html' %}
+    </div>
+    <div id="all-task-content" class="tabcontent">
+    {% include 'calendar/task_list.html' %}
+    </div>
+  </section>
+    {% if request.session.dashbordId %}
+        <h3>{{ request.session.dashbordId|json_script:"user_id" }}</h3>
+    {% else %}
+        <h3>{{ request.user.id|json_script:"user_id" }}</h3>
+    {% endif %}
+  {{request.session.token|json_script:"token"}}
+  {{request.session.company_id|json_script:"company_id"}}
+  {{request.session.company_name|json_script:"company_name"}}
+  {{request.session.timezone|json_script:"timezone"}}
+  <div class="modal fade" id="modal-create-task" style="display: none;" @click.self="close">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form @submit.prevent="Createtask()" id="create-task-form">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span></button>
+                        <h4 class="modal-title" v-if="task_id">Edit Task</h4>
+                        <h4 class="modal-title" v-else>Create Task</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label>Title</label> 
+                            <input class="form-control" v-model="title" id="title" type="text" name="title" required placeholder="Title"/>
+                        </div> 
+                        <div class="row">
+                          <div class="form-group col-md-6">
+                              <label>Start Time</label>
+                              <input type="datetime-local" class="form-control" v-model="start_time" id="start_time" name="start_time" required/>
+                          </div> 
+                          <div class="form-group col-md-6">
+                            <label>Due Time</label>
+                            <input type="datetime-local" class="form-control" v-model="end_time" id="end_time"  name="end_time" required/>
+                        </div> 
+                        </div>
+                        <div class="form-group">
+                            <label for="" class="control-label">Assign to</label>
+                            <select class="form-control select2" name="assign_to" id='assign_to' style="width: 100%;" multiple>
+                                <option 
+                                v-bind:value="user.id" 
+                                v-for="(user, index) in assign_users" 
+                                :key="index" :selected="task_assignee_list.includes(user.id)">
+                                [[user.name]]
+                                </option>
+                            </select>
+                        </div>
+                        <div class="row">
+                          <div class="form-group col-md-6">
+                              <input value="true" type="checkbox" name="is_recurring" id="is_recurring" v-model="is_recurring"/>
+                              <label for="is_recurring">Is Recurring</label>
+                          </div> 
+                          <div class="form-group col-md-6">
+                            <input value="true" type="checkbox" name="set_reminder" id="set_reminder" v-model="set_reminder"/>
+                            <label for="set_reminder">Set Reminder</label>
+                        </div> 
+                        </div>
+                        <div class="form-group" v-show="is_recurring" id="recurring_type_div">
+                            <label>Recurring Time</label>
+                            <select class="form-control select2" ref="recurring_time" type="text" name="recurring_time" style="width: 100%;">
+                                <option value="Daily" :selected="recurring_time_data == 'Daily'">Daily</option>
+                                <option value="Weekly" :selected="recurring_time_data == 'Weekly'">Weekly</option>
+                                <option value="Monthly" :selected="recurring_time_data == 'Monthly'">Monthly</option>
+                            </select>
+                        </div> 
+                        <div class="form-group" v-show="set_reminder" id="reminder_before_div">
+                            <label>Reminder Before(In mins)</label>
+                            <input class="form-control" v-model="reminder_before" id="reminder_before" type="number" />
+                        </div> 
+                        <div class="form-group">
+                            <label>Description</label>
+                            <textarea class="form-control" v-model="description" id="description" name="description" required></textarea>
+                        </div> 
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default pull-left" data-dismiss="modal" @click="close">Close</button>
+                        <button class="btn btn-primary">Save changes</button>
+                    </div>
+                </form>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+    <!-- /.modal-dialog -->
+    </div>
+    <div class="modal fade" id="modal-progress" style="display: none;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                  <div class="modal-body">
+                      <p class="text-center mb-0"><i class="fa fa-spin fa-cog"></i> Working on your changes, Please wait!</p>
+                  </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+    <!-- /.modal-dialog -->
+    </div>
+    <div class="modal fade" id="modal-update-task-status" style="display: none;" @click.self="close">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form @submit.prevent="UpdateTaskStatus()" id="update-task-status-form">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span></button>
+                    <h4 class="modal-title">Update Status</h4>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="task_id"  value="">
+                    <div class="form-group">
+                        <label>Status</label>
+                        <select class="form-control select2" ref="task_status" type="text" name="task_status" style="width: 100%;">
+                            <option value="In Progress">In Progress</option>
+                            <option value="Done">Done</option>
+                        </select>
+                    </div> 
+                    <div class="form-group">
+                        <label>Comment</label>
+                        <textarea class="form-control" v-model="comment" id="comment" name="comment" required></textarea>
+                    </div> 
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default pull-left" data-dismiss="modal" @click="close">Close</button>
+                    <button class="btn btn-primary">Save changes</button>
+                </div>
+            </form>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+<!-- /.modal-dialog -->
+</div>
+</div>
+{% endblock content %} {% block js %} 
+<script src="{% static 'bower_components/moment/moment.js' %}"></script>
+<script src="{% static 'bower_components/fullcalendar/dist/fullcalendar.min.js' %}"></script>
+<script src="{% static 'bower_components/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
+<script type="text/javascript">
+  
+  let app = new Vue({
+    el: "#vue-app",
+    delimiters: ['[[', ']]'],
+    data() {
+      return {
+        token:JSON.parse(document.getElementById('token').textContent),
+        auth:"",
+        base_url:window.location.origin,
+        user_id: JSON.parse(document.getElementById('user_id').textContent),
+        user_company_name: JSON.parse(document.getElementById('company_name').textContent),
+        user_company_id: JSON.parse(document.getElementById('company_id').textContent),
+        timezone: JSON.parse(document.getElementById('timezone').textContent),
+        title:"",
+        start_time:"",
+        end_time:"",
+        is_recurring:"",
+        set_reminder:"",
+        reminder_before:60,
+        description:"",
+        recurring_time_data:"",
+        reminder_data:"",
+        assign_users:"",
+        assign_user_list:[],
+        all_task_list:"",
+        task_assignee_list:[],
+        task_id: "",
+        alert_msg:"",
+        alert_class:"",
+        event_id:"",
+        comment:"",
+      };
+    },
+    mounted(){
+      this.showCalender();
+      this.showAlert();
+    },
+    methods: {
+        axiosGetRequest: function(url){
+        this.auth = "Token "+this.token;
+        var config = {
+          method: "get",
+          url: url,
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': this.auth,
+          },
+        };
+        return axios(config)
+        },
+        axiosPostRequest: function(url, data){
+            this.auth = "Token "+this.token;
+            var config = {
+            method: "post",
+            url: url,
+            headers: {
+                "Content-Type": "multipart/form-data",
+                "Accept": "application/json",
+                'Authorization': this.auth,
+            },
+            data:data
+            };
+
+            return axios(config)
+        },
+        async showAlert(){
+          var url = this.base_url+"/manager/check-for-subscription/"+this.user_id+"/";
+          response = await this.axiosGetRequest(url);
+          console.log("Alert response", response.data)
+          if(response.data.message != "No alert available"){
+            this.alert_msg = response.data.message
+            this.alert_class = response.data.css_class
+          }
+        },
+        async destroyDataTable(id){
+            if($(id).DataTable()){
+            console.log("destroying", id);
+            $(id).DataTable().clear();
+            $(id).DataTable().destroy();
+            }
+        },
+        async initializeDataTable(id){
+            console.log("initializing");
+            await this.sleep(2000);
+            $(id).DataTable({
+            "dom": '<"table-pull-left"f><"table-pull-right"l>tip',
+            'destroy': true,
+            'paging'      : true,
+            'lengthChange': true,
+            'searching'   : true,
+            'ordering'    : true,
+            'info'        : true,
+            'autoWidth'   : false,
+            'retrieve'    : true,
+            'scrollX'     : true,
+            })
+        },
+        sleep: function(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        },
+        showTab(tabName){
+          var i, tabContent, tabLinks;
+          tabContent = document.getElementsByClassName("tabcontent");
+          for (i = 0; i < tabContent.length; i++) {
+            tabContent[i].style.display = "none";
+          }
+          tabLinks = document.getElementsByClassName("tab-links");
+          for (i = 0; i < tabLinks.length; i++) {
+            tabLinks[i].className = tabLinks[i].className.replace(" active", "");
+          }
+          document.getElementById(tabName+'-content').style.display = "block";
+          document.getElementById(tabName+'-tab').classList.add("active");
+        },
+        async getAssignUser(){
+          var url =  this.base_url+"/manager/company-all-users/"+this.user_id+"/"+this.user_company_id;
+          response = await this.axiosGetRequest(url);
+          console.log("Assign user list Response", response.data);
+          this.assign_users = response.data.user_list
+        },
+        close(){
+          console.log("maodal closed")
+          this.title = this.start_time = this.end_time = this.description = this.set_reminder = this.is_recurring = "" 
+          this.reminder_before = 60
+          this.$refs.recurring_time.value = null
+          var elements = document.getElementById("assign_to").options;
+          for(var i = 0; i < elements.length; i++){
+            elements[i].selected = false;
+          }
+          $('.select2-selection__choice').empty()
+        },
+        async getTaskData(id){   
+          console.log("Hey Shru", id)
+          this.task_assignee_list = []
+          this.task_id = id
+          await this.getAssignUser()
+          var url =  this.base_url+"/manager/update-task/"+this.user_id+"/"+id+"/?timezone="+this.timezone+"&company_id="+this.user_company_id;
+          response = await this.axiosGetRequest(url);
+          console.log("Task Detail Response", response.data.data);
+          this.title = response.data.data.title
+          this.start_time = response.data.data.start.split("+")[0]
+          this.end_time = response.data.data.end.split("+")[0]
+          this.description = response.data.data.description
+          this.is_recurring =  response.data.data.is_recurring
+          this.set_reminder = response.data.data.set_remainder
+          this.recurring_time_data = response.data.data.recurring_time
+          this.reminder_before = response.data.data.reminder_before
+          for (let i=0; i < response.data.data.assign_to.length; i++){
+            this.task_assignee_list.push(response.data.data.assign_to[i].user_id)
+          }
+          console.log("task_assignee_list", this.task_assignee_list)
+          $("#modal-create-task").modal('show')
+        },
+        async showAllTask(){
+          this.task_id = ""
+          this.all_task_list = ""
+          this.showTab('all-task')
+          var url =  this.base_url+"/manager/create-task/"+this.user_id+"?company_id="+this.user_company_id+"&timezone="+this.timezone;
+          response = await this.axiosGetRequest(url);
+          console.log("task list Response", response.data);
+          this.all_task_list = response.data.data
+          await this.initializeDataTable('#all-task-table')
+        },
+        async showCalender(){
+        this.task_id = ""
+        // Generate a random UUID
+          const random_uuid = uuidv4();
+            
+          function uuidv4() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'
+            .replace(/[xy]/g, function (c) {
+                const r = Math.random() * 16 | 0, 
+                    v = c == 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+          }
+          this.showTab('calender');
+          var url =  this.base_url+"/manager/manager-calendar/"+this.user_id+"?company_id="+this.user_company_id+"&timezone="+this.timezone;
+          response = await this.axiosGetRequest(url);
+          console.log("Mentor Calendar Event list Response", response.data.data);
+          var calender_event_list = response.data.data
+          var url2 =  this.base_url+"/manager/create-task/"+this.user_id+"?company_id="+this.user_company_id+"&timezone="+this.timezone;
+          response2 = await this.axiosGetRequest(url2);
+          console.log("task list Response2", response2.data);
+          for(let i=0; i<response2.data.data.length; i++){
+            calender_event_list.push(response2.data.data[i])
+          }
+          var events = [];
+          for(let i=0; i<calender_event_list.length; i++){
+            start_time = calender_event_list[i]['start'].split("+")[0]
+            end_time = calender_event_list[i]['end'].split("+")[0]
+            events.push({
+              id             :  calender_event_list[i]['id'],
+              title          :  calender_event_list[i]['title'],
+              start          :  start_time,
+              end            :  end_time,
+              meeting_type   : "mentor_calendar",
+              session_type   : calender_event_list[i]['call_type'],
+              type           : calender_event_list[i]['type'],
+              url            : calender_event_list[i]['url'],
+              allDay         : false,
+              backgroundColor: calender_event_list[i]['backgroundColor'], //Primary (light-blue)
+              borderColor    : calender_event_list[i]['borderColor'], //Primary (light-blue)
+              is_expired     : calender_event_list[i]['is_expired'],
+              is_recurring   : calender_event_list[i]['is_recurring'],
+              recurring_time : calender_event_list[i]['recurring_time'],
+              set_reminder   : calender_event_list[i]['set_remainder'],
+              reminder_before: calender_event_list[i]['reminder_before'],
+              description    : calender_event_list[i]['description'],
+              is_assigned    : calender_event_list[i]['is_assigned'],
+              task_status    : calender_event_list[i]['task_status'],
+            }) 
+          }
+          var date = new Date()
+          var d    = date.getDate(),
+              m    = date.getMonth(),
+              y    = date.getFullYear()
+          //remove old data
+          $('#calendar').fullCalendar('removeEvents');
+          //Getting new event json data
+          $("#calendar").fullCalendar('addEventSource', events);
+          //Updating new events
+          $('#calendar').fullCalendar('rerenderEvents');
+          var calendar = $('#calendar').fullCalendar({
+            header    : {
+              left  : 'prev,next today',
+              center: 'title',
+              right : 'month,agendaWeek,agendaDay'
+            },
+            defaultView: 'agendaWeek',
+            buttonText: {
+              today: 'today',
+              month: 'month',
+              week : 'week',
+              day  : 'day'
+            },
+            slotDuration: '00:05:00',
+            eventLimit: true,
+            events    : events,
+            eventRender: function(event, element, view) {
+              if (event.allDay === 'true') {
+              event.allDay = true;
+              } else {
+              event.allDay = false;
+              }
+            },
+            selectable: false,
+            selectHelper: true,
+            select: function(start, end, allDay) {
+            var title = prompt('Event Title:');
+
+            if (title) {
+              var start = $.fullCalendar.formatDate(start, "Y-MM-DD HH:mm:ss");
+              var end = $.fullCalendar.formatDate(end, "Y-MM-DD HH:mm:ss");
+              create_event(start, end, title, random_uuid);
+              calendar.fullCalendar('renderEvent',
+              {
+                title: title,
+                start: start,
+                end: end,
+                allDay: allDay,
+                id:random_uuid,
+                session_type: "Mentor Session"
+              },
+              true
+              );
+            }
+            calendar.fullCalendar('unselect');
+            },
+
+            editable  : true,
+            eventDrop: function(event, delta) {
+              var start = $.fullCalendar.formatDate(event.start, "Y-MM-DD HH:mm:ss");
+              var end = $.fullCalendar.formatDate(event.end, "Y-MM-DD HH:mm:ss");
+              update_event(start, end, event.title, event.id);
+            },
+            selectHelper: true,
+            droppable : true, // this allows things to be dropped onto the calendar !!!
+            eventClick: function(event) {
+              var date = new Date().toJSON().slice(0, 10)
+              event_expired = false
+              if(date > $.fullCalendar.formatDate(event.start, "YYYY-MM-DD")){
+                event_expired = true
+              }
+        
+              if(event.type == 'task'){
+                if(event.is_assigned){
+                  var dialog = bootbox.dialog({
+                    title: event.title+"<button class='btn pull-right' style='background-color:#24a0ed; color:white;'>"+event.task_status+"</button>",
+                    message: "<strong>Start Time</strong>:-"+$.fullCalendar.formatDate(event.start, "Y-MM-DD HH:mm:ss")+"<br><strong>End Time</strong>:-"+$.fullCalendar.formatDate(event.end, "Y-MM-DD HH:mm:ss")+"<br><strong>Is Recurring:-</strong>"+event.is_recurring+"{% if event.set_reminder %} <br><strong>Recurring Time:-</strong>"+event.recurring_time+"{% endif %}<br><strong>Set Reminder:-</strong>"+event.set_reminder+"{% if event.reminder_before %} <br><strong>Reminder Before:-</strong>"+event.reminder_before+"mins{% endif %}<br><strong>Description:-</strong>"+event.description,
+                    size: 'large',
+                    buttons: {
+                      ok: {
+                        label: "Update Status",
+                        className: 'btn-info',
+                        callback: function(){
+                            console.log("hello", event.id)
+                            document.getElementById("task_id").value = event.id
+                            $("#modal-update-task-status").modal('show')
+                        }
+                      }
+                    }
+                  });
+                }
+                else{
+                  var dialog = bootbox.dialog({
+                    title: event.title,
+                    message: "<strong>Start Time</strong>:-"+$.fullCalendar.formatDate(event.start, "Y-MM-DD HH:mm:ss")+"<br><strong>End Time</strong>:-"+$.fullCalendar.formatDate(event.end, "Y-MM-DD HH:mm:ss")+"<br><strong>Is Recurring:-</strong>"+event.is_recurring+"{% if event.set_reminder %} <br><strong>Recurring Time:-</strong>"+event.recurring_time+"{% endif %}<br><strong>Set Reminder:-</strong>"+event.set_reminder+"{% if event.reminder_before %} <br><strong>Reminder Before:-</strong>"+event.reminder_before+"mins{% endif %}<br><strong>Description:-</strong>"+event.description,
+                    size: 'large',
+                  });
+                }
+              }
+              else{
+                if(event_expired == true){
+                  var dialog = bootbox.dialog({
+                  title: event.session_type,
+                  message: "<p>"+event.title+"</p><br><strong>Start Time</strong>:-"+$.fullCalendar.formatDate(event.start, "Y-MM-DD HH:mm:ss")+"<br><strong>End Time</strong>:-"+$.fullCalendar.formatDate(event.end, "Y-MM-DD HH:mm:ss")+"<br><br><a href = "+event.url+" target='_blank' id='meeting_url_"+event.id +"'><button class='btn btn-info' disabled> Start Call</button></a>",
+                  size: 'large',
+                  });
+                }
+                else{
+                  var dialog = bootbox.dialog({
+                  title: event.session_type,
+                  message: "<p>"+event.title+"</p><br><strong>Start Time</strong>:-"+$.fullCalendar.formatDate(event.start, "Y-MM-DD HH:mm:ss")+"<br><strong>End Time</strong>:-"+$.fullCalendar.formatDate(event.end, "Y-MM-DD HH:mm:ss")+"<br><br><a href = "+event.url+" target='_blank' id='meeting_url_"+event.id +"'><button class='btn btn-info'> Start Call</button></a>",
+                  size: 'large',
+                  });
+                }
+              }
+              if(event.url){
+                return false
+              } else {
+                $("#meeting_url_"+event.id).hide()
+              }
+            },
+            eventResize: function(event) {
+              var start = $.fullCalendar.formatDate(event.start, "Y-MM-DD HH:mm:ss");
+              var end = $.fullCalendar.formatDate(event.end, "Y-MM-DD HH:mm:ss");
+              update_event(start, end, event.title, event.id);
+            }
+          })
+          function create_event(start, end, title, random_uuid){
+              var form_data = new FormData();
+              var csrfmiddlewaretoken = "{{csrf_token}}";
+              form_data.append("start", start);
+              form_data.append("end", end);
+              form_data.append("title", title);
+              form_data.append("id", random_uuid)
+
+              form_data.append("csrfmiddlewaretoken", csrfmiddlewaretoken);
+              $.ajax({
+                url: "{% url 'user:add_events' %}",
+                data: form_data,
+                type: "POST",
+                contentType: false,
+                cache: false,
+                processData: false,
+                success: function() {
+                  bootbox.alert("Available Slot Created");
+                }
+              });
+          }
+          function update_event(start, end, title, id){
+            var form_data = new FormData();
+                var csrfmiddlewaretoken = "{{csrf_token}}";
+                form_data.append("start", start);
+                form_data.append("end", end);
+                form_data.append("title", title);
+                form_data.append("id", id);
+                form_data.append("csrfmiddlewaretoken", csrfmiddlewaretoken);
+
+              $.ajax({
+                url: "{% url 'user:update_manager_task' %}",
+                data: form_data ,
+                type: "POST",
+                contentType: false,
+                cache: false,
+                processData: false,
+                success: function(json) {
+
+                bootbox.alert("Your Session is Reschedule. ", function(){
+                    location.reload()
+                });
+                }
+              });
+          }
+          function MentorCancelSlot(id){
+            bootbox.confirm({
+              message: "Do you want to Cancel this slot?",
+              buttons: {
+                  confirm: {
+                      label: 'Yes',
+                      className: 'btn-success'
+                  },
+                  cancel: {
+                      label: 'No',
+                      className: 'btn-danger'
+                  }
+              },
+              callback: function (result) {
+                  if(result == true){
+                      $.ajax({
+                        url:"{% url 'user:cancel_mentor_slot' %}",
+                        type:"POST",
+                        data:{pk:id, csrfmiddlewaretoken : "{{csrf_token}}" },
+                        error: function(data){
+                          console.log(data)
+                          bootbox.alert('something is wrong');
+                        },
+                        beforeSend: function() {
+                          var dialog = bootbox.dialog({
+                              message: '<p class="text-center mb-0"><i class="fa fa-spin fa-cog"></i> working on your changes - please wait… </p>',
+                              closeButton: false
+                          });
+
+                          setTimeout(function(){
+                              dialog.modal('hide');
+                          }, 4000);
+
+
+                        },
+                        success: function(data) {
+                          console.log(data)
+                          bootbox.alert("Your Appointment is Cancelled!", function(){
+                            location.reload()
+                        });
+                        },
+                      });
+                    }
+                  }
+              });
+            }
+        },
+      
+      async BookSlot(session_id, mentor_id, start_date_time, end_date_time, title, user_id, base_url, token){
+        bootbox.confirm({
+          message: "Do you want to book this slot?",
+          buttons: {
+              confirm: {
+                  label: 'Yes',
+                  className: 'btn-success'
+              },
+              cancel: {
+                  label: 'No',
+                  className: 'btn-danger'
+              }
+          },
+          callback: function (result) {
+            
+              if(result == true){
+                  var data = new FormData();
+                  data.append("user_id", user_id)
+                  data.append("mentor_id",mentor_id)
+                  data.append("id", session_id)
+                  data.append("start_date_time", start_date_time)
+                  data.append("end_date_time", end_date_time)
+                  data.append("title", title)
+                  var url = base_url+"/api/book-appoinments/";
+                  var auth = "Token "+token;
+                  var config = {
+                  method: "post",
+                  url: url,
+                  headers: {
+                      "Content-Type": "multipart/form-data",
+                      "Accept": "application/json",
+                      'Authorization': auth,
+                  },
+                  data:data
+                  };
+                  axios(config)
+                    .then((response) => {
+                      console.log("response", response)
+                      location.reload()
+                    })
+                    .catch((error) => {
+                      console.log("error", error);
+                    });
+                }
+              }
+          });
+        },
+
+        async CancelSlot(session_id, mentor_id, title, user_id, base_url, token){
+          bootbox.confirm({
+            message: "Do you want to Cancel this slot?",
+            buttons: {
+                confirm: {
+                    label: 'Yes',
+                    className: 'btn-success'
+                },
+                cancel: {
+                    label: 'No',
+                    className: 'btn-danger'
+                }
+            },
+            callback: function (result) { 
+                if(result == true){
+                    var data = new FormData();
+                    data.append("user_id", user_id)
+                    data.append("mentor_id",mentor_id)
+                    data.append("id", session_id)
+                    data.append("title", title)
+                    var url = base_url+"/api/cancel-appoinments/";
+                    var auth = "Token "+token;
+                    var config = {
+                    method: "post",
+                    url: url,
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                        "Accept": "application/json",
+                        'Authorization': auth,
+                    },
+                    data:data
+                    };
+                    axios(config)
+                      .then((response) => {
+                        console.log("response", response)
+                        //location.reload()
+                      })
+                      .catch((error) => {
+                        console.log("error", error);
+                      });
+                    }
+                }
+            });
+          },
+          async UpdateTaskStatus(){
+            console.log("update", document.getElementById("task_id").value, this.comment, this.$refs.task_status.value)
+            var data = new FormData();
+            data.append("task_id", document.getElementById("task_id").value)
+            data.append("comment", this.comment)
+            data.append("task_status", this.$refs.task_status.value)
+            url = this.base_url+"/manager/update-task-status/"+this.user_id+"/";
+            response = await this.axiosPostRequest(url, data);
+            console.log("Update Task Status Response", response.data);
+            bootbox.alert("Task Status Updated Successfully!");
+            $("#modal-update-task-status").modal("hide")
+            await this.showCalender();
+            this.comment = ""
+          },
+          async Createtask(){
+            const date = new Date().toJSON().slice(0, 16);
+            console.log("date", date, this.start_time)
+            if(this.start_time < date){
+              bootbox.alert("Start time must be greater than current time!")
+            }
+            if(this.end_time < this.start_time){
+              bootbox.alert("End time must be greater than start time!")
+            }
+            else{
+              var data = new FormData()
+              data.append("title", this.title)
+              data.append("start_time", this.start_time)
+              data.append("due_time", this.end_time)
+              data.append("description", this.description)
+              is_recurring_val = false
+              if(this.is_recurring){
+                is_recurring_val = true
+                data.append("recurring_time", this.$refs.recurring_time.value)
+              }
+              data.append("is_recurring", is_recurring_val)
+              set_reminder_val = false
+              if(this.set_reminder){
+                set_reminder_val = true
+                data.append("reminder_before", this.reminder_before)
+              }
+              data.append("set_remainder", set_reminder_val)
+              data.append("timezone", this.timezone)
+              data.append("company_id", this.user_company_id)
+              this.assign_user_list = []
+              for (let option of document.getElementById('assign_to').options)
+              {
+                  if (option.selected) {
+                      this.assign_user_list.push(option.value);
+                  }
+              }
+              data.append("assign_to", this.assign_user_list)
+              var url =  this.base_url+"/manager/create-task/"+this.user_id+"/";
+              var message = "Task created successfully!"
+              if(this.task_id){
+                var url =  this.base_url+"/manager/update-task/"+this.user_id+"/"+this.task_id+"/";
+                message = "Task updated successfully!"
+              }
+              try{
+                $("#modal-create-task").modal('hide');
+                $("#modal-progress").modal('show');
+                response = await this.axiosPostRequest(url, data);
+                console.log("Create Task Response", response.data);
+                $("#modal-progress").modal('hide');
+                bootbox.alert(message);
+                this.close()
+                this.showCalender();
+                this.showAllTask();
+              }
+              catch(err){
+                console.log("error", err);
+                bootbox.alert("Something Went Wrong");
+                $("#modal-progress").modal('hide');
+              } 
+            }
+          },
+    }
+  });
+</script>
+
+{% endblock js %}

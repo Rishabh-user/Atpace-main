@@ -1,0 +1,55 @@
+{% extends 'base.html' %} {% load static %} {% load tags %} {% block title %} {{channel.title}} {% endblock %} {% block content %}
+
+<div class="content-wrapper"  
+style="background: transparent;"
+>
+<section class="content-header" style="padding-top: 20px; padding-bottom: 10px;">
+    <h1>
+      {{survey.name}}
+      
+    </h1>
+    
+  </section>
+<div class="col-md-2"></div>
+<div class="col-md-8" >
+    <!-- Widget: user widget style 1 -->
+    <div class="box box-widget widget-user course_box glassmorphism" >
+       <!-- Add the bg color to the header using any of the bg-* classes -->
+       <div
+          class=" bg-black course_card"
+          style="background: url('{{MEDIA_URL}}{{survey.cover_image}}') center; background-size: cover;
+          background-repeat: no-repeat;
+          width: 100%;
+          padding: 80px;
+          border-radius: 10px;
+          height: 350px;"
+          >
+       </div>
+       <div class="box-body  " style="height: auto; " >
+          <div class="row">
+             <!-- /.col -->
+             <div class="col-sm-12">
+                <h3 class="widget-user-desc" style="font-size: 18px;">Instructions:</h3>
+                <h5 class="widget-user-desc" style="line-height: 1;">{{survey.short_description|safe}}</h5>
+             </div>
+          </div>
+       </div>
+       <div class=""  style="padding: 0 10px ;     
+          height: 42px;
+          justify-content: center;
+          display: flex;">
+          
+          {% if '/test-series/assessment-instruction/' in request.path %}
+               <a href="{% url 'test_series:test_series_form' channel=channel.channel_id pk=survey.id %}?{{ request.GET.urlencode }}"><button class="btn btn-primary"> Start</button></a>
+              
+          {% else %}
+          <a href="{% url 'survey:survey_form' channel=channel.channel_id pk=survey.id %}"><button class="btn btn-primary"> Start</button></a>
+          {% endif %}
+          <!-- /.description-block -->
+       </div>
+       <!-- /.row -->
+    </div>
+    <!-- /.widget-user -->
+</div></div>
+</div>
+{% endblock content %}

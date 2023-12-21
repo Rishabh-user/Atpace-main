@@ -1,0 +1,258 @@
+{% extends 'website/web_base.html' %}
+{% load static %}
+{% block content %}
+
+
+<main>
+
+
+    <!-- course area start -->
+    <section class="course__area pt-120 pb-120">
+        <div class="container">
+            <div class="row">
+                <div class="col-xxl-8 col-xl-8 col-lg-8">
+                    <div class="course__tab-inner grey-bg-2 mb-50 d-sm-flex justify-content-between align-items-center">
+                        <div class="course__tab-wrapper d-flex align-items-center">
+                            <div class="course__tab-btn">
+                                <ul class="nav nav-tabs" id="courseTab" role="tablist">
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link active" id="grid-tab" data-bs-toggle="tab"
+                                                data-bs-target="#grid" type="button" role="tab" aria-controls="grid"
+                                                aria-selected="true">
+                                            <svg class="grid" viewBox="0 0 24 24">
+                                                <rect x="3" y="3" class="st0" width="7" height="7"/>
+                                                <rect x="14" y="3" class="st0" width="7" height="7"/>
+                                                <rect x="14" y="14" class="st0" width="7" height="7"/>
+                                                <rect x="3" y="14" class="st0" width="7" height="7"/>
+                                            </svg>
+                                        </button>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link list" id="list-tab" data-bs-toggle="tab"
+                                                data-bs-target="#list" type="button" role="tab" aria-controls="list"
+                                                aria-selected="false">
+                                            <svg class="list" viewBox="0 0 512 512">
+                                                <g>
+                                                    <path class="st0"
+                                                          d="M448,69H192c-17.7,0-32,13.9-32,31s14.3,31,32,31h256c17.7,0,32-13.9,32-31S465.7,69,448,69z"/>
+                                                    <circle class="st0" cx="64" cy="100" r="31"/>
+                                                    <path class="st0"
+                                                          d="M448,225H192c-17.7,0-32,13.9-32,31s14.3,31,32,31h256c17.7,0,32-13.9,32-31S465.7,225,448,225z"/>
+                                                    <circle class="st0" cx="64" cy="256" r="31"/>
+                                                    <path class="st0"
+                                                          d="M448,381H192c-17.7,0-32,13.9-32,31s14.3,31,32,31h256c17.7,0,32-13.9,32-31S465.7,381,448,381z"/>
+                                                    <circle class="st0" cx="64" cy="412" r="31"/>
+                                                </g>
+                                            </svg>
+                                        </button>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="course__view">
+                                <h4>Showing {{journey.object_list|length}} of {{journey.paginator.count}} </h4>
+                                <!-- Pagination Start here -->
+                                <div class="pagination">
+                                    <span class="step-links">
+                                       
+                                    </span>
+                                </div>
+                                <!-- pagination end here -->
+                            </div>
+                        </div>
+                        <div class="course__sort d-flex justify-content-sm-end" style="display:none !important;">
+                            <div class="course__sort-inner">
+                                <select>
+                                    <option>Default</option>
+                                    <option>Option 1</option>
+                                    <option>Option 2</option>
+                                    <option>Option 3</option>
+                                    <option>Option 4</option>
+                                    <option>Option 5</option>
+                                    <option>Option 6</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="course__tab-conent">
+                        <div class="tab-content" id="courseTabContent">
+                            <div class="tab-pane fade show active" id="grid" role="tabpanel" aria-labelledby="grid-tab">
+                                <div class="row">
+                                    {% for journey in journey %}
+                                    {% include 'website/web_component/course_card_col_6.html' %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="list" role="tabpanel" aria-labelledby="list-tab">
+                                <div class="row">
+                                    {% for journey in journey %}
+                                    {% include 'website/web_component/course_card_list.html' %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row" >
+                            <div class="col-xxl-12">
+                                <div class="basic-pagination wow fadeInUp mt-30" data-wow-delay=".2s">
+                                    <ul class="d-flex align-items-center">
+                                        
+                            
+                                    
+                            
+                                   
+                                        <li class="prev">
+                                            
+                                                
+                                                {% if journey.has_previous %}
+                                                    <a href="?page=1">&laquo; first</a>
+                                                    <a href="?page={{ journey.previous_page_number }}">Prev</a>
+                                                {% endif %}
+                                            
+                                        </li>
+                                        <li>
+                                            <span class="current">
+                                                Page {{ journey.number }} of {{ journey.paginator.num_pages }}
+                                            </span>
+                                        </li>
+                                        
+                                        <li class="next">
+                                        
+                                                
+                                                {% if journey.has_next %}
+                                                    <a href="?page={{ journey.next_page_number }}">Next</a>
+                                                    <a href="?page={{ journey.paginator.num_pages }}">last &raquo;</a>
+                                                {% endif %}
+                                            
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xxl-4 col-xl-4 col-lg-4">
+                    <div class="course__sidebar pl-70">
+                        <div class="course__sidebar-search mb-50">
+                            <form action="{% url 'user:program' %}", method="get">
+                                <input type="text" placeholder="Search for programs..." name="search">
+                                <button type="submit">
+                                    <svg version="1.1" xmlns="http://www.w3.org/2000/svg"
+                                         x="0px" y="0px"
+                                         viewBox="0 0 584.4 584.4" style="enable-background:new 0 0 584.4 584.4;"
+                                         xml:space="preserve">
+                                    <g>
+                                       <g>
+                                          <path class="st0"
+                                                d="M565.7,474.9l-61.1-61.1c-3.8-3.8-8.8-5.9-13.9-5.9c-6.3,0-12.1,3-15.9,8.3c-16.3,22.4-36,42.1-58.4,58.4    c-4.8,3.5-7.8,8.8-8.3,14.5c-0.4,5.6,1.7,11.3,5.8,15.4l61.1,61.1c12.1,12.1,28.2,18.8,45.4,18.8c17.1,0,33.3-6.7,45.4-18.8    C590.7,540.6,590.7,499.9,565.7,474.9z"/>
+                                           <path class="st1"
+                                                 d="M254.6,509.1c140.4,0,254.5-114.2,254.5-254.5C509.1,114.2,394.9,0,254.6,0C114.2,0,0,114.2,0,254.5    C0,394.9,114.2,509.1,254.6,509.1z M254.6,76.4c98.2,0,178.1,79.9,178.1,178.1s-79.9,178.1-178.1,178.1S76.4,352.8,76.4,254.5    S156.3,76.4,254.6,76.4z"/>
+                                       </g>
+                                    </g>
+                                 </svg>
+                                </button>
+                            </form>
+                        </div>
+                        <div class="course__sidebar-widget grey-bg">
+                            <div class="course__sidebar-info">
+                                {% comment %} <a target="_blank" href="{% static 'website/files/Privacy_Policy_growatpace.pdf' %}"><h3 class="course__sidebar-title">Privacy Policy</h3></a> {% endcomment %}
+                                {% comment %} <a target="_blank" href="{% static 'website/files/Terms_of_Use(EULA)_GROWATPACE.pdf' %}" ><h3 class="course__sidebar-title">Term of usage</h3></a> {% endcomment %}
+
+                                <h3 class="course__sidebar-title" onclick="showUl('category')">Search by category</h3>
+                                <ul class="ul-ele" id="category">
+                                    {% for category in category %}
+                                    <a href="{% url 'user:program' %}?category={{category}}">
+                                        <li>
+                                            <div class="course__sidebar-check mb-10 d-flex align-items-center">
+                                                <label class="m-check-label" for="m-eng">{{category}}</label>
+                                            </div>
+                                        </li>
+                                    </a>
+                                    {% endfor %}  
+                                </ul>
+                                <h3 class="course__sidebar-title" onclick="showUl('company')">Search by company</h3>
+                                <ul class="ul-ele" id="company">
+                                    {% for company in company %}
+                                    <a href="{% url 'user:program' %}?company={{company}}">
+                                        <li>
+                                            <div class="course__sidebar-check mb-10 d-flex align-items-center">
+                                                <label class="m-check-label" for="m-eng">{{company}}</label>
+                                            </div>
+                                        </li>
+                                    </a>
+                                    {% endfor %}  
+                                </ul>
+                                <h3 class="course__sidebar-title" onclick="showUl('tag')">Search by tag</h3>
+                                <ul class="ul-ele" id="tag">
+                                    {% for tag in tag %}
+                                    <a href="{% url 'user:program' %}?tag={{tag}}">
+                                        <li>
+                                            <div class="course__sidebar-check mb-10 d-flex align-items-center">
+                                                <label class="m-check-label" for="m-eng">{{tag}}</label>
+                                            </div>
+                                        </li>
+                                    </a>
+                                    {% endfor %}  
+                                </ul>
+                                <h3 class="course__sidebar-title" onclick="showUl('type')">Search by journey type</h3>
+                                <ul class="ul-ele" id="type">
+                                    <a href="{% url 'user:program' %}?type=MentoringJourney">
+                                        <li>
+                                            <div class="course__sidebar-check mb-10 d-flex align-items-center">
+                                                <label class="m-check-label" for="m-eng">MentoringJourney</label>
+                                            </div>
+                                        </li>
+                                    </a>
+                                    <a href="{% url 'user:program' %}?type=SkillDevelopment">
+                                        <li>
+                                            <div class="course__sidebar-check mb-10 d-flex align-items-center">
+                                                <label class="m-check-label" for="m-eng">SkillDevelopment</label>
+                                            </div>
+                                        </li>
+                                    </a>
+                                </ul>
+                                <h3 class="course__sidebar-title" onclick="showUl('price')">Search by price</h3>
+                                <ul class="ul-ele" id="price">
+                                    <a href="{% url 'user:program' %}?price=False">
+                                        <li>
+                                            <div class="course__sidebar-check mb-10 d-flex align-items-center">
+                                                <label class="m-check-label" for="m-eng">Free</label>
+                                            </div>
+                                        </li>
+                                    </a>
+                                    <a href="{% url 'user:program' %}?price=True">
+                                        <li>
+                                            <div class="course__sidebar-check mb-10 d-flex align-items-center">
+                                                <label class="m-check-label" for="m-eng">Paid</label>
+                                            </div>
+                                        </li>
+                                    </a>
+                                </ul>
+
+                                   
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- course area end -->
+
+    <!-- cta area start -->
+    {% include 'website/web_component/cta_area_card.html' %}
+    <!-- cta area end -->
+
+</main>
+{% endblock %}
+{% block js%}
+<script>
+    function showUl(ele){
+        var elements = document.getElementsByClassName('ul-ele')
+
+        for (var i = 0; i < elements.length; i++){
+            elements[i].style.display = "none";
+        }
+        document.getElementById(ele).style.display="block"
+    }
+</script>
+{% endblock js%}

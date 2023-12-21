@@ -1,0 +1,193 @@
+{% extends 'base.html' %}  {% load tags %} {% block title %} Update Journey Pathway  {% endblock %} {% load
+    crispy_forms_tags %} {% block content %}
+    <div class="content-wrapper">
+      <!-- Content Header (Page header) -->
+      <section class="content-header">
+        <h1>
+          Journey Pathway
+    
+        </h1>
+        <ol class="breadcrumb">
+          <li><a href="#"><i class="fa fa-dashboard"></i> Skill</a></li>
+          <li><a href="#">Journey Pathway</a></li>
+        </ol>
+      </section>
+    
+      <!-- Main content -->
+      <section class="content">
+    
+        <!-- Default box -->
+        <div class="box">
+          <div class="box-header with-border">
+            <h3 class="box-title">Journey Pathway</h3>
+            
+            <a href="{%url 'content:config_course_list' %}"><button class="btn btn-primary pull-right">Journey Pathway List</button></a>
+
+          </div>
+          <div class="box-body">
+            {% include 'component/error_message.html' %}
+            <form method="post" action="">
+                {% csrf_token %}
+                <input type="hidden" name="id" value="{{skill_config.id}}"> 
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label>Roles</label>
+                            
+                            <select class="form-control select2" id ="role" name="role" required style="width: 100%;">
+                              <option selected="selected" value="{{skill_config.role.id}}">{{skill_config.role}} </option>
+                              {% for role in request.user|all_role %}
+                              
+                                <option value="{{role.pk}}" >{{role.name}}}</option>
+                                {% endfor %}
+                            </select>
+                            </div>
+                      <div class="form-group">
+                        <label>Journey</label>
+                        <select class="form-control select2" id ="channel" required name="channel" style="width: 100%;">
+                          <option selected="selected" value="{{skill_config.channel.id}}">{{skill_config.channel}}</option>
+                          {% for channel in request.session.user_type|all_skill_channel:request.session.company_id %}
+                            <option value="{{channel.pk}}">{{channel.title}} {% if skill_config.channel == channel.title %} dd {% endif %}</option>
+                            {% endfor %}
+                        </select>
+                      </div>
+                      <div class="form-group">
+                        <label>Journey Pre Assessment {{skill_config.journey_pre_assessment.name }}</label>
+                        <select class="form-control select2" id="journey_pre_assessment" name="journey_pre_assessment" required style="width: 100%;">
+                          
+                          {% for assessment in request.user|all_assessment %}
+                          <option value="{{assessment.pk}}" {% if skill_config.journey_pre_assessment.name == assessment.name %} selected {% endif %} >  {{assessment.name}}</option>
+                          {% endfor %}
+                        </select>
+                      </div>
+                      <!-- /.form-group -->
+                      <div id="sub_channel_div">
+                        <div class="form-group">
+                            <label>Select Skill</label>
+                            <select class="form-control select2" id="sub_channel" name="sub_channel" required style="width: 100%;">
+                              
+                              <option selected="selected" value="{{skill_config.sub_channel.id}}">{{skill_config.sub_channel}}</option>
+                             
+                            </select>
+                          </div>
+                      </div>
+                      <div class="form-group">
+                        <label>Select Pre Assessment</label>
+                        <select class="form-control select2" id="pre_assessment" name="pre_assessment" required style="width: 100%;">
+                          
+                          {% for assessment in request.user|all_assessment %}
+                          <option value="{{assessment.pk}}" {% if skill_config.pre_assessment.name == assessment.name %} selected {% endif %}>{{assessment.name}}</option>
+                          {% endfor %}
+                        </select>
+                      </div>
+                      <div class="row">
+                      {% for skill_level in skill_config.skill_config_name.all %}
+                        <input type="hidden" name="skill_level_id[]" value="{{skill_level.pk}}">
+                        <div class="col-md-6">
+                          <div class="form-group">
+                            <label>Select Proficiency Level</label>
+                            <input type="text" readonly  name="title" value="{{skill_level.channel_group.title}}" class="form-control"><input type="hidden" readonly  name="group[]" value="{{skill_level.channel_group.pk}}" class="form-control">
+                          </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Select Post Assessment</label>
+                                <select class="form-control select2"  id="post_assessment" name="post_assessment[]" required style="width: 100%;">
+                                  {% for assessment in request.user|all_assessment %}
+                                  <option value="{{assessment.pk}}"  {% if skill_level.assessment.name == assessment.name %} selected {% endif %} >{{assessment.name}}</option>
+                                  {% endfor %}
+                                </select>
+                              </div>
+                            </div>
+                          
+                        
+                        
+                          {% endfor %}
+                          </div>
+                      <!-- /.form-group -->
+                      <button type="submit" id="sumbitContent" class="btn btn-primary">Save changes</button>
+                    </div>
+                  
+                  <!-- /.row -->
+            </form>
+    
+          </div>
+          <!-- /.box-body -->
+         
+        </div>
+        <!-- /.box -->
+    
+      </section>
+      <!-- /.content -->
+    </div>
+    {% endblock content %}
+    {% block js %}
+    <script>
+    $(document).on('change', '#sub_channel', function(e) {
+        console.log("dd");
+          var formData = {
+            channel: $("#sub_channel").val(),
+            csrfmiddlewaretoken:"{{csrf_token}}"
+          };
+          selectChannelGroup(formData);
+      });
+      
+      
+      function selectChannelGroup(formData){
+         $.ajax({
+            type: "POST",
+            url: '{% url "content:select_channel_group" %}',
+            data: formData,
+            encode: true,
+          }).done(function (data) {
+            // var obj = JSON.parse(data);
+            
+            $("#group").empty();
+            $.each(data,function(key, value)
+                      { 
+                          $("#group").append('<option value=' + value['id'] + '>' + value['title'] + '</option>');
+                      });
+          });
+      }
+      
+      $(document).ready(function () {
+      
+      $("#channel").change(function(){
+          var formData = {
+            channel: $("#channel").val(),
+            csrfmiddlewaretoken:"{{csrf_token}}"
+          };
+          $.ajax({
+            type: "POST",
+            url: '{% url "content:check_sub_channel" %}',
+            data: formData,
+            encode: true,
+          }).done(function (data) {
+            // var obj = JSON.parse(data);
+            // console.log(data.length);
+            // $("#group").empty();
+            // $.each(data,function(key, value)
+            //           { 
+            //               $("#group").html('<option value=' + value['id'] + '>' + value['title'] + '</option>');
+            //           });
+          
+            $("#sub_channel_div").empty();
+            if(data.SkillDevelopment){
+      
+                $("#sub_channel_div").html(' <div class="form-group"><label>Select Skill</label><select class="form-control select2" id="sub_channel" name="sub_channel" required style="width: 100%;" value=""><option selected="selected">Select Skill </option></select></div>')
+                console.log(data.data);
+                $.each(data.data,function(key, value)
+                      { 
+                          $("#sub_channel").append('<option value=' + value['id'] + '>' + value['title'] + '</option>');
+                      });
+                } else {
+                  selectChannelGroup(formData);
+                }
+          });
+          
+      
+          event.preventDefault();
+      });
+      });
+    </script>
+    {% endblock js %}

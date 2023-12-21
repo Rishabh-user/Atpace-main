@@ -1,0 +1,49 @@
+{% extends 'base.html' %} {% load static %}
+{% block css %}
+<style>
+  .box {
+    border-radius: 5px;
+}
+</style>
+{% endblock css %}
+ {% block content %}
+<div class="content-wrapper">
+  <section class="content-header">
+    <h1>
+      Profile Assessment
+      <small>WELCOME & Thank You for your interest to participate in this 3-month Mentoring program. <br>
+        •	Please do spend about 8 - 10 minutes of your time to answer this questionnaire. The answers provided are important as these will help us do a better matching of the mentoring pairs & ensure success for both the Mentors & Mentees (as well as the MPM team supporting the program). <br>
+        •	All details received will be managed with the strictest CONFIDENTIALITY.<br>
+        •	You understand that the collaborative partners of the 3rd ASEAN Mentorship Program 2022 will, at all times comply with the requirements of the Personal Data Protection Act (PDPA Act 26 of 2012, Singapore) in respect of the collection, use, disclosure & other handling of your Personal Data.  No further signed consent is needed from you.</small>
+    </h1>
+    
+  </section>
+  <section class="content">
+    <form method="post">
+      {% csrf_token %}
+    {% for profile_assest in profile_assest %}
+    <div class="box">
+      <div class="box-header with-border">
+        <h3 class="box-title">{{profile_assest.question}}</h3>
+        <input type="hidden" name="question[]" value="{{profile_assest.pk}}">
+      </div>
+      <div class="box-body">
+        {% if profile_assest.question_type ==  "Options" %}
+        <select class="form-control select2" name="response[]" style="width:100">
+            <option selected hidden value="">Selected</option>
+            {% for options in profile_assest.options %}
+                <option>{{options}}</option>
+            {% endfor %}
+        </select>
+        {% else %}
+        <textarea class="form-control" placeholder="Enter Your Answer" name="response[]"></textarea>
+        {% endif %}
+      </div>
+      
+    </div>
+    {% endfor %}
+    <button type="submit" class="btn btn-primary">Save</button>
+  </form>
+  </section>
+</div>
+{% endblock content %}

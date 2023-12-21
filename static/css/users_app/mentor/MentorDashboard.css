@@ -1,0 +1,109 @@
+.compare-box {
+    margin-left: 3px;
+}
+
+.compare-box-text {
+    font-size: 12px;
+}
+
+.compare-box-number {
+    font-size: large;
+    margin-left: 50px;
+}
+
+.compare-box-icon {
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    text-align: center;
+    margin-top: 20px;
+    margin-left: 6px;
+}
+
+.compare-box-icon i {
+    margin-top: 13px;
+}
+
+.info-box {
+    border-radius: 12px;
+}
+
+.col-md-4 {
+    padding-left: 15px;
+    padding-right: 0px;
+}
+
+.point-box-content {
+    background-color: #735cdf;
+}
+
+.point-box-text {
+    color: white;
+}
+
+.point-box-number {
+    color: white;
+}
+
+.point-box-content {
+    padding-left: 25px;
+    padding-top: 25px;
+}
+
+.col-md-8 {
+    padding-left: 15px;
+    padding-right: 0px;
+}
+
+.tile-container {
+    position: relative;
+    border: solid #bdbdbd 0px;
+    margin: 5px 0px;
+    width: 100%;
+    font-size: 0;
+}
+
+.tile {
+    font-size: 20px;
+    width: 20%;
+    min-height: 22px;
+    border: 1px #bdbdbd solid;
+    display: inline-block;
+}
+
+.streak {
+    font-size: 13px;
+    width: 33%;
+    min-height: 22px;
+    border: 0px #bdbdbd solid;
+    display: inline-block;
+}
+
+.badges-text {
+    font-size: 13px;
+    padding-left: 8px;
+    padding-top: 4px;
+}
+
+.box {
+    border-left: 0px solid #fc6600;
+}
+
+.bg-blue {
+    background-color: #3c8dbc;
+}
+
+.journey-list {
+    background-color: #3c8dbc;
+    padding: 8px;
+    margin: 5px;
+    width: 60%;
+    color: white;
+    display: inline-block;
+}
+
+.journey-list-progress {
+    width: 25%;
+    display: inline-block;
+}

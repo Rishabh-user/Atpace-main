@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div class="content-wrapper">
+    <section class="content">
+    <a href="{% url 'user:user-list' %}">Go Back</a>
+    <form method="POST">
+        {% csrf_token %}
+        <p> Are you sure want to delete {{user}}.</p>
+        <input type="submit" value="Delete">
+    </form>
+    </section>
+</div>
+{% endblock content %}

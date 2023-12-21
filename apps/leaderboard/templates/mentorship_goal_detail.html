@@ -1,0 +1,272 @@
+{% extends 'base.html' %} 
+{% load tags %} 
+{% load static %}
+{% block title %}Goal {% endblock %}
+{% block css %}
+<style>
+.dl dt{
+	font-size:large;
+}
+.dl dd{
+	font-size:medium;
+}
+</style>
+{% endblock %}
+{% block content %}
+<div class="content-wrapper">
+  <!-- Content Header (Page header) -->
+  <section class="content-header">
+    <h1>Goal</h1>
+  </section>
+
+  <!-- Main content -->
+  <section class="content">
+  <div class="row">
+  	<div class="col-md-12">
+        <div class="box box-solid" style="border-left: 0px solid;">
+            <div class="box-header with-border bg-blue">
+              <h3 class="box-title">{{goal.heading}}</h3>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+  				<div class="row">
+  					<div class="col-md-3">
+						<dl class="dl">
+							<dt>Category</dt>
+							<dd>{{goal.category}}</dd>
+						</dl>
+					</div>
+					<div class="col-md-3">
+						<dl class="dl">
+							<dt>Priority</dt>
+							<dd>{{goal.priority_level}}</dd>
+						</dl>
+					</div>
+					<div class="col-md-3">
+						<dl class="dl">
+							<dt>Duration</dt>
+							<dd>{{goal.duration_number}} {{goal.duration_time}}</dd>
+						</dl>
+					</div>
+					<div class="col-md-3">
+						<dl class="dl">
+							<dt>Due Date</dt>
+							<dd>{{goal.complete_till.date}}</dd>
+						</dl>
+					</div>
+					<div class="col-md-6">
+						<dl class="dl">
+							<dt>Description</dt>
+							<dd>{{goal.description}}</dd>
+						</dl>
+					</div>
+          {% comment %} <div class="col-md-3">
+						<dl class="dl">
+							<dt>Progress</dt>
+							<dd>
+                  {% if status == '25%_done' %}
+                  <div class="col-xs-6 col-md-3 text-center">
+                    <input type="hidden" class="knob" value="25" data-width="60" data-height="60" data-thickness="0.4" data-fgColor="#3c8dbc">
+                  </div>
+                  {% elif status == '50%_done' %}
+                  <div class="col-xs-6 col-md-3 text-center">
+                    <input type="hidden" class="knob" value="50" data-width="60" data-height="60" data-thickness="0.4" data-fgColor="#3c8dbc">
+                  </div>
+                  {% elif status == '75%_done' %}
+                  <div class="col-xs-6 col-md-3 text-center">
+                    <input type="hidden" class="knob" value="75" data-width="60" data-height="60" data-thickness="0.4" data-fgColor="#3c8dbc">
+                  </div>
+                  {% elif status == 'Started' %}
+                  <span class="label label-primary">Started</span>
+                  {% elif status == 'ApprovedByMentor' %}
+                  <span class="label label-success">Approved</span>
+                  {% elif status == 'RejectedByMentor' %}
+                  <span class="label label-danger">Rejected</span>
+                  {% elif status == 'RequestForApprove' %}
+                  <span class="label label-warning">Requested</span>
+                  {% elif status == '' or status == 'None' %}
+                  <span class="label label-primary">Not Started</span>
+                  {% endif %}
+              </dd>
+						</dl>
+					</div> {% endcomment %}
+          {% if status != 'ApprovedByMentor' and status != 'Completed' and status != 'RequestForApprove' and status != 'RejectedByMentor' and is_expired != 'True' %}         
+					<div class="col-md-3">
+						<dl class="dl">
+							<dt>Log Progress</dt>
+							<dd>
+              <input
+                  type="range"
+                  value="{{progress_percentage}}"
+                  min="0"
+                  max="100"
+                  oninput="this.nextElementSibling.value = this.value"
+                  onchange="LogProgress('{{goal.id}}',this.value)"
+              />
+              <output>{{progress_percentage}}</output>
+							</dd>
+						</dl>
+					</div>
+          {% else %}
+          <div class="col-md-3">
+						<dl class="dl">
+							<dt>Status</dt>
+            {% if status == "Completed" %}
+							<dd><span class="label label-success">{{status}}</span></dd>
+            {% elif status == "ApprovedByMentor" %}
+							<dd><span class="label label-success">Approved</span></dd>
+            {% elif status == "RejectedByMentor" %}
+							<dd><span class="label label-danger">Rejected</span></dd>
+            {% elif status == "RequestForApprove" %}
+							<dd><span class="label label-warning">Requested</span></dd>
+            {% endif %}
+						</dl>
+					</div>
+          {% endif %}
+				  </div>
+         </div>
+            <!-- /.box-body -->
+        </div>
+        <!-- /.box -->
+    </div>
+      <!-- ./col -->
+    <div class="col-md-12">
+      
+    <div class="box box-widget">
+                
+  
+                <h4 style="padding: 10px;">Comments</h4>
+                
+                <div class="box-footer box-comments">
+                  {% for comment in comment %}
+                  <div class="box-comment">
+                    <!-- User image -->
+                    <img 
+                    class="img-circle img-sm" 
+                    src="{{MEDIA_URL}}{{comment.created_by.avatar}}" 
+                    onerror="this.onerror=null; this.src='{{comment.created_by.avatar}}'"
+                    alt="User Image">
+        
+                    <div class="comment-text">
+                        <span class="username">
+                            {{comment.created_by.first_name}} {{comment.created_by.last_name}}
+                            <span class="text-muted pull-right">
+                              {{comment.created_at}}
+                            </span>
+                        </span><!-- /.username -->
+                        {% autoescape off %}
+                        {{comment.comment}}
+                        {% endautoescape %}
+                    </div>
+                    <!-- /.comment-text -->
+                  </div>
+                  {% endfor %}
+                  <!-- /.box-comment -->
+
+                </div>
+                <!-- /.box-body -->
+               
+                <div class="box-footer">
+                  <form action='{% url "leaderboard:mentorship_goal_comment" %}' method="post">
+                    {% csrf_token %}
+                    <img 
+                    class="img-responsive img-circle img-sm" 
+                    src="{{MEDIA_URL}}{{request.user.avatar}}" 
+                    onerror="this.onerror=null; this.src='{{request.user.avatar}}'"
+                    alt="Alt Text">
+                    <!-- .img-push is used to add margin to elements next to floating images -->
+                    <div class="img-push">
+                      <input type="hidden" value="{{goal.pk}}" name="goal_id"/>
+                      <input type="text" class="form-control" name="comment" placeholder="Type Comment ..." style=""/>
+                    	<button class="btn btn-info">POST</button>
+                    </div>
+                  </form>
+                </div>
+                <!-- /.box-footer -->
+               
+              </div>
+        </div>
+    </div>  
+  </div>
+  </section>
+</div>
+  <!-- /.content -->
+</div>
+<!-- jQuery Knob -->
+<script src="{% static 'bower_components/jquery-knob/js/jquery.knob.js' %}"></script>
+{% endblock content %} {% block js %}
+<script>
+  function LogProgress(goal_id, status){
+    console.log("fun log progress",goal_id, status)
+    $.ajax({
+        url: "{% url 'leaderboard:user_goal_log' %}",
+        type: "post",
+        data: { id: goal_id, status: status, csrfmiddlewaretoken: "{{csrf_token}}" },
+        error: function () {
+          console.log("error")
+        },
+        success: function (data) {
+          console.log("data",data)
+        },
+    });
+  }
+  //$("#progress").on("change",function (event) {
+    //value = $("#progress").val();
+    //console.log("calling", value)
+  //});
+</script>
+<!-- page script -->
+<script>
+  $(function () {
+    /* jQueryKnob */
+
+    $(".knob").knob({
+      draw: function () {
+        // "tron" case
+        if (this.$.data('skin') == 'tron') {
+
+          var a = this.angle(this.cv)  // Angle
+              , sa = this.startAngle          // Previous start angle
+              , sat = this.startAngle         // Start angle
+              , ea                            // Previous end angle
+              , eat = sat + a                 // End angle
+              , r = true;
+
+          this.g.lineWidth = this.lineWidth;
+
+          this.o.cursor
+          && (sat = eat - 0.3)
+          && (eat = eat + 0.3);
+
+          if (this.o.displayPrevious) {
+            ea = this.startAngle + this.angle(this.value);
+            this.o.cursor
+            && (sa = ea - 0.3)
+            && (ea = ea + 0.3);
+            this.g.beginPath();
+            this.g.strokeStyle = this.previousColor;
+            this.g.arc(this.xy, this.xy, this.radius - this.lineWidth, sa, ea, false);
+            this.g.stroke();
+          }
+
+          this.g.beginPath();
+          this.g.strokeStyle = r ? this.o.fgColor : this.fgColor;
+          this.g.arc(this.xy, this.xy, this.radius - this.lineWidth, sat, eat, false);
+          this.g.stroke();
+
+          this.g.lineWidth = 2;
+          this.g.beginPath();
+          this.g.strokeStyle = this.o.fgColor;
+          this.g.arc(this.xy, this.xy, this.radius - this.lineWidth + 1 + this.lineWidth * 2 / 3, 0, 2 * Math.PI, false);
+          this.g.stroke();
+
+          return false;
+        }
+      }
+    });
+    /* END JQUERY KNOB */
+
+  });
+  
+</script>
+{% endblock js %}

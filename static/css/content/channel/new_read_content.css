@@ -1,0 +1,192 @@
+/*css from 1st style--- Sarthak*/
+
+.c_btn {
+    border: 2px solid black;
+    background-color: white;
+    color: black;
+    padding: 9px 28px;
+    font-size: 16px;
+    cursor: pointer;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.c_poll_btn {
+    border: 2px solid black;
+    background-color: white;
+    color: black;
+    font-size: 16px;
+    cursor: pointer;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+/* Blue */
+.c_info {
+    border-color: #2196f3;
+    color: dodgerblue;
+}
+
+.c_info:hover {
+    background: #2196f3;
+    color: white;
+}
+
+.wrong_answer {
+    border-color: #e8453c !important;
+    background-color: #e7acac !important;
+}
+
+.right_answer {
+    border-color: #6ceb96 !important;
+    background-color: #96f1bc !important;
+}
+
+.quiz_result {
+    background-color: #f2f0f0;
+    padding: 15px;
+    display: none;
+}
+
+.content {
+    min-height: auto;
+}
+
+/*css from 1st style--- Sarthak*/
+
+.section {
+    padding: 15px;
+}
+
+
+section.content {
+    min-height: calc(100vh - 33px);
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
+    display: block;
+    margin-top: 1%;
+    width: 100%;
+    max-width: 750px;
+
+}
+
+.c_poll_btn {
+    border: 2px solid black;
+    background-color: white;
+    color: black;
+    font-size: 16px;
+    cursor: pointer;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.c_btn {
+    border: 2px solid black;
+    background-color: white;
+    color: black;
+    padding: 9px 28px;
+    font-size: 16px;
+    cursor: pointer;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+/* //Nick Css */
+.section {
+    justify-content: center !important;
+    align-items: center !important;
+    /* display: flex !important; */
+    display: block;
+}
+
+
+.padding-x-48 {
+    padding: 0 48px;
+}
+
+.box-header {
+    padding: 10px 0;
+}
+
+@media only screen and (max-width: 600px) {
+    .content_card {
+        padding: 12px;
+        width: 100%;
+        max-width: 750px;
+        min-width: unset;
+    }
+
+    iframe.content_card {
+        width: 100%;
+        min-width: 100%;
+    }
+
+    .content {
+        width: 100%;
+    }
+
+    .row {
+        padding: 0px;
+        margin-left: -2px;
+        margin-right: 0px;
+    }
+
+    .card_image {
+        width: 100% !important;
+    }
+}
+
+@media (max-width: 1200px) {
+    .padding-x-48 {
+        padding: 0;
+    }
+
+    .content_card {
+        /* max-width: 400px; */
+        max-width: unset;
+        width: 100%;
+        /* min-width: 630px; */
+        min-width: unset;
+
+    }
+
+    .card_image {
+        width: 60%;
+    }
+
+    .row {
+        width: 100%;
+        min-width: 100%;
+        margin-left: -3px;
+        margin-right: -5px;
+    }
+
+}
+
+.pdf-content svg {
+    width: 100%;
+    max-width: 80px;
+}
+
+.pdf-content > div {
+    padding: 0;
+}
+
+.img-cover {
+    height: 400px;
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+}
+
+.img-cover img {
+    position: absolute;
+    left: -1000%;
+    right: -1000%;
+    top: -1000%;
+    bottom: -1000%;
+    margin: auto;
+    /* min-height: 100%; */
+    min-width: 100%;
+}

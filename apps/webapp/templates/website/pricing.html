@@ -1,0 +1,198 @@
+{% extends 'website/web_base.html' %} {% load static %}
+{% block content %}
+<style>
+#mobile-menu ul li a {
+    color: #000000;
+}
+</style>
+
+   
+      <div class="body-overlay"></div>
+      <!-- cart mini area end -->
+
+
+    
+      <!-- sidebar area end -->
+
+      <main>
+
+         <!-- page title area start -->
+         <section class="price__area pt-120 pb-130">
+            <div class="container">
+               <div class="row">
+                  <div class="col-xxl-4 offset-xxl-4">
+                     <div class="section__title-wrapper mb-60 text-center">
+                        <h2 class="section__title">Simple <br> modular  <span class="yellow-bg yellow-bg-big">Offering<img src="{% static 'website/img/shape/yellow-bg.png' %}" alt=""></span></h2>
+                         
+                     </div>
+                  </div>
+               </div>
+               <div class="row">
+                  <div class="col-xxl-12">
+                     <div class="price__tab-btn text-center mb-50">
+                        <nav>
+                           <div class="nav nav-tabs justify-content-center" id="nav-tab" role="tablist">
+                             <button class="nav-link" id="nav-monthly-tab" data-bs-toggle="tab" data-bs-target="#nav-monthly" type="button" role="tab" aria-controls="nav-monthly" aria-selected="true">Summary of features</button>
+                           </div>
+                         </nav>
+                     </div>
+                  </div>
+               </div>
+               <div class="row">
+                  <div class="col-xxl-10 offset-xxl-1 col-xl-10 offset-xl-1 col-lg-10 offset-lg-1">
+                     <div class="price__tab-content">
+                        <div class="tab-content" id="nav-tabContent">
+                           <div class="tab-pane fade show active" id="nav-monthly" role="tabpanel" aria-labelledby="nav-monthly-tab">
+                              <div class="row">
+                                 <div class="col-xxl-4 col-xl-4 col-lg-4 col-md-4">
+                                    <div class="price__item grey-bg mb-30 p-relative">
+                                       <div class="price__head">
+                                          <h3>Upskilling Mode</h3>
+                                          
+                                       </div>
+                                       
+                                       <div class="price__features mb-40">
+                                          <ul>
+                                             <li><i class="far fa-check"></i>Reinforcement</li>
+                                             <li><i class="far fa-check"></i>Content creation Module</li>
+                                             <li><i class="far fa-check"></i>Skill Pathways</li>
+                                             <li><i class="far fa-check"></i>Courses only</li>
+                                             <li><i class="far fa-check"></i>Private learning Journals</li>
+                                             <li><i class="far fa-check"></i>Assessments</li>
+                                             <li><i class="far fa-check"></i>Proctoring</li>
+                                             <li><i class="far fa-check"></i>Badges and Rewards</li>
+                                          </ul>
+                                       </div>
+                                      
+
+                                       <a href="{% url 'user:contact_us' %}" class="e-btn e-btn-4">Get Quote</a>
+                                    </div>
+                                 </div>
+                                  <div class="col-xxl-4 col-xl-4 col-lg-4 col-md-4">
+                                    <div class="price__item grey-bg mb-30 p-relative">
+                                       <div class="price__head">
+                                          <h3>Hyper skilling</h3>
+                                          
+                                       </div>
+                                       
+                                       <div class="price__features mb-40">
+                                          <ul>
+                                             <li><i class="far fa-check"></i>All Upskilling +</li>
+                                             <li><i class="far fa-check"></i>Private communities</li>
+                                             <li><i class="far fa-check"></i>Instructors' engagement with
+                                                learners to answer questions
+                                                quickly
+                                                </li>
+                                                <li><i class="far fa-check"></i>Peer to Peer learning</li>
+                                                <li><i class="far fa-check"></i>Community Journals and
+                                                   engagement</li>
+                                          </ul>
+                                       </div>
+                                       <a href="{% url 'user:contact_us' %}" class="e-btn e-btn-4">Get Quote</a>
+                                    </div>
+                                 </div>
+                                 
+                                 <div class="col-xxl-4 col-xl-4 col-lg-4 col-md-4">
+                                    <div class="price__item grey-bg mb-30 p-relative">
+                                       <div class="price__head">
+                                          <h3>Mentoring</h3>
+                                       </div>
+                                       
+                                       <div class="price__features mb-40">
+                                          <ul>
+                                             <li><i class="far fa-check"></i>Sign up for mentors</li>
+                                             <li><i class="far fa-check"></i>Sign up for Mentees</li>
+                                             <li><i class="far fa-check"></i>Profile Assessments</li>
+                                             <li><i class="far fa-check"></i>Private mentoring journeys</li>
+                                             <li><i class="far fa-check"></i>Mentor / Mentee Matching</li>
+                                             <li><i class="far fa-check"></i>Weekly learning content</li>
+                                             <li><i class="far fa-check"></i>Weekly journals</li>
+                                             <li><i class="far fa-check"></i>Admin access to managing</li>
+                                             <li><i class="far fa-check"></i>Redirects to FB / websites</li>
+                                          </ul>
+                                       </div>
+                                       <a href="{% url 'user:contact_us' %}" class="e-btn e-btn-4">Get Quote</a>
+                                    </div>
+                                 </div>
+                                 <div class="col-xxl-4 col-xl-4 col-lg-4 col-md-4">
+                                    <div class="price__item grey-bg mb-30 p-relative">
+                                       <div class="price__head">
+                                          <h3>Custom on Mobile</h3>
+                                          
+                                       </div>
+                                       
+                                       <div class="price__features mb-40">
+                                          <ul>
+                                             <li><i class="far fa-check"></i>Ability to put together pieces
+                                                that work best for you</li>
+                                             <li><i class="far fa-check"></i>Mobile app that allows for all
+                                                the access enabled for
+                                                learners</li>
+                                             
+                                          </ul>
+                                       </div>
+                                       <a href="{% url 'user:contact_us' %}" class="e-btn e-btn-4">Get Quote</a>
+                                    </div>
+                                 </div>
+                                 <div class="col-xxl-4 col-xl-4 col-lg-4 col-md-4">
+                                    <div class="price__item grey-bg mb-30 p-relative">
+                                       <div class="price__head">
+                                          <h3>Private Community</h3>
+                                       </div>
+                                       
+                                       <div class="price__features mb-40">
+                                          <ul>
+                                             <li><i class="far fa-check"></i>Private communities</li>
+                                             <li><i class="far fa-check"></i>Posts</li>
+                                             <li><i class="far fa-check"></i>Embed variety of content
+                                                • 3P Videos, Audio
+                                                • 3P Surveys
+                                                • External Links</li>
+                                             <li><i class="far fa-check"></i>Live stream from YT, FB</li>
+                                             <li><i class="far fa-check"></i>Redirects to FB / websites</li>
+                                          </ul>
+                                       </div>
+                                       <a href="{% url 'user:contact_us' %}" class="e-btn e-btn-4">Get Quote</a>
+                                    </div>
+                                 </div>
+                                 <div class="col-xxl-4 col-xl-4 col-lg-4 col-md-4">
+                                    <div class="price__item grey-bg mb-30 p-relative">
+                                       <div class="price__head">
+                                          <h3>Community+</h3>
+                                          
+                                       </div>
+                                      
+                                       
+                                       <div class="price__features mb-40">
+                                          <ul>
+                                             <li><i class="far fa-check"></i>Webinars from community</li>
+                                             <li><i class="far fa-check"></i>Going live from within the
+                                                community</li>
+                                             <li><i class="far fa-check"></i>native surveys</li>
+                                             <li><i class="far fa-check"></i>native assessments</li>
+                                             <li><i class="far fa-check"></i>Landing page</li>
+                                             <li><i class="far fa-check"></i>Paywall integration</li>
+                                          </ul>
+                                       </div>
+                                       <a href="{% url 'user:contact_us' %}" class="e-btn e-btn-4">Get Quote</a>
+                                    </div>
+                                 </div>
+                              </div>
+                           </div>
+                         
+                         </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </section>
+         <!-- page title area end -->
+
+
+         <!-- cta area start -->
+         {% include 'website/web_component/cta_area_card.html' %}
+         <!-- cta area end -->
+
+
+      </main>
+{% endblock %}

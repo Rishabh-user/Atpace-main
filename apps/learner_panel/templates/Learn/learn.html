@@ -1,0 +1,212 @@
+{% extends 'base.html' %} {% load static %} 
+{% block title %} Learn {% endblock %} 
+{% load tags %}
+{% block css %} 
+  <link
+          rel="stylesheet"
+          href="{% static 'css/program_manager/program_manager.css' %}"
+  />
+  <style>
+    .capitalize {
+      text-transform: capitalize;
+    }
+    .mgt-10{
+      margin-top: 10px;
+    }
+    /* Create an active/current tablink class */
+    .tab div div.active {
+      border-top: 5px solid #1B74E4;
+    }
+    /* Style the tab content */
+    .tabcontent {
+      display: none;
+    }
+  </style>
+{% endblock css %} {% block content %}
+<div class="content-wrapper" id="vue-app">
+  <section class="content-header">
+    <h1>Learn</h1>
+  </section>
+  <section class="content">
+    <div class="row tab">
+      <div class="col-md-2">
+        <div class="small-box box-tab tab-links"  id="journey-tab" @click="showJourney()">
+          <div class="inner">
+            <h4>Journey</h4>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <div class="small-box box-tab tab-links"  id="journal-tab" @click="showJournal()">
+          <div class="inner">
+            <h4>Journal</h4>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <div class="small-box box-tab tab-links"  id="survey-tab" @click="showSurvey()">
+          <div class="inner">
+            <h4>Survey Assigned</h4>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="journey-content" class="tabcontent">
+    {% include 'Learn/journey.html' %}
+    </div>
+    <div id="survey-content" class="tabcontent">
+    {% include 'Learn/survey.html' %}
+    </div>
+    <div id="journal-content" class="tabcontent">
+    {% include 'Learn/journal.html' %}
+    </div>
+  </section>
+  {{ request.user.id|json_script:"user_id" }}
+  {{request.session.token|json_script:"token"}}
+  {{request.session.company_id|json_script:"company_id"}}
+  {{request.session.company_name|json_script:"company_name"}}
+  {{request.session.timezone|json_script:"timezone"}}
+  
+</div>
+{% endblock content %} {% block js %} 
+<script src="{% static 'bower_components/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
+<script type="text/javascript">
+  let app = new Vue({
+    el: "#vue-app",
+    delimiters: ['[[', ']]'],
+    data() {
+      return {
+        token:JSON.parse(document.getElementById('token').textContent),
+        auth:"",
+        base_url:window.location.origin,
+        user_id: JSON.parse(document.getElementById('user_id').textContent),
+        user_company_name: JSON.parse(document.getElementById('company_name').textContent),
+        user_company_id: JSON.parse(document.getElementById('company_id').textContent),
+        timezone: JSON.parse(document.getElementById('timezone').textContent),
+        learning_journal:"",
+        weekly_journal:"",
+        private_journal:"",
+        all_journey:"",
+        survey_assigned:"",
+        loading: true,
+      };
+    },
+    mounted(){
+      this.showJourney();
+    },
+    filters: {
+      formateTime: function (value) {
+        if (!value) return ''
+        //value = value.toString()
+        //console.log("time value", value)
+        return value
+      }
+    },
+    methods: {
+        axiosGetRequest: function(url){
+        this.auth = "Token "+this.token;
+        var config = {
+          method: "get",
+          url: url,
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': this.auth,
+          },
+        };
+        return axios(config)
+        },
+        axiosPostRequest: function(url, data){
+            this.auth = "Token "+this.token;
+            var config = {
+            method: "post",
+            url: url,
+            headers: {
+                "Content-Type": "multipart/form-data",
+                "Accept": "application/json",
+                'Authorization': this.auth,
+            },
+            data:data
+            };
+
+            return axios(config)
+        },
+        async destroyDataTable(id){
+            if($(id).DataTable()){
+            console.log("destroying", id);
+            $(id).DataTable().clear();
+            $(id).DataTable().destroy();
+            }
+        },
+        async initializeDataTable(id){
+            console.log("initializing");
+            await this.sleep(2000);
+            $(id).DataTable({
+            "dom": '<"table-pull-left"f><"table-pull-right"l>tip',
+            'destroy': true,
+            'paging'      : true,
+            'lengthChange': true,
+            'searching'   : true,
+            'ordering'    : true,
+            'info'        : true,
+            'autoWidth'   : false,
+            'retrieve':true,
+            'scrollX': true,
+            })
+        },
+        sleep: function(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        },
+        showTab(tabName){
+          var i, tabContent, tabLinks;
+          tabContent = document.getElementsByClassName("tabcontent");
+          for (i = 0; i < tabContent.length; i++) {
+            tabContent[i].style.display = "none";
+          }
+          tabLinks = document.getElementsByClassName("tab-links");
+          for (i = 0; i < tabLinks.length; i++) {
+            tabLinks[i].className = tabLinks[i].className.replace(" active", "");
+          }
+          document.getElementById(tabName+'-content').style.display = "block";
+          document.getElementById(tabName+'-tab').classList.add("active");
+        },
+        async showJournal(){
+          this.showTab('journal');
+          var url =  this.base_url+"/api/journal/"+this.user_id+"/Learner"+"?company_id="+this.user_company_id+"&timezone="+this.timezone;
+          response = await this.axiosGetRequest(url);
+          console.log("All Journal Response", response.data);
+          this.learning_journal = response.data.data.learning_journals;
+          this.weekly_journal = response.data.data.weekly_journal;
+          this.private_journal = response.data.data.private_journals;
+          this.loading = false;
+        },
+        async showJourney(){
+          this.showTab('journey');
+          await this.destroyDataTable('#all-survey-table')
+          this.all_journey = ""
+          var url =  this.base_url+"/api/user-joined-channel/"+this.user_id+"?company_id="+this.user_company_id;
+          response = await this.axiosGetRequest(url);
+          console.log("All Journey Response", response.data.data);
+          this.all_journey = response.data.data.all_journey;
+          await this.initializeDataTable('#all-journey-table')
+        },
+        async showSurvey(){
+          this.showTab('survey');
+          await this.destroyDataTable('#all-journey-table')
+          this.survey_assigned = ""
+          var data = new FormData();
+          data.append("user_id", this.user_id)
+          data.append("company_id", this.user_company_id)
+          data.append("user_type", "Learner")
+          var url =  this.base_url+"/api/assign-survey-list/";
+          response = await this.axiosPostRequest(url, data);
+          console.log("All Survey Response", response.data.data);
+          this.survey_assigned = response.data.data;
+          await this.initializeDataTable('#all-survey-table')
+        },
+
+    }
+  });
+</script>
+
+{% endblock js %}

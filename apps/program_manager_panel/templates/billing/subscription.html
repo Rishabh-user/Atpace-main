@@ -1,0 +1,98 @@
+{% comment %} <div class="row">
+    <div class="col-md-4" v-for="subscription in subscription_list" :key="subscription.id">
+        <div class="box box-subscription" style="" id="">
+          <div class="box-header" style="border-bottom: 1px solid #f4f4f4;">
+            <h3 class=" label label-primary pull-right" style="font-size:14px; margin-top:5px;">[[subscription.sub_type]]</h3>
+            <h3 class="box-title">[[subscription.title]]</h3>
+          </div>
+          <div class="box-body">
+            <p class="text-center" style="font-size:20px;"><b> &#36;[[subscription.price]]</b></p>
+            <p class="text-center" style="font-size:15px;">[[subscription.duration]] [[subscription.duration_type]]</p>
+            <p style="font-size:15px;">[[subscription.description]]</p>
+          </div>
+          <div class="box-footer">
+            <a v-if="subscription.is_purchased" href="" class="btn btn-success pull-right">Subscribed</a>
+            <a v-else :href="'/checkout/subscription/'+subscription.id" class="btn btn-info pull-right">Buy now</a>
+            <div style="margin-top:50px;">
+                <b >*Terms and Conditions:</b>
+                <p>[[subscription.terms_conditions]]</p>
+            </div>
+          </div>
+
+        </div>
+    </div>
+</div> {% endcomment %}
+<div class="wrapper-sub">
+    <div class="table-sub basic" v-for="subscription in subscription_list" :key="subscription.id">
+      <div class="head_tab"><h2>[[subscription.sub_type]]</h2><h3>[[subscription.title]]</h3></div>
+      <div class="aj_p"><p>[[subscription.description]]</p></div>
+      <div class="price-section">
+        <div class="price-area">
+          <div class="inner-area">
+            <span class="text">&#36;</span>
+            <span class="price"><span v-if="subscription.sub_type == 'Free'">0</span><span v-else>[[subscription.price]]</span><span style="font-size:12px">[[subscription.duration]] [[subscription.duration_type]]</span></span>
+          </div>
+        </div>
+      </div>
+      <div class="package-name"></div>
+      <ul class="features">
+        <div class="btn">
+        {% comment %} <button type="button" class="btn bg-purple update_btn" data-toggle="modal" data-target="#exampleModalCenter" @click="selectCompany(subscription.id)">
+          Update
+        </button>  {% endcomment %}
+        {% comment %} <button v-if="subscription.is_purchased">Subscribed</button> {% endcomment %}
+        <button v-if="subscription.sub_type == 'Free'" @click="buySubscription(subscription.id, 'Free')">Subscribe</button>
+        {% comment %} <button v-else ><a :href="'/checkout/subscription/'+subscription.id" style="color:white;">Buy Now</a></button> {% endcomment %}
+        <button v-else @click="buySubscription(subscription.id, 'Buy')">Buy Now</button>
+        </div>
+        <p class=""><b>Max Mentor : </b>[[subscription.max_mentor]]</p>
+        <p class=""><b>Max Mentee : </b>[[subscription.max_learner]]</p>
+        <p class=""><b>Max Mentee per mentor : </b>[[subscription.learner_per_mentor]]</p>
+        {% comment %} <li>
+          <span class="list-name">1 Website</span>
+          <span class="icon check"><i class="fas fa-check"></i></span>
+        </li> {% endcomment %}
+          
+      </ul>
+      <b>*Terms and Conditions:</b>
+      <p>[[subscription.terms_conditions]]</p>
+      {% comment %} <div style="position:absolute; bottom:15px; right:25px;">
+        <b>Detail <i class="fa-angle-double-right"></i></b>
+      </div> {% endcomment %}
+    </div>
+  </div>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="md-col-11 modal-title" id="exampleModalLongTitle">Select Company</h3>
+      </div>
+      <div class="modal-body">
+        <form>  
+          <input type="hidden" name="subscription_id" id="subscription_id" v-model="subscription_id">
+          <div class="col-sm-12">
+            <div class="form-group">
+              <label>Company</label>
+              <select class="form-control select2" name="company" required style="width: 100%;" ref="company">
+                <option selected="selected">Select</option>
+                <option
+                  v-bind:value="company.id"
+                  v-for="company in company_list"
+                  :key="company.id"
+                >
+                  [[company.name]] 
+                </option>
+              </select>
+            </div>
+          </div>  
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" @click="buySubscription" data-dismiss="modal">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>

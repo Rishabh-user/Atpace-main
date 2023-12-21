@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% load static %} {% load tags %}
+{% block css %} 
+  
+
+ 
+   {% endblock %}
+{% block sidebar %}
+<aside
+class="main-sidebar"
+style="
+  box-shadow: 0px 12px 7px #2329314d;
+  background-color: white;
+  border-radius: none;
+  backdrop-filter: blur(1.5px);
+  -webkit-backdrop-filter: blur(1.5px);
+  border-right: 1px solid #ababab;
+"
+>
+<!-- sidebar: style can be found in sidebar.less -->
+<section class="sidebar" style="background-color: #fff">
+  <ul class="sidebar-menu" data-widget="tree">
+    {% for data in content_data %}
+
+    {% endfor %}
+  </ul>
+</section>
+</aside>
+{% endblock sidebar %}
+{% block content %}
+      <!-- Content Wrapper. Contains page content -->
+      <div class="content-wrapper">
+        <section class="content-header">
+            <a href="{% url 'community:journey_post' channel=channel.pk   %}" style="color: black;"><h4><i class="fa fa-arrow-left"></i> Back to All Post</h4></a>
+          <p></p>
+        </section>
+
+        <section class="content">
+            <div class="box box-widget">
+            
+              {% include 'community/community_post_detail.html' %}
+            
+            <div class="box-footer box-comments">
+              
+                {% for comment in comment %}
+                <div class="box-comment">
+                  <!-- User image -->
+                  <img class="img-circle img-sm" 
+                  src="{{comment.user_profile_image}}" alt="User Image"
+                  onerror="this.onerror=null; this.src='{{request.user.avatar}}'"
+                  />
+      
+                  <div class="comment-text">
+                        <span class="username">
+                          {{comment.created_by}}
+                          <span class="text-muted pull-right">
+                            {{comment.created_at}}
+                                          </span>
+                                      </span><!-- /.username -->
+                                      {% autoescape off %}
+                                      {{comment.description}}
+                      {% endautoescape %}
+                  </div>
+                  <!-- /.comment-text -->
+                </div>
+                <!-- /.box-comment -->
+               {% endfor %}
+              </div>
+              <!-- /.box-footer -->
+              <div class="box-footer">
+                <form action="{% url 'community:post_answer'%}" method="post">
+                  {% csrf_token %}
+                  <img class="img-responsive img-circle img-sm" 
+                  src="{{request.user.avatar}}"
+                  onerror="this.onerror=null; this.src='{{MEDIA_URL}}{{request.user.avatar}}'"
+                  alt="Alt Text"
+                  >
+                  <!-- .img-push is used to add margin to elements next to floating images -->
+                  <div class="img-push">
+                    <input type="hidden" value="{{channel.pk}}" name="channel"/>
+                    <input type="hidden" value="{{data.id}}" name="post_id"/>
+                    <textarea class="form-control input-sm" name="answer" placeholder="Press enter to post answer"></textarea>
+                  </div>
+                  <button class="btn btn-info">POST</button>
+                </form>
+              </div>
+              <!-- /.box-footer -->
+            </div>
+        </div>
+                
+          </section>
+      </div>
+{% endblock content %} 
+{% block js %}
+
+{% endblock %}
+  </body>
+</html>

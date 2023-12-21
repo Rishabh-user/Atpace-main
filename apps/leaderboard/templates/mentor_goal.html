@@ -1,0 +1,560 @@
+{% extends 'base.html' %} 
+{% load tags %} 
+{% block title %}Goal {% endblock %} {% comment %} {%
+load crispy_forms_tags %} {% endcomment %} {% block content %}
+<div class="content-wrapper">
+  <!-- Content Header (Page header) -->
+  <section class="content-header">
+    <h1>Goal</h1>
+  </section>
+
+  <!-- Main content -->
+  <section class="content">
+  <div class="row">
+    <div class="col-md-12">
+      <div class="box">
+        <div class="box-header">
+          <h3 class="box-title">Goals</h3>
+          {% comment %} <button class="btn-primary pull-right" onclick="createGoal()"> {% endcomment %}
+          <button class="btn-primary pull-right" data-toggle="modal" data-target="#modal-default">
+            Create Goal
+          </button>
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body no-padding">
+          <table class="table table-striped">
+            {% if goals.count == 0 %}
+            <tr>
+              <td class="text-center">No Goal</td>
+            </tr>
+            {% else %} 
+            <tr>
+            <th>Heading</th>
+            <th>Description</th>
+            <th>Due Date</th>
+            <th>Action</th>
+            </tr>
+            {% for data in data %}
+            <tr>
+              <td>{{data.goal.heading}}</td>
+              <td style="width:450px;">{{data.goal.description}}</td>
+              <td>
+              {% if data.is_expired == 'Yes' %}
+              <span class="label label-danger">Expired</span>
+              {% else %}
+              {{data.goal.complete_till.date}}
+              {% endif %}
+              </td>
+              <td>
+                <button class="btn btn-info" onclick="viewGoal('{{data.goal.id}}')" style="margin: 0px" data-toggle="modal" data-target="#modal-edit">
+                Edit</button>
+
+                <button
+                  onclick="deleteGoal('{{data.goal.id}}')"
+                  class="btn btn-danger"
+                  style="margin: 0px"
+                >
+                  Delete
+                </button>
+                <a href="{% url 'leaderboard:view_comment' pk=data.goal.id %}">
+                <button
+                  class="btn btn-info"
+                  style="margin: 0px;"
+                >
+                  View Request
+                </button>
+                </a>
+              </td>
+             
+              
+            </tr>
+            {% endfor %} {% endif %}
+          </table>
+        </div>
+        <!-- /.box-body -->
+      </div>
+    </div>
+    
+    {{goal_log|json_script:"goal_log" }}
+
+    <div class="col-md-12">
+      <div class="box box-success">
+        <div class="box-header with-border">
+          <h3 class="box-title">Goal Progress</h3>
+
+          <div class="box-tools pull-right">
+            <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+            </button>
+          </div>
+        </div>
+        <div class="box-body chart-responsive">
+          <div class="chart" id="bar-chart" style="height: 300px;"></div>
+        </div>
+        <!-- /.box-body -->
+      </div>
+    </div>
+
+    {{category_list|json_script:"category_list" }}
+
+    {% comment %} <div class="col-md-4">
+      <!-- DONUT CHART -->
+          <div class="box box-danger">
+            <div class="box-header with-border">
+              <h3 class="box-title">Goal Category</h3>
+
+              <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                </button>
+                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+              </div>
+            </div>
+            <div class="box-body chart-responsive">
+              <div class="chart" id="sales-chart" style="height: 300px; position: relative;"></div>
+            </div>
+            <!-- /.box-body -->
+          </div>
+          <!-- /.box -->
+    </div> {% endcomment %}
+   
+  </div>
+  </section>
+  <div class="modal fade" id="modal-default" style="display: none;">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <form id="Content_form">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">×</span></button>
+              <h4 class="modal-title">Create Goal</h4>
+            </div>
+            <div class="modal-body">
+              <div class="form-group">
+                <label for="heading" class="col-sm-2 control-label">Heading</label>
+                  <input type="text" class="form-control" id="heading" required name="heading" placeholder="Heading"/>
+              </div>
+              <div class="form-group">
+                <label for="category" class="col-sm-2 control-label">Category</label>
+                <select class="form-control select2" name="category" required id='category' style="width: 100%;">
+                  <option selected="selected" value="Gain Clarity">Gain Clarity</option>
+                  <option value="Health">Health</option>
+                  <option value="Learn">Learn</option>
+                  <option value="Follow Through">Follow Through</option>
+                </select>
+              </div>
+              {% if request.session.user_type == "Mentor" %}
+              <div class="form-group">
+                <label for="learners" class="col-sm-2 control-label">Learners</label>
+                <select class="form-control select2" name="learners" required id='learners' style="width: 100%;" multiple>
+                  {% for mentee in request.user|get_mentor_mentees:request.session.company_id %}
+                    <option value="{{mentee.user.pk}}">{{mentee.user.first_name}} {{mentee.user.last_name}}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              {% endif %}
+              <div class="form-group">
+                <label for="description" class="col-sm-2 control-label">Description</label>
+                  <input type="text" class="form-control" required id="description" name="description" placeholder="Description"/>
+              </div>
+              <div class="form-group">
+                <label for="duration" class="col-md-12 control-label">Duration</label>
+                  <div class="row">
+                    <div class="col-md-6">
+                      <input type="number" class="form-control" required id="duration_number" name="duration_number" min="1" max="100"/>
+                    </div>
+                    <div class="col-md-6">
+                      <select class="form-control select2" name="duration_time" required id='duration_time' style="width: 100%;">
+                        <option value="Mins">Mins</option>
+                        <option value="Times">Times</option>
+                      </select>
+                    </div>
+                  </div>
+              </div>
+              <div class="form-group">
+                <label for="complete_by" class="col-sm-2 control-label">Due Date</label>
+                <input type="date" id="complete_by" name="complete_by" class="form-control" required>
+              </div>
+              <div class="form-group">
+                <label for="priority" class="col-sm-2 control-label">Priority</label>
+                <select class="form-control select2" name="priority" required id='priority' style="width: 100%;">
+                  <option value="High">High</option>
+                  <option selected="selected" value="Medium">Medium</option>
+                  {% comment %} <option selected="selected" value="Normal">Normal</option> {% endcomment %}
+                  <option value="Low">Low</option>
+                </select>
+              </div>
+                 
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+              <button type="submit" id="submitContent" class="btn btn-primary">Save changes</button>
+
+            </div>
+          </form>
+          </div>
+          <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+  </div>
+  <div class="modal fade" id="modal-edit" style="display: none;">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <form id="edit_form">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">×</span></button>
+                <h4 class="modal-title">Edit Goal</h4>
+              </div>
+              <div class="modal-body">
+                <input type="hidden" class="form-control" id="edit-id" required name="id"/>
+                <div class="form-group">
+                  <label for="heading" class="col-sm-2 control-label">Heading</label>
+                    <input type="text" class="form-control" id="edit-heading" required name="heading" placeholder="Heading"/>
+                </div>
+                <div class="form-group">
+                  <label for="category" class="col-sm-2 control-label">Category</label>
+                  <select class="form-control select2" name="category" required id='edit-category' style="width: 100%;">
+                    <option value="Gain Clarity">Gain Clarity</option>
+                    <option value="Health">Health</option>
+                    <option value="Learn">Learn</option>
+                    <option value="Follow Through">Follow Through</option>
+                  </select>
+                </div>
+                {% if request.session.user_type == "Mentor" %}
+                <div class="form-group">
+                  <label for="learners" class="col-sm-2 control-label">Learners</label>
+                  <select class="form-control select2" name="learners" required id='edit-learners' style="width: 100%;" multiple>
+                    {% for mentee in request.user|get_mentor_mentees %}
+                      <option value="{{mentee.user.pk}}">{{mentee.user.first_name}} {{mentee.user.last_name}}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+                {% endif %}
+                <div class="form-group">
+                  <label for="description" class="col-sm-2 control-label">Description</label>
+                    <input type="text" class="form-control" required id="edit-description" name="description" placeholder="Description"/>
+                </div>
+                <div class="form-group">
+                  <label for="duration" class="col-md-12 control-label">Duration</label>
+                    <div class="row">
+                      <div class="col-md-6">
+                        <input type="number" class="form-control" required id="edit-duration_number" name="duration_number" min="1" max="100"/>
+                      </div>
+                      <div class="col-md-6">
+                        <select class="form-control select2" name="duration_time" required id='edit-duration_time' style="width: 100%;">
+                          <option value="Mins">Mins</option>
+                          <option value="Times">Times</option>
+                        </select>
+                      </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                  <label for="complete_by" class="col-sm-2 control-label">Due Date</label>
+                  <input type="date" id="edit-complete_by" name="complete_by" class="form-control" required>
+                </div>
+                <div class="form-group">
+                  <label for="priority" class="col-sm-2 control-label">Priority</label>
+                  <select class="form-control select2" name="priority" required id='edit-priority' style="width: 100%;">
+                    <option value="High">High</option>
+                    <option value="Medium">Medium</option>
+                    {% comment %} <option value="Normal">Normal</option> {% endcomment %}
+                    <option value="Low">Low</option>
+                  </select>
+                </div>
+                  
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+                <button type="submit" id="editContent" class="btn btn-primary">Save changes</button>
+              </div>
+            </form>
+          </div>
+          <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+  </div>
+</div>
+  <!-- /.content -->
+</div>
+{% endblock content %} {% block js %}
+<script>
+  $(function () {
+    const goal_log = JSON.parse(document.getElementById("goal_log").textContent);
+    const category_list = JSON.parse(document.getElementById("category_list").textContent);
+    // console.log("category_list", goal_log)
+    // console.log("goal_log", goal_log)
+    "use strict";
+    //DONUT CHART
+    //var donut = new Morris.Donut({
+      //element: 'sales-chart',
+      //resize: true,
+      //colors: ["#3c8dbc", "#f56954", "#00a65a", "#432342"],
+      //data: category_list,
+      //hideHover: 'auto'
+    //});
+    //BAR CHART
+    var bar = new Morris.Bar({
+      element: 'bar-chart',
+      resize: true,
+      data: goal_log,
+      barColors: ['#f39c12', '#dd4b39', '#00a65a'],
+      xkey: 'name',
+      ykeys: ['requested', 'rejected', 'approved'],
+      labels: ['Requested', 'Rejected', 'Approved'],
+      hideHover: 'auto'
+    });
+  });
+$("#Content_form").submit(function (event) {
+    document.getElementById("submitContent").disabled = true;
+
+    heading = $("#heading").val();
+    description = $("#description").val();
+    category = $("#category").val();
+    learners = $("#learners").val();
+    priority = $("#priority").val()
+    duration_number = $("#duration_number").val()
+    duration_time = $("#duration_time").val()
+    goal_type = "Mentorship"
+    complete_by = $("#complete_by").val();
+    console.log("complete_by",complete_by)
+    var formData = {
+      heading: heading,
+      description : description,
+      category : category,
+      learners:learners,
+      goal_type:goal_type,
+      complete_by :complete_by,
+      priority : priority,
+      duration_number : duration_number,
+      duration_time : duration_time,
+      csrfmiddlewaretoken:"{{csrf_token}}"
+    };
+    console.log(formData);
+    $.ajax({
+      type: "POST",
+      url: '{% url "leaderboard:goal" %}',
+      data: formData,
+      encode: true,
+    }).done(function (data) {
+      bootbox.alert({
+          message: "Goal Created Successfully",
+          callback: function () {
+              location.reload()
+          }
+      })
+    });
+
+    event.preventDefault();
+});
+//$("#edit_form").submit(function (event) {
+$("#editContent").click(function (event) {
+    document.getElementById("editContent").disabled = true;
+    id = $("#edit-id").val();
+    heading = $("#edit-heading").val();
+    description = $("#edit-description").val();
+    category = $("#edit-category").val();
+    learners = $("#edit-learners").val();
+    complete_by = $("#edit-complete_by").val();
+    priority = $("#edit-priority").val()
+    duration_number = $("#edit-duration_number").val()
+    duration_time = $("#edit-duration_time").val()
+
+    var formData = {
+      id: id,
+      heading: heading,
+      description : description,
+      category : category,
+      complete_by : complete_by,
+      learners:learners,
+      priority : priority,
+      duration_number : duration_number,
+      duration_time : duration_time,
+      goal_type : 'Mentorship',
+      csrfmiddlewaretoken:"{{csrf_token}}"
+    };
+    console.log(formData);
+    $.ajax({
+      type: "POST",
+      url: '{% url "leaderboard:view_goal" %}',
+      data: formData,
+      encode: true,
+    }).done(function (data) {
+      if(data == 'Failed'){
+        msg = "Something went wrong"
+      }
+      else{
+        msg = "Goal Edited Successfully"
+      }
+      bootbox.alert({
+          message: msg,
+          callback: function () {
+              location.reload()
+          }
+      })
+    });
+
+    event.preventDefault();
+});
+  function UndoGoalLog(d){
+    var id = d.getAttribute("data-id")
+    ul = document.getElementById('status-ul'+id)
+    var ele_succeed = document.getElementById("succeed"+id);
+    var ele_skip = document.getElementById("skip"+id);
+    var ele_fail = document.getElementById("fail"+id);
+
+    console.log("calling", id, ele_fail, ele_skip, ele_succeed)
+    $.ajax({
+      url: "{% url 'leaderboard:user_goal_log' %}",
+      type: "post",
+      data: { id: id, status: "None", csrfmiddlewaretoken: "{{csrf_token}}" },
+      error: function () {
+        bootbox.alert("Something is wrong");
+      },
+      success: function (data) {
+        if(ele_fail){
+          ele_fail.remove();
+        }
+        if(ele_skip){
+          ele_skip.remove();
+        }
+        if(ele_succeed){
+          ele_succeed.remove();
+        }
+        ul.innerHTML  += ('<li id="succeed'+id+'"><a href="javascript:void(0)" data-id='+id+' onclick="GoalLogCompleted(this)"><i class="fa fa-check" aria-hidden="true"></i><span> Complete </span></a></li>')
+        ul.innerHTML  += ('<li id="skip'+id+'"><a href="javascript:void(0)" data-id='+id+' onclick="GoalLogSkipped(this)"><i class="fa fa-arrow-right"></i><span> Skip </span></a></li>')
+        ul.innerHTML  += ('<li id="fail'+id+'"><a href="javascript:void(0)" data-id='+id+' onclick="GoalLogFailed(this)"><i class="fa fa-times" aria-hidden="true"></i><span> Fail </span></a></li>')
+        console.log("data", data);
+      },
+    });
+  }
+  function GoalLogCompleted(d){
+    var id = d.getAttribute("data-id")
+    UserGoalLog(id, 'Completed');
+  }
+  function GoalLogSkipped(d){
+    var id = d.getAttribute("data-id")
+    UserGoalLog(id, 'Skipped');
+  }
+  function GoalLogFailed(d){
+    var id = d.getAttribute("data-id")
+    UserGoalLog(id, 'Failed');
+  }
+  function UserGoalLog(id, status) {
+    console.log("id", id, status);
+    var ele_succeed = document.getElementById("succeed"+id);
+    var ele_skip = document.getElementById("skip"+id);
+    var ele_fail = document.getElementById("fail"+id);
+    var ul = document.getElementById("status-ul");
+
+    $.ajax({
+      url: "{% url 'leaderboard:user_goal_log' %}",
+      type: "post",
+      data: { id: id, status: status, csrfmiddlewaretoken: "{{csrf_token}}" },
+      error: function () {
+        bootbox.alert("Something is wrong");
+      },
+      success: function (data) {
+        if(status == 'Completed'){
+          ele_succeed.innerHTML = '<a href="javascript:void(0)" data-id='+id+' onclick="UndoGoalLog(this)"><i class="fa fa-undo" aria-hidden="true"></i><span> Undo Completed </span></a>'
+          ele_skip.remove();
+          ele_fail.remove();
+        }
+        if(status == 'Skipped'){
+          ele_skip.innerHTML = '<a href="javascript:void(0)" data-id='+id+' onclick="UndoGoalLog(this)"><i class="fa fa-undo" aria-hidden="true"></i><span> Undo Skipped </span></a>'
+          ele_succeed.remove();
+          ele_fail.remove();
+        }
+        if(status == 'Failed'){
+          ele_fail.innerHTML = '<a href="javascript:void(0)" data-id='+id+' onclick="UndoGoalLog(this)"><i class="fa fa-undo" aria-hidden="true"></i><span> Undo Failed </span></a>'
+          ele_skip.remove();
+          ele_succeed.remove();
+        }
+        //if(status == 'None'){
+          //ul.innerHTML = '<li><a href="javascript:void(0)" ><i class="fa fa-check" aria-hidden="true"></i>Complete</a></li>'
+        //}
+        console.log("data", data);
+      },
+    });
+  }
+
+  function createGoal() {
+    var dialog = bootbox.dialog({
+      title: "Create Goal",
+      message:
+        '<form class="form-horizontal" action="/leaderboard/goal/" method="POST">{% csrf_token %}<div class="box-body"><div class="form-group"><label for="heading" class="col-sm-2 control-label">Heading</label><div class="col-sm-10"><input type="text" class="form-control" id="heading" name="heading" placeholder="Heading"/></div></div><div class="form-group"><label for="description" class="col-sm-2 control-label">Description</label><div class="col-sm-10"><input type="text" class="form-control" id="description" name="description" placeholder="Description"/></div></div> <div class="form-group"><label for="frequency" class="col-sm-2 control-label">Frequency</label><div class="col-sm-5"><select class="form-control" name="frequency"><option value="Hourly">Hourly</option><option selected="selected" value="Daily">Daily</option><option value="Weekly">Weekly</option><option value="Monthly">Monthly</option></select></div></div><div class="form-group"><label for="frequency" class="col-sm-2 control-label">Priority</label><div class="col-sm-5"><select class="form-control" name="priority"><option value="High">High</option><option value="Medium">Medium</option><option selected="selected" value="Normal">Normal</option><option value="Low">Low</option></select></div></div><div class="box-footer"><button type="submit" class="btn btn-primary pull-right">Create</button></div></form>',
+      size: "medimum",
+    });
+  }
+
+  function viewGoal(id) {
+    // console.log("id",id)
+    $.ajax({
+      url: "{% url 'leaderboard:view_goal' %}",
+      type: "get",
+      data: { id: id },
+      error: function () {
+        bootbox.alert("Something is wrong");
+      },
+      success: function (data) {
+        console.log("data", data.complete_by)
+        date = data.complete_by.split("T")
+        console.log("date",date[0])
+        document.getElementById("edit-id").value = data.id;
+        document.getElementById("edit-heading").value = data.heading;
+        document.getElementById("edit-description").value = data.description;
+        document.getElementById("edit-category").value = data.category;
+        document.getElementById("edit-complete_by").value = date[0];
+        document.getElementById("edit-priority").value = data.priority;
+        document.getElementById("edit-duration_time").value = data.duration_time;
+        document.getElementById("edit-duration_number").value = data.duration_number;
+        //edit_learner = document.getElementById("edit-learners")
+        //console.log("edit learner", edit_learner)
+        //for(let i=0; i<data.learners.length; i++){
+          //edit_learner.value = data.learners[i]
+          //console.log("data lerner",data.learners[i], edit_learner.value)
+        //}
+        var element = document.getElementById('edit-learners');
+        var values = data.learners
+        console.log("values", values)
+        for (var i = 0; i < element.options.length; i++) {
+            element.options[i].selected = values.indexOf(element.options[i].value) >= 0;
+        }
+       
+      },
+    });
+  }
+
+  function deleteGoal(id) {
+    bootbox.confirm({
+      message: "Are you sure to delete this goal ?",
+      buttons: {
+        confirm: {
+          label: "Yes",
+          className: "btn-success",
+        },
+        cancel: {
+          label: "No",
+          className: "btn-danger",
+        },
+      },
+      callback: function (result) {
+        if (result == true) {
+          $.ajax({
+            url: "{% url 'leaderboard:delete_goal' %}",
+            type: "post",
+            data: { id: id, csrfmiddlewaretoken: "{{csrf_token}}" },
+            error: function () {
+              bootbox.alert("Something is wrong");
+            },
+            success: function (data) {
+              console.log("data", data);
+              bootbox.alert("Goal deleted successfully");
+              location.reload();
+            },
+          });
+        }
+      },
+    });
+  }
+  
+</script>
+{% endblock js %}

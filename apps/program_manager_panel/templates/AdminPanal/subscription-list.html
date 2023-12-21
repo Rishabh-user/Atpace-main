@@ -1,0 +1,121 @@
+{% extends 'base.html' %} {% load static %}
+Subscription List 
+{% load tags %}
+<!-- DataTables -->
+{% block css %}
+<link rel="stylesheet" href="{% static 'bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css' %}">
+{% endblock css %} 
+{% block content %}
+
+
+<div class="content-wrapper">
+  <section class="content-header">
+    <h1>
+        Subscription
+      <small>List</small>
+    </h1>
+    <ol class="breadcrumb">
+      <li><a href="#"><i class="fa fa-dashboard"></i> Subscription Settings</a></li>
+      <li><a href="#">Subscription</a></li>
+      <li class="active">List</li>
+    </ol>
+  </section>
+
+  <section class="content">
+    <div class="row">
+       <div class="col-xs-12">
+           <div class="box">
+             <div class="box-header">
+               <h3 class="box-title">Subscription List</h3>               
+              </div>
+             <!-- /.box-header -->
+             <div class="box-body">
+              {% include 'component/error_message.html' %}
+              <input type="hidden" name="action" id="action_type" value="">
+              <table id="example2" class="table table-bordered table-hover">
+                 <thead>
+                  <tr>
+                    <th></th>
+                    <th>Title</th>
+                    <th>Description</th>
+                    {% comment %} <th>Terms & Conditions</th> {% endcomment %}
+                    <th>Subscription Type</th>
+                    <th>Price</th>
+                    <th>Duration</th>
+                    {% comment %} <th>Duration Type</th> {% endcomment %}
+                    {% comment %} <th>Is Trial</th> {% endcomment %}
+                    {% comment %} <th>Trial Duration</th> {% endcomment %}
+                    {% comment %} <th>Trial Period</th> {% endcomment %}
+                    <th>On Offer</th>
+                    <th>Action</th>
+                </tr>
+                 </thead>
+                 <tbody>
+                  {% for subscription in subscriptions %}
+                    <tr>
+                      <td><input class="checkbox" style="display: none;" type="checkbox" name="user_id" value="{{user.id}}"></td>
+                      <td>{{subscription.title}}</td>
+                      <td>{{subscription.description}}</td>
+                      {% comment %} <td>{{subscription.terms_conditions}}</td> {% endcomment %}
+                      <td>{{subscription.sub_type}}</td>
+                      <td>{{subscription.price}}</td>
+                      <td>{{subscription.duration}} {{subscription.duration_type}}</td>
+                      {% comment %} <td>{{subscription.duration_type}}</td> {% endcomment %}
+                      {% comment %} <td>
+                        <kbd>{{subscription.is_trial}}<kbd>
+                      </td> {% endcomment %}
+                      {% comment %} <td>{{subscription.trial_duration}} {{subscription.trial_period}}</td>
+                      <td>{{subscription.trial_period}}</td> {% endcomment %}
+                      <td>
+                        <kbd>{{subscription.on_offer}}<kbd>
+                      </td>
+                      <td>
+                        <div class="dropdown">
+                          <button class="btn bg-purple dropdown-toggle btn-select-option" type="button" data-toggle="dropdown" aria-expanded="true">Select an option<span class="caret"></span>
+                          </button>
+                          <ul class="dropdown-menu options-dropdown">
+                          <li>
+                            <a href="{% url 'program_manager:update_subscription' pk=subscription.id %}"><i class="fa fa-edit option-icon"></i>Edit</a>
+                          </li>
+                          <li>
+                            <a href="{% url 'program_manager:delete_subscription' subscription_id=subscription.id %}"><i class="fa fa-trash option-icon"></i>Delete</a>
+                          </li>
+                          </ul>
+                      </div>
+                      </td>
+                    </tr>
+                    {% endfor %}
+                 </tfoot>
+               </table>
+             </div>
+           <!-- /.box -->
+ 
+          
+         </div>
+       <!-- /.col -->
+    </div>
+    <!-- /.row -->
+ </section>
+ 
+</div>
+{% endblock content %} 
+{% block js %}
+<script src="{% static 'bower_components/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
+<script>
+
+$(function () {
+ 
+  $('#example2').DataTable({
+    "dom": '<"table-pull-left"f><"table-pull-right"l>tip',
+    'paging'      : true,
+    'lengthChange': true,
+    'searching'   : true,
+    'ordering'    : true,
+    'info'        : true,
+    'autoWidth'   : true,
+    'scrollX'     : true
+  })
+})
+</script>
+{% endblock js %}

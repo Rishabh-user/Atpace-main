@@ -1,0 +1,491 @@
+{% extends 'base.html' %} {% load static %}
+{% if request.path == '/user/list/' %} User List {% else %} Admin {% endif %}
+{% load tags %}
+<!-- DataTables -->
+{% block css %}
+<link rel="stylesheet" href="{% static 'bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css' %}">
+{% endblock css %} 
+{% block content %}
+<div class="content-wrapper">
+    <section class="content-header">
+      <h1>
+        {{user.first_name}} {{user.last_name}}
+        
+      </h1>
+      <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Student</a></li>
+        <li class="active">List</li>
+      </ol>
+    </section>
+  
+    <section class="content">
+      <div class="row">
+         <div class="col-xs-12">
+             <div class="box">
+                <div class="nav-tabs-custom">
+                    <ul class="nav nav-tabs">
+                        <li class="active"><a href="#session" data-toggle="tab">Sessions</a></li>
+                        <li><a href="#assessment" data-toggle="tab">Assessments</a></li>
+                        <li><a href="#survey" data-toggle="tab">Surveys</a></li>
+                        <li><a href="#curriculum" data-toggle="tab">Curriculum</a></li>
+                        <li><a href="#messages" data-toggle="tab">Messages</a></li>
+                        <li><a href="#notes" data-toggle="tab">Journals</a></li>
+                        <li><a href="#program" data-toggle="tab">Archive</a></li>
+                        <li><a href="#activity" data-toggle="tab">Activity</a></li>
+                    </ul>
+                    <div class="tab-content">
+                        <div class="active tab-pane" id="session">
+
+                          {% for meeting in meetings %}
+
+                            <div class="row">
+                              <div class="col-md-10">
+                            <h3 class="">{{meeting.title}}</h3> {{meeting.start_time}}
+                              <i class="fa fa-time"></i>
+                              {% if meeting.is_cancel %}
+                               <small>Session Cancelled</small>
+                              {% endif  %}
+
+                            <div class="timeline-body">
+                            {{meeting.description}}
+                            </div>
+                          </div>
+                            <div class="col-md-2">
+                            {% if meeting.is_cancel %}
+                              <a class="btn btn-danger btn-xs">Session Cancelled</a>
+                            {% else %}
+                              {% if meeting.status == "Upcoming" %}
+                                <a href="{{meeting.url}}" target="_blank" class="btn btn-primary btn-xs">Start Call</a>
+                                <a class="btn btn-danger btn-xs" onclick="CancelSlot('{{meeting.id}}')" >Cancel</a>
+                                {% else  %}
+                                <a class="btn btn-primary btn-xs">Session Completed</a>
+                              {% endif %}
+                            {% endif %}
+                          </div>
+
+                          </div>
+                          {% endfor %}
+                          {% for meeting in expire_meetings %}
+
+                            <div class="row">
+                              <div class="col-md-10">
+                            <h3 class="">{{meeting.title}}</h3> {{meeting.start_time}}
+                              <i class="fa fa-time"></i>
+                              {% if meeting.is_cancel %}
+                                <small>Session Cancelled</small>
+                              {% else %}
+                                <small>Session Expired</small>
+                              {% endif %}
+                            <div class="timeline-body">
+                            {{meeting.description}}
+                            </div>
+                          </div>
+                            <div class="col-md-2">
+                            {% if meeting.is_cancel %}
+                              <a class="btn btn-danger btn-xs">Session Cancelled</a>
+                            {% else %}
+                            <a class="btn btn-danger btn-xs">Session Expired</a>
+                            {% endif %}
+                          </div>
+
+                          </div>
+                          {% endfor %}
+                        </div>
+                        <div class="tab-pane" id="assessment">
+                          {% for data in display_content %}
+                            {% if data.type == "assessment" %}
+                              <div class="row">
+                                <div class="col-md-8">
+                                  <h4 class="">{{data.data.name}}</h4>
+                                  <i class="fa fa-time"></i>
+                                  <small>{{data.data.description|safe}}</small>
+                                </div>
+                                <div class="col-md-4">
+                                  {% if data.read_status  == "" %}
+                                    <a  class="btn btn-primary btn-xs">Pending</a>
+                                  {% else  %}
+                                    <a class="btn btn-primary btn-xs">{{data.read_status}}</a>
+                                    <a href="{% url 'test_series:check_assessment' assessment=data.read_data.id %}" class="btn btn-primary btn-xs">View</a>
+                                  {% endif %}
+                                </div>
+                              </div>
+                            {% endif  %}
+                        {% endfor %}
+                        </div>
+                        <div class="tab-pane" id="survey">
+                          {% for data in display_content %}
+                            {% if data.type == "survey"  %}
+                              <div class="row">
+                                <div class="col-md-8">
+                                  <h4 class="">{{data.data.name}}</h4>
+                                  <i class="fa fa-time"></i>
+                                  <small>{{data.data.description|safe}}</small>
+                                </div>
+                                <div class="col-md-4">
+                                  {% if data.read_status  == "" %}
+                                    <a  class="btn btn-primary btn-xs">Pending</a>
+                                  {% else  %}
+                                    <a class="btn btn-primary btn-xs">{{data.read_status}}</a>
+                                    <a href="{% url 'survey:check_survey' survey_attempt=data.read_data.id %}" class="btn btn-primary btn-xs">View</a>
+                                  {% endif %}
+                                </div>
+                              </div>
+                            {% endif  %}
+                        {% endfor %}
+                        </div>
+                        <div class="tab-pane" id="curriculum">
+                          {% for data in display_content %}
+
+                          {% if data.type == "quest" %}
+                          <div class="row">
+                            <div class="col-md-8">
+                          <h4 class="">{{data.data}}</h4>
+                            {% comment %} <i class="fa fa-time"></i>
+
+
+                          <small>{{data.data.description|safe}}</small> {% endcomment %}
+
+                        </div>
+                          <div class="col-md-4">
+
+                          {% if data.read_status  == "" %}
+                          <a  class="btn btn-info btn-xs">Pending</a>
+                          {% else  %}
+                          <a class="btn btn-info btn-xs">{{data.read_status}}</a>
+                          {% endif %}
+                          <a href="{% url 'content:admin_read_content' pk=data.data.pk %}" class="btn btn-primary btn-xs">Content</a>
+                          {% if data.read_data %}
+                            <a href="{% url 'user:learning_journal_post' user_id=user.id pk=data.read_data.id %}" class="btn btn-primary btn-xs">Journals</a>
+                          {% endif %}
+                          </div>
+
+                        </div>
+                          {% endif  %}
+                        {% endfor %}
+                        </div>
+                        <div class="tab-pane" id="messages">
+                            <div class=" direct-chat direct-chat-warning" >
+
+                                <!-- /.box-header -->
+                               <div class="box-body">
+                                <!-- Conversations are loaded here -->
+                                <div class="direct-chat-messages">
+
+                                    {% for chat in chats %}
+                                        {% if user != chat.from_user %}
+                                          <!-- Message to the right -->
+                                          <div class="direct-chat-msg right">
+                                            <div class="direct-chat-info clearfix">
+                                              <span class="direct-chat-name pull-right">{{chat.from_user.first_name}} {{chat.from_user.last_name}}</span>
+                                              <span class="direct-chat-timestamp pull-left">{{chat.timestamp}}</span>
+                                            </div>
+                                            <!-- /.direct-chat-info -->
+                                            <img class="direct-chat-img" src="{{MEDIA_URL}}{{chat.from_user.avatar}}" onerror="this.onerror=null; this.src='{{chat.from_user.avatar}}'" alt="image">
+                                            <!-- /.direct-chat-img -->
+                                            <div class="direct-chat-text">
+                                              {{chat.message}}
+                                            </div>
+                                            <!-- /.direct-chat-text -->
+                                          </div>
+                                          <!-- /.direct-chat-msg -->
+                                        {% else %}
+                                          <!-- Message to the left -->
+                                          <div class="direct-chat-msg">
+                                            <div class="direct-chat-info clearfix">
+                                              <span class="direct-chat-name pull-left">{{chat.from_user.first_name}} {{chat.from_user.last_name}}</span>
+                                              <span class="direct-chat-timestamp pull-right">{{chat.timestamp}}</span>
+                                            </div>
+                                            <!-- /.direct-chat-info -->
+                                            <img class="direct-chat-img" src="{{MEDIA_URL}}{{chat.from_user.avatar}}" onerror="this.onerror=null; this.src='{{chat.from_user.avatar}}'" alt="image">
+                                            <!-- /.direct-chat-img -->
+                                            <div class="direct-chat-text">
+                                                {{chat.message}}
+                                            </div>
+                                            <!-- /.direct-chat-text -->
+                                          </div>
+                                          <!-- /.direct-chat-msg -->
+                                        {% endif %}
+                                  {% endfor %}
+
+                                  <div id="chat-box" class="chat-box">
+
+                                  </div>
+                                </div>
+                                <!--/.direct-chat-messages-->
+                              </div>
+                              <!-- /.box-body -->
+                              <div class="box-footer">
+                                  <div class="input-group">
+                                    <input id="chat-message-input" type="text" name="message" placeholder="Type Message ..." class="form-control">
+                                    <span class="input-group-btn">
+                                          <button id="chat-message-submit" type="button" class="btn btn-warning btn-flat">Send</button>
+                                        </span>
+                                    {{ room|json_script:"room-name" }}
+                                    {{ request.user.id|json_script:"user_id" }}
+                                    <!-- {{ room|json_script:"room-name" }} -->
+
+                                  </div>
+                                </div>
+                                <!-- /.box-footer-->
+                              </div>
+                         </div>
+                         <div class="tab-pane" id="notes">
+                          <div class="nav-tabs-custom">
+                            <ul class="nav nav-tabs">
+                                <li class="active"><a href="#journals" data-toggle="tab">Weekly Journal</a></li>
+                                <li ><a href="#learning_journal" data-toggle="tab">Learning Journal</a></li>
+                            </ul>
+                            <div class="tab-content">
+                              <div class="tab-pane active" id="journals">
+                              {% for data in display_content %}
+                              {% if data.type == "journals" %}
+                              <div class="row">
+                                <div class="col-md-8">
+                                  <h4 class="">{{data.data.name}}</h4>
+                                    <i class="fa fa-time"></i>
+                                    <small>{{data.data.description|safe}}</small>
+                                  </div>
+                                  <div class="col-md-4">
+                                    
+                                    {% if data.read_status  == "" %}
+                                    <a  class="btn btn-info btn-xs">Pending</a>
+                                    {% else  %}
+                                    <a class="btn btn-info  btn-xs">{{data.read_status}}</a>
+                                    <a href="{% url 'user:learning_journal_post' user_id=user.id pk=data.read_data.id %}" class="btn btn-primary btn-xs">Journals</a>
+                                    {% endif %}
+                                  </div>
+                                  
+                                </div>
+                                  {% endif  %}
+                              {% endfor %}
+                            </div>
+                            <div class="tab-pane" id="learning_journal">
+                                {% for data in learning_journals %}
+                                <div class="row">
+                                  <div class="col-md-8">
+                                    <h4 class="">{{ data.name}}</h4>
+                                      <i class="fa fa-time"></i>
+                                      <small>{{data.description|safe}}</small>
+                                    </div>
+                                    <div class="col-md-4">                                
+                                      <a href="{% url 'user:learning_journal_post' user_id=user.id pk=data.id %}" class="btn btn-primary btn-xs">Learning Journal</a>
+                                    </div>
+                                    
+                                  </div>
+                              {% endfor %}
+                            </div>
+                          </div>
+                        </div>
+                        </div>
+                        <div class="tab-pane" id="program">
+                            <h1>Archive Coming Soon</h1>
+                         </div>
+                        <div class="tab-pane" id="activity">
+                          {% for data in user_activity %}
+                            <div class="row">
+                              <div class="col-md-8">
+                                <h4 class="">{{data.content_data.title}}</h4>
+                                <i class="fa fa-time"></i>
+                                <small>{{data.content_data.data|safe}}</small>
+                              </div>
+                              <div class="col-md-4">
+                                  <a href="{{MEDIA_URL}}{{data.upload_file}}" target="_blank" class="btn btn-primary btn-xs">View</a>
+                              </div>
+                            </div>
+                          {% endfor %}
+                        </div>
+
+
+                        </div>
+
+                    </div>
+             </div>
+             <!-- /.box -->
+
+
+        </div>
+
+      </div>
+      <!-- /.row -->
+   </section>
+
+  </div>
+{% endblock  %}
+
+{% block js %}
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+<script>
+  function CancelSlot(id){
+    bootbox.confirm({
+      message: "Do you want to Cancel this slot?",
+      buttons: {
+          confirm: {
+              label: 'Yes',
+              className: 'btn-success'
+          },
+          cancel: {
+              label: 'No',
+              className: 'btn-danger'
+          }
+      },
+      callback: function (result) {
+          if(result == true){
+              $.ajax({
+                url:"{% url 'user:cancel_mentor_slot' %}",
+                type:"POST",
+                data:{pk:id, csrfmiddlewaretoken : "{{csrf_token}}" },
+                error: function(data){
+                  console.log(data)
+                  bootbox.alert('something is wrong');
+                },
+                success: function(data) {
+                  console.log(data)
+                  bootbox.alert("Your Appointment is Cancelled!")
+                },
+              });
+            }
+          }
+      });
+    }
+
+        var currentdate = new Date();
+
+        const roomName = JSON.parse(document.getElementById('room-name').textContent);
+        const user_id = JSON.parse(document.getElementById('user_id').textContent);
+        // console.log("roomname", roomName)
+        var protocol = document.location.protocol;
+        if(protocol == "http:"){
+           var socket_server = "ws" ;
+        } else {
+            var socket_server = "wss" ;
+        }
+        const chatSocket = new WebSocket(
+            socket_server+'://'
+            + window.location.host
+            + '/ws/chat/'
+            + roomName
+            + '/'
+            
+        );
+
+        chatSocket.onopen = function(e) {
+            // console.log("Successfully connected to the WebSocket. Change the status to online");
+            // console.log(roomName)
+            $.ajax({
+                 url:  "{% url 'user:user_chat_status' %}",
+                 type: 'POST',
+                 data: {WebSocket: "connected" , csrfmiddlewaretoken : "{{csrf_token}}" },
+                 error: function(data) {
+                   console.log(data)
+                 },
+                 success: function(data) {
+                    console.log(data)
+                 }
+              });
+        }
+
+        chatSocket.onmessage = function(e) {
+            // console.log("to-user",roomName);
+            // console.log("message send")
+            const data = JSON.parse(e.data);
+            // console.log(data);
+            const from_user_id = data['user_id']
+            const from_user = data['from_user']
+            // console.log("from_user_id",from_user_id);
+            const loggedInUserId = JSON.parse(document.getElementById('user_id').textContent)
+            // console.log("login_user_id",loggedInUserId)
+            if ( from_user_id == loggedInUserId) {
+                // console.log("same side")
+                // const right_div = document.getElementById("right-div");
+                const chat_box = document.getElementById("chat-box");
+                const right_div = document.createElement('div');
+                right_div.classList.add('direct-chat-msg', 'right');
+                const chat_div = document.createElement('div');
+                chat_div.classList.add('direct-chat-info', 'clearfix');
+                const chat_span = document.createElement('span');
+                chat_span.classList.add('direct-chat-name', 'pull-right');
+                chat_span.textContent = from_user;
+                const time_span = document.createElement('span');
+                time_span.classList.add('direct-chat-timestamp', 'pull-left');
+                time_span.textContent = currentdate;
+                chat_div.append(chat_span);
+                chat_div.append(time_span);
+                const msg_div = document.createElement('div');
+                msg_div.classList.add('direct-chat-text');
+                msg_div.innerHTML = data.message;
+                right_div.append(chat_div)
+                right_div.append(msg_div)
+                chat_box.append(right_div)
+
+            }
+            if ( from_user_id != loggedInUserId) {
+                // console.log("other side")
+                // const right_div = document.getElementById("left-div");
+                const chat_box = document.getElementById("chat-box");
+                // console.log("chat_box", chat_box)
+                const right_div = document.createElement('div');
+                right_div.classList.add('direct-chat-msg');
+                const chat_div = document.createElement('div');
+                chat_div.classList.add('direct-chat-info', 'clearfix');
+                const chat_span = document.createElement('span');
+                chat_span.classList.add('direct-chat-name', 'pull-left');
+                chat_span.textContent = from_user;
+                const time_span = document.createElement('span');
+                time_span.classList.add('direct-chat-timestamp', 'pull-right');
+                time_span.textContent = currentdate;
+                chat_div.append(chat_span);
+                chat_div.append(time_span);
+                const msg_div = document.createElement('div');
+                msg_div.classList.add('direct-chat-text');
+                msg_div.innerHTML = data.message;
+                right_div.append(chat_div)
+                right_div.append(msg_div)
+                chat_box.append(right_div)
+
+            }
+            $("#chat-box").animate({ scrollTop: 20000000 }, "slow");
+            // window.scrollTo(0, document.body.scrollHeight);
+            // chat_box.scrollTop = chat_box.scrollHeight;
+            // $("#chat-box").scrollTop($("#chat-box")[0].scrollHeight);
+            // $('#chat-box').scrollTop(1000000);
+
+            // document.querySelector('#chat-log').value += (data.message + '\n');
+        };
+
+        chatSocket.onclose = function(e) {
+            console.log(e);
+            console.error('Chat socket has closed unexpectedly');
+            $.ajax({
+                 url:  "{% url 'user:user_chat_status' %}",
+                 type: 'POST',
+                 data: {WebSocket: "disconnected" , csrfmiddlewaretoken : "{{csrf_token}}" },
+                 error: function(data) {
+                   console.log(data)
+                 },
+                 success: function(data) {
+                    console.log(data)
+                 }
+              });
+        };
+
+        document.querySelector('#chat-message-input').focus();
+        document.querySelector('#chat-message-input').onkeyup = function(e) {
+            if (e.keyCode === 13) {  // enter, return
+                document.querySelector('#chat-message-submit').click();
+            }
+        };
+
+        document.querySelector('#chat-message-submit').onclick = function(e) {
+            const messageInputDom = document.querySelector('#chat-message-input');
+            const message = messageInputDom.value;
+            chatSocket.send(JSON.stringify({
+                'message': message
+            }));
+            messageInputDom.value = '';
+            // window.scrollTo(0, document.body.scrollHeight);
+
+        };
+</script>
+
+{% endblock %}

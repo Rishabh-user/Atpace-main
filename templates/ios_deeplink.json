@@ -1,0 +1,15 @@
+{
+    "applinks": {
+        "apps": [],
+        "details": [
+            {
+                "appID": "M5XQ6M34PZ.org.reactjs.native.example.AtPace",
+                "paths": ["*"]
+            },
+            {
+                "appID": "M5XQ6M34PZ.com.mentoratpace",
+                "paths": ["*"]
+            }
+        ]
+    }
+}

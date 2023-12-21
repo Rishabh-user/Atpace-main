@@ -1,0 +1,129 @@
+{% load static %} 
+
+<section class="section" id="{{forloop.counter}}">
+  <div class="row">
+    <div class="col-md-12">
+      <div class="content_card" style="min-height: 400px; max-height: 510px" data-id="{{data.id}}" id="get_primary_key">
+          <video width="100%" preload="auto" crossorigin="anonymous" id="videoPlayer" autoplay controls controlslist="nodownload">
+            <source src="{{MEDIA_URL}}{{data.video}}" type="video/mp4">
+            <track src="https://atpace-storage.s3.ap-south-1.amazonaws.com/subtitles/{{data.id}}_en.vtt" kind="subtitles" srclang="en" label="English" default>
+            <track src="https://atpace-storage.s3.ap-south-1.amazonaws.com/subtitles/{{data.id}}_zh-CN.vtt" kind="subtitles" srclang="zh-cn" label="Chinese(Simplified)">
+            <track src="https://atpace-storage.s3.ap-south-1.amazonaws.com/subtitles/{{data.id}}_zh-TW.vtt" kind="subtitles" srclang="zh-tw" label="Chinese(Traditional)">
+            <track src="https://atpace-storage.s3.ap-south-1.amazonaws.com/subtitles/{{data.id}}_nl.vtt" kind="subtitles" srclang="nl" label="Dutch">
+            <track src="https://atpace-storage.s3.ap-south-1.amazonaws.com/subtitles/{{data.id}}_tl.vtt" kind="subtitles" srclang="tl" label="Filipino">
+            <track src="https://atpace-storage.s3.ap-south-1.amazonaws.com/subtitles/{{data.id}}_fr.vtt" kind="subtitles" srclang="fr" label="French">
+            <track src="https://atpace-storage.s3.ap-south-1.amazonaws.com/subtitles/{{data.id}}_de.vtt" kind="subtitles" srclang="de" label="German">
+            <track src="https://atpace-storage.s3.ap-south-1.amazonaws.com/subtitles/{{data.id}}_id.vtt" kind="subtitles" srclang="id" label="Indonesian">
+            <track src="https://atpace-storage.s3.ap-south-1.amazonaws.com/subtitles/{{data.id}}_ja.vtt" kind="subtitles" srclang="ja" label="Japanese">
+            <track src="https://atpace-storage.s3.ap-south-1.amazonaws.com/subtitles/{{data.id}}_ko.vtt" kind="subtitles" srclang="ko" label="Korean">
+            <track src="https://atpace-storage.s3.ap-south-1.amazonaws.com/subtitles/{{data.id}}_ms.vtt" kind="subtitles" srclang="ms" label="Malay">
+            <track src="https://atpace-storage.s3.ap-south-1.amazonaws.com/subtitles/{{data.id}}_mn.vtt" kind="subtitles" srclang="mn" label="Mongolian">
+            <track src="https://atpace-storage.s3.ap-south-1.amazonaws.com/subtitles/{{data.id}}_pl.vtt" kind="subtitles" srclang="pl" label="Polish">
+            <track src="https://atpace-storage.s3.ap-south-1.amazonaws.com/subtitles/{{data.id}}_pt.vtt" kind="subtitles" srclang="pt" label="Portuguese">
+            <track src="https://atpace-storage.s3.ap-south-1.amazonaws.com/subtitles/{{data.id}}_es.vtt" kind="subtitles" srclang="es" label="Spanish">
+            <track src="https://atpace-storage.s3.ap-south-1.amazonaws.com/subtitles/{{data.id}}_th.vtt" kind="subtitles" srclang="th" label="Thai">
+            <track src="https://atpace-storage.s3.ap-south-1.amazonaws.com/subtitles/{{data.id}}_vi.vtt" kind="subtitles" srclang="vi" label="Vietnamese">
+          </video>
+        {{data.title}}
+      </div>
+    </div>
+  </div>
+
+  <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+  <script src="{% static 'bower_components/jquery/dist/jquery.min.js' %}"></script>
+   <script>
+    // Global variable to store the selected language
+    var selectedLanguage = 'en';
+  
+    function googleTranslateElementInit() {
+      new google.translate.TranslateElement(
+        {
+          pageLanguage: 'en',
+          includedLanguages: 'en,fr,th,vi,zh-CN,zh-TW,id,tl,ms,mn,ja,ko,nl,de,pl,pt,es',
+          autoDisplay: false, // Disable automatic display of translation
+        },
+        'google_translate_element'
+      );
+  
+      // Hide the logo and link
+      var logo = document.querySelector('.VIpgJd-ZVi9od-l4eHX-hSRGPd');
+      logo.setAttribute('style', 'display: none');
+    }
+  
+    // Function to handle language change
+    function onLanguageChange(selectedLanguage) {
+      const video = document.querySelector('video');
+      video.textTracks[0].mode = 'showing';
+
+      const activeTrack = Array.from(video.textTracks).find(track => track.mode === 'showing');
+      if (activeTrack) {
+        activeTrack.mode = 'disabled';
+      }
+  
+      const subtitleTrack = Array.from(video.textTracks).find(track => track.language === selectedLanguage);
+      
+      if (subtitleTrack) {
+        Array.from(video.textTracks).forEach(track => track.mode = 'disabled');
+  
+        subtitleTrack.mode = 'showing';
+      }
+    } 
+  
+    // Event listener to detect language change from Google Translate dropdown
+    document.addEventListener('click', function (event) {
+      if (event.target.matches('.goog-te-combo')) {
+        setInterval(function () {
+          if (selectedLanguage !== document.querySelector('.goog-te-combo option:checked').value) {
+            onLanguageChange(document.querySelector('.goog-te-combo option:checked').value);
+          }
+        }, 100);
+      }
+    });
+  
+    // Disable default subtitle track based on page language
+    function disableDefaultSubtitle() {
+      const video = document.querySelector('video');
+      const subtitleTracks = video.getElementsByTagName('track');
+      const pageLanguage = navigator.language || navigator.userLanguage;
+  
+    //   // Disable default subtitle track based on page language
+    //   Array.from(subtitleTracks).forEach(track => {
+    //     if (track.srclang === pageLanguage) {
+    //       track.mode = 'disabled';
+    //     }
+    //   });
+    // }
+    // Disable default subtitle track based on page language
+    Array.from(subtitleTracks).forEach(track => {
+      if (track.srclang === pageLanguage) {
+        track.mode = 'showing'; // Turn on captions for default language
+      } else {
+        track.mode = 'disabled';
+      }
+    });
+  }
+    // Wait for the video to load and then disable the default subtitle
+    document.addEventListener('DOMContentLoaded', disableDefaultSubtitle);
+    document.getElementById('videoPlayer').addEventListener('play', function () {
+      disableDefaultSubtitle();
+    });
+  </script>
+  <script>
+    const video = document.getElementById('videoPlayer');
+    document.addEventListener('click', function (event) {
+    if (event.target.matches('.goog-te-combo')) {
+        setInterval(function () {
+          if (selectedLanguage !== document.querySelector('.goog-te-combo option:checked').value) {
+            selectedLanguage = document.querySelector('.goog-te-combo option:checked').value;
+            onLanguageChange(selectedLanguage);
+          }
+        }, 100);
+      }
+    });
+    $(document).ready(function() {
+    $("#videoPlayer").bind("contextmenu",function(){
+        return false;
+        });
+ } );
+  </script>
+</section>

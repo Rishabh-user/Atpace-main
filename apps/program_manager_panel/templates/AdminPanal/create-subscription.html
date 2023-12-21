@@ -1,0 +1,43 @@
+{% extends 'base.html' %} 
+{% block title %}Create Subscription {% endblock %} 
+{% load crispy_forms_tags %} {% block content %}
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      {% if "offer" not in request.path %}
+      <h1>
+        Create Subscription
+      </h1>
+      {% else %}
+      <h1>
+        Create Subscription Offer
+      </h1>
+      {% endif %}        
+    </section>
+  
+    <!-- Main content -->
+    <section class="content">
+      {% include 'component/error_message.html' %}
+      <!-- Default box -->
+      <div class="box">
+        <div class="box-header with-border">
+          {% if request.path == "subscription-offer/" %}
+          <h3 class="box-title">Create Subscription</h3>
+          {% else %}
+          <h3 class="box-title">Create Subscription Offer</h3>
+          {% endif %}        
+        </div>
+        <div class="box-body">          
+          {% crispy form %}
+          <div id='form-errors'>{{ form_errors }}</div>  
+        </div>
+        <!-- /.box-footer-->
+      </div>
+      <!-- /.box -->
+    </section>
+    <!-- /.content -->
+  </div>
+  {% block js %}
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.15/js/intlTelInput.min.js"></script>
+  {% endblock js %}
+  {% endblock content %}

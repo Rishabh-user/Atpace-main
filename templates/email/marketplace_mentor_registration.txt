@@ -1,0 +1,8 @@
+{% autoescape off %}
+Hello User,
+
+You have invited to join Company as Mentor
+
+Regards team AtPace
+
+{% endautoescape %}

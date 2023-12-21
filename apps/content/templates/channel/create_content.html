@@ -1,0 +1,41 @@
+{% extends 'base.html' %} {% load static %}  {% block title %}Create {% if request.path == '/content/proficiency-level/create/' %} Proficiency Level  {% else %} Microskill {% endif %} {% endblock %} 
+{% load crispy_forms_tags %} {% block content %}
+<div class="content-wrapper">
+  <!-- Content Header (Page header) -->
+  <section class="content-header">
+    <h1>
+      Create 
+      {% if request.path == '/content/proficiency-level/create/' %} Proficiency Level  {% else %} Microskill {% endif %}
+      
+    </h1>
+    <ol class="breadcrumb">
+      <li>
+        <a href="#"><i class="fa fa-dashboard"></i> {% if request.path == '/content/proficiency-level/create/' %} Proficiency Level  {% else %} Microskill {% endif %}</a>
+      </li>
+      <li class="active">Create</li>
+    </ol>
+  </section>
+
+  <!-- Main content -->
+  <section class="content">
+    <!-- Default box -->
+    <div class="box">
+      {% include 'component/error_message.html' %}
+      <div class="box-header with-border">
+        <h3 class="box-title">Create {% if request.path == '/content/proficiency-level/create/' %} Proficiency Level  {% else %} Microskill {% endif %} </h3>
+      </div>
+      <div class="box-body">{% crispy form %}</div>
+      <!-- /.box-body -->
+    </div>
+    <!-- /.box -->
+  </section>
+  <!-- /.content -->
+</div>
+{% endblock content %}
+{% block js %}
+<script src="{% static 'bower_components/ckeditor/ckeditor.js' %}"></script>
+<script type="text/javascript">                 
+  CKEDITOR.replace('editor_description')
+  CKEDITOR.add
+  </script>
+{% endblock %}

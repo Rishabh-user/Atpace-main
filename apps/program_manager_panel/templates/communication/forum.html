@@ -1,0 +1,31 @@
+<div class="box">
+    <div class="box-header">
+        <h3 class="box-title">Post List</h3>
+    </div>
+    <!-- /.box-header -->
+    <div class="box-body">
+        <table id="forum-table" class="table table-bordered table-hover">
+        <thead>
+            <tr>
+            <th>SNo.</th>
+            <th>Title</th>
+            <th>Description</th>
+            <th>Space</th>
+            <th>Space Group</th>
+            <th>View</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr v-for="(post, index) in post_list">
+            <td>[[index+1]]</td>
+            <td>[[post.title]]</td>
+            <td v-html="post.description">[[post.description]]</td>
+            <td>[[post.space_name]]</td>
+            <td>[[post.space_group_name]]</td>
+            <td><a :href="'http://forum.dev.growatpace.com/post-details/'+post.id"> <button class="btn btn-primary">View</button></a></td>
+            </tr>
+        </tfoot>
+        </table>
+    </div>
+    <!-- /.box-body -->
+</div>

@@ -1,0 +1,15 @@
+Dear {{ name }},
+
+We are also sending you the Dynamic access code/OTP {{ otp }}, 
+You can use this to complete your log into the AtPace Academy
+
+User Email address : {{email}}
+
+Use this verification code below to finish login process.
+
+Your login code is: {{ otp }}
+
+Thanks 
+
+Regards
+Team AtPace

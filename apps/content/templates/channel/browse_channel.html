@@ -1,0 +1,543 @@
+{% extends 'base.html' %} {% load static %} {% load tags %}
+{% block title %} Browse Journey {% endblock %} 
+<!-- DataTables -->
+{% block css %}
+<link
+  rel="stylesheet"
+  href="{% static 'bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css' %}"
+/>
+<!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" > -->
+<style>
+  .tabs-left, .tabs-right {
+    border-bottom: none;
+    padding-top: 2px;
+  }
+  .tabs-left {
+    border-right: 1px solid #ddd;
+  }
+  .tabs-right {
+    border-left: 1px solid #ddd;
+  }
+  .tabs-left>li, .tabs-right>li {
+    float: none;
+    margin-bottom: 2px;
+  }
+  .tabs-left>li {
+    margin-right: -1px;
+  }
+  .tabs-right>li {
+    margin-left: -1px;
+  }
+  .tabs-left>li.active>a,
+  .tabs-left>li.active>a:hover,
+  .tabs-left>li.active>a:focus {
+    border-bottom-color: #ddd;
+    border-right-color: transparent;
+  }
+  
+  .tabs-right>li.active>a,
+  .tabs-right>li.active>a:hover,
+  .tabs-right>li.active>a:focus {
+    border-bottom: 1px solid #ddd;
+    border-left-color: transparent;
+  }
+  .tabs-left>li>a {
+    border-radius: 4px 0 0 4px;
+    margin-right: 0;
+    display:block;
+  }
+  .tabs-right>li>a {
+    border-radius: 0 4px 4px 0;
+    margin-right: 0;
+  }
+  .vertical-text {
+    margin-top:50px;
+    border: none;
+    position: relative;
+  }
+  .vertical-text>li {
+    height: 20px;
+    width: 120px;
+    margin-bottom: 100px;
+  }
+  .vertical-text>li>a {
+    border-bottom: 1px solid #ddd;
+    border-right-color: transparent;
+    text-align: center;
+    border-radius: 4px 4px 0px 0px;
+  }
+  .vertical-text>li.active>a,
+  .vertical-text>li.active>a:hover,
+  .vertical-text>li.active>a:focus {
+    border-bottom-color: transparent;
+    border-right-color: #ddd;
+    border-left-color: #ddd;
+  }
+  .vertical-text.tabs-left {
+    left: -50px;
+  }
+  .vertical-text.tabs-right {
+    right: -50px;
+  }
+  .vertical-text.tabs-right>li {
+    -webkit-transform: rotate(90deg);
+    -moz-transform: rotate(90deg);
+    -ms-transform: rotate(90deg);
+    -o-transform: rotate(90deg);
+    transform: rotate(90deg);
+  }
+  .vertical-text.tabs-left>li {
+    -webkit-transform: rotate(-90deg);
+    -moz-transform: rotate(-90deg);
+    -ms-transform: rotate(-90deg);
+    -o-transform: rotate(-90deg);
+    transform: rotate(-90deg);
+  }
+
+  .modal-footer{
+    display: grid ;
+    justify-content: center;
+  }
+  .pt-30{
+    padding-top: 30px;
+  }
+
+  .main-footer{
+    background-color: #f3f3f3;
+  }
+  a{
+    color: black;
+  }
+  .modal-dialog{
+    margin-top: 25vh;
+  }
+  p{
+    line-height: 1.6;
+  }
+  .nav-tabs>li.active>a, .nav-tabs>li.active>a:focus, .nav-tabs>li.active>a:hover{
+    background-color: #ffffff75 !important;
+  }
+  
+
+  .glassmorphism{
+    background: rgba(255, 255, 255, 0.45);
+    
+    
+    backdrop-filter: blur( 10.5px );
+    -webkit-backdrop-filter: blur( 10.5px );
+    border-radius: 10px;
+    border: 1px solid rgba( 255, 255, 255, 0.18 );
+  }
+  .glassmorphism_channel{
+background: rgba(187, 176, 176, 0.137);
+    
+    backdrop-filter: blur( 1.5px );
+    -webkit-backdrop-filter: blur( 1.5px );
+    border: 1px solid rgba( 255, 255, 255, 0.18 );
+  }
+  .mg-10{
+    margin-top:10px;
+  }
+
+  /* Large devices (laptops/desktops, 1024 and up) */
+
+  </style>
+{% endblock css %} 
+
+{% block content %}
+
+<div class="content-wrapper" style="background: transparent;height: calc(100vh - 100px);min-height:620px;" >
+<!-- style="background-image: url('/static/images/glass_16.png') !important; background-size: cover; background-repeat: no-repeat;" --> 
+
+  <section class="content">
+    <div class="row">
+    
+
+      <div class="col-xs-10" style="float: none; margin: 7% auto;">
+
+        <div class="box glassmorphism " style=" height: 61vh;    border-radius: 30px; border-top: none; box-shadow: rgb(149 157 165 / 70%) 0px 0px 10px;">
+          <div class="box-body" style="padding-top: 0; padding-bottom: 0; padding-left: 14px; ">
+            <div class="row">
+              
+              <div class="col-md-12 glassmorphism_channel" style="height: 61vh; overflow: auto; border-radius: 30px;
+              padding-right: 0;">
+                  <h4 style="padding: 10px 12px 15px 13px;"> <strong> All Journey  </strong> <i class="bi bi-arrow-right icon_color"></i></h4>
+                
+                    
+                    <ul class="nav nav-tabs tabs-left">
+                  
+                  
+                  {% for channel in channels %}
+                  
+                  {% if request.session.user_type == "Learner" or request.session.user_type == "Mentor" %}
+                      {% if request.user.id|coupon_code == "" %}
+                      <li class="">
+                   
+                        <div class="row" style="margin-bottom: 20px;">
+                        <div class="col-md-4 col-lg-4 col-sm-4" >
+                          <a href="#home{{channel.channel.pk}}" data-toggle="tab">{{channel.channel}}</a><br>
+                          {{channel.channel.short_description}}
+                        </div>
+                        <div class="col-md-3 col-lg-2 col-sm-3" style="margin-top:10px">
+                          {% if channel.channel.channel_type == "SurveyCourse" %}
+                            <i class="fa fa-question"></i>
+                          {% elif channel.channel.channel_type == "SkillDevelopment" %}
+
+                            <i class="fa fa-check-square-o fa-lg"></i>
+
+                          {% endif %}
+                          <i class="fa fa-book fa-lg"></i>
+                        </div>
+                        <div class="col-md-2 col-lg-2 col-sm-2" style="margin-top:10px">
+                          {% if channel.status == "completed" %}
+                          <kbd>Completed</kbd>
+                          {% elif request.user.id|is_user_joind:channel.channel == "Joined" %}
+                          <kbd>InProgress</kbd>
+                          {% endif %}
+                        </div>
+                        
+                        <div class=" col-md-3 col-lg-3 col-sm-3">
+                          {% if request.user.id|is_user_joind:channel.channel == "Joined" %}
+                      
+                      <a href="{% url 'content:Channel_content' Channel=channel.channel.pk  %}"><button class="btn btn-primary">Continue</button></a>
+                      {% elif request.user.id|is_user_joind:channel.channel == "Pending" %}
+                      <button class="btn btn-primary"> Pending</button>
+                      {% elif request.user.id|is_user_joind:channel.channel == "removed" %}
+                      <button class="btn btn-warning mg-10"> Removed</button>
+                      {% else %}
+                      <p>
+                        {% if channel.channel.is_paid %}
+                        <a href="/course-detail/{{channel.channel.id}}">  
+                          <button class="btn btn-warning mg-10">Launch</button></a
+                        >
+                        {% else %}
+                        {% if channel.channel.is_test_required %}
+                        {% if channel.channel.channel_type == "SurveyCourse" %}
+                        <button class="btn btn-warning mg-10" onclick="enrollUser('{{channel.channel.id}}', '{{channel.channel.survey}}','{{channel.channel.survey.id}}')">Launch</button>
+                        {% elif channel.channel.channel_type == "SkillDevelopment" %}
+                        <button class="btn btn-warning mg-10" onclick="enrollUser('{{channel.channel.id}}', '{{channel.channel.test_series}}','{{channel.channel.test_series.id}}', 'Assessment')">Launch</button>
+      
+                        {% else %}
+                        <a href="javascript:void(0)">
+                          
+                          <button class="btn btn-warning mg-10" onclick="JoinRequest('{{channel.channel.id}}')">Launch</button></a
+                        >
+                        {% endif %}
+                        {% else %}
+              
+                          <a href="javascript:void(0)">
+                            
+                            <button class="btn btn-warning mg-10" onclick="JoinRequest('{{channel.channel.id}}')">Launch</button></a
+                          >
+                        
+                        {% endif %}
+                        {% endif %}
+                        
+                      </p>
+                      {% endif %}
+      
+                          
+                        </div>
+                      </div>
+                    </li>
+                      {% else %}
+                        {% if request.user.id|is_user_joind:channel.channel == "Joined" %}
+                        <li class="">
+                   
+                          <div class="row" style="margin-bottom: 20px;">
+                        <div class="col-md-4 col-lg-4 col-sm-4" >
+                          <a href="#home{{channel.channel.pk}}" data-toggle="tab">{{forloop.counter}}. {{channel.channel}}</a><br>
+                          {{channel.channel.short_description}}
+                        </div>
+                        <div class="col-md-3 col-lg-2 col-sm-3">
+                          {% if channel.channel.channel_type == "SurveyCourse" %}
+                            <i class="fa fa-question"></i>
+                          {% elif channel.channel.channel_type == "SkillDevelopment" %}
+
+                            <i class="fa fa-check-square-o fa-lg"></i>
+
+                          {% endif %}
+                          <i class="fa fa-book fa-lg"></i>
+                        </div>
+                        <div class="col-md-2 col-lg-2 col-sm-2" style="margin-top:10px">
+                          {% if channel.status == "completed" %}
+                          <kbd>Completed</kbd>
+                          {% elif request.user.id|is_user_joind:channel.channel == "Joined" %}
+                          <kbd>InProgress</kbd>
+                          {% endif %}
+                        </div>
+                        
+                        <div class=" col-md-3 col-lg-3 col-sm-3" style="margin-top:10px">
+                          {% if request.user.id|is_user_joind:channel.channel == "Joined" %}
+                      
+                      <a href="{% url 'content:Channel_content' Channel=channel.channel.pk  %}"><button class="btn btn-primary">Continue</button></a>
+                      {% elif request.user.id|is_user_joind:channel.channel == "Pending" %}
+                      <button class="btn btn-primary"> Pending</button>
+                      {% elif request.user.id|is_user_joind:channel.channel == "removed" %}
+                      <button class="btn btn-warning mg-10"> Removed</button>
+                      {% else %}
+                      <p>
+                        {% if channel.channel.is_paid %}
+                        <a href="/course-detail/{{channel.channel.id}}">  
+                          <button class="btn btn-warning mg-10">Launch</button></a
+                        >
+                        {% else %}
+                        {% if channel.channel.is_test_required %}
+                        {% if channel.channel.channel_type == "SurveyCourse" %}
+                        <button class="btn btn-warning mg-10" onclick="enrollUser('{{channel.channel.id}}', '{{channel.channel.survey}}','{{channel.channel.survey.id}}')">Launch</button>
+                        {% elif channel.channel_type == "SkillDevelopment" %}
+                        <button class="btn btn-warning mg-10" onclick="enrollUser('{{channel.channel.id}}', '{{channel.channel.test_series}}','{{channel.channel.test_series.id}}', 'Assessment')">Launch</button>
+      
+                        {% else %}
+                        <a href="javascript:void(0)">
+                          
+                          <button class="btn btn-warning mg-10" onclick="JoinRequest('{{channel.channel.id}}')">Launch</button></a
+                        >
+                        {% endif %}
+                        {% else %}
+                          <a href="javascript:void(0)">
+                            
+                            <button class="btn btn-warning mg-10" onclick="JoinRequest('{{channel.channel.id}}')">Launch</button></a
+                          >
+                        
+                        {% endif %}
+                        {% endif %}
+                        
+                      </p>
+                      {% endif %}
+      
+                          
+                        </div>
+                      </div>
+                    </li>
+                        {% endif %}
+                        
+                      {% endif %}
+                  {% endif %}
+
+                     {% if request.session.user_type == "Admin" or request.session.user_type == "ProgramManager" %}
+                      {% if request.session.dashbordId|coupon_code == "" %}
+                      <li class="">
+
+                        <div class="row" style="margin-bottom: 20px;">
+                        <div class="col-md-4 col-lg-4 col-sm-4" >
+                          <a href="#home{{channel.channel.pk}}" data-toggle="tab">{{channel.channel}}</a><br>
+                          {{channel.channel.short_description}}
+                        </div>
+                        <div class="col-md-3 col-lg-2 col-sm-3">
+                          {% if channel.channel.channel_type == "SurveyCourse" %}
+                            <i class="fa fa-question"></i>
+                          {% elif channel.channel.channel_type == "SkillDevelopment" %}
+
+                            <i class="fa fa-check-square-o fa-lg"></i>
+
+                          {% endif %}
+                          <i class="fa fa-book fa-lg"></i>
+                        </div>
+                        <div class="col-md-2 col-lg-2 col-sm-2" style="margin-top:10px">
+                          {% if channel.status == "completed" %}
+                          <kbd>Completed</kbd>
+                          {% elif request.session.dashbordId|is_user_joind:channel.channel == "Joined" %}
+                          <kbd>InProgress</kbd>
+                          {% endif %}
+                        </div>
+
+                        <div class=" col-md-3 col-lg-3 col-sm-3" style="margin-top:10px">
+                          {% if request.session.dashbordId|is_user_joind:channel.channel == "Joined" %}
+
+                      <a href="#"><button class="btn btn-primary" disabled>Continue</button></a>
+                      {% elif request.session.dashbordId|is_user_joind:channel.channel == "Pending" %}
+                      <button class="btn btn-primary"> Pending</button>
+                      {% elif request.session.dashbordId|is_user_joind:channel.channel == "removed" %}
+                      <button class="btn btn-warning mg-10"> Removed</button>
+                      {% else %}
+                      <p>
+                        {% if channel.channel.is_paid %}
+                        <a href="/course-detail/{{channel.channel.id}}">
+                          <button class="btn btn-warning mg-10">Launch</button></a
+                        >
+                        {% else %}
+                        {% if channel.channel.is_test_required %}
+                        {% if channel.channel.channel_type == "SurveyCourse" %}
+                        <button class="btn btn-warning mg-10" onclick="enrollUser('{{channel.channel.id}}', '{{channel.channel.survey}}','{{channel.channel.survey.id}}')">Launch</button>
+                        {% elif channel.channel.channel_type == "SkillDevelopment" %}
+                        <button class="btn btn-warning mg-10" onclick="enrollUser('{{channel.channel.id}}', '{{channel.channel.test_series}}','{{channel.channel.test_series.id}}', 'Assessment')">Launch</button>
+
+                        {% else %}
+                        <a href="javascript:void(0)">
+
+                          <button class="btn btn-warning mg-10" onclick="JoinRequest('{{channel.channel.id}}')">Launch</button></a
+                        >
+                        {% endif %}
+                        {% else %}
+
+                          <a href="javascript:void(0)">
+
+                            <button class="btn btn-warning mg-10" onclick="JoinRequest('{{channel.channel.id}}')">Launch</button></a
+                          >
+
+                        {% endif %}
+                        {% endif %}
+
+                      </p>
+                      {% endif %}
+
+
+                        </div>
+                      </div>
+                    </li>
+                      {% else %}
+                        {% if request.session.dashbordId|is_user_joind:channel.channel == "Joined" %}
+                        <li class="">
+
+                          <div class="row" style="margin-bottom: 20px;">
+                        <div class="col-md-4 col-lg-4 col-sm-4" >
+                          <a href="#home{{channel.channel.pk}}" data-toggle="tab">{{forloop.counter}}. {{channel.channel}}</a><br>
+                          {{channel.channel.short_description}}
+                        </div>
+                        <div class="col-md-3 col-lg-2 col-sm-3">
+                          {% if channel.channel.channel_type == "SurveyCourse" %}
+                            <i class="fa fa-question"></i>
+                          {% elif channel.channel.channel_type == "SkillDevelopment" %}
+
+                            <i class="fa fa-check-square-o fa-lg"></i>
+
+                          {% endif %}
+                          <i class="fa fa-book fa-lg"></i>
+                        </div>
+                        <div class="col-md-2 col-lg-2 col-sm-2" style="margin-top:10px">
+                          {% if channel.status == "completed" %}
+                          <kbd>Completed</kbd>
+                          {% elif request.session.dashbordId|is_user_joind:channel.channel == "Joined" %}
+                          <kbd>InProgress</kbd>
+                          {% endif %}
+                        </div>
+
+                        <div class=" col-md-3 col-lg-3 col-sm-3" style="margin-top:10px">
+                          {% if request.session.dashbordId|is_user_joind:channel.channel == "Joined" %}
+
+                      <a href="#"><button class="btn btn-primary">Continue</button></a>
+                      {% elif request.session.dashbordId|is_user_joind:channel.channel == "Pending" %}
+                      <button class="btn btn-primary"> Pending</button>
+                      {% elif request.session.dashbordId|is_user_joind:channel.channel == "removed" %}
+                      <button class="btn btn-warning mg-10"> Removed</button>
+                      {% else %}
+                      <p>
+                        {% if channel.channel.is_paid %}
+                        <a href="/course-detail/{{channel.channel.id}}">
+                          <button class="btn btn-warning mg-10">Launch</button></a
+                        >
+                        {% else %}
+                        {% if channel.channel.is_test_required %}
+                        {% if channel.channel.channel_type == "SurveyCourse" %}
+                        <button class="btn btn-warning mg-10" onclick="enrollUser('{{channel.channel.id}}', '{{channel.channel.survey}}','{{channel.channel.survey.id}}')">Launch</button>
+                        {% elif channel.channel_type == "SkillDevelopment" %}
+                        <button class="btn btn-warning mg-10" onclick="enrollUser('{{channel.channel.id}}', '{{channel.channel.test_series}}','{{channel.channel.test_series.id}}', 'Assessment')">Launch</button>
+
+                        {% else %}
+                        <a href="javascript:void(0)">
+
+                          <button class="btn btn-warning mg-10" onclick="JoinRequest('{{channel.channel.id}}')">Launch</button></a
+                        >
+                        {% endif %}
+                        {% else %}
+                          <a href="javascript:void(0)">
+
+                            <button class="btn btn-warning mg-10" onclick="JoinRequest('{{channel.channel.id}}')">Launch</button></a
+                          >
+
+                        {% endif %}
+                        {% endif %}
+
+                      </p>
+                      {% endif %}
+
+
+                        </div>
+                      </div>
+                    </li>
+                        {% endif %}
+
+                      {% endif %}
+                  {% endif %}
+            
+                  {% endfor %}
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- /.box -->
+      </div>
+      
+      <!-- /.col -->
+    </div>
+   
+    <!-- /.row -->
+  </section>
+</div>
+{% endblock content %} {% block js %}
+<script src="{% static 'bower_components/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
+<!-- <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script> -->
+<script>
+  $(function () {
+    $("#example2").DataTable({
+      paging: true,
+      lengthChange: true,
+      searching: true,
+      ordering: true,
+      info: true,
+      autoWidth: true,
+    });
+  });
+</script>
+<script>
+  function  enrollUser(channel_id, survey, survey_id, type="Survey") {
+    var dialog = bootbox.dialog({
+    title: '',
+    message: "<div class='text-center pt-30'><img src=\"{% static 'images/logo/logo.png' %}\" width='100'> <p style='padding:20px 0px;'>You need to take this "+ type +" in order to enoll for this channel.</p> <h4>"+survey+"</h4></div>",
+    size: 'medimum',
+    buttons: {
+        ok: {
+            label: "Start " + type,
+            className: 'btn-primary pull-center',
+            callback: function(){
+            
+              if(1){
+                if(type == "Survey"){
+                  window.location.href = "/survey/survey-question/"+channel_id+"/"+survey_id+"/";
+                } else if (type == "Assessment"){
+                  window.location.href = "/test-series/assessment/"+channel_id+"/"+survey_id+"/?type=journey_pre_assessment";
+                }
+              }
+            }
+        }
+    }
+});
+
+  }
+
+  function JoinRequest(channel_id) {
+    SendJoinRequest(channel_id);
+    location.reload()
+  }
+  function SendJoinRequest(channel_id) {
+      $.ajax({
+        url:  "{% url 'content:join_channel' %}",
+        type: 'post',
+        data: {id: channel_id, csrfmiddlewaretoken : "{{csrf_token}}" },
+        error: function() {
+          bootbox.alert('Something is wrong');
+        },
+        success: function(data) {
+          return true;
+        }
+      });
+    }
+  $(".tabs-left li:first").addClass("active");
+  $(".tab-content div:first").addClass("active");
+</script>
+     
+{% endblock js %}

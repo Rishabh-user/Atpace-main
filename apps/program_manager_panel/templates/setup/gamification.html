@@ -1,0 +1,18 @@
+<div class="row" style="margin-top: 30px;">
+    <div class="col-md-2">
+    <div class="card side-tab" style="">
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item" @click="showPoints" id="points">Points</li>
+            <li class="list-group-item" @click="showBadges" id="badges">Badges</li>
+        </ul>
+    </div>
+    </div>
+    <div class="col-md-10">
+      <div v-if="displayPoints">
+        {% include 'setup/points.html' %}
+      </div>
+      <div v-if="displayBadges">
+        {% include 'setup/badges.html' %}
+      </div>
+    </div>
+</div>

@@ -1,0 +1,129 @@
+{% extends 'base.html' %}  {% load tags %} {% load static %} {% block title %} Program Announcement {% endblock %}
+ {% load crispy_forms_tags %} {% block content %}
+ {% block css %}
+<link rel="stylesheet" href="{% static 'bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css' %}">
+{% endblock css %} 
+<div class="content-wrapper">
+  <!-- Content Header (Page header) -->
+  <section class="content-header">
+    <h1>
+      Program Announcement
+
+    </h1>
+    <ol class="breadcrumb">
+      <li><a href="#"><i class="fa fa-dashboard"></i> Program </a></li>
+      <li><a href="#">Announcement</a></li>
+    </ol>
+  </section>
+
+  <!-- Main content -->
+  <section class="content">
+
+    <!-- Default box -->
+    {% if messages %} 
+    {% for message in messages %}
+       <div class="alert-success alert-dismissible" role="alert" >
+           <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+               <span aria-hidden="true"></span>
+           </button>
+           {{ message }}
+       </div>
+   {% endfor %}
+   {% endif %}
+  <div class="box">
+      <div class="box-header with-border">
+        <h3 class="box-title">Program Announcement</h3>
+
+      </div>
+      <div class="box-body">
+         <form method="post" action="{% url 'user:program_announcement' %}">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-md-12">                      
+                      <div class="form-group">
+                        <label>Company</label>
+                        <select class="form-control select2" id ="company" name="company" required style="width: 100%;">
+                          <option selected="selected">Select</option>
+                          {% for company in company_list %}
+                            <option value="{{company.pk}}">{{company.name}}</option>
+                            {% endfor %}
+                        </select>
+                      </div>
+
+                      <div id="announcement_form" class="form-group">
+                        <label>Journey</label>
+                        <select class="form-control select2" id ="journey" name="journey" required style="width: 100%;">
+                          <option selected="selected">Select</option>
+                            <option value=""></option>
+                        </select>    
+                      </div>                        
+                      <div class="form-group">
+                        <label>Topic</label>
+                        <input name="topic" type="text" required class="form-control">
+                      </div>
+                     
+                      <div class="form-group">
+                        <label>Summary</label>
+                        <textarea name="summary" class="form-control" required ></textarea>
+                      </div>
+                      <div class="form-group">
+                        <label>Please select checkbox: </label> <br>
+                        <input type="checkbox" name="mentors" > All Mentors <br>
+                        <input type="checkbox" name="mentees" > All Mentees <br>
+                        <input type="checkbox" name="program_team" > Program Team Only <br>
+                        <input type="checkbox" name="everyone" > Everyone <br>
+                      </div>
+                      <hr>
+                        <p><strong>Note: </strong>If there is no <i class="fa fa-check-square-o" aria-hidden="true"></i> selected, then, The announcement will not be shared with anyone.</p>
+                      <!-- /.form-group -->
+                      <button type="submit" id="sumbitContent" class="btn btn-primary">Save changes</button>
+                    </div>
+                   
+                  </div>
+                  <!-- /.row -->
+            </form>
+    
+      </div>
+      <!-- /.box-body -->
+      
+      <!-- /.box-footer-->
+    </div>
+    <!-- /.box -->
+
+  </section>
+  <!-- /.content -->
+</div>
+{% endblock content %}
+{% block js %}
+<script src="{% static 'bower_components/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
+<script>
+  $(document).on('change', '#company', function(){
+    var id = $(this).val();
+    console.log("id ",id);
+    var formdata = {
+      company_id: id,
+      csrfmiddlewaretoken: "{{csrf_token}}"
+    };
+    $.ajax({
+      type: "post",
+      url: "{% url 'content:journey_list' %}",
+      data: formdata,
+      success: function(data){
+        console.log("data ",data)
+        const select = document.querySelector('select[name="journey"]');
+        for (let i=0; i<data.journey_list.length; i++) {
+          select.options.add(new Option(data.journey_list[i]['name'], data.journey_list[i]['pk']))
+        }
+      },
+      error: function(){
+          console.log('fail')
+      }
+    })
+  });
+
+  $("#announcement_form").submit(function(e) {
+    e.preventDefault();
+  });
+</script>
+{% endblock js %}

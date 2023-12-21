@@ -1,0 +1,134 @@
+{% extends 'base.html' %} {% load tags %} {% load static %}
+{% load tags %}
+{% block css %}
+{% endblock css %} 
+{% block content %}
+
+<div class="content-wrapper">
+  <section class="content-header">
+    <h1>
+      Edit Journal
+    </h1>
+    <ol class="breadcrumb">
+      <li><a href="#"><i class="fa fa-dashboard"></i>Edit</a></li>
+      <li class="active">Journal</li>
+    </ol>
+  </section>
+
+  <section class="content">
+    <div class="row">
+       <div class="col-xs-12">
+           <div class="box">
+             <div class="box-header">
+               <h3 class="box-title">Edit Journal
+               </h3>
+              </div>
+             <!-- /.box-header -->
+             <div class="box-body">
+             {% if messages %} 
+             {% for message in messages %}
+                <div class="alert-success alert-dismissible" role="alert" >
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true"></span>
+                    </button>
+                    {{ message }}
+                </div>
+            {% endfor %}
+            {% endif %}
+            <form method="post" action="{% url 'community:post_journal' %}">
+            {% csrf_token %}
+            <div class="modal-body">  
+              <div class="row">
+                <div class="col-md-12">
+                <div class="form-group">
+                  <label for=title class="col-md-12 control-label">Title</label>
+                  <input class="form-control" type="hidden" id="id" name="id" value="{{learning_journal.id}}">
+                  {% if learning_journal.is_weekly_journal %}
+                    <input class="form-control" type="text" id="title" name="title" placeholder="Title" value="{{learning_journal.name}}" required readonly>
+                  {% else %}
+                    <input class="form-control" type="text" id="title" name="title" placeholder="Title" value="{{learning_journal.name}}" required>
+                  {% endif %}
+                  </div> 
+                <div class="form-group">
+                  <textarea id="" name="learning_journal" style="width: 100%; height: 130px; font-size: 14px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;" rows="10" class="form-control textarea" placeholder="Enter Learning Journal" required>{{learning_journal.learning_journal}}</textarea>
+                </div> 
+                <div class="form-group">
+                {% if request.session.user_type == "Mentor" %}
+                  <input type="checkbox" id="is_private" name="is_private" value="True" checked readonly><label>is private</label>
+                  {% else %}
+                    {% if learning_journal.is_private %}
+                    <input type="checkbox" id="is_private" name="is_private" value="True" onchange="show_journey()" checked> <label for="is_private">is private</label>
+                    {% else %}
+                    <input type="checkbox" id="is_private" name="is_private" value="True" onchange="show_journey()"> <label for="is_private">is private</label>
+                    {% endif %}
+                  {% endif %}
+                </div> 
+                <div class="form-group" id="journey-div">
+                  <label for=journey class="col-md-12 control-label">Journey</label>
+                  <select class="form-control select2" style="width:100%;" name="journey" id="journey">
+                    <option value="">Select</option>
+                    {% for journey in request.user|get_mentee_journeys:request.session.company_id %}
+                      {% if learning_journal.journey_id == journey.id|stringformat:"s" %}
+                      <option value="{{journey.id}}" selected>{{journey.title}}</option>
+                      {% else %}
+                      <option value="{{journey.id}}">{{journey.title}}</option>
+                      {% endif %}
+                    {% endfor %}
+                  </select>
+                </div> 
+            </div>  
+            <div class="col-md-2">
+                <button type="submit" id="sumbitContent" class="btn btn-info" style="margin: 0px;">Save</button>
+            </div>
+          </div>
+          </div>
+          
+          </form>
+             </div>
+             <!-- /.box-body -->
+           </div>
+           <!-- /.box -->  
+         </div>
+       <!-- /.col -->
+    </div>
+    <!-- /.row -->
+ </section>
+ 
+</div>
+{% endblock content %} 
+{% block js %}
+<script>
+$(function () {
+    // Replace the <textarea id="editor1"> with a CKEditor
+    //bootstrap WYSIHTML5 - text editor
+    $('.textarea').wysihtml5({
+    toolbar: {
+    "font-styles": true, // Font styling, e.g. h1, h2, etc.
+    "emphasis": true, // Italics, bold, etc.
+    "lists": true, // (Un)ordered lists, e.g. Bullets, Numbers.
+    "html": false, // Button which allows you to edit the generated HTML.
+    "link": false, // Button to insert a link.
+    "image": false, // Button to insert an image.
+    "color": false, // Button to change color of font
+    "blockquote": true, // Blockquote
+    }
+    })
+  })
+
+  show_journey()
+
+function show_journey(){
+  is_checked = document.getElementById("is_private").checked
+//  document.getElementById("is_private").disabled = true;
+
+  // console.log("is_private", is_checked)
+  if(is_checked){
+    document.getElementById("journey-div").style.display = "none"
+  }
+  else{
+    document.getElementById("journey-div").style.display = "block"
+  }
+}
+ 
+</script>
+{% endblock js %}

@@ -1,0 +1,143 @@
+{% extends 'base_with_empty_sidebar.html' %} {% load static %}
+{% load tags %}
+<!-- DataTables -->
+{% block css %}
+    <link
+            rel="stylesheet"
+            href="{% static 'css/content/channel/read_content.css' %}"
+    />
+{% endblock css %} 
+{% block content %}
+<aside
+class="main-sidebar"
+style="
+  box-shadow: 0px 12px 7px #2329314d;
+  background-color: white;
+  border-radius: none;
+  backdrop-filter: blur(1.5px);
+  -webkit-backdrop-filter: blur(1.5px);
+  border-right: 1px solid #ababab;
+"
+>
+<!-- sidebar: style can be found in sidebar.less -->
+<section class="sidebar" style="background-color: #fff">
+  <ul class="sidebar-menu" data-widget="tree">
+    {% for data in data %}
+    <li class="read_content_link" style="border-bottom: 1px solid gray; padding-top:5px ; ">
+      <a
+        href="{% url 'content:revice_mode' pk=content.pk group=group.pk %}#{{data.display_order}}"
+       style="padding: 0px 5px 5px 0px;">
+        {% if data.type == "Text" %}
+        <img src="{% static 'images/icon/text.png' %}" width="30" style="border-radius: 30%;" />
+        <span style="color: #000; white-space: initial; ">
+          {{data.title}} (3:00)</span
+        >
+        {% elif data.type == "Image" %}
+        <img src="{% static 'images/icon/image.png' %}" width="30"  style="border-radius: 30%;"/>
+        <span style="color: #000;  white-space: initial; "
+          >{{data.title}} (1:00)</span
+        >
+        {% elif data.type == "Video" %}
+        <img src="{% static 'images/icon/video.png' %}" width="30" style="border-radius: 30%;"/>
+        <span style="color: #000; white-space: initial; "
+          >{{data.title}} (5:00)</span
+        >
+        {% elif data.type == "Link" %}
+        <img src="{% static 'images/icon/link.png' %}" width="30" style="border-radius: 30%;" />
+        <span style="color: #000; white-space: initial; "
+          >{{data.title}} (1:00)</span
+        >
+        {% elif data.type == "Quiz" %}
+        <img src="{% static 'images/icon/quiz.png' %}" width="30" style="border-radius: 30%;" />
+        <span style="color: #000; white-space: initial; "
+          >{{data.title}} (2:00)</span
+        >
+        {% elif data.type == "Poll" %}
+        <img src="{% static 'images/icon/poll.png' %}" width="30" style="border-radius: 30%;" />
+        <span style="color: #000; white-space: initial; "
+          >{{data.title}} (1:00)</span
+        >
+        {% elif data.type == "Pdf" %}
+        <img src="{% static 'images/icon/pdf.png' %}" width="30" style="border-radius: 30%;" />
+        <span style="color: #000;  white-space: initial; "
+          >{{data.title}} (5:00)</span
+        >
+        {% endif %}
+      </a>
+    </li>
+
+    {% endfor %}
+  </ul>
+</section>
+</aside>
+
+<div class="content-wrapper" >
+  <section class="content-header">
+    <a href="{% url 'user:user-dashboard' %}"><button class="btn btn-primary pull-right">Go to dashboard</button></a>
+    <h1>
+      {{content.title}}  - Revise Mode
+     
+    </h1>
+    
+  </section>
+
+  <section class="content">
+    <div class="row content_data" style="padding: 8px;" >
+      <div class="col-md-12 col-sm-12 section padding-x-48"  style="width: 100%;">
+          <!-- Widget: user widget style 1 -->
+          <div class="box box-widget widget-user  content_card" style=" box-shadow: 0 8px 32px 0 rgba( 31, 38, 135, 0.37 ); max-height: auto !important;
+            width: 100%;
+            max-width: 750px;">
+            <!-- Add the bg color to the header using any of the bg-* classes -->
+            
+            
+            <div class="widget-user-header bg-black" style="background: url('{{MEDIA_URL}}{{content.image}}') center; background-size: cover; background-repeat: no-repeat; height:45vh;">
+              <!-- <i class="fa fa-times go_back"></i> -->
+            </div>
+          
+            <div class="box-footer" style="background-color: #f3f3f3;" >
+              <h2 id="content_title" >{{content.title}} </h2>
+              <div class="user-block">
+                </div>
+              </div>
+              
+          </div>
+          <!-- /.widget-user -->
+      </div>
+    <!-- /.box -->
+
+  </section>
+  <section class="content">
+    {% for data in data %}
+    <div class="row content_data" data-id="{{data.id}}">
+      <!-- <div class="col-md-12"> -->
+
+      <!-- User image -->
+      {% if data.type == "Text" %} 
+        {% include 'microskill_card/text.html' %} 
+      {% elif data.type == "Video" %} 
+        {% include 'microskill_card/video.html' %} 
+      {% elif data.type == "Image" %} 
+        {% include 'microskill_card/image.html' %} 
+      {% elif data.type == "YtVideo" %} 
+        {% include 'microskill_card/yt_video.html' %}
+      {% elif data.type == "Link" %} 
+        {% include 'microskill_card/system_link.html' %} 
+      {% elif data.type == "Pdf" %} 
+        {% include 'microskill_card/pdf.html' %} 
+      {% elif data.type == "Quiz" %} 
+        {% include 'microskill_card/quiz.html' %} 
+      {% elif data.type == "Poll" %} 
+        {% include 'microskill_card/poll.html' %} 
+      {% elif data.type == "Activity" %} 
+        {% include 'microskill_card/activity.html' %} 
+      {% endif %}
+      <!-- </div> -->
+    </div>
+
+    {% endfor %}
+    {% include 'microskill_card/floting_button.html' %}
+  </section>
+ 
+</div>
+{% endblock content %} 

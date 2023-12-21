@@ -1,0 +1,178 @@
+<div class="box">
+  <div class="box-header with-border">
+    <h3 class="box-title">Create Pool Setup</h3>
+  </div>
+  <div class="box-body">
+    <form @submit.prevent="onCreatePoolSetup">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="form-group">
+            <label>Name</label>
+            <input
+              name="title"
+              type="text"
+              required
+              class="form-control"
+              v-model="title"
+            />
+          </div>
+          <div class="form-group">
+            <label>Company</label>
+            <input type="text" class="form-control" value="" v-model="user_company_name" name="sidebarCompany" readOnly/>
+            {% comment %} <select
+              class="form-control"
+              name="company"
+              required
+              style="width: 100%"
+              ref="company"
+              @change="showJourneyList"
+            >
+              <option selected="selected">Select</option>
+              <option
+                v-bind:value="company.id"
+                v-for="company in company_list"
+                :key="company.id"
+              >
+                [[company.name]]
+              </option>
+            </select> {% endcomment %}
+          </div>
+          <div class="form-group">
+            <label>Journey</label>
+            <select
+              class="form-control"
+              name="journey"
+              required
+              style="width: 100%"
+              ref="journey"
+            >
+              <option selected="selected">Select</option>
+              <option
+                v-bind:value="journey.id"
+                v-for="journey in journey_list"
+                :key="journey.id"
+                v-if="journey.type!='SelfPaced'"
+              >
+                [[journey.name]]
+              </option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Pool by</label>
+            <select
+              class="form-control select2"
+              name="pool_by"
+              required
+              style="width: 100%"
+              ref="pool_by"
+            >
+              <option value="All">All</option>
+              <option value="Tags">Tags</option>
+              <option value="Industry">Industry</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Tags</label>
+            <select
+              class="form-control select2"
+              name="tags"
+              required
+              style="width: 100%"
+              id="tags"
+              multiple
+            >
+              <option
+                v-bind:value="tag.id"
+                v-for="tag in tag_list"
+                :key="tag.id"
+              >
+                [[tag.name]]
+              </option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Industry</label>
+            <select
+              class="form-control select2"
+              name="industry"
+              required
+              style="width: 100%"
+              id="industry"
+              multiple
+            >
+              <option
+                v-bind:value="industry.id"
+                v-for="industry in industry_list"
+                :key="industry.id"
+              >
+                [[industry.name]]
+              </option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <input
+              type="checkbox"
+              name="is_active"
+              v-model="is_active"
+              checked
+              id="is_active"
+            />
+            <label for="is_active">Is active</label>
+          </div>
+          <!-- /.form-group -->
+          <button type="submit" class="btn btn-primary">Create</button>
+        </div>
+      </div>
+      <!-- /.row -->
+    </form>
+  </div>
+</div>
+<!-- /.box -->
+<div class="box">
+  <div class="box-header">
+    <h3 class="box-title">Pool Setup List</h3>
+  </div>
+  <!-- /.box-header -->
+  <div class="box-body">
+    <table id="pool-setup-table" class="table table-bordered table-hover">
+      <thead>
+        <tr>
+          <th>SNo.</th>
+          <th>Pool</th>
+          <th>Journey</th>
+          <th>Active</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="(pool, index) in pool_setup_list" :key="pool.id">
+          <td>[[index+1]]</td>
+          <td>[[pool.name]]</td>
+          <td>[[pool.journey_name]]</td>
+          <td class="capitalize">[[pool.is_active]]</td>
+          <td>
+            <div class="dropdown">
+              <button
+                class="btn bg-purple dropdown-toggle btn-select-option"
+                type="button"
+                data-toggle="dropdown"
+                aria-expanded="true"
+              >
+                Select an option <span class="caret"></span>
+              </button>
+              <ul class="dropdown-menu options-dropdown">
+                <li>
+                  <a :href="'/config/edit-pool/'+pool.id"
+                    ><i class="fa fa-edit option-icon"></i>Edit</a
+                  >
+                </li>
+              </ul>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <!-- /.box-body -->
+</div>

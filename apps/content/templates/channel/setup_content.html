@@ -1,0 +1,342 @@
+{% extends 'base.html' %} {% load static %} 
+
+{% block content %}
+<link
+  href="https://www.jqueryscript.net/css/jquerysctipttop.css"
+  rel="stylesheet"
+  type="text/css"
+/>
+
+<!-- Link Bootstrap -->
+
+<!-- Link simple flow stylesheet -->
+<link
+  rel="stylesheet"
+  type="text/css"
+  href="{% static 'dist/flow/css/simple-flow.min.css' %}"
+/>
+
+<!-- Link demo stylesheet -->
+<link
+  rel="stylesheet"
+  type="text/css"
+  href="{% static 'dist/flow/css/simple-flow-demo.min.css' %} "
+/>
+<div class="content-wrapper">
+  <section class="content-header">
+    <h1>
+      Setup Mentoring Journey
+    </h1>
+    <ol class="breadcrumb">
+      <li>
+        <a href="#"><i class="fa fa-dashboard"></i> Skill Hierarchy</a>
+      </li>
+      <li><a href="#">Mentoring Journey</a></li>
+      <li class="active">Setup</li>
+    </ol>
+  </section>
+  <section class="content">
+    <!-- Default box -->
+    <div class="row">
+      <div class="col-md-3">
+        <div class="box">
+          <div class="box-header with-border">
+            <h3 class="box-title">search</h3>
+          </div>
+          <div class="box-body">
+            <form action="{% url 'content:filter_setup_journey_content' %}" method="post">
+              {% csrf_token %}
+              <input type="hidden" class="form-control" name="journey_id" id="journey_id" value="{{journey_id}}"/>
+              <input type="text" class="form-control" name="title" id="title"/>
+              <button class="btn btn-primary pull-right">Search</button>
+            </form>
+          </div>
+          <div class="box-footer">
+            {% if content.count > 0 %}
+            <h5>Quest</h5>
+            {% endif %} {% for content in content %}
+            <button 
+            class="btn" style="width:100%; margin:5px; padding:4px; border-radius:3px; background:#f0f2f5;"
+              draggable="true"
+              ondragstart="drag(event, '{{content.pk}}', '{{content.title}}', 'quest')"
+            >
+              {{content.title}}</button
+            ><br />
+            {% endfor %} {% if survey.count > 0 %}
+            <h5>Survey</h5>
+            {% endif %} {% for survey in survey %}
+            <button
+              class="btn " style="width:100%; margin:5px; padding:4px; border-radius:3px; background:#f0f2f5;"
+              draggable="true"
+              ondragstart="drag(event, '{{survey.pk}}', '{{survey.name}}', 'survey')"
+            >
+              {{survey.name}}</button
+            ><br />
+            {% endfor %} {% if test_series.count > 0 %}
+            <h5>Assessment</h5>
+            {% endif %} {% for test_series in test_series %}
+            <button
+              class="btn" style="width:100%; margin:5px; padding:4px; border-radius:3px; background:#f0f2f5;"
+              draggable="true"
+              ondragstart="drag(event, '{{test_series.pk}}', '{{test_series.name}}', 'assessment')"
+            >
+              {{test_series.name}}</button
+            ><br />
+            {% endfor %} {% if journals_templates.count > 0 %}
+            {% if journey.channel_type != 'SelfPaced' %}
+            <h5>Journals</h5>
+            {% for journals_templates in journals_templates %}
+            <button class="btn" style="width:100%; margin:5px; padding:4px; border-radius:3px; background:#f0f2f5;"
+              draggable="true"
+              ondragstart="drag(event, '{{journals_templates.pk}}', '{{journals_templates.title}}', 'journals')"
+            >
+              {{journals_templates.title}}</button
+            ><br />
+            {% endfor %}
+            {% endif %}
+            {% endif %}
+            <br />
+          </div>
+        </div>
+      </div>
+      <div class="col-md-9">
+        <div class="box">
+          <div class="box-header with-border">
+            <h3 class="box-title">Setup Mentoring Journey Content</h3>
+          </div>
+          <div class="box-body">
+            <section class="container canvas">
+              <div class="row" style="width: 60%">
+                <ul class="timeline timeline-inverse reorder-gallery" ondragover="allowDrop(event)" id="add_new_option">
+                  <!-- timeline item -->
+                  {% for mentoring_journay_data in mentoring_journay_data %}
+                    <li id="{{mentoring_journay_data.pk}}">
+                      <span class="close" style="cursor: pointer; position: inherit; z-index: 999;" onclick='deleteContent("{{mentoring_journay_data.pk}}")'>&times;</span>
+                      <input type="checkbox" {% if mentoring_journay_data.is_checked %} checked {% endif %} style="position:absolute; left:25px; top:7px; width: 20px; height: 20px;" id="checkbox{{mentoring_journay_data.pk}}" value="on" onchange='updateIsChecked("{{mentoring_journay_data.pk}}")'/>
+                      <div class="timeline-item">
+                        <div class="timeline-body" style="background:#f0f2f5;"> 
+                            {{mentoring_journay_data.meta_key | capfirst}} -
+                            {{mentoring_journay_data.name}}
+                        </div>
+                      </div>
+                    </li>
+                  {% endfor %}
+                </ul> 
+              </div>
+            </section>
+            <!-- End of canvas -->
+          </div>
+          <!-- /.box-body -->
+          <div class="box-footer">
+          <h4><strong>Note: </strong></h4>
+          <p>* For adding content just drag the content from left and drop here.</p>
+          <p>* For activating content check the &nbsp;<i class="fa fa-check-square-o" aria-hidden="true"></i>&nbsp; box. If the &nbsp;<i class="fa fa-check-square-o" aria-hidden="true"></i>&nbsp; box is not checked , the content will be shown but grayed out.</p>
+          <p>* For reorder content data swap them.</p>
+          </div>
+      </div>
+    </div>
+
+    <!-- /.box -->
+  </section>
+</div>
+{% endblock content %} {% block js %}
+
+<!-- <script
+  src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+  integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+  crossorigin="anonymous"
+></script> -->
+<!-- Add simple flow -->
+<script src="{% static 'dist/flow/js/simple-flow.min.js' %}"></script>
+<script type="text/javascript">
+  $(function () {
+    // all settings are optional
+    var settings = {
+      lineWidth: 2,
+      lineSpacerWidth: 15,
+      lineColour: "#E74C3C",
+      canvasElm: ".canvas",
+    };
+    // connect objects with simple flow
+    $(".object").SimpleFlow(settings);
+  });
+</script>
+<script>
+  $(document).ready(function(){	
+	$("ul.reorder-gallery").sortable({		
+		update: function( event, ui ) {
+      //console.log("sortable function", event, ui)
+			updateOrder();
+		}
+	});
+});
+function updateIsChecked(id){
+  console.log("odc", id)
+  is_checked = document.getElementById("checkbox"+id).checked
+  var form_data = new FormData();
+  var csrfmiddlewaretoken = "{{csrf_token}}"; 
+  form_data.append("id", id);
+  form_data.append("checked", is_checked);
+  form_data.append("csrfmiddlewaretoken", csrfmiddlewaretoken);
+ 
+	$.ajax({
+		type: "POST",
+		url: "{% url 'content:update-content-checked' %}",
+		data: form_data,
+	  contentType: false,
+            cache: false,
+            processData: false,
+		success: function(data){	
+      //location.reload()		
+		}
+	});
+}
+function updateOrder() {	
+	var item_order = new Array();
+  var item_checked = new Array();
+	$('ul.reorder-gallery li').each(function() {
+    is_checked = document.getElementById("checkbox"+$(this).attr("id")).checked
+		item_order.push($(this).attr("id"));
+    item_checked.push(is_checked)
+    console.log("is_checked",is_checked)
+	});
+  //console.log("item_order",item_order);
+  var form_data = new FormData();
+  var csrfmiddlewaretoken = "{{csrf_token}}"; 
+  form_data.append("order", item_order);
+  form_data.append("checked", item_checked);
+  //form_data.append('journey', "{{journey.pk}}")
+  form_data.append("csrfmiddlewaretoken", csrfmiddlewaretoken);
+ 
+	$.ajax({
+		type: "POST",
+		url: "{% url 'content:update-content-order' %}",
+		data: form_data,
+	  contentType: false,
+            cache: false,
+            processData: false,
+		success: function(data){	
+      //location.reload()		
+		}
+	});
+  
+}
+  function allowDrop(ev) {
+    ev.preventDefault();
+
+    // Append image to the drop box
+  }
+
+  function drag(ev, id, title, type) {
+    console.log(id);
+    ev.dataTransfer.setData("text", ev.target.id);
+    console.log(addContentToJourney(id, title, type));
+    
+      $("#add_new_option").append(
+      '<li id="card3">\
+      <input type="checkbox" checked style="position:absolute; left:25px; top:7px; width: 20px; height: 20px;"/>\
+                    <div class="timeline-item">\
+                      <div class="timeline-body" style="background:#f0f2f5;">' +
+        type +
+        " - " +
+        title +
+        "</div>\
+                    </div>\
+                  </li>"
+    );
+    
+    var settings = {
+      lineWidth: 2,
+      lineSpacerWidth: 15,
+      lineColour: "#E74C3C",
+      canvasElm: ".canvas",
+    };
+    
+    // connect objects with simple flow
+    $(".object").SimpleFlow(settings);
+  }
+
+  function drop(ev) {
+    ev.preventDefault();
+    var data = ev.dataTransfer.getData("text");
+    ev.target.appendChild(document.getElementById(data));
+  }
+  function addContentToJourney(id, title, type) {
+    var formData = {
+      id: id,
+      title: title,
+      type: type,
+      journey_id: "{{journey_id}}",
+      csrfmiddlewaretoken: "{{csrf_token}}",
+    };
+    
+    $.ajax({
+      type: "POST",
+      url: '{% url "content:update-setup-journey-content" %}',
+      data: formData,
+      encode: true,
+    
+    success:(function (data) {
+      if(data=="Success"){
+        console.log(data);
+        return true;
+      } else {
+        bootbox.alert(data, function(){
+        location.reload();
+        });
+      }
+    })
+    });
+
+    event.preventDefault();
+  }
+
+  
+</script>
+<script>
+  function deleteContent(id) {
+    bootbox.confirm({
+      message: "Are you Sure you want to delete this content ?",
+      buttons: {
+          confirm: {
+              label: 'Yes',
+              className: 'btn-success'
+          },
+          cancel: {
+              label: 'No',
+              className: 'btn-danger'
+          }
+      },
+      callback: function (result) {
+         if(result){
+          var form_data = new FormData();
+          var csrfmiddlewaretoken = "{{csrf_token}}"; 
+          form_data.append("id", id);
+          form_data.append("csrfmiddlewaretoken", csrfmiddlewaretoken);
+          console.log(form_data);
+            $.ajax({ 
+                    type: 'POST',
+                    url: '{% url "content:delete-journey-content" %}', 
+                    contentType: false,
+                    cache: false,
+                    processData: false,
+                    data: form_data ,
+                        success: function(data){
+                          bootbox.alert(data, function(){ 
+                            location.reload();
+                          });
+                        // location.reload()
+
+                        },
+                        error: function(){
+                            console.log('fail')
+                        }
+                });  
+         }
+      }
+  });
+
+  }
+
+  </script>
+{% endblock %}

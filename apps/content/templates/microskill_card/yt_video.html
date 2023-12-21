@@ -1,0 +1,15 @@
+{% load tags %}
+<section class="section" id="{{forloop.counter}}" style="max-width: none">
+  <div class="content" style="width: 100%; max-width: 750px">
+    <div class="box-header with-border">
+      <div class="row">
+        <div
+          class="col-md-12"
+          style="display: flex; align-items: center; justify-content: center"
+        >
+          {% if data.url %} {{ data.url|youtube_embed_url|safe }} {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

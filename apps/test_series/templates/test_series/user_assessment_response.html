@@ -1,0 +1,86 @@
+{% extends 'base.html' %} {% block title %} Assessment Response {% endblock %} {%
+    load crispy_forms_tags %} 
+    {% load tags %}
+    {% block content %}
+    <style>
+      .question_label {
+          border: 2px solid #9f9f9f;
+          padding: 9px 10px;
+          width: 100%;
+          background-color: #388797 ;
+          margin: 20px 0;
+          color: white;
+        }
+    </style>
+    <div class="content-wrapper">
+      <!-- Content Header (Page header) -->
+      <section class="content-header">
+        <h1>
+            Assesment result
+        </h1>
+        <ol class="breadcrumb">
+          <li>
+            <a href="{% url 'test_series:test-list' %}"><i class="fa fa-dashboard"></i> Assesment</a>
+          </li>
+          <li><a href="{% url 'test_series:user_test_attempt' %}">Attempt</a></li>
+          <li class="active">Result</li>
+        </ol>
+      </section>
+    
+      <!-- Main content -->
+      <section class="content">
+        <!-- Default box -->
+        <form method="post">
+        <div class="box">
+          <div class="box-header with-border">
+            <h3 class="box-title">User Response</h3>
+            <a href="{%url 'api:assessment_csv' attempt_id=test_attempt.pk %}"><span class="btn btn-primary pull-right">Export As CSV</span></a>
+          </div>
+          <div class="box-body">
+            <p>Total Marks :  {{test_attempt.total_marks}}</p>
+
+            <p>Assessment Marks :  {{test_attempt.test_marks}}</p>
+            <input type="hidden" name="test_marks" value="{{test_attempt.test_marks}}">
+              
+             <p> Skill Level : {% if test_attempt.user_skill %} {{test_attempt.user_skill}} {% else %} - {% endif %}</p> 
+            {% for user_answers in user_answers %}
+            <label class="question_label">Q: {{user_answers.question}}</label>
+            A:{{user_answers.response}} 
+              <input type="hidden" name="response_id[]" value="{{user_answers.id}}">
+              <div class="row">
+                <div class="col-md-6">
+                <input type="number" class="form-control" name="marks[]" min="0"  max="{{user_answers.question_marks}}" value="{{user_answers.total_marks}}" required placeholder="Enter Marks">
+              </div>
+                <div class="col-md-6">Current Marks: {{user_answers.total_marks}}/{{user_answers.question_marks}}</div>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+        <!-- /.box -->
+        <div class="box">
+          <div class="box-body">
+              {% csrf_token %}
+              <input
+                type="hidden"
+                name="survey_attempt"
+                value="{{survey_attempt_id}}"
+              />
+              <div class="form-group">
+                <select class="form-control select2" name="user_skill">
+                  <option selected value="">Select</option>
+                  {% for label in labels %}
+                  <option value="{{label.pk}}">{{label}}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <button type="submit" class="btn btn-primary">Submit</button>
+              <button type="submit" class="btn btn-primary" value="joined" name="survey_and_joined">Assessment & Joined Journey</button>
+          </div>
+        </div>
+      </form>
+      </section>
+    
+      <!-- /.content -->
+    </div>
+    {% endblock content %}
+    

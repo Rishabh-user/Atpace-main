@@ -1,0 +1,156 @@
+{% extends 'website/web_base.html' %} 
+{% load static %}
+{% load crispy_forms_tags %}  
+{% load tags %}
+{% block content %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.15/css/intlTelInput.css">
+      <main>
+
+         <!-- sign up area start -->
+         <section class="signup__area po-rel-z1 pt-100 pb-145">
+            <div class="page__title-shape">
+                <img class="page-title-shape-5 d-none d-sm-block"
+                    src="{% static 'website/img/page-title/page-title-shape-1.png' %}" alt="">
+                <img class="page-title-shape-6" src="{% static 'website/img/page-title/page-title-shape-6.png' %}" alt="">
+                <img class="page-title-shape-7" src="{% static 'website/img/page-title/page-title-shape-4.png' %}" alt="">
+            </div>
+            <div class="container">
+            <div class="row">
+                <div class="col-xxl-12 col-xl-12 col-lg-12">
+                    <div class="course__wrapper">
+                        <div class="page__title-content mb-25">
+
+                            <span class="page__title-pre">Create a free  Account</span>
+                            <h5 class="page__title-3">{{journey.title}}</h5>
+                        </div>
+
+                        <div class="course__img w-img mb-30">
+                            <img src="{{MEDIA_URL}}{{journey.image}}" alt="">
+                        </div>
+
+                        
+                    </div>
+                </div>
+                 <div class="course__tab-content mb-95">
+                      <div class="tab-content" id="courseTabContent">
+                         <div class="tab-pane fade show active" id="description" role="tabpanel" aria-labelledby="description-tab">
+                            <div class="course__description">
+                               <h3>Course Overview</h3>
+                               <p>{{journey.description}}</p>
+
+                               
+                               
+                               <div class="col-xxl-8 offset-xxl-2 col-xl-8 offset-xl-2 col-lg-8 offset-lg-2">
+                                    <div class="sign__wrapper white-bg">
+                                        
+                                        <div class="sign__form">
+                                            {% comment %} <p style="text-align: center"><strong> {{message.message}}</strong><br><br></p> {% endcomment %}
+                                            {% if message.message == "You're already enrolled in this journey." %}
+                                            <a href="{% url 'user:login'  %}"> <button type="button" class="e-btn" > <span></span>Sign In</button></a>
+                                            {% else %}
+                                            <strong> Name : </strong> <br>{{data.name}}<br>
+                                            <strong> Email : </strong> <br>{{data.email}}<br>
+                                            <strong> Username : </strong><br> {{data.username}}<br>
+                                            <strong> Mobile : </strong><br> {{data.mobile}}<br>
+                                            <strong> User Type : </strong><br> {{data.type}}<br>
+                                        
+                                            {{data.question }}
+                                            {% for question in question_list %}
+                                                <strong>{{question.question}}</strong><br>
+                                                {{question.response}}<br>
+                                            {% endfor %}
+                                            
+                                            
+                                        </div>
+                                         <form  id="singup" class="singup_form" method="POST" action="{% url 'user:signup_lite_post' %}">
+                                            {%csrf_token%}
+                                        <input type="hidden" name="data" value="{{data}}">
+                                         {% if message.success or "None" %}
+                                         <br><button type="submit" class="e-btn " id="btnSubmit"> <span></span> Sign Up</button>
+                                         {% endif %}
+                                         
+                                         <a href="{% url 'user:signup-lite' journey_id=journey_id  %}"> <button type="button" class="e-btn " > <span></span> Reset</button></a>
+                                         {% endif %}
+                                         </form>
+                                         <form  id="singup" class="singup_form" method="POST" action="{% url 'user:edit_signup_lite' journey_id=journey_id %}">
+                                            {%csrf_token%}
+                                        <input type="hidden" name="data" value="{{data}}">
+                                        <br><button type="submit" class="e-btn " id="btnSubmit"> <span></span> Edit</button>
+                                         </form>
+                                    </div>
+                                </div>
+                            </div>
+                         </div>
+                         
+                        
+                       </div>
+                   </div>
+
+            </div>
+        </div>
+        
+         </section>
+         <!-- sign up area end -->
+         
+      </main>
+
+{% endblock content %}
+  
+{% block js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.15/js/intlTelInput.min.js"></script>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <script type="text/javascript">
+        $(window).on('beforeunload', function () {
+            $("button[type=submit]").prop("disabled", "disabled");
+        });
+    </script>
+<script>
+   $(document).ready(function(){
+      $('#m-agree, #m-enable').on('change', function(){
+         if ($(this).is('checked')){
+            $(this).prop('value', 'False');
+         }
+         else {
+            $(this).prop('value', 'True');
+         }
+      })
+   })
+</script>
+<script>
+// Vanilla Javascript
+var input = document.querySelector("#phone");
+window.intlTelInput(input,({
+  // options here
+}));
+
+$(document).ready(function() {
+    $('.iti__flag-container').click(function() { 
+      var countryCode = $('.iti__selected-flag').attr('title');
+      var countryCode = countryCode.replace(/[^0-9]/g,'')
+      $('#phone').val("");
+      $('#phone').val("+"+countryCode+" "+ $('#phone').val());
+   });
+});
+
+</script>
+<script>
+$(document).ready(function(){
+var text = "Learner"
+$("#id_type option").filter(function() {
+return this.text == text; 
+}).text('Learner/Mentee');
+});
+</script>
+<script>
+    const form = document.getElementsByClassName('singup_form');
+    console.log("SINGUP FORM", form)
+    for (var i=0; i<=form.length; i++){
+      form[i].addEventListener('keypress', function(e){
+         if(e.keyCode == 13){
+            e.preventDefault();
+            console.log("EVENT listner added")
+         }
+      })
+    }
+ </script>
+{% endblock %}

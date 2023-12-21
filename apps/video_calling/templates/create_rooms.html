@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Create Room</title>
+    </head>
+    <body>
+        
+        {% include 'component/error_message.html' %}
+        
+        <div>
+            <h1 style="text-align: center;">{{request.user.username}}</h1>
+            <hr>
+            <br>
+        </div>
+
+        <form method="POST" action="{% url 'create-room' %}">   {% csrf_token %}
+            <label id="name">Name</label>
+            <input type="text" name="name"><br>
+            <label id="privacy">Privacy</label>
+            <input type="radio" id="privacy" name="privacy" value="private">
+            <label for="html">Private</label>
+            <input type="radio" id="privacy" name="privacy" value="public">
+            <label for="css">Public</label><br>
+            <label id="enable_new_call_ui">Enable New Call UI</label>
+            <input type="radio" id="enable_new_call_ui" name="enable_new_call_ui" value="True">
+            <label for="html">True</label>
+            <input type="radio" id="enable_new_call_ui" name="enable_new_call_ui" value="False">
+            <label for="css">False</label><br>
+            <label id="enable_prejoin_ui">Enable Prejoin UI</label>
+            <input type="radio" id="enable_prejoin_ui" name="enable_prejoin_ui" value="True">
+            <label for="html">True</label>
+            <input type="radio" id="enable_prejoin_ui" name="enable_prejoin_ui" value="False">
+            <label for="css">False</label><br>
+            <label id="enable_knocking">Enable Knocking</label>
+            <input type="radio" id="enable_knocking" name="enable_knocking" value="False">
+            <label for="html">False</label>
+            <input type="radio" id="enable_knocking" name="enable_knocking" value="True">
+            <label for="css">True</label><br>
+            <label id="enable_screenshare">Enable Screenshare</label>
+            <input type="radio" id="enable_screenshare" name="enable_screenshare" value="True">
+            <label for="html">True</label>
+            <input type="radio" id="enable_screenshare" name="enable_screenshare" value="False">
+            <label for="css">False</label><br>
+            <label id="enable_video_processing_ui">Enable Video Processing UI</label>
+            <input type="radio" id="enable_video_processing_ui" name="enable_video_processing_ui" value="True">
+            <label for="html">True</label>
+            <input type="radio" id="enable_video_processing_ui" name="enable_video_processing_ui" value="False">
+            <label for="css">False</label><br>
+            <label id="enable_chat">Enable Chat</label>
+            <input type="radio" id="enable_chat" name="enable_chat" value="False">
+            <label for="html">False</label>
+            <input type="radio" id="enable_chat" name="enable_chat" value="True">
+            <label for="css">True</label><br>
+            <label id="start_video_off">Start Video Off</label>
+            <input type="radio" id="start_video_off" name="start_video_off" value="False">
+            <label for="html">False</label>
+            <input type="radio" id="start_video_off" name="start_video_off" value="True">
+            <label for="css">True</label><br>
+            <label id="start_audio_off">Start Audio Off</label>
+            <input type="radio" id="start_audio_off" name="start_audio_off" value="False">
+            <label for="html">False</label>
+            <input type="radio" id="start_audio_off" name="start_audio_off" value="True">
+            <label for="css">True</label><br>
+            <label id="owner_only_broadcast">Owner Only Broadcast</label>
+            <input type="radio" id="owner_only_broadcast" name="owner_only_broadcast" value="False">
+            <label for="html">False</label>
+            <input type="radio" id="owner_only_broadcast" name="owner_only_broadcast" value="True">
+            <label for="css">True</label><br>
+            <label id="is_owner">Is Owner</label>
+            <input type="radio" id="is_owner" name="is_owner" value="False">
+            <label for="html">False</label>
+            <input type="radio" id="is_owner" name="is_owner" value="True">
+            <label for="css">True</label><br>
+            <label for="date">Date and Time:</label>
+            <input type="datetime-local" id="date" name="date"><br>
+            <label for="participants">Participants</label>
+            <select name="participants">
+                <option value=None >None</option>
+                {% for user in user %}
+                <option value={{user.pk}} >{{user.username}}</option>
+                {% endfor %%}
+            </select>
+            <br><br>
+            <button type="submit">Create Room</button>
+        </form>
+    </body>
+</html>

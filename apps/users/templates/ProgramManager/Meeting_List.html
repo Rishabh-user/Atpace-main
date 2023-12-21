@@ -1,0 +1,133 @@
+{% extends 'base.html' %} {% load static %}
+{% load tags %}
+{% load tz %}
+<!-- DataTables -->
+{% block css %}
+<link rel="stylesheet" href="{% static 'bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css' %}">
+{% endblock css %} 
+{% block content %}
+
+<div class="content-wrapper">
+  <section class="content-header">
+    {% if request.path == '/group-meetings/' %}
+    <h1>Collaboration<small>Group Meeting</small></h1>
+    {% else %}
+    <h1>Collaboration<small>LiveStream</small></h1>
+    {% endif %}
+    <ol class="breadcrumb">
+      <li><a href="#"><i class="fa fa-dashboard"></i>Collaboration</a></li>
+      {% if request.path == '/group-meetings/' %}
+      <li><a href="#">Group Meeting</a></li>
+      {% else %}
+      <li><a href="#">LiveStream</a></li>
+      {% endif %}
+      <li class="active">List</li>
+    </ol>
+  </section>  
+  <section class="content">
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="box">
+          <div class="box-header">
+            {% if request.path == '/meetings/' %}
+            <h3 class="box-title">LiveStream List</h3>
+            <a href="{% url 'user:create_meet' %}"><button class="btn btn-primary pull-right">Create LiveStream</button></a>               
+            {% else %}
+            <h3 class="box-title">Group Meeting List</h3>
+            <a href="{% url 'user:create_group_meet' %}"><button class="btn btn-primary pull-right">Create Group Meeting</button></a>    
+            {% endif %}           
+          </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+              {% include 'component/error_message.html' %}
+              <table id="example2" class="table table-bordered table-hover">
+                 <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>URL Link</th>
+                    <th>Speaker</th>
+                    {% if request.path == '/group-meetings/' %}<th>Participants</th>{% endif %}  
+                    <th>Start time</th>                  
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+                 </thead>
+                 <tbody>
+                  {% for meet in meetings %}
+                    <tr>
+                      
+                      <td>{{meet.title}}</td>
+                      <td>{{meet.description}}</td>
+                      <td><a href="{{meet.custom_url}}" target="_blank">click to enter</a></td>
+                      <td>{{meet.speaker}}</td>
+                      {% if request.path == '/group-meetings/' %}<td>{{meet.participants.all|join:', '}}</td>{% endif %}
+                      {% localtime off %}
+                      <td>{{meet.start_time}}</td>
+                      {% endlocaltime %}
+                      <td>
+                        {% if meet.is_active %}
+                          <kbd>Active</kbd>
+                        {% else %}
+                          <kbd>InActive</kbd>
+                        {% endif %}
+                        </td>
+                      <td>
+                        <div class="dropdown">
+                          <button class="btn bg-purple dropdown-toggle btn-select-option" type="button" data-toggle="dropdown" aria-expanded="true">Select an option                                            <span class="caret"></span>
+                          </button>
+                          <ul class="dropdown-menu options-dropdown">
+                              <li>
+                                  {% if meet.type == 'LiveStreaming' %}
+                                  <a href="{% url 'user:edit_meet' pk=meet.id %}"><i class="fa fa-pencil option-icon"></i>Edit</a>
+                                  {% else %}
+                                  <a href="{% url 'user:edit_group_meet' pk=meet.id %}"><i class="fa fa-pencil option-icon"></i>Edit</a>
+                                  {% endif %}
+                              </li>
+                              <li>
+                                  <a href="{% url 'user:delete_meet' pk=meet.id %}"><i class="fa fa-trash option-icon"></i>Delete</a>
+                              </li>
+                              <li>
+                                <a href="{% url 'user:meeting_details' id=meet.id %}"><i class="fa-circle-info option-icon"></i>Detail</a>
+                            </li>
+                        </ul>
+                      </div>
+                      </td>
+                    </tr>
+                    {% endfor %}
+                 </tfoot>
+               </table>
+             </div>
+             <!-- /.box-body -->
+           </div>
+           <!-- /.box -->
+ 
+          
+         </div>
+       <!-- /.col -->
+    </div>
+    <!-- /.row -->
+ </section>
+ 
+</div>
+{% endblock content %} 
+{% block js %}
+<script src="{% static 'bower_components/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
+<script>
+
+$(function () {
+ 
+  $('#example2').DataTable({
+    "dom": '<"table-pull-left"f><"table-pull-right"l>tip',
+    'paging'      : true,
+    'lengthChange': true,
+    'searching'   : true,
+    'ordering'    : true,
+    'info'        : true,
+    'autoWidth'   : true,
+    'scrollX'     : true
+  })
+})
+</script>
+{% endblock js %}

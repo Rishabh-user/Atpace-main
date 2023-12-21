@@ -1,0 +1,36 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "com.atpace",
+    "sha256_cert_fingerprints":
+    ["FD:45:BA:25:1D:E8:A0:B4:F2:C2:89:8C:F3:E0:1C:C1:29:1E:41:50:DA:DF:56:AC:B1:0F:AE:E9:1C:6C:7C:E9"]
+  }
+},
+{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "com.mentoratpace",
+    "sha256_cert_fingerprints":
+    ["FD:45:BA:25:1D:E8:A0:B4:F2:C2:89:8C:F3:E0:1C:C1:29:1E:41:50:DA:DF:56:AC:B1:0F:AE:E9:1C:6C:7C:E9"]
+  }
+},
+{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "com.atpace",
+    "sha256_cert_fingerprints":
+    ["FA:C6:17:45:DC:09:03:78:6F:B9:ED:E6:2A:96:2B:39:9F:73:48:F0:BB:6F:89:9B:83:32:66:75:91:03:3B:9C"]
+  }
+},
+{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "com.mentoratpace",
+    "sha256_cert_fingerprints":
+    ["FA:C6:17:45:DC:09:03:78:6F:B9:ED:E6:2A:96:2B:39:9F:73:48:F0:BB:6F:89:9B:83:32:66:75:91:03:3B:9C"]
+  }
+}]

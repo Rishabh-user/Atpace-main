@@ -1,0 +1,65 @@
+{% extends 'base.html' %} 
+{% block title %}Create Meeting{% endblock %}
+{% load crispy_forms_tags %}
+{% block content %}
+{% block css %}
+<style>
+.hide_space{
+  display:'none';
+}
+</style>
+{% endblock css %}
+<div class="content-wrapper">
+  <!-- Content Header (Page header) -->
+  <section class="content-header">
+    {% if request.path == '/create-meet/' %}<h1>Create LiveStream</h1>{% else %}<h1>Create Group Call</h1>{% endif %}
+    {% comment %} <ol class="breadcrumb">
+      <li><a href="#"><i class="fa fa-dashboard"></i> User Settings</a></li>
+      <li><a href="#">User</a></li>
+      <li class="active">Upload Bluk User</li>
+    </ol> {% endcomment %}
+  </section>
+
+  <!-- Main content -->
+  <section class="content">
+
+    <!-- Default box -->
+    <div class="box">
+      {% include 'component/error_message.html' %}
+      <div class="box-header with-border">
+        {% if request.path == '/create-meet/' %}<h3 class="box-title">Create LiveStream</h3>{% else %}<h3 class="box-title">Create Group Call</h3>{% endif %}
+      </div>
+      <div class="box-body">
+        
+        {% crispy form %}
+
+      </div>
+      <!-- /.box-footer-->
+    </div>
+    <!-- /.box -->
+
+  </section>
+  <!-- /.content -->
+  </div>
+  {% block js %}
+  <script>
+    var add_to_community = document.querySelector('#id_add_to_community')
+    space_box = document.querySelector('#div_id_space_name')
+    space_box.style.display = 'none';
+
+    add_to_community.addEventListener('change', (event) => {
+      console.log("add_to_community",event.target.checked)
+      if(event.target.checked == true){
+        console.log(space_box)
+        space_box.style.display = 'block';
+        space_box.style.width = "550px";
+      }
+      else{
+        space_box.style.display = 'none';
+      }
+    });
+
+
+  </script>
+  {% endblock js %}
+{% endblock content %}

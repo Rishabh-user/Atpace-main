@@ -1,0 +1,18 @@
+<div class="row" style="margin-top: 30px;">
+    <div class="col-md-2">
+    <div class="card side-tab" style="">
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item" @click="showPoolSetup" id="pool-setup">Pool Setup</li>
+            <li class="list-group-item" @click="showPoolAllocation" id="pool-allocation">Pool Allocation</li>
+        </ul>
+    </div>
+    </div>
+    <div class="col-md-10">
+      <div v-if="displayPoolSetup">
+        {% include 'setup/pool_setup.html' %}
+      </div>
+      <div v-if="displayPoolAllocation">
+        {% include 'setup/pool_allocation.html' %}
+      </div>
+    </div>
+</div>

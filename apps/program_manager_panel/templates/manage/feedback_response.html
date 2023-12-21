@@ -1,0 +1,35 @@
+<div class="box">
+    <div class="box-header">
+    <h3 class="box-title">Feedback Response List</h3>
+    </div>
+    <!-- /.box-header -->
+    <div class="box-body">
+            <table id="feedback-response-table" class="table table-bordered table-hover">
+                <thead>
+                <tr>
+                    <th>Template</th>
+                    <th>Template For</th>
+                    <th>Company</th>
+                    <th>Journey</th>
+                    <th>User</th>
+                    <th>Is Private</th>
+                    <th>Is name private</th>
+                    <th>View</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr v-for="feedback in feedback_response_list" :key="feedback.id">                   
+                <td>[[feedback.template_name]] </td>
+                <td>[[feedback.template_for]]</td>
+                <td>[[feedback.company]]</td>
+                <td>[[feedback.journey]]</td>
+                <td>[[feedback.feedback_for_user]]</td>
+                <td>[[feedback.is_private]]</td>
+                <td>[[feedback.is_name_private]]</td>
+                <td><a :href="'/feedback/feedback-response-detail/'+feedback.template_id">View</a></td>
+                </tr>
+            </table>
+    </div>
+    <!-- /.box-body -->
+</div>
+<!-- /.box -->

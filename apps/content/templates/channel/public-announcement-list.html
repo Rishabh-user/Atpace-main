@@ -1,0 +1,177 @@
+{% extends 'base.html' %} {% load static %}
+{% block title %} Public Announcement {% endblock %}
+<!-- DataTables -->
+{% block css %}
+<style>
+  .material-switch > input[type="checkbox"] {
+    display: none;
+  }
+
+  .material-switch > label {
+    cursor: pointer;
+    height: 0px;
+    position: relative;
+    width: 40px;
+  }
+
+  .material-switch > label::before {
+    background: rgb(0, 0, 0);
+    box-shadow: inset 0px 0px 10px rgba(0, 0, 0, 0.5);
+    border-radius: 8px;
+    content: "";
+    height: 16px;
+    margin-top: -8px;
+    position: absolute;
+    opacity: 0.3;
+    transition: all 0.4s ease-in-out;
+    width: 40px;
+  }
+  .material-switch > label::after {
+    background: rgb(255, 255, 255);
+    border-radius: 16px;
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.3);
+    content: "";
+    height: 24px;
+    left: -4px;
+    margin-top: -8px;
+    position: absolute;
+    top: -4px;
+    transition: all 0.3s ease-in-out;
+    width: 24px;
+  }
+  .material-switch > input[type="checkbox"]:checked + label::before {
+    background: inherit;
+    opacity: 0.5;
+  }
+  .material-switch > input[type="checkbox"]:checked + label::after {
+    background: inherit;
+    left: 20px;
+  }
+
+  .q_icon{
+    float: right;
+    margin: 0 10px;
+    color: black;
+
+  }
+
+ 
+</style>
+
+<link rel="stylesheet" href="{% static 'bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css' %}">
+{% endblock css %} 
+{% block content %}
+
+
+<div class="content-wrapper">
+  <section class="content-header">
+    <h1>
+    Public Announcement
+    </h1>
+    <ol class="breadcrumb">
+      <li><a href="#"><i class="fa fa-dashboard"></i>Public Announcement</a></li>
+      <li class="active">List</li>
+    </ol>
+  </section>
+
+  <section class="content">
+    <div class="row">
+       <div class="col-xs-12">
+           <div class="box">
+             <div class="box-header">
+               <h3 class="box-title">Public Announcement List</h3>
+             </div>
+             <!-- /.box-header -->
+             <div class="box-body">
+               <table id="example2" class="table table-bordered table-hover">
+                 <thead>
+                 <tr>
+                  <tr>
+                    <th>Company</th>
+                    <th>Journey</th>
+                    <th>Announcement For</th>
+                    <th>Announcement Type</th>
+                    <th>Topic</th>
+                    <th>Summary</th>
+                    <th>Action</th>
+                  </tr>
+                   
+                 </tr>
+                 </thead>
+                 <tbody>
+                   {% for announcement in announcements %}
+                   <tr>
+                    <td>{{announcement.company_name}}</td>
+                    <td>{{announcement.journey_name}}</td>
+                    <td>{{announcement.topic_name}}</td>
+                    <td>{{announcement.type}}</td>
+                    <td>{{announcement.topic}}</td>
+                    <td>{{announcement.summary}}</td>
+                    <td>
+                      <div class="col-md-12">
+                        <div class="material-switch" >
+                          <input hx-get="{% url 'content:update_public_announcement' pk=announcement.id %}"
+                            name="is_required"
+                            type="checkbox"
+                            id="togBtn_required_{{announcement.id}}"
+                            {% if announcement.is_active %}checked{% endif %}
+                          />
+                          <label
+                            for="togBtn_required_{{announcement.id}}"
+                            class="label-default"
+                          ></label>
+                        </div>
+                      </div>
+                          </td>
+                    {% comment %} <td>
+                      <div class="dropdown">
+                        <button class="btn bg-purple dropdown-toggle btn-select-option" type="button" data-toggle="dropdown" aria-expanded="true">Select an option                                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu options-dropdown">
+                            <li>
+                                <a href="{% url 'content:edit_public_announcement' pk=announcement.id %}"><i class="fa fa-edit option-icon"></i>Edit</a>
+                            </li>
+                            <li>
+                                <a href=""><i class="fa fa-edit option-icon"></i>Delte</a>
+                            </li>
+                        </ul>
+                    </div>
+                    </td> {% endcomment %}
+                   </tr>
+                   {% endfor %}
+                 </tfoot>
+               </table>
+             </div>
+             <!-- /.box-body -->
+           </div>
+           <!-- /.box -->
+ 
+          
+         </div>
+       <!-- /.col -->
+    </div>
+    <!-- /.row -->
+ </section>
+ 
+</div>
+{% endblock content %} 
+{% block js %}
+<script src="{% static 'bower_components/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
+<script>
+
+$(function () {
+ 
+  $('#example2').DataTable({
+    "dom": '<"table-pull-left"f><"table-pull-right"l>tip',
+    'paging'      : true,
+    'lengthChange': true,
+    'searching'   : true,
+    'ordering'    : true,
+    'info'        : true,
+    'autoWidth'   : true,
+    'scrollX'     : true
+  })
+})
+</script>
+{% endblock js %}

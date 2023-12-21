@@ -1,0 +1,142 @@
+{% extends 'base.html' %} {% load static %}
+{% block title %} Journey List {% endblock %} 
+{% load tags %}
+{% load crispy_forms_tags %} 
+<!-- DataTables -->
+{% block css %}
+<link rel="stylesheet" href="{% static 'bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css' %}">
+{% endblock css %} 
+{% block content %}
+
+
+<div class="content-wrapper">
+  <section class="content-header">
+    <h1>
+      Journey
+    </h1>
+    <ol class="breadcrumb">
+      <li><a href="#"><i class="fa fa-dashboard"></i>Skill Hierarchy</a></li>
+      <li><a href="#">Journey</a></li>
+      <li class="active">List</li>
+    </ol>
+  </section>
+
+  <section class="content">
+    <div class="row">
+       <div class="col-xs-12">
+           <div class="box">
+             <div class="box-header">
+                <form action="" method="POST">
+                    {% crispy form %}
+                </form>
+             </div>
+             <!-- /.box-header -->
+             <div class="box-body">
+               <table id="example2" class="table table-bordered table-hover">
+                 <thead>
+                 <tr>
+                  <tr>
+                    <th>Journey Title</th>
+                    <th>Category</th>
+                    <th>Type</th>
+                    <th>Description</th>
+                    
+                    <th>Action</th>
+                  </tr>
+                   
+                 </tr>
+                 </thead>
+                 <tbody>
+                   {% for channel in homepagejourney %}
+                   
+                   <tr {% if channel.journey.is_global %} style="background: lightblue;" {% endif %} id="{{channel.id}}">
+                    <td>{{channel.journey.title}} </td>
+                    <td>{{ channel.journey.category|check_value_is_none }} </td>
+                    <td>{{channel.journey.channel_type}}</td>
+                    <td>{{channel.journey.description|safe}}</td>
+                    
+                    <td>
+                      <div class="dropdown">
+                        <button class="btn bg-purple dropdown-toggle btn-select-option" type="button" data-toggle="dropdown" aria-expanded="true">Select an option<span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu options-dropdown">
+                            <li>
+                                <a href="javascript:void(0)"  class="delete_channel"><i class="fa fa-trash option-icon"></i>Delete</a>
+                            </li>
+                        </ul>
+                    </div>
+                    </td>
+                   </tr>
+                   {% endfor %}
+                 </tfoot>
+               </table>
+             </div>
+             <!-- /.box-body -->
+           </div>
+           <!-- /.box -->
+ 
+          
+         </div>
+       <!-- /.col -->
+    </div>
+    <!-- /.row -->
+ </section>
+ 
+</div>
+{% endblock content %} 
+{% block js %}
+<script src="{% static 'bower_components/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
+<script>
+
+$(function () {
+  $("body").on("click",".delete_channel", function(){
+    var id = $(this).parents("tr").attr("id");
+    console.log(id)
+    bootbox.confirm({
+    message: "Are you sure to remove this record ?",
+    buttons: {
+        confirm: {
+            label: 'Yes',
+            className: 'btn-success'
+        },
+        cancel: {
+            label: 'No',
+            className: 'btn-danger'
+        }
+    },
+    callback: function (result) {
+        if(result == true){
+          $.ajax({
+              url:  "{% url 'web_app:delete_journey' %}",
+              type: 'POST',
+              data: {pk: id, csrfmiddlewaretoken : "{{csrf_token}}" },
+              error: function() {
+              bootbox.alert('Something is wrong');
+            },
+              success: function(data) {
+                $("#"+id).remove();
+                bootbox.alert("Record removed successfully");  
+              }
+          });
+        }
+    }
+});
+});
+});
+
+$(function () {
+ 
+  $('#example2').DataTable({
+    "dom": '<"table-pull-left"f><"table-pull-right"l>tip',
+    'paging'      : true,
+    'lengthChange': true,
+    'searching'   : true,
+    'ordering'    : true,
+    'info'        : true,
+    'autoWidth'   : true,
+    'scrollX'     : true
+  })
+})
+</script>
+{% endblock js %}

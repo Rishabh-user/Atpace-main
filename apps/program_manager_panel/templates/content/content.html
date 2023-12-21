@@ -1,0 +1,576 @@
+{% extends 'base.html' %} {% load static %} 
+{% block title %} Content {% endblock %} 
+{% load tags %}
+{% block css %} 
+<link
+          rel="stylesheet"
+          href="{% static 'css/program_manager/program_manager.css' %}"
+  />
+  <style>
+    .capitalize {
+      text-transform: capitalize;
+    }
+  </style>
+{% endblock css %} {% block content %}
+<div class="content-wrapper" id="vue-app">
+
+  <div :class="'alert alert-dismissible '+[[alert_class]]" v-if="alert_msg" style="margin:10px;">
+    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+    <h4 style="margin-top:10px;"><i class="icon fa fa-warning"></i> Alert!</h4>
+    <a href="/manager/billing">[[alert_msg]]</a>
+  </div>
+
+  <section class="content-header">
+    <h1>Content</h1>
+  </section>
+
+  <section class="content">
+    <div class="row">
+      {% comment %} <div class="col-md-2">
+        <div class="small-box box-tab" style="border-top: 5px solid #1B74E4;" @click="showJourney()" id="journey">
+          <div class="inner">
+            <h4>Journey</h4>
+          </div>
+        </div>
+      </div> {% endcomment %}
+      <div class="col-md-2">
+        <div class="small-box box-tab" @click="showAssessment()" id="assessment">
+          <div class="inner">
+            <h4>Assessment</h4>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <div class="small-box box-tab" @click="showMicroskill()" id="microskill">
+          <div class="inner">
+            <h4>Microskill</h4>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-2">
+        <div class="small-box box-tab" @click="showSurvey()" id="survey">
+          <div class="inner">
+            <h4>Survey</h4>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <div class="small-box box-tab" @click="showCategory()" id="category">
+          <div class="inner">
+            <h4>Category</h4>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <div class="small-box box-tab" @click="showIndustry()" id="industry">
+          <div class="inner">
+            <h4>Industry</h4>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <div class="small-box box-tab" @click="showTag()" id="tag">
+          <div class="inner">
+            <h4>Tags</h4>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div v-if="displayMicroskill">
+    {% include 'content/microskill.html' %}
+    </div>
+    {% comment %} <div v-if="displayJourney">
+    {% include 'content/journey.html' %}
+    </div> {% endcomment %}
+    <div v-if="displayAssessment">
+    {% include 'content/assessment.html' %}
+    </div>
+    <div v-if="displaySurvey">
+    {% include 'content/survey.html' %}
+    </div>
+    <div v-if="displayCategory">
+    {% include 'content/category.html' %}
+    </div>
+    <div v-if="displayIndustry">
+    {% include 'content/industry.html' %}
+    </div>
+    <div v-if="displayTag">
+    {% include 'content/tag.html' %}
+    </div>
+  </section>
+
+  {{ request.user.id|json_script:"user_id" }}
+  {{request.session.token|json_script:"token"}}
+
+</div>
+
+<div class="modal fade" id="modal-assessment" style="display: none;">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form id="assessment_form">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span></button>
+          <h4 class="modal-title">Save As</h4>
+        </div>
+        <div class="modal-body">
+            <input name="assessment_id" id="test_id" type="hidden" value=""/>
+            <div class="form-group">
+              <label>Assessment Name</label>
+              <input type="text" class="form-control"  name="assessment" id="assessment_name" required>
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+          <button type="submit" id="sumbitAssessment" class="btn btn-primary">Save changes</button>
+        </div>
+      </form>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div> 
+
+<div class="modal fade" id="modal-survey" style="display: none;">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form id="journey_form">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span></button>
+          <h4 class="modal-title">Save As</h4>
+        </div>
+        <div class="modal-body">
+            <input name="id" id="survey_id" type="hidden" value=""/>
+            <div class="form-group">
+              <label>Survey Name</label>
+              <input type="text" class="form-control"  name="survey" id="survey_name" required>
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+          <button type="submit" id="sumbitSurvey" class="btn btn-primary">Save changes</button>
+        </div>
+      </form>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div> 
+{% endblock content %} {% block js %} 
+
+<script src="{% static 'bower_components/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
+<script type="text/javascript">
+  $(function () {
+    $("#sumbitAssessment").on('click', function (event) {
+      var id = document.getElementById('test_id').value;
+      console.log("id ", id);
+      assessment = $('#assessment_name').val();
+      console.log("assessment ", assessment);
+      var data = {
+        assessment_id: document.getElementById('test_id').value,
+        assessment: $('#assessment_name').val(),
+        csrfmiddlewaretoken : "{{csrf_token}}"
+      }
+      console.log("Data", data)
+      if (assessment){
+        $.ajax({
+          url:  "{% url 'test_series:copy_assessment' %}",
+          type: 'post',
+          data: data,
+          error: function() {
+            bootbox.alert('Something is wrong');
+          },
+          success: function(data) {
+            if (data.success){
+            bootbox.alert(data.message);
+            window.location.reload();
+            }
+            else {
+              bootbox.alert(data.message);
+              window.location.reload();
+            }  
+          }
+        });
+      }
+      else {
+        bootbox.alert("Please specify new assessment name");
+      }
+      event.preventDefault();
+    });
+  }); 
+  $(function () {
+    $("#sumbitSurvey").on('click', function (event) {
+      var id = document.getElementById('survey_id').value;
+      console.log("id ", id);
+      survey = $('#survey_name').val();
+      console.log("survey ", survey);
+      var data = {
+        survey_id: document.getElementById('survey_id').value,
+        survey: $('#survey_name').val(),
+        csrfmiddlewaretoken : "{{csrf_token}}"
+      }
+      console.log("Data", data)
+      if (survey){
+        $.ajax({
+          url:  "{% url 'survey:copy_survey' %}",
+          type: 'post',
+          data: data,
+          error: function() {
+            bootbox.alert('Something is wrong');
+          },
+          success: function(data) {
+            if (data.success){
+            bootbox.alert(data.message);
+            window.location.reload();
+            }
+            else {
+              bootbox.alert(data.message);
+              window.location.reload();
+            }  
+          }
+        });
+      }
+      else {
+        bootbox.alert("Please specify new survey name");
+      }
+      event.preventDefault();
+    });
+  });
+  const app = new Vue({
+    el: "#vue-app",
+    delimiters: ['[[', ']]'],
+    data() {
+      return {
+        displayMicroskill: false,
+        //displayJourney: true,
+        displayAssessment: true,
+        displaySurvey: false,
+        displayCategory: false,
+        displayIndustry: false,
+        displayTag: false,
+        token:JSON.parse(document.getElementById('token').textContent),
+        user_id: JSON.parse(document.getElementById('user_id').textContent),
+        auth:"",
+        tag_list:"",
+        industry_list:"",
+        category_list:"",
+        name:"",
+        color:"#423282",
+        is_active:true,
+        image:"",
+        microskill_list:"",
+        survey_list:"",
+        assessment_list:"",
+        base_url:window.location.origin,
+        alert_msg:"",
+        alert_class:""
+      };
+    },
+    mounted(){
+      this.showAssessment();
+      this.showAlert();
+    },
+    methods: {
+      axiosGetRequest: function(url){
+        this.auth = "Token "+this.token;
+        var config = {
+          method: "get",
+          url: url,
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': this.auth,
+          },
+        };
+        return axios(config)
+      },
+      axiosPostRequest: function(url, data){
+        this.auth = "Token "+this.token;
+        var config = {
+          method: "post",
+          url: url,
+          headers: {
+            "Content-Type": "multipart/form-data",
+            "Accept": "application/json",
+            'Authorization': this.auth,
+          },
+          data:data
+        };
+
+        return axios(config)
+      },
+      async showAlert(){
+        var url = this.base_url+"/manager/check-for-subscription/"+this.user_id+"/";
+        response = await this.axiosGetRequest(url);
+        console.log("Alert response", response.data)
+        if(response.data.message != "No alert available"){
+          this.alert_msg = response.data.message
+          this.alert_class = response.data.css_class
+        }
+      },
+      async destroyDataTable(id){
+        if($(id).DataTable()){
+          console.log("destroying", id);
+          $(id).DataTable().clear();
+          $(id).DataTable().destroy();
+        }
+      },
+      async initializeDataTable(id){
+        console.log("initializing");
+        await this.sleep(2000);
+        $(id).DataTable({
+          "dom": '<"table-pull-left"f><"table-pull-right"l>tip',
+          'destroy': true,
+          'paging'      : true,
+          'lengthChange': true,
+          'searching'   : true,
+          'ordering'    : true,
+          'info'        : true,
+         'autoWidth'   : false,
+         'retrieve':true,
+         'scrollX': true,
+        })
+      },
+      sleep: function(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+      },
+      addImage(event){
+        console.log("image", event.target.files[0]);
+        this.image = event.target.files[0]
+      },
+      async onCreateTags(){
+        console.log("data",this.is_active, this.color, this.name)
+        var data = new FormData();
+        data.append("name", this.name);
+        data.append("color", this.color);
+        if(this.is_active){
+          data.append("is_active", this.is_active);
+        }
+        else{
+          data.append("is_active", false);
+        }
+        
+        var url =  this.base_url+"/manager/tags/"+this.user_id+"/";
+        try{
+          response = await this.axiosPostRequest(url, data);
+          console.log("Tag Create Response", response.data);
+          bootbox.alert("Tag created successfully!")
+        }
+        catch(err){
+          console.log("error",err)
+          bootbox.alert(err.response.data.message)
+        }
+        
+        this.showTag()
+      },
+      getAssessmentId(id){
+        document.getElementById("test_id").value = id
+      },
+      getSurveyId(id){
+        document.getElementById("survey_id").value = id;
+      },
+      async onCreateIndustry(){
+        console.log("data",this.is_active, this.name)
+        var data = new FormData();
+        data.append("name", this.name);
+        if(this.is_active){
+          data.append("is_active", this.is_active);
+        }
+        else{
+          data.append("is_active", false);
+        }
+        
+        var url =  this.base_url+"/manager/industry/"+this.user_id+"/";
+        try{
+          response = await this.axiosPostRequest(url, data);
+          console.log("Industry Create Response", response);
+          bootbox.alert("Industry created successfully!")
+        }
+        catch(err){
+          console.log("error",err)
+          bootbox.alert(err.response.data.message)
+        }
+        this.showIndustry()
+      },
+      async onCreateCategory(){
+        console.log("data",this.is_active, this.name, this.image)
+        var data = new FormData();
+        data.append("category", this.name);
+        data.append("image", this.image);
+        data.append("color", this.color);
+        data.append("is_active", true);
+        var url =  this.base_url+"/manager/category/"+this.user_id+"/";
+        try{
+          response = await this.axiosPostRequest(url, data);
+          console.log("Category Create Response", response.data);
+          bootbox.alert("Category created successfully!")
+        }
+        catch(err){
+          console.log("error",err)
+          bootbox.alert(err.response.data.message)
+        }
+        this.showCategory()
+      },
+      
+      async removeMicroskill(){
+        ele = document.getElementById('microskill')
+        this.displayMicroskill = false;
+        ele.style.borderTop = "none";
+        await this.destroyDataTable('#microskill-table')
+      },
+      //removeJourney: function(){
+        //ele = document.getElementById('journey')
+        //this.displayJourney = false;
+        //ele.style.borderTop = "none";
+      //},
+      async removeAssessment(){
+        ele = document.getElementById('assessment')
+        this.displayAssessment = false;
+        ele.style.borderTop = "none";
+        await this.destroyDataTable('#assessment-table')
+      },
+      async removeSurvey(){
+        ele = document.getElementById('survey')
+        this.displaySurvey = false;
+        ele.style.borderTop = "none";
+        await this.destroyDataTable('#survey-table')
+      },
+      async removeCategory(){
+        ele = document.getElementById('category')
+        this.displayCategory = false;
+        ele.style.borderTop = "none";
+        await this.destroyDataTable('#category-table')
+      },
+      async removeIndustry(){
+        ele = document.getElementById('industry')
+        this.displayIndustry = false;
+        ele.style.borderTop = "none";
+        await this.destroyDataTable('#industry-table')
+      },
+      async removeTag(){
+        ele = document.getElementById('tag')
+        this.displayTag = false;
+        ele.style.borderTop = "none";
+        await this.destroyDataTable('#tag-table')
+      },
+      async showMicroskill(){
+        this.microskill_list = ""
+        ele = document.getElementById('microskill')
+        this.displayMicroskill = true;
+        ele.style.borderTop = "5px solid #1B74E4";
+        //this.removeJourney();
+        this.removeAssessment();
+        this.removeSurvey();
+        this.removeCategory();
+        this.removeIndustry();
+        this.removeTag();
+        var url = this.base_url+"/manager/create-content/"+this.user_id+"/";
+        let response = await this.axiosGetRequest(url);
+        console.log("Content list response", response.data)
+        this.microskill_list = response.data.data
+        await this.initializeDataTable('#microskill-table')
+      },
+      //showJourney: function(){
+       // ele = document.getElementById('journey')
+        //this.displayJourney = true;
+       // ele.style.borderTop = "5px solid #1B74E4";
+        //this.removeMicroskill();
+       // this.removeAssessment();
+        //this.removeSurvey();
+       // this.removeCategory();
+        //this.removeIndustry();
+       // this.removeTag();
+      //},
+      async showAssessment(){
+        this.assessment_list = ""
+        ele = document.getElementById('assessment')
+        this.displayAssessment = true;
+        ele.style.borderTop = "5px solid #1B74E4";
+        this.removeMicroskill();
+        //this.removeJourney();
+        this.removeSurvey();
+        this.removeCategory();
+        this.removeIndustry();
+        this.removeTag();
+        var url =  this.base_url+"/manager/assessment/"+this.user_id+"/";
+        response = await this.axiosGetRequest(url);
+        console.log("Assessment list Response", response.data);
+        this.assessment_list = response.data.data
+        await this.initializeDataTable('#assessment-table')
+      },
+      async showSurvey(){
+        this.survey_list = ""
+        ele = document.getElementById('survey')
+        this.displaySurvey = true;
+        ele.style.borderTop = "5px solid #1B74E4";
+        this.removeMicroskill();
+        this.removeAssessment();
+        //this.removeJourney();
+        this.removeCategory();
+        this.removeIndustry();
+        this.removeTag();
+        var url =  this.base_url+"/manager/surveys/"+this.user_id+"/";
+        response = await this.axiosGetRequest(url);
+        console.log("Survey list Response", response.data);
+        this.survey_list = response.data.data
+        await this.initializeDataTable('#survey-table')
+      },
+      async showCategory(){
+        this.category_list = ""
+        ele = document.getElementById('category')
+        this.displayCategory = true;
+        ele.style.borderTop = "5px solid #1B74E4";
+        this.removeMicroskill();
+        this.removeAssessment();
+        this.removeSurvey();
+        //this.removeJourney();
+        this.removeIndustry();
+        this.removeTag();
+        var url =  this.base_url+"/manager/category/"+this.user_id+"/";
+        response = await this.axiosGetRequest(url);
+        console.log("Category list Response", response.data);
+        this.category_list = response.data.data
+        await this.initializeDataTable('#category-table')
+      },
+      async showIndustry(){
+        this.industry_list = ""
+        ele = document.getElementById('industry')
+        this.displayIndustry = true;
+        ele.style.borderTop = "5px solid #1B74E4";
+        this.removeMicroskill();
+        this.removeAssessment();
+        this.removeSurvey();
+        this.removeCategory();
+        //this.removeJourney();
+        this.removeTag();
+        var url =  this.base_url+"/manager/industry/"+this.user_id+"/";
+        response = await this.axiosGetRequest(url);
+        console.log("Industry list Response", response.data);
+        this.industry_list = response.data.data
+        await this.initializeDataTable('#industry-table')
+      },
+      async showTag(){
+        this.tag_list = ""
+        ele = document.getElementById('tag')
+        this.displayTag = true;
+        ele.style.borderTop = "5px solid #1B74E4";
+        this.removeMicroskill();
+        this.removeAssessment();
+        this.removeSurvey();
+        this.removeCategory();
+        //this.removeJourney();
+        this.removeIndustry();
+        var url =  this.base_url+"/manager/tags/"+this.user_id+"/";
+        response = await this.axiosGetRequest(url);
+        console.log("Tag list Response", response.data);
+        this.tag_list = response.data.data
+        await this.initializeDataTable('#tag-table')
+      },
+
+    }
+  });
+</script>
+
+{% endblock js %}

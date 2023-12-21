@@ -1,0 +1,330 @@
+{% load static %} {% load tags %}
+{% block css %}
+
+<link
+      rel="stylesheet"
+      href="{% static 'css/common/user_mentor_side_bar.css' %}"
+    />
+    {% endblock %}
+<aside class="main-sidebar" style="box-shadow: 0px 12px 7px #2329314d; background-color:#E4E6EB; border-radius: none;
+backdrop-filter: blur( 1.5px );
+-webkit-backdrop-filter: blur( 1.5px ); border-right: 1px solid #ababab;">
+    <!-- sidebar: style can be found in sidebar.less -->
+    <section class="sidebar">
+        <!-- Sidebar user panel -->
+        <div class="user-panel">
+            <div class="pull-left image">
+                <img
+                    src="{{MEDIA_URL}}{{request.user.avatar}}"
+                    onerror="this.onerror=null; this.src='{{request.user.avatar}}'"
+                    class="img-circle"
+                    alt="User Image"
+                />
+            </div>
+            <div class="pull-left info">
+                <p>{{ request.user.first_name }} {{ request.user.last_name }}</p>
+                <a href="#"><i class="fa fa-circle text-success"></i> Online</a>
+            </div>
+        </div>
+        <!-- sidebar menu: : style can be found in sidebar.less -->
+        <div style="margin:10px;">
+            <span><b>Organization - </b>{{request.session.company_name}}</span>
+            <div class="form-group">
+                <label>Change</label>
+                <select class="form-control select2" name="sidebar_company" style="width:100%;" id="sidebar_company" onchange="saveCompany()">
+                {% comment %} <option value="" disabled>----------</option> {% endcomment %}
+                {% for company in request.user.company.all %}
+                <option value="{{company.pk}}" {% if company.pk|stringformat:"s" == request.session.company_id %} selected {% endif %}>{{company.name}}</option>
+                {% endfor %}
+                </select>
+            </div>
+        </div>
+        <ul class="sidebar-menu" data-widget="tree">
+            <li class="header our_background_color"><strong>MAIN NAVIGATION</strong></li>
+            {% comment %}
+            <li class="">
+                <a href="{% url 'content:user_journey' pk=request.user.id %}"> <i class="fa fa-bar-chart"></i> <span>User Pathway</span>
+                </a>
+            </li>
+            {% endcomment %}
+             <li class="">
+                 <link rel="icon" href="{% static 'images/icon/Dashboard.png' %}">
+{#                <a href="{% url 'user:userdashboard' %}"> <i class="fa fa-bar-chart"></i><img src="{% static 'images/icon/Dashboard.png' %}"> <span>Dashboard</span>#}
+                 <a href="{% url 'user:userdashboard' %}">
+                     <img class="sidebar-icon-img" src="{% static 'images/icon/Dashboard.png' %}">
+                     <span><strong>Dashboard</strong></span>
+                </a>
+            </li>
+            <li class="{% active 'leaderboard:goal' %}">
+{#                <a href="{% url 'leaderboard:goal' %}"> <i class="fa fa-dashboard"></i> <span>Set Track Goals</span> </a>#}
+                {% if request.session.user_type == "Learner" %}
+                    <a href="{% url 'leaderboard:goal' %}">
+                        <img class="sidebar-icon-img" src="{% static 'images/icon/set_track_goal.png' %}">
+                        <span><strong>Set Track Goals</strong></span>
+                    </a>
+                {% else %}
+                    <a href="{% url 'leaderboard:goal_with_id' pk=request.session.dashbordId %}">
+                        <img class="sidebar-icon-img" src="{% static 'images/icon/set_track_goal.png' %}">
+                        <span><strong>Set Track Goals</strong></span>
+                    </a>
+                {% endif %}
+
+            </li>
+            <li class="{% active 'community:all_journal' %}">
+{#                <a href="{% url 'community:all_journal' %}">#}
+{#                    <i class="fa fa-comment-o"></i> <span>Journals</span>#}
+{#                </a>#}
+                 <a href="{% if request.session.user_type == "Learner" %}{% url 'community:all_journal' %}{% else %}{% url 'community:all_journal_with_id' pk=request.session.dashbordId %}{% endif %}">
+                     <img class="sidebar-icon-img" src="{% static 'images/icon/Journals.png' %}">
+                     <span><strong>Journals</strong></span>
+                </a>
+            </li>
+            <li class="{% active 'community:post_journal' %}">
+{#                <a href="{% url 'community:post_journal' %}">#}
+{#                    <i class="fa fa-comment-o"></i> <span>Write Journal</span>#}
+{#                </a>#}
+                <a href="{% url 'community:post_journal' %}">
+                    <img class="sidebar-icon-img" src="{% static 'images/icon/Write_journal.png' %}">
+                    <span><strong>Write Journal</strong></span>
+                </a>
+            </li>
+            <li class="{% active 'user:user_calendar' %}">
+{#                <a href="{% url 'user:user_calendar' %}">#}
+{#                    <i class="fa fa-comment-o"></i> <span>Calendar/Sessions</span>#}
+{#                </a>#}
+                <a href="{% if request.session.user_type == "Learner" %}{% url 'user:user_calendar' %}{% else %}{% url 'user:user_calendar_with_id' pk=request.session.dashbordId %}{% endif %}">
+                    <img class="sidebar-icon-img" src="{% static 'images/icon/Calender.png' %}">
+                    <span><strong>Calendar/Sessions</strong></span>
+                </a>
+            </li>
+            <li class="{% active 'content:browse_channel' %}">
+{#                <a href="{% url 'content:browse_channel' %}">#}
+{#                    <i class="fa fa-dashboard"></i> <span>Browse Journey</span>#}
+{#                </a>#}
+                <a href="{% if request.session.user_type == "Learner" %}{% url 'content:browse_channel' %}{% else %}{% url 'content:browse_channel_with_id' pk=request.session.dashbordId %}{% endif %}">
+                    <img class="sidebar-icon-img" src="{% static 'images/icon/Browse_Journey.png' %}">
+                    <span><strong>Browse Journey</strong></span>
+                </a>
+            </li>
+            <li class="{% active 'user:user_mentor_list' %}">
+{#                <a href="{% url 'user:user_mentor_list' %}">#}
+{#                    <i class="fa fa-comment-o"></i> <span>Mentor/Coaches</span>#}
+{#                </a>#}
+                <a href="{% if request.session.user_type == "Learner" %}{% url 'user:user_mentor_list' %}{% else %}{% url 'user:user_mentor_list_with_id' pk=request.session.dashbordId %}{% endif %}">
+                    <img class="sidebar-icon-img" src="{% static 'images/icon/Mentor.png' %}">
+                    <span><strong>Mentor/Coaches</strong></span>
+                </a>
+            </li>
+            <li class="{% active 'user:book_mentor_slots' %}">
+{#                <a href="{% url 'user:book_mentor_slots' %}">#}
+{#                    <i class="fa fa-comment-o"></i> <span>Book Mentor Sessions</span>#}
+{#                </a>#}
+                <a href="{% if request.session.user_type == "Learner" %}{% url 'user:book_mentor_slots' %}{% else %}{% url 'user:book_mentor_slots_with_id' pk=request.session.dashbordId %}{% endif %}">
+                    <img class="sidebar-icon-img" src="{% static 'images/icon/Book_mentor.png' %}">
+                    <span><strong>Book Mentor Sessions</strong></span>
+                </a>
+            </li>
+            <li class="">
+{#                <a href="{% url 'user:chat' %}">#}
+{#                    <i class="fa fa-dashboard"></i> #}
+{#                    <span>Chat</span> #}
+{#                </a>#}
+                 <a href="{% if request.session.user_type == "Learner" %}{% url 'user:chat' %}{% else %}{% url 'user:chat_with_id' pk=request.session.dashbordId %}{% endif %}">
+                    <img class="sidebar-icon-img" src="{% static 'images/icon/Chat.png' %}">
+                    <span><strong>Chat</strong></span>
+                </a>
+            </li>
+            <li class="">
+{#                <a href="{% url 'user:assign_survey_list' %}">#}
+{#                    <i class="fa fa-dashboard"></i> #}
+{#                    <span>Surveys Assigned</span> #}
+{#                </a>#}
+                <a href="{% if request.session.user_type == "Learner" %}{% url 'user:assign_survey_list' %}{% else %}{% url 'user:assign_survey_list_with_id' pk=request.session.dashbordId %}{% endif %}">
+                     <img class="sidebar-icon-img" src="{% static 'images/icon/Survey.png' %}">
+                    <span><strong>Surveys Assigned</strong></span>
+                </a>
+            </li>
+            <li class="{% active 'user:contact_program_team' %}">
+{#                <a href="{% url 'user:contact_program_team' %}">#}
+{#                    <i class="fa fa-comment-o"></i> <span>Contact Program Team</span>#}
+{#                </a>#}
+                <a href="{% url 'user:contact_program_team' %}">
+                    <img class="sidebar-icon-img" src="{% static 'images/icon/Contact_program_team.png' %}">
+                    <span><strong>Contact Program Team</strong></span>
+                </a>
+            </li>
+            <li class="header our_background_color"><strong>ALL JOINED JOURNEY</strong></li>
+            {% if request.session.user_type == "Learner" or request.session.user_type == "Mentor" %}
+
+                {% for channel in request.user.id|user_channel:request.session.company_id %}
+
+                    {% if channel.Channel.channel_type == "SkillDevelopment" %}
+                        <li class="treeview">
+                            <a href="#" style="font-size: 12px;">
+                                <i class="fa fa-circle-o"></i><span>{{ channel.Channel }} </span>
+                                <span class="pull-right-container" style="right: 0px;">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+                            </a>
+                            <ul class="treeview-menu">
+                                {% for sub_channel in channel.Channel.pk|sub_channel_with_pathway %}
+                                    <li>
+                                        <a href="{% url 'content:Channel_content' Channel=sub_channel.id %}"
+                                                {% if channel.is_removed %} class="disabled-link" {% endif %}
+                                           style="font-size: 12px; white-space: break-spaces;"><i
+                                                class="fa fa-chevron-right"></i>{{ sub_channel.title }}</a
+                                        >
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </li>
+                    {% elif channel.Channel.channel_type == "MentoringJourney" %}
+                        <li class="joined_channel">
+                            <a
+                                    href="{% url 'content:Channel_content_v2' Channel=channel.Channel.pk %}"
+                                    {% if channel.is_removed %} class="disabled-link" {% endif %}
+                                    style="font-size: 12px;">
+                                <i class="fa fa-circle-o"></i> <span style="white-space: initial;">{{ channel.Channel }} </span>
+                            </a>
+                        </li>
+                    {% else %}
+
+                        <li class="joined_channel">
+                            <a
+                                    href="{% url 'content:Channel_content' Channel=channel.Channel.pk %}"
+                                    {% if channel.is_removed %} class="disabled-link" {% endif %}
+                                    style="font-size: 12px;">
+                                <i class="fa fa-circle-o"></i> <span style="white-space: initial;">{{ channel.Channel }} </span>
+                            </a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+            {% if request.session.user_type == "Admin" or request.session.user_type == "ProgramManager" %}
+                   {% for channel in request.session.dashbordId|user_channel:request.session.company_id %}
+
+                    {% if channel.Channel.channel_type == "SkillDevelopment" %}
+                        <li class="treeview">
+                            <a href="#" style="font-size: 12px;">
+                                <i class="fa fa-circle-o"></i><span>{{ channel.Channel }} </span>
+                                <span class="pull-right-container" style="right: 0px;">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+                            </a>
+                            <ul class="treeview-menu">
+                                {% for sub_channel in channel.Channel.pk|sub_channel_with_pathway %}
+                                    <li>
+                                        <a href="{% url 'content:Channel_content' Channel=sub_channel.id %}"
+                                                {% if channel.is_removed %} class="disabled-link" {% endif %}
+                                           style="font-size: 12px; white-space: break-spaces;"><i
+                                                class="fa fa-chevron-right"></i>{{ sub_channel.title }}</a
+                                        >
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </li>
+                    {% elif channel.Channel.channel_type == "MentoringJourney" %}
+                        <li class="joined_channel">
+                            <a
+                                    href="{% url 'content:Channel_content_v2' Channel=channel.Channel.pk %}"
+                                    {% if channel.is_removed %} class="disabled-link" {% endif %}
+                                    style="font-size: 12px;">
+                                <i class="fa fa-circle-o"></i> <span style="white-space: initial;">{{ channel.Channel }} </span>
+                            </a>
+                        </li>
+                    {% else %}
+
+                        <li class="joined_channel">
+                            <a
+                                    href="{% url 'content:Channel_content' Channel=channel.Channel.pk %}"
+                                    {% if channel.is_removed %} class="disabled-link" {% endif %}
+                                    style="font-size: 12px;">
+                                <i class="fa fa-circle-o"></i> <span style="white-space: initial;">{{ channel.Channel }} </span>
+                            </a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+{#                {% for journey in journey_data %}#}
+{##}
+{##}
+{##}
+{#                    {% if journey.journey_type == "SkillDevelopment" %}#}
+{#                        <li class="treeview">#}
+{#                            <a href="#" style="font-size: 12px;">#}
+{#                                <i class="fa fa-circle-o"></i><span>{{ journey.name }}</span>#}
+{#                                <span class="pull-right-container" style="right: 0px;">#}
+{#              <i class="fa fa-angle-left pull-right"></i>#}
+{#            </span>#}
+{#                            </a>#}
+{##}
+{#                            <ul class="treeview-menu">#}
+{#                                {% for sub_channeli in journey.sub_channel %}#}
+{#                                     <li>#}
+{#                                        <a href="{% url 'content:Channel_content' Channel=sub_channeli.id %}"#}
+{#                                                ><i#}
+{#                                                class="fa fa-chevron-right"></i>{{ sub_channeli }}</a#}
+{#                                        >#}
+{#                                    </li>#}
+{#                                {% endfor %}#}
+{##}
+{#                            </ul>#}
+{#                            <ul class="treeview-menu">#}
+{#                                {% for sub_channel in channel.Channel.pk|sub_channel_with_pathway %}#}
+{#                                    <li>#}
+{#                                        <a href="{% url 'content:Channel_content' Channel=sub_channel.id %}"#}
+{#                                                {% if channel.is_removed %} class="disabled-link" {% endif %}#}
+{#                                           style="font-size: 12px; white-space: break-spaces;"><i#}
+{#                                                class="fa fa-chevron-right"></i>{{ sub_channel.title }}</a#}
+{#                                        >#}
+{#                                    </li>#}
+{#                                {% endfor %}#}
+{#                            </ul>#}
+{#                        </li>#}
+{#                    {% elif journey.journey_type == "MentoringJourney" %}#}
+{#                        {% for sub_channeli in journey.sub_channel %}#}
+{#                            <li class="joined_channel">#}
+{#                                <a href="{% url 'content:Channel_content_v2' Channel=sub_channeli.pk %}"#}
+{#                                ><i#}
+{#                                        class="fa fa-chevron-right"></i>{{ sub_channeli }}</a#}
+{#                                >#}
+{#                            </li>#}
+{#                        {% endfor %}#}
+{#                        <li class="joined_channel">#}
+{#                            <a#}
+{#                                    href="{% url 'content:Channel_content_v2' Channel=channel.Channel.pk %}"#}
+{#                                    {% if channel.is_removed %} class="disabled-link" {% endif %}#}
+{#                                    style="font-size: 12px;">#}
+{#                                <i class="fa fa-circle-o"></i> <span>{{ channel.Channel }} </span>#}
+{#                            </a>#}
+{#                        </li>#}
+{#                    {% else %}#}
+{##}
+{#                         {% for sub_channeli in journey.sub_channel %}#}
+{#                            <li class="joined_channel">#}
+{#                                <a href="{% url 'ccontent:Channel_content' Channel=sub_channeli.pk %}"#}
+{#                                ><i#}
+{#                                        class="fa fa-chevron-right"></i>{{ sub_channeli }}</a#}
+{#                                >#}
+{#                            </li>#}
+{#                        {% endfor %}#}
+{##}
+{#                        <li class="joined_channel">#}
+{#                            <a#}
+{#                                    href="{% url 'content:Channel_content' Channel=channel.Channel.pk %}"#}
+{#                                    {% if channel.is_removed %} class="disabled-link" {% endif %}#}
+{#                                    style="font-size: 12px;">#}
+{#                                <i class="fa fa-circle-o"></i> <span>{{ channel.Channel }} </span>#}
+{#                            </a>#}
+{#                        </li>#}
+{#                    {% endif %}#}
+{#                {% endfor %}#}
+            {% endif %}
+
+{#            {% endfor %}#}
+{#            {% endif %}#}
+
+
+        </ul>
+    </section>
+    <!-- /.sidebar -->
+</aside>

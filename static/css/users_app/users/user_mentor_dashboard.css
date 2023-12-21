@@ -1,0 +1,152 @@
+.compare-box {
+    margin-left: 3px;
+}
+
+.compare-box-text {
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.compare-box-number {
+    font-size: large;
+    margin-left: 50px;
+}
+
+.compare-box-icon {
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    text-align: center;
+    margin-top: 20px;
+    margin-left: 6px;
+}
+
+.compare-box-icon i {
+    margin-top: 13px;
+}
+
+.info-box {
+    border: 1px solid #F1F9FE;
+}
+
+.remaining-box {
+    box-shadow: 0px 2px 10px 0px rgba(0, 0, 0, 0.10) !important;
+    border-radius: 12px;
+}
+
+.dashboard-box{
+    border-top-left-radius: 10px !important;
+    border-top-right-radius: 10px !important;
+}
+.bg-gradient{
+    background: var(--gradient-flow, linear-gradient(152deg, #822ECC 0%, #008EFF 100%));
+    color: white;
+}
+.bg-navy{
+    background: var(--s-econdary-navy-blue, #212529);
+    color: white;
+}
+.col-md-4 {
+    padding-left: 15px;
+    padding-right: 0px;
+}
+
+.point-box-content {
+    background-color: #735cdf;
+}
+
+.point-box-text {
+    color: black;
+}
+
+.point-box-number {
+    color: black;
+}
+
+.point-box-content {
+    padding-left: 25px;
+    padding-top: 0px;
+    background-color: #f4f4f4;
+}
+
+.col-md-8 {
+    padding-left: 15px;
+    padding-right: 0px;
+}
+
+.tile-container {
+    position: relative;
+    border: solid #bdbdbd 0px;
+    margin: 5px 0px;
+    width: 100%;
+    font-size: 0;
+}
+
+.tile {
+    font-size: 20px;
+    width: 20%;
+    min-height: 22px;
+    border: 1px #bdbdbd solid;
+    display: inline-block;
+}
+
+.streak {
+    font-size: 13px;
+    width: 33%;
+    min-height: 22px;
+    border: 0px #bdbdbd solid;
+    display: inline-block;
+}
+
+.badges-text {
+    font-size: 13px;
+    padding-left: 8px;
+    padding-top: 4px;
+        font-weight: 700;
+}
+
+.box {
+    border-left: 0px solid #fc6600;
+}
+
+.bg-blue {
+    background-color: #3c8dbc;
+}
+
+.journey-list {
+    /*background-color: #3c8dbc;*/
+    padding: 8px;
+    margin: 5px;
+    width: 60%;
+    color: black;
+    display: inline-block;
+}
+
+.journey-list-progress {
+    height: 20px;
+    background-image: linear-gradient(to right, #3a9cea 50%, #a50bfd 100%);
+    border-radius: 0 59px 56px 0;
+
+}
+
+.my-point {
+    box-shadow: none;
+}
+
+.my-point-box {
+    display: flex;
+}
+
+.speedometer-img {
+    height: 82px;
+}
+
+.bg-green-gradient {
+    background: #822ECC !important;
+}
+
+img.img-card {
+    width: 20%;
+    margin: 10px;
+}

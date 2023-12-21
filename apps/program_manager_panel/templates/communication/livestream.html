@@ -1,0 +1,53 @@
+<div class="box">
+          <div class="box-header">
+            <h3 class="box-title">LiveStream List</h3>
+            <a href="{% url 'user:create_meet' %}"><button class="btn btn-primary pull-right">Create LiveStream</button></a>                         
+          </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+              {% include 'component/error_message.html' %}
+                  <table id="live-stream-table" class="table table-bordered table-hover">
+
+                    <thead>
+                      <tr>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>URL Link</th>
+                        <th>Speaker</th>
+                        <th>Start time</th>                  
+                        <th>Status</th>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr v-for="meet in liveStream_list">
+                          <td>[[meet.title]]</td>
+                          <td>[[meet.description]]</td>
+                          <td><a :href="meet.custom_url" target="_blank">click to enter</a></td>
+                          <td>[[meet.speaker_name]]</td>
+                          <td>[[meet.start_time]]</td>
+                          <td v-if="meet.is_active"><kbd>Active</kbd></td>
+                          <td v-else><kbd>InActive</kbd></td>
+                          <td>
+                            <div class="dropdown">
+                              <button class="btn bg-purple dropdown-toggle btn-select-option" type="button" data-toggle="dropdown" aria-expanded="true">Select an option                                            <span class="caret"></span>
+                              </button>
+                              <ul class="dropdown-menu options-dropdown">
+                                  <li>
+                                      <a :href="'/edit-meet/'+meet.id"><i class="fa fa-pencil option-icon"></i>Edit</a>
+                                  </li>
+                                  <!-- <li>
+                                    <a :href="'/meeting-details/'+meet.id"><i class="fa fa-book option-icon"></i>Detail</a>
+                                </li> -->
+                            </ul>
+                          </div>
+                          </td>
+                        </tr>
+                    </tbody>
+                  </table>
+            </div>
+             <!-- /.box-body -->
+           </div>
+           <!-- /.box -->
+ 

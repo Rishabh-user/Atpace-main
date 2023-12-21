@@ -1,0 +1,109 @@
+<div class="box">
+        <div class="box-header">
+          <div class="col-sm-12">
+            <h3 class="box-title">Change Pool Allocation</h3>
+          </div>
+          <br>
+          <br>
+          <form @submit.prevent="onPoolAllocationMultiple">
+            <div class="row">
+                <div class="col-md-12">
+                  <div class="form-group">
+                    <label>Select Pool</label>
+                    <select class="form-control select2" name="select_pool" required style="width: 100%;" ref="select_pool">
+                      <option
+                        v-bind:value="pool.id"
+                        v-for="(pool, index) in pool_setup_list"
+                        :key="index"
+                      >
+                        [[pool.name]] 
+                      </option>
+                    </select>
+                  </div>
+                </div>
+                <div class="col-md-12">
+                  <div class="form-group">
+                    <input type="submit" class="btn btn-primary" value="Add Multiple" id="multi_add_btn">
+                  </div>
+                </div>
+                <!-- /.col -->
+              </div>
+              <!-- /.row -->
+          </form>
+        </div>
+      </div>
+      <div class="box">
+        
+        <!-- /.box-header -->
+      
+        <form>  
+          <div class="box-body">
+            <table id="pool-allocation-table" class="table table-bordered table-hover">
+              <thead>
+              <tr>
+                <th></th>
+                <th>Full Name</th>
+                <th>Username</th> 
+                <th>Status</th>
+                <th>Pool</th>
+                <th>Action</th>
+            </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(pool, index) in pool_allocation_list" :key="index" > 
+                  <td><input class="checkbox" type="checkbox" name="id" :value="pool.mentor_id" :ref="'mentor_checkbox_'+index"></td>   
+                  <td>[[pool.mentor_name]]</td>
+                  <td>[[pool.mentor_username]]</td>  
+                  <td>
+                      <kbd v-if="pool.status">Active</kbd>
+                      <kbd v-else >InActive</kbd>
+                  </td>
+                  <td>
+                    <div v-for="(pool_name, index) in pool.pools" :key="index">
+                      <kbd>[[pool_name.pool_name]]</kbd>
+                    </div>
+                  </td>
+                  <td>
+                  <div class="dropdown">    
+                      <button type="button" class="btn bg-purple update_btn" data-toggle="modal" data-target="#exampleModalCenter" @click="updateMentorPool(pool.mentor_id, pool.mentor_name, pool.pools)">
+                        Update
+                      </button> 
+                  </div>
+                  </td>
+                </tr>
+            </table>
+          </div>
+          
+        </form>
+        <!-- /.box-body -->
+      </div>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="md-col-11 modal-title" id="exampleModalLongTitle">Update Pool</h3>
+      </div>
+      <div class="modal-body">
+        <form>  
+          <input type="hidden" name="username" id="mentor_id" v-model="mentor_id">
+          <div class="col-sm-12">
+            <span class="col-sm-9"><h4><strong>Mentor : </strong> <input type="text" v-model="mentor_name" readonly style="border: 0px solid;"> </h4></span>
+          </div>
+          <div class="col-sm-12">
+            <span class="col-sm-12"><h4><strong>Pools</strong></h4></span><br>
+              <span class="col-sm-12" v-for="(pool, index) in pool_setup_list" :key="index">
+                <input :value="pool.id" :ref="'chkbox_'+pool.id" class="pool_chkbox" name="pool_records" type="checkbox" :id="'tochkbox_'+pool.id"><label :for="'tochkbox_'+pool.id" style="margin-left:10px;">[[pool.name]]</label>
+              </span> 
+          </div>  
+            
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" @click="onUpdateMentorPool()" class="btn btn-primary">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>

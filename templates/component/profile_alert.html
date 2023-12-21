@@ -1,0 +1,15 @@
+{% load tags %}
+{% if request.session.user_type == "Learner" or request.session.user_type == "Mentor" %}
+    {% if request.user|user_profile_assessment == 0 %}
+        <div class="callout callout-danger lead">
+            <h4>Profile Alert!</h4>
+            <p>Complete Your Profile <a href="{% url 'user:profile_assessment' pk=request.user.id %}">Click Here</a></p>
+        </div>
+    {% endif %}
+{% endif %}
+{% if request.session.user_type == "Admin" or request.session.user_type == "ProgramManager" %}
+    <div>
+
+    </div>
+
+{% endif %}

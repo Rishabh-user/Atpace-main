@@ -1,0 +1,85 @@
+<div class="box">
+        <div class="box-header with-border">
+          <h3 class="box-title">Create Tags</h3>
+
+        </div>
+        <div class="box-body">
+          <form @submit.prevent="onCreateTags">
+            <div class="row">
+                    <div class="col-md-12">
+                      <div class="form-group">
+                        <label>Name</label>
+                        <input
+                          name="name"
+                          type="text"
+                          id="name"
+                          v-model="name"
+                          class="form-control"
+                          required
+                        />
+                      </div>
+                      <!-- /.form-group -->
+                      <div class="form-group">
+                        <label>Color</label>
+                        <input
+                          name="color"
+                          type="color"
+                          id="color"
+                          v-model="color"
+                          class="form-control"
+                          required
+                          value="#423282"
+                        />
+                      </div>
+                      <!-- /.form-group -->
+                      <div class="form-group">
+                        <input
+                        name="is_active"
+                        type="checkbox"
+                        value="true"
+                        id="is_active"
+                        v-model="is_active"
+                        checked
+                      />
+                      is active
+                      <label for="is_active" class="label-default"></label>
+                      </div>
+                      <!-- /.form-group -->
+                    </div>
+                    <!-- /.col -->
+                    <button type="submit" class="btn btn-primary">Create</button>
+                  </div>
+                  <!-- /.row -->
+        </form>
+  
+        </div>
+      </div>
+      <!-- /.box -->
+      <div class="box">
+        <div class="box-header">
+          <h3 class="box-title">Tags List</h3>
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body">
+          <table id="tag-table" class="table table-bordered table-hover">
+            <thead>
+             <tr>
+               <th>SNo.</th>
+               <th>Tags</th>
+               <th>Active</th>
+               
+             </tr>
+            </thead>
+            <tbody>
+             <tr v-for="(tag, index) in tag_list" :key="tag.id">
+               <td>[[index+1]]</td>
+               <td>[[tag.name]]</td>
+               <td class="capitalize">[[tag.is_active]]</td>
+               
+             </tr>
+            </tfoot>
+          </table>
+        </div>
+        <!-- /.box-body -->
+      </div>
+  

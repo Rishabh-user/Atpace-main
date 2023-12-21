@@ -1,0 +1,248 @@
+{% extends 'base.html' %} {% load static %}
+{% block title %} Goals {% endblock %}
+<!-- DataTables -->
+{% block css %}
+<link rel="stylesheet" href="{% static 'bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css' %}">
+<style>
+
+</style>
+{% endblock css %} 
+{% block content %}
+
+
+<div class="content-wrapper">
+  <section class="content-header">
+    <h1>
+      Goals
+    </h1>
+    <ol class="breadcrumb">
+      <li><a href="#"><i class="fa fa-dashboard"></i>Goals</a></li>
+      <li class="active">System Goals</li>
+    </ol>
+  </section>
+
+  <section class="content">
+    <div class="row">
+       <div class="col-xs-12">
+           <div class="box">
+             <div class="box-header">
+               <h3 class="box-title">Goals</h3>
+               <a href="{% url 'leaderboard:create_system_goal' %}">
+                <button class="btn btn-primary pull-right">Create Goals</button>
+               </a>
+             </div>
+             <!-- /.box-header -->
+             <div class="box-body">
+               <table id="example2" class="table table-bordered table-hover">
+                 <thead>
+                 <tr>
+                  <tr>
+                    <th>Heading</th>
+                    <th>Description</th>
+                    <th>Last Update</th>
+                    <th>Action</th>
+                  </tr>
+                   
+                 </tr>
+                 </thead>
+                 <tbody>
+                   {% for content in goals %}
+                   <tr>
+                    <td>{{content.heading}}</td>
+                    <td>{{content.description}}</td>
+                    <td>{{content.updated_at}}</td>
+                    <td>
+                      <div class="dropdown">
+                        <button class="btn bg-purple dropdown-toggle btn-select-option" type="button" data-toggle="dropdown" aria-expanded="true">Select an option                                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu options-dropdown">
+                            <li>
+                                <a href=""><i class="fa fa-edit option-icon"></i>Edit</a>
+                            </li>
+                            <li>
+                                <a href=""><i class="fa fa-eye option-icon"></i>View</a>
+                            </li>
+                            
+                            <li >
+                                <a href="javascript:void(0)"  class="delete_goal" ><i class="fa fa-trash option-icon"></i>Delete</a>
+                            </li>
+                        </ul>
+                        <button data-toggle="modal" data-target="#modal-default"  data-id={{content.id}} class="btn btn-primary" >Assign to journey</button>
+
+                    </div>
+                    </td>
+                   </tr>
+                   {% endfor %}
+                 </tfoot>
+               </table>
+             </div>
+             <!-- /.box-body -->
+           </div>
+           <!-- /.box -->
+ 
+          
+         </div>
+       <!-- /.col -->
+    </div>
+    <!-- /.row -->
+ </section>
+
+<div class="modal fade" id="modal-default" style="display: none;">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <form id="Content_form">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">×</span></button>
+              <h4 class="modal-title">Assign Content</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Select Journey</label>
+                    <select class="form-control select2" id="channel" required style="width: 100%;">
+
+                      <option selected="selected" value="">Select Journey</option>
+                      {% for channel in channel %}
+                        <option value="{{channel.pk}}">{{channel.title}}</option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                  <div id="sub_channel_div"></div>
+                 
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+              <button type="submit" id="sumbitContent" class="btn btn-primary">Save changes</button>
+            </div>
+          </form>
+          </div>
+          <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+      </div>
+</div>
+{% endblock content %} 
+{% block js %}
+<script src="{% static 'bower_components/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
+<script>
+var goal_id
+$('#modal-default').on('show.bs.modal', function (e) {
+    goal_id = $(e.relatedTarget).attr('data-id');
+});
+$("#Content_form").submit(function (event) {
+    sub_channel = $("#sub_channel").val();
+    if(sub_channel === undefined){
+      sub_channel = null
+    }
+    channel = $("#channel").val();
+    console.log("goal id",goal_id)
+    var formData = {
+      channel: channel,
+      content : sub_channel,
+      goal_id : goal_id,
+      csrfmiddlewaretoken:"{{csrf_token}}"
+    };
+    console.log(formData);
+    $.ajax({
+      type: "POST",
+      url: '{% url "leaderboard:assign_journey_to_goal" %}',
+      data: formData,
+      encode: true,
+    }).done(function (data) {
+      bootbox.alert({
+          message: data,
+          callback: function () {
+              //location.reload()
+          }
+      })
+    });
+
+    event.preventDefault();
+});
+$(document).ready(function () {
+
+$("#channel").change(function(){
+    console.log("on change")
+    var formData = {
+      channel: $("#channel").val(),
+      csrfmiddlewaretoken:"{{csrf_token}}"
+    };
+    $.ajax({
+      type: "POST",
+      url: '{% url "leaderboard:journey_content" %}',
+      data: formData,
+      encode: true,
+    }).done(function (data) {
+      
+      $("#sub_channel_div").empty();
+      console.log("data",data)
+      if(data.length > 0){
+
+          $("#sub_channel_div").html(' <div class="form-group"><label>Select Content</label><select  multiple="multiple" class="form-control select2" id="sub_channel" required style="width: 100%;"></select></div>')
+          // console.log(data);
+          $.each(data,function(key, value)
+                { 
+                    $("#sub_channel").append('<option value=' + value['id'] + '>' + value['title'] + '</option>');
+                });
+          } else {
+            //selectChannelGroup(formData);
+      }
+    });
+    
+
+    event.preventDefault();
+});
+});
+$(function () {
+  $(".delete_goal").click(function(){
+    var id = $(this).parents("tr").attr("id");
+    bootbox.confirm({
+    message: "Are you sure to remove this record ?",
+    buttons: {
+        confirm: {
+            label: 'Yes',
+            className: 'btn-success'
+        },
+        cancel: {
+            label: 'No',
+            className: 'btn-danger'
+        }
+    },
+    callback: function (result) {
+        if(result == true){
+          $.ajax({
+               url:  "{% url 'leaderboard:delete_system_goal' %}",
+               type: 'post',
+               data: {pk: id, csrfmiddlewaretoken : "{{csrf_token}}" },
+               error: function() {
+                bootbox.alert('Something is wrong');
+               },
+               success: function(data) {
+                    $("#"+id).remove();
+                    bootbox.alert("Record removed successfully");  
+               }
+            });
+        }
+    }
+});
+});
+});
+
+$(function () {
+  
+ 
+  $('#example2').DataTable({
+    "dom": '<"table-pull-left"f><"table-pull-right"l>tip',
+    'paging'      : true,
+    'lengthChange': true,
+    'searching'   : true,
+    'ordering'    : true,
+    'info'        : true,
+    'autoWidth'   : true,
+    'scrollX'     : true
+    
+  })
+})
+</script>
+{% endblock js %}

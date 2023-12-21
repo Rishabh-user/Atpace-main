@@ -1,0 +1,83 @@
+<div class="box">
+             <div class="box-header">
+               <h3 class="box-title">Survey List</h3>
+               <a href="{%url 'survey:create-survey' %}"><button class="btn btn-primary pull-right">Create Survey</button></a>
+               
+             </div>
+            
+             <div class="box-body">
+                  <table id="survey-table" class="table table-bordered table-hover">
+                    <thead>
+                      <tr>
+                        <th>SNo.</th>
+                        <th>Survey Name</th>
+                        <th>Is Active</th>
+                        <th>Add Question</th>
+                        {% comment %} <th>Add To Journey</th> {% endcomment %}
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                      <tbody>
+                        <tr v-for="(survey, index) in survey_list" :key="survey.id">
+                          <td>[[index+1]]</td>
+                          <td>[[survey.name]]</td>
+                          <td><kbd class="capitalize">[[survey.is_active]]</kbd></td>
+                          <td><a :href="'/survey/add-question/'+survey.id"> <button class="btn btn-primary"> Add Questions</button></a></td>
+                          {% comment %} <td> <button class="btn btn-primary" data-toggle="modal" data-target="#modal-default"> Add To Journey</button></td> {% endcomment %}
+                          <td>
+                            <div class="dropdown">
+                                <button class="btn bg-purple dropdown-toggle btn-select-option" type="button" data-toggle="dropdown" aria-expanded="true">Select an option                                            <span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu options-dropdown">
+                                    <li>
+                                        <a :href="'/survey/edit/'+survey.id"><i class="fa fa-edit option-icon"></i>Edit</a>
+                                    </li>
+                                    <li>
+                                        <a :href="'/survey/user/?survey_id='+survey.id"><i class="fa fa-eye option-icon"></i>User Response</a>
+                                    </li>
+                                    <li>
+                                      <a data-target="#modal-survey" data-toggle="modal" @click="getSurveyId(survey.id)"><i class="fa fa-save option-icon"></i>Save as</a>
+                                    </li>
+                                </ul>
+                            </div>
+                          </td>
+                        </tr>
+                      </tbody>
+                  </table>
+             </div>
+             <!-- /.box-body -->
+           </div>
+           <div class="modal fade" id="modal-default" style="display: none;">
+            <div class="modal-dialog">
+              <form action="{% url 'survey:addsurvey_to_channel' %}" method="POST">
+                {% csrf_token %}
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span></button>
+                  <h4 class="modal-title">Add Journey To Survey</h4>
+                </div>
+                <div class="modal-body">
+                  <input type="hidden" value="" name="survey_id" required id="survey_id">
+                  <div class="form-group">
+                    <label>Select Journey </label>
+                    <select class="form-control select2" id="channel"  name="channel" required style="width: 100%;">
+
+                      <option selected="selected">Select Journey</option>
+                      {% comment %} {% for channel in request.user|get_user_channel %} {% endcomment %}
+                        {% comment %} <option value="{{channel.pk}}">{{channel.title}}</option> {% endcomment %}
+                      {% comment %} {% endfor %} {% endcomment %}
+                    </select>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+                  <button type="submit" class="btn btn-primary pull-right">Save changes</button>
+                </div>
+              </div>
+            </form>
+              <!-- /.modal-content -->
+            </div>
+            <!-- /.modal-dialog -->
+          </div>
+ 
